@@ -95,6 +95,11 @@ check_PROGRAMS += test_time_solver_trotter3
 test_time_solver_trotter3_SOURCES = test_time_solver_trotter3.cc
 test_time_solver_trotter3_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
+TESTS += test_time_solver_arnoldi
+check_PROGRAMS += test_time_solver_arnoldi
+test_time_solver_arnoldi_SOURCES = test_time_solver_arnoldi.cc
+test_time_solver_arnoldi_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
+
 noinst_LIBRARIES += libtestmain.a
 libtestmain_a_SOURCES = test_main.cc \
 	 random_unitary_d.cc random_unitary_z.cc random_permutation.cc
