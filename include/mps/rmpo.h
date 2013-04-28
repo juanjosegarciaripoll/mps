@@ -30,6 +30,8 @@ namespace mps {
   /**Real matrix product structure.*/
   class RMPO : public MP<tensor::RTensor> {
   public:
+    typedef RMPS MPS;
+
     RMPO(index size, index physical_dimension);
     RMPO(const tensor::Indices &physical_dimension);
     RMPO(const Hamiltonian &H, double t = 0.0);

@@ -51,9 +51,22 @@ namespace mps {
       std::cerr << "In add_local_term(MPO, Tensor, index), the dimensions of the tensor do not match those of the MPO.\n";
       abort();
     }
-    Pi.at(range(0),range(),range(),range(1)) =
-      Tensor(Pi(range(0),range(),range(),range(1))) +
-      reshape(Hloc, 1, Hloc.rows(), Hloc.columns(), 1);
+    if (Pi.dimension(0) == 1) {
+      /* First */
+      Pi.at(range(0),range(),range(),range(1)) =
+        Tensor(Pi(range(0),range(),range(),range(1))) +
+        reshape(Hloc, 1, d, d, 1);
+    } else if (Pi.dimension(3) == 1) {
+      /* Last */
+      Pi.at(range(0),range(),range(),range(0)) =
+        Tensor(Pi(range(0),range(),range(),range(0))) +
+        reshape(Hloc, 1, d, d, 1);
+    } else {
+      /* Middle */
+      Pi.at(range(0),range(),range(),range(1)) =
+        Tensor(Pi(range(0),range(),range(),range(1))) +
+        reshape(Hloc, 1, d, d, 1);
+    }
     mpo.at(i) = Pi;
   }
 

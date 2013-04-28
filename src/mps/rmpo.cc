@@ -45,21 +45,25 @@ namespace mps {
       std::cerr << "Cannot create MPO with size 0 or 1.\n";
       abort();
     }
+    elt_t P;
     for (index i = 0; i < size(); i++) {
       index d = physical_dimensions[i];
-      if (i == 0) { /* first */
-        at(i) = elt_t::zeros(1,d,d,2);
-      } else if (i+1 < size()) { /* last */
-        elt_t P = elt_t::zeros(2,d,d,2);
-        P.at(range(1),range(),range(),range(1)) =
-          reshape(elt_t::eye(d,d), 1,d,d,1);
-        at(i) = P;
-      } else { /* otherwise */
-        elt_t P = elt_t::zeros(2,d,d,1);
-        P.at(range(1),range(),range(),range(0)) =
-          reshape(elt_t::eye(d,d), 1,d,d,1);
-        at(i) = P;
+      elt_t Id = reshape(elt_t::eye(d,d), 1,d,d,1);
+      if (i == 0) {
+        /* first */
+        P = elt_t::zeros(1,d,d,2);
+        P.at(range(0),range(),range(),range(0)) = Id;
+      } else if (i+1 < size()) {
+        /* last */
+        P = elt_t::zeros(2,d,d,2);
+        P.at(range(1),range(),range(),range(1)) = Id;
+        P.at(range(0),range(),range(),range(0)) = Id;
+      } else {
+        /* otherwise */
+        P = elt_t::zeros(2,d,d,1);
+        P.at(range(1),range(),range(),range(0)) = Id;
       }
+      at(i) = P;
     }
   }
 
