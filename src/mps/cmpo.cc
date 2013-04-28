@@ -28,6 +28,10 @@ namespace mps {
 
   CMPO::CMPO(index length, index physical_dimension)
   {
+    if (length < 2) {
+      std::cerr << "Cannot create MPO with size 0 or 1.\n";
+      abort();
+    }
     tensor::Indices dims(length);
     std::fill(dims.begin(), dims.end(), physical_dimension);
     *this = CMPO(dims);
@@ -36,6 +40,10 @@ namespace mps {
   CMPO::CMPO(const tensor::Indices &physical_dimensions) :
     parent(physical_dimensions.size())
   {
+    if (physical_dimensions.size() < 2) {
+      std::cerr << "Cannot create MPO with size 0 or 1.\n";
+      abort();
+    }
     for (index i = 0; i < size(); i++) {
       index d = physical_dimensions[i];
       if (i == 0) { /* first */
