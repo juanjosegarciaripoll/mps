@@ -17,23 +17,18 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <cassert>
-#include <mps/mpo.h>
+#include "mpo_add_term.cc"
 
 namespace mps {
 
-  CMPO::CMPO(const Hamiltonian &H, double t) :
-    parent(H.size())
+  void add_local_term(CMPO &mpo, const CTensor &Hloc, index i)
   {
-    for (index i = 0; i < size(); i++) {
-      add_local_term(*this, H.local_term(i,t), i);
-    }
-    for (index i = 0; i < size(); i++) {
-      for (index j = 0; j < H.interaction_depth(i, t); j++) {
-        add_interaction(*this, H.interaction_left(i, t), i,
-                        H.interaction_right(i, t));
-      }
-    }
+    do_add_local_term(mpo, Hloc, i);
+  }
+
+  void add_interaction(CMPO &mpo, const CTensor &Hi, index i, const CTensor &Hj)
+  {
+    do_add_interaction(mpo, Hi, i, Hj);
   }
 
 } // namespace mps

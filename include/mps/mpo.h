@@ -28,17 +28,17 @@ namespace mps {
 
   using namespace tensor;
 
-  void add_local_term(RMPO &mpdo, const RTensor &Hloc);
+  void add_local_term(RMPO &mpdo, const RTensor &Hloc, index k);
 
-  void add_interaction(RMPO &mpdo, const RTensor &Hi, const RTensor &Hj);
+  void add_interaction(RMPO &mpdo, const RTensor &Hi, index i, const RTensor &Hj);
 
-  void add_local_term(CMPO &mpdo, const CTensor &Hloc);
+  void add_local_term(CMPO &mpdo, const CTensor &Hloc, index i);
 
-  void add_interaction(CMPO &mpdo, const CTensor &Hi, const CTensor &Hj);
+  void add_interaction(CMPO &mpdo, const CTensor &Hi, index i, const CTensor &Hj);
 
-  RMPS apply(const RMPO &mpdo, const RMPS &state);
+  const RMPS apply(const RMPO &mpdo, const RMPS &state);
 
-  CMPS apply(const CMPO &mpdo, const CMPS &state);
+  const CMPS apply(const CMPO &mpdo, const CMPS &state);
 
   double expected(const RMPS &bra, const RMPO &op, const RMPS &ket);
 

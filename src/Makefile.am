@@ -102,6 +102,8 @@ libmps_la_SOURCES = \
 	mps/rmpo.cc \
 	mps/rmpo_from_hamiltonian.cc \
 	mps/cmpo_from_hamiltonian.cc \
+	mps/mpo_add_term_d.cc \
+	mps/mpo_add_term_z.cc \
 	mps/mpo_apply_d.cc \
 	mps/mpo_apply_z.cc \
 	mps/mpo_expected_d.cc \

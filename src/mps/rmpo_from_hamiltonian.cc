@@ -35,11 +35,11 @@ namespace mps {
     parent(H.size())
   {
     for (index i = 0; i < size(); i++) {
-      at(i) = safe_real(H.local_term(i, t));
+      add_local_term(*this, safe_real(H.local_term(i,t)), i);
     }
     for (index i = 0; i < size(); i++) {
       for (index j = 0; j < H.interaction_depth(i, t); j++) {
-        add_interaction(*this, safe_real(H.interaction_left(i, t)),
+        add_interaction(*this, safe_real(H.interaction_left(i, t)), i,
                         safe_real(H.interaction_right(i, t)));
       }
     }
