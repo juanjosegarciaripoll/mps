@@ -91,7 +91,7 @@ test_time_solver_SOURCES = test_time_solver.cc
 test_time_solver_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
 
 noinst_LIBRARIES += libtestmain.a
-libtestmain_a_SOURCES = test_main.cc alloc_informer.cc \
+libtestmain_a_SOURCES = test_main.cc \
 	 random_unitary_d.cc random_unitary_z.cc random_permutation.cc
 
 #
