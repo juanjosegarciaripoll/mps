@@ -23,47 +23,52 @@ AM_TESTS_FD_REDIRECT = --gtest_death_test_style=threadsafe
 TESTS += test_quantum_spin
 check_PROGRAMS += test_quantum_spin
 test_quantum_spin_SOURCES = test_quantum_spin.cc
-test_quantum_spin_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_quantum_spin_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_quantum_fock
 check_PROGRAMS += test_quantum_fock
 test_quantum_fock_SOURCES = test_quantum_fock.cc
-test_quantum_fock_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_quantum_fock_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_mps_mps
 check_PROGRAMS += test_mps_mps
 test_mps_mps_SOURCES = test_mps_mps.cc
-test_mps_mps_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_mps_mps_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_mps_norm
 check_PROGRAMS += test_mps_norm
 test_mps_norm_SOURCES = test_mps_norm.cc
-test_mps_norm_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_mps_norm_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_mps_expected
 check_PROGRAMS += test_mps_expected
 test_mps_expected_SOURCES = test_mps_expected.cc
-test_mps_expected_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_mps_expected_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_mps_correlation
 check_PROGRAMS += test_mps_correlation
 test_mps_correlation_SOURCES = test_mps_correlation.cc
-test_mps_correlation_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_mps_correlation_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_mps_canonical
 check_PROGRAMS += test_mps_canonical
 test_mps_canonical_SOURCES = test_mps_canonical.cc
-test_mps_canonical_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_mps_canonical_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_mps_simplify
 check_PROGRAMS += test_mps_simplify
 test_mps_simplify_SOURCES = test_mps_simplify.cc
-test_mps_simplify_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_mps_simplify_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_mps_simplify_many
 check_PROGRAMS += test_mps_simplify_many
 test_mps_simplify_many_SOURCES = test_mps_simplify_many.cc
-test_mps_simplify_many_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_mps_simplify_many_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
+
+TESTS += test_mpo_base
+check_PROGRAMS += test_mpo_base
+test_mpo_base_SOURCES = test_mpo_base.cc
+test_mpo_base_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_itebd_base
 check_PROGRAMS += test_itebd_base
