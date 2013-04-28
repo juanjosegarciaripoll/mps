@@ -1,0 +1,13 @@
+// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
+/*!\mainpage MPS Library Documentation
+
+MPS is a library for simulating complex quantum systems in one dimensions,
+using the tools of Density Matrix Renormalization Group (DMRG), Matrix
+Product States (MPS), Time Evolve Block Decimation (TEBD) algorithms and
+similar stuff.
+
+MPS relies on the library Tensor for its data structures and provides a
+very comprehensive set of tools for computing ground states, time evolution,
+correlations, density matrices, entanglement, etc.
+
+*/
