@@ -68,27 +68,32 @@ test_mps_simplify_many_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.l
 TESTS += test_itebd_base
 check_PROGRAMS += test_itebd_base
 test_itebd_base_SOURCES = test_itebd_base.cc
-test_itebd_base_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_itebd_base_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_itebd_expected
 check_PROGRAMS += test_itebd_expected
 test_itebd_expected_SOURCES = test_itebd_expected.cc
-test_itebd_expected_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_itebd_expected_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_itebd_expected_slow
 check_PROGRAMS += test_itebd_expected_slow
 test_itebd_expected_slow_SOURCES = test_itebd_expected_slow.cc
-test_itebd_expected_slow_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_itebd_expected_slow_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 TESTS += test_itebd_itime
 check_PROGRAMS += test_itebd_itime
 test_itebd_itime_SOURCES = test_itebd_itime.cc
-test_itebd_itime_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+test_itebd_itime_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
-TESTS += test_time_solver
-check_PROGRAMS += test_time_solver
-test_time_solver_SOURCES = test_time_solver.cc
-test_time_solver_LDADD = libtestmain.a ../src/libmps.la ../src/libtensor.la $(GTEST_LDFLAGS) #-lstdc++
+TESTS += test_time_solver_trotter2
+check_PROGRAMS += test_time_solver_trotter2
+test_time_solver_trotter2_SOURCES = test_time_solver_trotter2.cc
+test_time_solver_trotter2_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
+
+TESTS += test_time_solver_trotter3
+check_PROGRAMS += test_time_solver_trotter3
+test_time_solver_trotter3_SOURCES = test_time_solver_trotter3.cc
+test_time_solver_trotter3_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
 noinst_LIBRARIES += libtestmain.a
 libtestmain_a_SOURCES = test_main.cc \

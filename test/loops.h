@@ -120,11 +120,21 @@ namespace tensor_test {
   /*
    * Test over integers.
    */
+  template<typename F>
   inline void
-  test_over_integers(int min, int max, void test(int))
+  test_over_integers(int min, int max, F test)
   {
     for (; min <= max; min++) {
       test(min);
+    }
+  }
+
+  template<typename F, typename A>
+  inline void
+  test_over_integers(int min, int max, F test, A args)
+  {
+    for (; min <= max; min++) {
+      test(min, args);
     }
   }
 
