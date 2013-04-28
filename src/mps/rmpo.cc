@@ -22,8 +22,6 @@
 
 namespace mps {
 
-  template class MP<tensor::RTensor>;
-
   RMPO::RMPO() :
     parent()
   {

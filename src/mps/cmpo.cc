@@ -22,8 +22,6 @@
 
 namespace mps {
 
-  template class MP<tensor::CTensor>;
-
   CMPO::CMPO() :
     parent()
   {
