@@ -1,12 +1,34 @@
 DESCRIPTION
 ===========
 
-To be done.
+A library with numerical algorithms for studying one-dimensional quantum
+many-body systems. Among the things you will find here:
+
+* Simple tools for exact diagonalizations.
+
+* Tensor network representations
+  - Matrix Product States ansatz for states in finite lattices.
+  - iTEBD ansatz for translationally invariant states
+  - Matrix Product Operator representation for 1D Hamiltonians
+  - Computation of expectation values, correlations and more using
+    all these ansatz.
+
+* Computation of ground states and excited states using
+  - Matrix Product States
+  - Density Matrix Renormalization Group
+  - Translationally invariant infinite-dimensional systems (iTEBD)
+
+* Time evolution of quantum many body systems using
+  - Trotter algorithms
+  - Arnoldi methods
 
 BUILD AND INSTALL
 =================
 
 Follow these steps to prepare, configure, build and install this library:
+
+0) Download the Tensor library (https://github.com/juanjosegarciaripoll/tensor)
+   and install it. Make sure tensor-config is available in the path afterwards.
 
 1) If you have checked out the library using a version control system (git) then
    several files have to be rebuilt before moving any further. Open a terminal
