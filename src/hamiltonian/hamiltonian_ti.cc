@@ -33,17 +33,21 @@ namespace mps {
 			       bool periodic) :
     size_(N), H12_(H12), H1_(H1), periodic_(periodic)
   {
-    if (H12.is_empty()) {
-      std::cerr << "In TIHamiltonian::get_interaction_H(). You forgot to set the value of\n"
-		<< "the interaction Hamiltonian.";
-      abort();
-    }
     if (H1.is_empty()) {
-      std::cerr << "In TIHamiltonian::get_interaction_H(). You forgot to set the value of\n"
-		<< "the local Hamiltonian.";
-      abort();
+      if (H12.is_empty()) {
+        std::cerr << "In TIHamiltonian(). You have to provide at least a local term or an interaction.\n";
+        abort();
+      } else {
+        index d = round(sqrt(H12.rows()));
+        H1_ = RTensor::zeros(d,d);
+      }
     }
-    split_interaction(H12_, &H12_left_, &H12_right_);
+    if (H12.is_empty()) {
+      index d = H1_.rows();
+      H12_ = RTensor::zeros(d*d, d*d);
+    } else if (norm2(H12)) {
+      split_interaction(H12_, &H12_left_, &H12_right_);
+    }
   }
 
   const Hamiltonian *

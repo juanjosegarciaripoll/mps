@@ -108,6 +108,7 @@ namespace mps {
     virtual const CTensor interaction_right(index k, index n, double t) const;
     virtual index interaction_depth(index k, double t = 0.0) const;
     virtual const CTensor local_term(index k, double t) const;
+    virtual index dimension(index k) const;
 
   private:
 
@@ -115,6 +116,7 @@ namespace mps {
 
     std::vector<CTensor> H12_, H1_;
     std::vector<std::vector<CTensor> > H12_left_, H12_right_;
+    Indices dimensions_;
     bool periodic_;
   };
 

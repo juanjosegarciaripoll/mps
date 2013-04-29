@@ -28,7 +28,9 @@ namespace mps {
   /** Create the ConstantHamiltonian, reserving space for the local
       terms and interactions.*/
   ConstantHamiltonian::ConstantHamiltonian(index N, bool periodic) :
-    H12_(N), H12_left_(N), H12_right_(N), H1_(N), periodic_(periodic)
+    H12_(N), H12_left_(N, std::vector<CTensor>(0)),
+    H12_right_(N, std::vector<CTensor>(0)),
+    H1_(N), periodic_(periodic), dimensions_(N)
   {
   }
 
@@ -59,7 +61,14 @@ namespace mps {
   const CTensor
   ConstantHamiltonian::interaction(index k, double t) const
   {
-    return H12_[k];
+    const CTensor &H = H12_[k];
+    if (H.is_empty()) {
+      index d1 = dimension(k);
+      index d2 = dimension(k+1);
+      return RTensor::zeros(d1*d2, d1*d2);
+    } else {
+      return H;
+    }
   }
 
   const CTensor
@@ -86,12 +95,19 @@ namespace mps {
     return H1_[k];
   }
 
+  index
+  ConstantHamiltonian::dimension(index k) const
+  {
+    return dimensions_[k];
+  }
+
   /** Add a local term on the k-th site.*/
   void
   ConstantHamiltonian::set_local_term(index k, const CTensor &H1)
   {
     assert((k >= 0) && (k <= H1_.size()));
     H1_.at(k) = H1;
+    dimensions_.at(k) = H1.rows();
   }
 
   /** Add a nearest-neighbor interaction between sites 'k' and 'k+1'.*/
@@ -112,6 +128,8 @@ namespace mps {
     H12_left_[k].push_back(H1);
     H12_right_[k].push_back(H2);
     H12_.at(k) = compute_interaction(k);
+    dimensions_.at(k) = H1.rows();
+    dimensions_.at(k+1) = H2.rows();
   }
 
   const CTensor
