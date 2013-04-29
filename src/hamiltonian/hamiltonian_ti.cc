@@ -79,13 +79,13 @@ namespace mps {
   const CTensor
   TIHamiltonian::interaction_left(index k, index ndx, double t) const
   {
-    return H12_left_[k];
+    return H12_left_[ndx];
   }
 
   const CTensor
   TIHamiltonian::interaction_right(index k, index ndx, double t) const
   {
-    return H12_right_[k];
+    return H12_right_[ndx];
   }
 
   index
