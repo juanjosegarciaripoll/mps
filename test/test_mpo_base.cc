@@ -153,6 +153,9 @@ namespace tensor_test {
     }
   }
 
+  /*
+   * Test MPO using only nearest-neighbor interactions in small problems.
+   */
   template<class MPO>
   void
   test_small_nn_mpo()
@@ -206,6 +209,43 @@ namespace tensor_test {
     }
   }
 
+  template<class MPO>
+  void test_random_mpo(int size)
+  {
+    typedef typename MPO::elt_t Tensor;
+    typedef typename MPO::MPS MPS;
+
+    MPS psi = cluster_state(size);
+
+    for (int i = 0; i < size; i++) {
+      ConstantHamiltonian H(size);
+      MPO mpo(size, 2);
+
+      for (int j = 0; j < size; j++) {
+        typename MPO::elt_t Hloc =
+          rand<double>() * mps::Pauli_z +
+          rand<double>() * mps::Pauli_x +
+          rand<double>() * mps::Pauli_id;
+        H.set_local_term(j, Hloc);
+        add_local_term(mpo, Hloc, j);
+      }
+      for (int j = 0; j < size-1; j++) {
+        double c1 = rand<double>();
+        double c2 = rand<double>();
+        H.set_interaction(j, c1 * Pauli_z, Pauli_z);
+        H.add_interaction(j, c2 * Pauli_x, Pauli_x);
+        add_interaction(mpo, c1 * Pauli_z, j, Pauli_z);
+        add_interaction(mpo, c2 * Pauli_x, j, Pauli_x);
+      }
+
+      Tensor mpo_times_psi = mps_to_vector(apply(mpo, psi));
+      Tensor H_times_psi = mmult(full(real(sparse_hamiltonian(H))),
+                                 mps_to_vector(psi));
+
+      EXPECT_CEQ(norm2(mpo_times_psi - H_times_psi), 0.0);
+    }
+  }
+
   ////////////////////////////////////////////////////////////
 
   TEST(RMPO, Zero) {
@@ -220,6 +260,10 @@ namespace tensor_test {
     test_small_nn_mpo<RMPO>();
   }
 
+  TEST(RMPO, Random) {
+    test_over_integers(2, 10, test_random_mpo<RMPO>);
+  }
+
   ////////////////////////////////////////////////////////////
 
   TEST(CMPO, Zero) {
@@ -232,6 +276,10 @@ namespace tensor_test {
 
   TEST(CMPO, SmallNNMPO) {
     test_small_nn_mpo<CMPO>();
+  }
+
+  TEST(CMPO, Random) {
+    test_over_integers(2, 10, test_random_mpo<CMPO>);
   }
 
 } // namespace test
