@@ -91,6 +91,8 @@ libmps_la_SOURCES = \
 	mps/mps_simplify_z.cc \
 	mps/mps_simplify_many_d.cc \
 	mps/mps_simplify_many_z.cc \
+	mps/mps_simplify_many2_d.cc \
+	mps/mps_simplify_many2_z.cc \
 	mps/mps_canonical_d.cc \
 	mps/mps_canonical_z.cc \
 	mps/mps_canonical2_d.cc \

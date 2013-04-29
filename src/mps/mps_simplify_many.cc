@@ -20,7 +20,6 @@
 #include <vector>
 #include <algorithm>
 #include <tensor/linalg.h>
-#include <mps/mps.h>
 #include <mps/mps_algorithms.h>
 #include <tensor/io.h>
 #include "mps_prop_matrix.cc"
@@ -194,14 +193,18 @@ namespace mps {
       index a1,a2,b1,i1,b2,a3,b3;
 
       if (Mr.is_empty()) {
-        Ml.get_dimensions(&a1,&b1,&a2,&b2);
-        Qk.get_dimensions(&b2,&i1,&b1);
-        // Ml(a1,b1,a2,b2) -> Ml([b2,b1],a2,a1)
-        Ml = reshape(permute(Ml, 0, 3), b2*b1,a2,a1);
-        // Qk(b2,i1,b1) -> Pk([b2,b1],i1)
-        Tensor Pk = reshape(permute(Qk, 1, 2), b2*b1,i1);
-        // Pk(a2,i1,a1) = Ml([b2,b1],a2,a1) Pk([b2,b1],i1)
-        return permute(reshape(fold(Ml, 0, Pk, 0), a2,a1,i1), 1,2);
+        if (Ml.is_empty()) {
+          return Qk;
+        } else {
+          Ml.get_dimensions(&a1,&b1,&a2,&b2);
+          Qk.get_dimensions(&b2,&i1,&b1);
+          // Ml(a1,b1,a2,b2) -> Ml([b2,b1],a2,a1)
+          Ml = reshape(permute(Ml, 0, 3), b2*b1,a2,a1);
+          // Qk(b2,i1,b1) -> Pk([b2,b1],i1)
+          Tensor Pk = reshape(permute(Qk, 1, 2), b2*b1,i1);
+          // Pk(a2,i1,a1) = Ml([b2,b1],a2,a1) Pk([b2,b1],i1)
+          return permute(reshape(fold(Ml, 0, Pk, 0), a2,a1,i1), 1,2);
+        }
       } else if (Ml.is_empty()) {
         Mr.get_dimensions(&a1,&b1,&a2,&b2);
         Qk.get_dimensions(&b2,&i1,&b1);
@@ -315,6 +318,98 @@ namespace mps {
           }
           break;
         }
+        *sense = -*sense;
+      }
+      return err;
+    }
+
+
+    const Tensor
+    next_projector_2_sites(index site)
+    {
+      Tensor output;
+      index a1, i1, i2, a2;
+      for (int i = 0; i < nvectors; i++) {
+        Tensor P = fold(Q[i][site], -1, Q[i][site+1], 0);
+        P.get_dimensions(&a1, &i1, &i2, &a2);
+
+        Tensor new_Pk =
+          weights[i] * next_projector(matrix(site-1, i), matrix(site+2, i),
+                                      reshape(P, a1, i1*i2, a2));
+        if (i)
+          output = output + new_Pk;
+        else
+          output = new_Pk;
+      }
+      return reshape(output, a1, i1, i2, a2);
+    }
+
+    /*
+     * This routine takes a state Q with large dimensionality and obtains another
+     * matrix product state P which is smaller.
+     *
+     * Input:	Q = MPS of large dimension
+     *		P = MPS of smaller dimensions (initial guess)
+     *		sense = +1/-1 depending on wheter we move to the right or left
+     *
+     * Output:	P = Most accurate approximation to Q
+     *		sense = +1/-1 depending on the orthonormality of P
+     *		double : the error |P-Q|^2
+     *
+     * 1) If sense = +1 initially, we move from left to right, and the states Q and
+     *    P are assumed to be orthogonal on the right.
+     *
+     * 2) If the last iteration was from left to right, then sense = -1, meaning that
+     *    the state is orthogonal on the left.
+     *
+     * 3) The value of SENSE can be passed further to apply_unitary(), simplify(), etc.
+     */
+    double
+    simplify_2_sites(MPS &P, index Dmax, double tol, int *sense,
+                     index sweeps, bool normalize)
+    {
+      int aux_sense = 1;
+      if (!sense) {
+        sense = &aux_sense;
+      }
+      if (sweeps < 1)
+        sweeps = 1;
+
+      initialize_matrices(P, *sense);
+
+      double err = 1.0, olderr, scp, normP2;
+      for (index sweep = 0; sweep < sweeps; sweep++) {
+        Tensor Pk;
+        if (*sense > 0) {
+          for (index k = 0; k < (L-1); k++) {
+            Pk = next_projector_2_sites(k);
+            set_canonical_2_sites(P, Pk, k, +1, Dmax, tol);
+            update_matrices(k, P[k], +1);
+          }
+          update_matrices(L-1, Pk = P[L-1], +1);
+          scp = real(scalar_product(L-1));
+          normP2 = real(scprod(Pk, Pk));
+        } else {
+          for (index k = L-1; k > 0; k--) {
+            Pk = next_projector_2_sites(k-1);
+            set_canonical_2_sites(P, Pk, k-1, -1, Dmax, tol);
+            update_matrices(k, P[k], -1);
+          }
+          update_matrices(0, Pk = P[0], -1);
+          scp = real(scalar_product(0));
+          normP2 = real(scprod(Pk, Pk));
+        }
+        olderr = err;
+        err = 1 - scp/sqrt(normQ2*normP2);
+        if ((olderr-err) < 1e-5*abs(olderr) || (err < 1e-14)) {
+          if (normalize) {
+            index ndx = (*sense>0) ? L-1 : 0;
+            P.at(ndx) = Pk/sqrt(normP2);
+            *sense = -*sense;
+          }
+          break;
+        }
+        abort();
         *sense = -*sense;
       }
       return err;

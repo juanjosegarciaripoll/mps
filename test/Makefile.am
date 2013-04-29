@@ -65,6 +65,11 @@ check_PROGRAMS += test_mps_simplify_many
 test_mps_simplify_many_SOURCES = test_mps_simplify_many.cc
 test_mps_simplify_many_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
+TESTS += test_mps_simplify_many2
+check_PROGRAMS += test_mps_simplify_many2
+test_mps_simplify_many2_SOURCES = test_mps_simplify_many2.cc
+test_mps_simplify_many2_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
+
 TESTS += test_mpo_base
 check_PROGRAMS += test_mpo_base
 test_mpo_base_SOURCES = test_mpo_base.cc
