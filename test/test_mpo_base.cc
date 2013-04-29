@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 #include <gtest/gtest-death-test.h>
 #include <mps/mpo.h>
+#include <mps/io.h>
 #include <mps/quantum.h>
 
 namespace tensor_test {
@@ -63,9 +64,12 @@ namespace tensor_test {
     EXPECT_CEQ(norm2(apply(mpo, psi)), 0.0);
   }
 
+  /*
+   * Test MPO using only local terms in small problems.
+   */
   template<class MPO>
   void
-  test_small_mpo()
+  test_small_local_mpo()
   {
     typedef typename MPO::elt_t Tensor;
     typedef typename MPO::MPS MPS;
@@ -87,6 +91,18 @@ namespace tensor_test {
       Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
       Tensor H = kron2(mps::Pauli_id, mps::Pauli_z);
+      Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
+
+      EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
+    }
+    {
+      MPO mpo(2,2);
+      add_local_term(mpo, mps::Pauli_z, 0);
+      add_local_term(mpo, mps::Pauli_z, 1);
+      Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+
+      Tensor H = kron2(mps::Pauli_id, mps::Pauli_z) +
+        kron2(mps::Pauli_z, mps::Pauli_id);
       Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
       EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
@@ -123,6 +139,71 @@ namespace tensor_test {
 
       EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
     }
+    {
+      MPO mpo(3,2);
+      add_local_term(mpo, mps::Pauli_z, 0);
+      add_local_term(mpo, mps::Pauli_z, 2);
+      Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+
+      Tensor H = kron2(mps::Pauli_z, kron2(mps::Pauli_id, mps::Pauli_id)) +
+        kron2(mps::Pauli_id, kron2(mps::Pauli_id, mps::Pauli_z));
+      Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
+
+      EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
+    }
+  }
+
+  template<class MPO>
+  void
+  test_small_nn_mpo()
+  {
+    typedef typename MPO::elt_t Tensor;
+    typedef typename MPO::MPS MPS;
+
+    MPS psi = cluster_state(2);
+    {
+      MPO mpo(2,2);
+      add_interaction(mpo, mps::Pauli_z, 0, mps::Pauli_z);
+      Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+
+      Tensor H = kron2(mps::Pauli_z, mps::Pauli_z);
+      Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
+
+      EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
+    }
+    psi = cluster_state(3);
+    {
+      MPO mpo(3,2);
+      add_interaction(mpo, mps::Pauli_z, 0, mps::Pauli_z);
+      Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+
+      Tensor H = kron2(mps::Pauli_z, kron2(mps::Pauli_z, mps::Pauli_id));
+      Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
+
+      EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
+    }
+    {
+      MPO mpo(3,2);
+      add_interaction(mpo, mps::Pauli_z, 1, mps::Pauli_z);
+      Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+
+      Tensor H = kron2(mps::Pauli_id, kron2(mps::Pauli_z, mps::Pauli_z));
+      Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
+
+      EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
+    }
+    {
+      MPO mpo(3,2);
+      add_interaction(mpo, mps::Pauli_z, 0, mps::Pauli_z);
+      add_interaction(mpo, mps::Pauli_z, 1, mps::Pauli_z);
+      Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+
+      Tensor H = kron2(mps::Pauli_id, kron2(mps::Pauli_z, mps::Pauli_z)) +
+        kron2(mps::Pauli_z, kron2(mps::Pauli_z, mps::Pauli_id));
+      Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
+
+      EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
+    }
   }
 
   ////////////////////////////////////////////////////////////
@@ -131,17 +212,26 @@ namespace tensor_test {
     test_over_integers(2, 10, test_zero_mpo<RMPO>);
   }
 
-  TEST(RMPO, SmallMPO) {
-    test_small_mpo<RMPO>();
+  TEST(RMPO, SmallLocalMPO) {
+    test_small_local_mpo<RMPO>();
   }
+
+  TEST(RMPO, SmallNNMPO) {
+    test_small_nn_mpo<RMPO>();
+  }
+
   ////////////////////////////////////////////////////////////
 
   TEST(CMPO, Zero) {
     test_over_integers(2, 10, test_zero_mpo<CMPO>);
   }
 
-  TEST(CMPO, SmallMPO) {
-    test_small_mpo<CMPO>();
+  TEST(CMPO, SmallLocalMPO) {
+    test_small_local_mpo<CMPO>();
+  }
+
+  TEST(CMPO, SmallNNMPO) {
+    test_small_nn_mpo<CMPO>();
   }
 
 } // namespace test
