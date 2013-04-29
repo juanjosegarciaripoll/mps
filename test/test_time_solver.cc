@@ -67,7 +67,7 @@ namespace tensor_test {
     CMPS psi = ghz_state(size);
     // Id is a zero operator that causes the evolution operator to
     // be the identity
-    TIHamiltonian H(size, RTensor::zeros(4,4), RTensor::zeros(2,2));
+    TIHamiltonian H(size, RTensor(), RTensor::zeros(2,2));
     CMPS aux = apply_H(H, 0.1, psi);
     EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
     EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
@@ -79,7 +79,7 @@ namespace tensor_test {
     CMPS psi = ghz_state(size);
     // H is a multiple of the identity, causing the evolution
     // operator to be just a global phase
-    TIHamiltonian H(size, RTensor::zeros(4,4), RTensor::eye(2,2));
+    TIHamiltonian H(size, RTensor(), RTensor::eye(2,2));
     CMPS aux = apply_H(H, 0.1, psi);
     EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
     EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
@@ -91,7 +91,6 @@ namespace tensor_test {
     ConstantHamiltonian H(size);
     for (int i = 0; i < size; i++) {
       H.set_local_term(i, mps::Pauli_z * (dphi * i));
-      if (i > 0) H.add_interaction(i-1, CTensor::zeros(2,2), CTensor::zeros(2,2));
     }
     do_test(H, 0.1, ghz_state(size));
     do_test(H, 0.1, cluster_state(size));
