@@ -109,6 +109,8 @@ libmps_la_SOURCES = \
 	mps/mpo_apply_z.cc \
 	mps/mpo_expected_d.cc \
 	mps/mpo_expected_z.cc \
+	mps/mpo_dump_d.cc \
+	mps/mpo_dump_z.cc \
 	evolve/solver_base.cc \
 	evolve/trotter_unitary.cc \
 	evolve/solver_trotter2.cc \
