@@ -39,6 +39,8 @@ namespace mps {
 
   private:
     typedef MP<elt_t> parent;
+
+    void clear(const tensor::Indices &dimensions);
   };
 
 }

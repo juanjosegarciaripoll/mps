@@ -19,21 +19,26 @@
 
 #include <cassert>
 #include <mps/mpo.h>
+#include <mps/io.h>
 
 namespace mps {
 
   CMPO::CMPO(const Hamiltonian &H, double t) :
     parent(H.size())
   {
+    clear(H.dimensions());
     for (index i = 0; i < size(); i++) {
       add_local_term(*this, H.local_term(i,t), i);
     }
-    for (index i = 0; i < size(); i++) {
+    for (index i = 0; i < (size()-1); i++) {
       for (index j = 0; j < H.interaction_depth(i, t); j++) {
-        add_interaction(*this, H.interaction_left(i, t), i,
-                        H.interaction_right(i, t));
+        CTensor Hi = H.interaction_left(i, j, t);
+        CTensor Hj = H.interaction_right(i, j, t);
+        if (!Hi.is_empty())
+          add_interaction(*this, Hi, i, Hj);
       }
     }
+    std::cout << "*************\n" << *this;
   }
 
 } // namespace mps

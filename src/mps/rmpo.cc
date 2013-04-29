@@ -35,11 +35,17 @@ namespace mps {
     }
     tensor::Indices dims(length);
     std::fill(dims.begin(), dims.end(), physical_dimension);
-    *this = RMPO(dims);
+    clear(dims);
   }
 
   RMPO::RMPO(const tensor::Indices &physical_dimensions) :
     parent(physical_dimensions.size())
+  {
+    clear(physical_dimensions);
+  }
+
+  void
+  RMPO::clear(const tensor::Indices &physical_dimensions)
   {
     if (physical_dimensions.size() < 2) {
       std::cerr << "Cannot create MPO with size 0 or 1.\n";

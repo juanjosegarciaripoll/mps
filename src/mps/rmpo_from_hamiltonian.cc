@@ -34,6 +34,7 @@ namespace mps {
   RMPO::RMPO(const Hamiltonian &H, double t) :
     parent(H.size())
   {
+    clear(H.dimensions());
     for (index i = 0; i < size(); i++) {
       add_local_term(*this, safe_real(H.local_term(i,t)), i);
     }
