@@ -18,6 +18,7 @@
 */
 
 #include <mps/mpo.h>
+#include <tensor/io.h>
 
 namespace mps {
 
@@ -103,7 +104,11 @@ namespace mps {
     }
 
     Pi.at(range(0), range(),range(), range(b-1)) = reshape(Hi, 1, di, di, 1);
-    Pj.at(range(b-1), range(), range(), range(1)) = reshape(Hj, 1, dj, dj, 1);
+    if (i+2 == mpo.size()) {
+      Pj.at(range(b-1), range(), range(), range(0)) = reshape(Hj, 1, dj, dj, 1);
+    } else {
+      Pj.at(range(b-1), range(), range(), range(1)) = reshape(Hj, 1, dj, dj, 1);
+    }
 
     mpo.at(i) = Pi;
     mpo.at(i+1) = Pj;
