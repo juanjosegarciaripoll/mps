@@ -53,7 +53,7 @@ namespace mps {
     for (index k = 0; k < a.size(); k++) {
       M = prop_matrix(M, +1, a[k], a[k], NULL);
     }
-    return sqrt(real(prop_matrix_close(M)[0]));
+    return sqrt(abs(real(prop_matrix_close(M)[0])));
   }
 
   /* STATE NORM */
