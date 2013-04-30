@@ -73,7 +73,6 @@ namespace tensor_test {
       {
         double n = norm2(current);
         if (n < tolerance * std::max(n0, 1.0)) {
-          std::cout << "Stopping at " << ndx << " vectors\n";
           N = N(range(0,ndx-1),range(0,ndx-1));
           Heff = Heff(range(0,ndx-1),range(0,ndx-1));
           break;
@@ -106,11 +105,6 @@ namespace tensor_test {
     CTensor coef = CTensor::zeros(igen << Heff.rows());
     coef.at(0) = to_complex(1.0);
     coef = mmult(expm(idt * solve_with_svd(N, Heff)), coef);
-    std::cout << "nvectors=" << max_states << std::endl
-              << "H=" << matrix_form(real(Heff)) << std::endl
-              << "N=" << matrix_form(real(N)) << std::endl
-              << "x=" << matrix_form(coef) << std::endl;
-
     //
     // 4) Here is where we perform the truncation from our basis to a single MPS.
     //
@@ -154,7 +148,6 @@ namespace tensor_test {
   // EVOLVE WITH TROTTER METHODS
   //
 
-  /*
   TEST(ArnoldiSolver, Identity) {
     test_over_integers(2, 7, evolve_identity, apply_H_Arnoldi<2,3>);
   }
@@ -162,13 +155,11 @@ namespace tensor_test {
   TEST(ArnoldiSolver, GlobalPhase) {
     test_over_integers(2, 7, evolve_global_phase, apply_H_Arnoldi<2,3>);
   }
-  */
 
   TEST(ArnoldiSolver, LocalOperatorSzTruncated) {
     test_over_integers(2, 7, evolve_local_operator_sz, test_Arnoldi_truncated<4,6>);
   }
 
-  /*
   TEST(ArnoldiSolver, LocalOperatorSxTruncated) {
     test_over_integers(2, 7, evolve_local_operator_sx, test_Arnoldi_truncated<4,5>);
   }
@@ -180,5 +171,5 @@ namespace tensor_test {
   TEST(ArnoldiSolver, NearestNeighborSxSxTruncated) {
     test_over_integers(2, 7, evolve_interaction_xx, test_Arnoldi_truncated<4,6>);
   }
-  */
+
 } // namespace tensor_test

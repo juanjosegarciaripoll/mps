@@ -79,7 +79,7 @@ namespace mps {
 	truncate(&current, vectors[0], 2*Dmax, false);
 	simplify(&current, vectors, coeffs, NULL, 2, false);
         */
-	simplify(&current, vectors, coeffs, Dmax, -1, NULL, 2, false);
+	simplify(&current, vectors, coeffs, 2*Dmax, -1, NULL, 2, false);
       }
       {
         double n = norm2(current);
