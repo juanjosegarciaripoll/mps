@@ -111,10 +111,17 @@ namespace mps {
       A = matrices_t(L+2, tensor_vector_t(nvectors));
       dump_matrices("Const");
 
-      normQ2 = 0.0;
+      number x = number_zero<number>();
       for (int i = 0; i < nvectors; i++) {
-        normQ2 += real(scprod(Q[i], Q[i])) * square(abs(weights[i]));
+        for (int j = i; j < nvectors; j++) {
+          number y = scprod(Q[i], Q[j]) * conj(weights[i]) * weights[j];
+          if (i == j)
+            x = x + y;
+          else
+            x = x + 2 * real(y);
+        }
       }
+      normQ2 = real(x);
     }
 
     Tensor &matrix(index site, index vector) {
@@ -341,7 +348,7 @@ namespace mps {
         else
           output = new_Pk;
       }
-      return reshape(output, a1, i1, i2, a2);
+      return reshape(output, output.dimension(0), i1, i2, output.dimension(2));
     }
 
     /*
@@ -377,7 +384,7 @@ namespace mps {
 
       initialize_matrices(P, *sense);
 
-      double err = 1.0, olderr, scp, normP2;
+      double err = normQ2, olderr, scp, normP2;
       for (index sweep = 0; sweep < sweeps; sweep++) {
         Tensor Pk;
         if (*sense > 0) {
@@ -400,16 +407,18 @@ namespace mps {
           normP2 = real(scprod(Pk, Pk));
         }
         olderr = err;
-        err = 1 - scp/sqrt(normQ2*normP2);
-        if ((olderr-err) < 1e-5*abs(olderr) || (err < 1e-14)) {
-          if (normalize) {
-            index ndx = (*sense>0) ? L-1 : 0;
-            P.at(ndx) = Pk/sqrt(normP2);
-            *sense = -*sense;
+        err = abs(normQ2 + normP2 - 2 * scp);
+        if ((olderr-err) < 1e-5*abs(olderr) ||
+            (err < 1e-14 * normQ2) ||
+            (err < 1e-14))
+          {
+            if (normalize) {
+              index ndx = (*sense>0) ? L-1 : 0;
+              P.at(ndx) = Pk/sqrt(normP2);
+              *sense = -*sense;
+            }
+            break;
           }
-          break;
-        }
-        abort();
         *sense = -*sense;
       }
       return err;
