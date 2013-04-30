@@ -38,7 +38,6 @@ namespace mps {
           add_interaction(*this, Hi, i, Hj);
       }
     }
-    std::cout << "*************\n" << *this;
   }
 
 } // namespace mps
