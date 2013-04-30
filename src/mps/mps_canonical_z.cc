@@ -31,7 +31,12 @@ namespace mps {
 
   const CMPS canonical_form(const CMPS &psi, int sense)
   {
-    return canonical_form_inner(psi, sense);
+    return either_form_inner(psi, sense, false);
+  }
+
+  const CMPS normal_form(const CMPS &psi, int sense)
+  {
+    return either_form_inner(psi, sense, true);
   }
 
 }

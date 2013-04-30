@@ -80,21 +80,22 @@ namespace mps {
   }
 
   template<class MPS>
-  static const MPS canonical_form_inner(const MPS &psi, int sense)
+  static const MPS either_form_inner(MPS psi, int sense, bool normalize)
   {
-    MPS output(psi);
+    index L = psi.size();
     if (sense < 0) {
-      for (index i = psi.size(); i; ) {
+      for (index i = L; i; ) {
 	--i;
-	set_canonical(output, i, output[i], sense);
+	set_canonical(psi, i, psi[i], sense);
       }
+      if (normalize) psi.at(0) = psi[0] / norm2(psi[0]);
     } else {
-      for (index i = 0; i < psi.size(); i++) {
-	set_canonical(output, i, output[i], sense);
+      for (index i = 0; i < L; i++) {
+	set_canonical(psi, i, psi[i], sense);
       }
+      if (normalize) psi.at(0) = psi[L-1] / norm2(psi[0]);
     }
-    return output;
+    return psi;
   }
-
 
 } // namespace mps
