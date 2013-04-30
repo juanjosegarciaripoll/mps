@@ -165,6 +165,7 @@ namespace mps {
     const cdouble dt_;
     const CMPO H_;
     const int max_states_;
+    const double tolerance_;
   };
 
 

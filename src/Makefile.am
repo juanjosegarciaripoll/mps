@@ -97,8 +97,6 @@ libmps_la_SOURCES = \
 	mps/mps_canonical_z.cc \
 	mps/mps_canonical2_d.cc \
 	mps/mps_canonical2_z.cc \
-	mps/mps_normal_d.cc \
-	mps/mps_normal_z.cc \
 	mps/apply_local_operator_d.cc \
 	mps/apply_local_operator_z.cc \
 	mps/rmpo.cc \

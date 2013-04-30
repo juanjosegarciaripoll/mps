@@ -98,10 +98,11 @@ namespace tensor_test {
 
   void evolve_local_operator_sx(int size, void do_test(const Hamiltonian &H, double dt, const CMPS &psi))
   {
-    double dphi = 1.3 / size;
+    double dphi = 0.3;
     ConstantHamiltonian H(size);
     for (int i = 0; i < size; i++) {
-      H.set_local_term(i, mps::Pauli_x * (dphi * i));
+      H.set_local_term(i, mps::Pauli_x * dphi);
+      dphi = - dphi;
       if (i > 0) H.add_interaction(i-1, CTensor::zeros(2,2), CTensor::zeros(2,2));
     }
     do_test(H, 0.1, ghz_state(size));
