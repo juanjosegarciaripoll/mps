@@ -156,6 +156,9 @@ namespace mps {
     /**Create Solver with fixed time step.*/
     ArnoldiSolver(const Hamiltonian &H, cdouble dt, int nvectors);
 
+    /**Create Solver with fixed time step.*/
+    ArnoldiSolver(const CMPO &H, cdouble dt, int nvectors);
+
     /**Compute next time step. Given the state \f$\psi(0)\f$ represented
        by P, estimate the state at \f$\psi(\Delta t)\f$ within the space
        of MPS with dimension <= Dmax. P contains the output.*/

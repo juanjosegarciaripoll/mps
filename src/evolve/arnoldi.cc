@@ -36,6 +36,16 @@ namespace mps {
     }
   }
 
+  ArnoldiSolver::ArnoldiSolver(const CMPO &H, cdouble dt, int nvectors) :
+    TimeSolver(dt), H_(H), max_states_(nvectors), tolerance_(1e-10)
+  {
+    if (max_states_ <= 0 || max_states_ >= 30) {
+      std::cerr << "In ArnoldiSolver(...), the number of states exceeds the limits [1,30]"
+		<< std::endl;
+      abort();
+    }
+  }
+
   double
   ArnoldiSolver::one_step(CMPS *psi, index Dmax)
   {
