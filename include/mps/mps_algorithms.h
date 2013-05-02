@@ -39,10 +39,10 @@ namespace mps {
 			    const CTensor &P, const CTensor *op = NULL);
 
   /** Given an MPS, produce another with bond dimension <= Dmax, by truncating it. */
-  bool truncate(RMPS *P, const RMPS &Q, index Dmax, bool periodicbc);
+  bool truncate(RMPS *P, const RMPS &Q, index Dmax, bool periodicbc, bool increase = false);
 
   /** Given an MPS, produce another with bond dimension <= Dmax, by truncating it. */
-  bool truncate(CMPS *P, const CMPS &Q, index Dmax, bool periodicbc);
+  bool truncate(CMPS *P, const CMPS &Q, index Dmax, bool periodicbc, bool increase = false);
 
   double simplify(RMPS *P, const RMPS &Q, int *sense, bool periodicbc,
 		  index sweeps, bool normalize);
