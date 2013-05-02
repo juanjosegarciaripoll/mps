@@ -408,6 +408,7 @@ namespace mps {
         }
         olderr = err;
         err = abs(normQ2 + normP2 - 2 * scp);
+        //std::cout << "err=" << err << ", normP2=" << normP2 << std::endl;
         if (abs(olderr-err) < 1e-5*abs(normQ2) ||
             (err < 1e-14 * normQ2) ||
             (err < 1e-14))
