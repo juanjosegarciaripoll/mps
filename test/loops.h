@@ -14,7 +14,7 @@
 #include <tensor/io.h>
 #include <tensor/tools.h>
 
-#define EPSILON 1e-14
+#define EPSILON 1e-12
 
 #ifdef NDEBUG
 #define ONLY_IN_DEBUG(x)
