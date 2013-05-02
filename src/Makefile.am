@@ -44,6 +44,7 @@ libmps_la_SOURCES = \
 	hamiltonian/hamiltonian_ti.cc \
 	hamiltonian/hamiltonian_constant.cc \
 	hamiltonian/split_interaction.cc \
+	tools/debug.cc \
 	tools/entropy.cc \
 	tools/truncate.cc \
 	tools/limited_svd_d.cc \

@@ -290,7 +290,11 @@ namespace mps {
 
       initialize_matrices(P, *sense);
 
-      double err = normQ2 * 10, olderr, scp, normP2;
+      if (debug_flags & MPS_DEBUG_SIMPLIFY_MANY) {
+        std::cout << "----------\nSimplifying " << Q.size()
+                  <<" states with norm " << normQ2 << std::endl;
+      }
+      double err = normQ2 * 10, scp, normP2;
       for (index sweep = 0; sweep < sweeps; sweep++) {
         Tensor Pk;
         if (*sense > 0) {
@@ -312,8 +316,11 @@ namespace mps {
           scp = real(scalar_product(0));
           normP2 = real(scprod(Pk, Pk));
         }
-        olderr = err;
+        double olderr = err;
         err = abs(normQ2 + normP2 - 2 * scp);
+        if (debug_flags & MPS_DEBUG_SIMPLIFY_MANY) {
+          std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
+        }
         if (abs(olderr-err) < 1e-5*abs(normQ2) ||
             (err < 1e-14 * normQ2) ||
             (err < 1e-14))
@@ -384,7 +391,12 @@ namespace mps {
 
       initialize_matrices(P, *sense);
 
-      double err = normQ2 * 10, olderr, scp, normP2;
+      if (debug_flags & MPS_DEBUG_SIMPLIFY_MANY) {
+        std::cout << "----------\nSimplifying " << Q.size()
+                  <<" states with norm " << normQ2 << std::endl;
+      }
+
+      double err = normQ2 * 10, scp, normP2;
       for (index sweep = 0; sweep < sweeps; sweep++) {
         Tensor Pk;
         if (*sense > 0) {
@@ -406,9 +418,11 @@ namespace mps {
           scp = real(scalar_product(0));
           normP2 = real(scprod(Pk, Pk));
         }
-        olderr = err;
+        double olderr = err;
         err = abs(normQ2 + normP2 - 2 * scp);
-        //std::cout << "err=" << err << ", normP2=" << normP2 << std::endl;
+        if (debug_flags & MPS_DEBUG_SIMPLIFY_MANY) {
+          std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
+        }
         if (abs(olderr-err) < 1e-5*abs(normQ2) ||
             (err < 1e-14 * normQ2) ||
             (err < 1e-14))

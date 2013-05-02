@@ -26,6 +26,13 @@ namespace mps {
 
   using namespace tensor;
 
+  enum {
+    MPS_DEBUG_NONE = 0,
+    MPS_DEBUG_SIMPLIFY = 1,
+    MPS_DEBUG_SIMPLIFY_MANY = 2,
+    MPS_DEBUG_ARNOLDI = 4
+  };
+  extern int debug_flags;
 
   size_t where_to_truncate(const RTensor &s, double tol = -1, tensor::index max_a2 = 0);
 

@@ -18,9 +18,10 @@
 */
 
 #include <tensor/linalg.h>
+#include <tensor/io.h>
 #include <mps/mps_algorithms.h>
 #include <mps/time_evolve.h>
-#include <tensor/io.h>
+#include <mps/tools.h>
 
 namespace mps {
 
@@ -89,7 +90,8 @@ namespace mps {
 	truncate(&current, states[0], 2*Dmax, false, true);
 	simplify(&current, vectors, coeffs, NULL, 2, false);
 #else
-	simplify(&current, vectors, coeffs, 2*Dmax, -1, NULL, 2, false);
+        int sense[1] = {+1};
+	simplify(&current, vectors, coeffs, 2*Dmax, -1, sense, 2, false);
 #endif
       }
       {
@@ -134,10 +136,15 @@ namespace mps {
     //
 #if 0
     truncate(psi, states[0], Dmax, false, true);
-    return simplify(psi, states, coef, NULL, 12, false);
+    double err = simplify(psi, states, coef, NULL, 12, false);
 #else
-    return simplify(psi, states, coef, Dmax, -1, NULL, 12, true);
+    int sense[1] = {+1};
+    double err = simplify(psi, states, coef, Dmax, -1, sense, 12, true);
 #endif
+    if (debug_flags & MPS_DEBUG_ARNOLDI) {
+      std::cout << "Arnoldi final truncation error " << err << std::endl;
+    }
+    return err;
   }
 
 } // namespace mps
