@@ -28,13 +28,24 @@ namespace mps {
 
   template <class MPS, class Tensor>
   Tensor
-  all_correlations_fast(const MPS &a, const Tensor &op1, const Tensor &op2, const MPS &b,
+  all_correlations_fast(const MPS &a,
+                        const std::vector<Tensor> &op1,
+                        const std::vector<Tensor> &op2,
+                        const MPS &b,
                         bool symmetric = false,
                         const Tensor *jordan_wigner_op = 0)
   {
     size_t L = a.size();
     if (b.size() != L) {
       std::cerr << "In expected(MPS, Tensor, Tensor, MPS), two MPS of different size were passed";
+      abort();
+    }
+    if (op1.size() != L) {
+      std::cerr << "In expected(MPS, std::vector<Tensor>, std::vector<Tensor>, MPS), the 1st argument differs from the MPS size.";
+      abort();
+    }
+    if (op2.size() != L) {
+      std::cerr << "In expected(MPS, std::vector<Tensor>, std::vector<Tensor>, MPS), the 2n argument differs from the MPS size.";
       abort();
     }
     Tensor *auxRight = new Tensor[L];
@@ -53,14 +64,14 @@ namespace mps {
     Tensor output = Tensor::zeros(L, L);
     for (size_t i = 0; i < L; i++) {
       {
-        Tensor op12 = mmult(op1, op2);
+        Tensor op12 = mmult(op1[i], op2[i]);
         Tensor aux = prop_matrix(auxLeft[i], +1, a[i], b[i], &op12);
         output.at(i,i) = prop_matrix_close(aux, auxRight[i])[0];
       }
       {
-        Tensor aux = prop_matrix(auxLeft[i], +1, a[i], b[i], &op1);
+        Tensor aux = prop_matrix(auxLeft[i], +1, a[i], b[i], &op1[i]);
         for (size_t j = i+1; j < L; j++) {
-          Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op2);
+          Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op2[j]);
           output.at(i,j) = prop_matrix_close(aux2, auxRight[j])[0];
           aux = prop_matrix(aux, +1, a[j], b[j], jordan_wigner_op);
           if (symmetric) {
@@ -69,9 +80,9 @@ namespace mps {
         }
       }
       if (!symmetric) {
-        Tensor aux = prop_matrix(auxLeft[i], +1, a[i], b[i], &op2);
+        Tensor aux = prop_matrix(auxLeft[i], +1, a[i], b[i], &op2[i]);
         for (size_t j = i+1; j < L; j++) {
-          Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op1);
+          Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op1[j]);
           output.at(i,j) = prop_matrix_close(aux2, auxRight[j])[0];
           aux = prop_matrix(aux, +1, a[j], b[j], 0);
         }

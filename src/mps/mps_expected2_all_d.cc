@@ -24,9 +24,17 @@ namespace mps {
 
   using namespace tensor;
 
-  RTensor expected(const RMPS &a, const RTensor &op1, const RTensor &op2)
+  RTensor expected(const RMPS &a, const std::vector<RTensor> &op1, const std::vector<RTensor> &op2)
   {
     return all_correlations_fast(a, op1, op2, a);
+  }
+
+  RTensor expected(const RMPS &a, const RTensor &op1, const RTensor &op2)
+  {
+    index L = a.size();
+    std::vector<RTensor> vec1(L, op1);
+    std::vector<RTensor> vec2(L, op2);
+    return all_correlations_fast(a, vec1, vec2, a);
   }
 
 } // namespace mps
