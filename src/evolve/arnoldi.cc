@@ -85,11 +85,12 @@ namespace mps {
 	  vectors.push_back(states[ndx-2]);
           coeffs.push_back(-scprod(current, states[ndx-2]));
 	}
-        /*
-	truncate(&current, vectors[0], 2*Dmax, false);
+#if 0
+	truncate(&current, states[0], 2*Dmax, false, true);
 	simplify(&current, vectors, coeffs, NULL, 2, false);
-        */
+#else
 	simplify(&current, vectors, coeffs, 2*Dmax, -1, NULL, 2, false);
+#endif
       }
       {
         double n = norm2(current);
@@ -131,7 +132,12 @@ namespace mps {
     //
     // 4) Here is where we perform the truncation from our basis to a single MPS.
     //
+#if 0
+    truncate(psi, states[0], Dmax, false, true);
+    return simplify(psi, states, coef, NULL, 12, false);
+#else
     return simplify(psi, states, coef, Dmax, -1, NULL, 12, true);
+#endif
   }
 
 } // namespace mps
