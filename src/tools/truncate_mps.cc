@@ -18,6 +18,7 @@
 */
 
 #include <mps/mps_algorithms.h>
+#include <tensor/io.h>
 
 namespace mps {
 
@@ -33,7 +34,7 @@ namespace mps {
     } else {
       d.at(0) = 1;
       d.at(l) = 1;
-      for (index i = 0, c = 1; i < l; i++) {
+      for (index i = 1, c = 1; i < l; i++) {
 	c *= P[i].dimension(1);
 	if (c > Dmax) c = Dmax;
 	d.at(i) = c;
