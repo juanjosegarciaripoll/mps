@@ -290,16 +290,14 @@ namespace mps {
 
       initialize_matrices(P, *sense);
 
-      double err = 1.0, olderr, scp, normP2;
+      double err = normQ2 * 10, olderr, scp, normP2;
       for (index sweep = 0; sweep < sweeps; sweep++) {
         Tensor Pk;
         if (*sense > 0) {
           for (index k = 0; k < L; k++) {
             Pk = next_projector(k);
-            if (k < (L-1)) {
-              normalize_this(Pk, +1);
-            }
-            P.at(k) = Pk;
+            set_canonical(P, k, Pk, +1, false);
+            Pk = P.at(k);
             update_matrices(k, Pk, +1);
           }
           scp = real(scalar_product(L-1));
@@ -307,24 +305,26 @@ namespace mps {
         } else {
           for (index k = L; k--; ) {
             Pk = next_projector(k);
-            if (k > 0) {
-              normalize_this(Pk, -1);
-            }
-            P.at(k) = Pk;
+            set_canonical(P, k, Pk, -1, false);
+            Pk = P.at(k);
             update_matrices(k, Pk, -1);
           }
           scp = real(scalar_product(0));
           normP2 = real(scprod(Pk, Pk));
         }
         olderr = err;
-        err = 1 - scp/sqrt(normQ2*normP2);
-        if ((olderr-err) < 1e-5*abs(olderr) || (err < 1e-14)) {
-          if (normalize) {
-            P.at(*sense > 0? L-1 : 0) = Pk/sqrt(normP2);
-            *sense = -*sense;
+        err = abs(normQ2 + normP2 - 2 * scp);
+        if (abs(olderr-err) < 1e-5*abs(normQ2) ||
+            (err < 1e-14 * normQ2) ||
+            (err < 1e-14))
+          {
+            if (normalize) {
+              index ndx = (*sense>0) ? L-1 : 0;
+              P.at(ndx) = Pk/sqrt(normP2);
+              *sense = -*sense;
+            }
+            break;
           }
-          break;
-        }
         *sense = -*sense;
       }
       return err;
@@ -384,7 +384,7 @@ namespace mps {
 
       initialize_matrices(P, *sense);
 
-      double err = normQ2, olderr, scp, normP2;
+      double err = normQ2 * 10, olderr, scp, normP2;
       for (index sweep = 0; sweep < sweeps; sweep++) {
         Tensor Pk;
         if (*sense > 0) {
@@ -408,7 +408,7 @@ namespace mps {
         }
         olderr = err;
         err = abs(normQ2 + normP2 - 2 * scp);
-        if ((olderr-err) < 1e-5*abs(olderr) ||
+        if (abs(olderr-err) < 1e-5*abs(normQ2) ||
             (err < 1e-14 * normQ2) ||
             (err < 1e-14))
           {
