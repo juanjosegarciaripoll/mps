@@ -87,6 +87,8 @@ libmps_la_SOURCES = \
 	mps/mps_expected2_d.cc \
 	mps/mps_expected2_dz.cc \
 	mps/mps_expected2_z.cc \
+	mps/mps_expected2_all_d.cc \
+	mps/mps_expected2_all_z.cc \
 	mps/mps_simplify_d.cc \
 	mps/mps_simplify_z.cc \
 	mps/mps_simplify_many_d.cc \

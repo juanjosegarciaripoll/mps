@@ -124,6 +124,15 @@ namespace mps {
   /**Compute a two-site correlation.*/
   cdouble expected(const CMPS &a, const CTensor &op1, index k1, const CTensor &op2, index k2);
 
+  /**Compute all two-site correlations.*/
+  RTensor expected(const RMPS &a, const RTensor &op1, const RTensor &op2);
+
+  /**Compute all two-site correlations.*/
+  CTensor expected(const RMPS &a, const CTensor &op1, const CTensor &op2);
+
+  /**Compute all two-site correlations.*/
+  CTensor expected(const CMPS &a, const CTensor &op1, const CTensor &op2);
+
   /**Store a tensor in a matrix product state in the canonical form.*/
   void set_canonical(RMPS &psi, index site, const RTensor &A, int sense, bool truncate = true);
 
