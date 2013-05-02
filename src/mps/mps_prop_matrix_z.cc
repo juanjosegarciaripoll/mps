@@ -27,6 +27,11 @@ namespace mps {
     return do_prop_close(N);
   }
 
+  const CTensor prop_matrix_close(const CTensor &L, const CTensor &R)
+  {
+    return do_prop_close(L, R);
+  }
+
   const CTensor prop_matrix(const CTensor &M0, int sense, const CTensor &Q,
 			    const CTensor &P, const CTensor *op)
   {

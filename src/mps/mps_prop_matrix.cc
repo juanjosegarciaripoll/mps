@@ -41,6 +41,22 @@ namespace mps {
   }
 
   template<typename t>
+  static inline const t do_prop_close(const t &L, const t &R)
+  {
+    if (R.is_empty())
+      return do_prop_close(L);
+    else if (L.is_empty())
+      return do_prop_close(R);
+    else {
+      index a1, a2, b1, b2;
+      L.get_dimensions(&a1, &a2, &b1, &b2);
+      R.get_dimensions(&b1, &b2, &a1, &a2);
+      return mmult(reshape(L, 1, a1*a2*b1*b2),
+                   reshape(transpose(reshape(R, b1*b2, a1*a2)), a1*a2*b1*b2, 1));
+    }
+  }
+
+  template<typename t>
   static inline const t do_prop_right(const t &M0, const t &Q, const t &P, const t *op)
   {
     index a1,b1,a2,b2,i2,a3,b3;
