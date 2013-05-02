@@ -60,13 +60,13 @@ namespace mps {
       if (Qk.dimension(0) > d[k]) {
 	truncated = 1;
 	Qk = change_dimension(Qk, 0, d[k]);
-      } else if (increase && Qk.dimension(0) > d[k]) {
+      } else if (increase && (Qk.dimension(0) < d[k])) {
 	Qk = change_dimension(Qk, 0, d[k]);
       }
       if (Qk.dimension(2) > d[k+1]) {
 	truncated = 1;
 	Qk = change_dimension(Qk, 2, d[k+1]);
-      } else if (increase  && (Qk.dimension(2) > d[k+1])) {
+      } else if (increase && (Qk.dimension(2) < d[k+1])) {
 	Qk = change_dimension(Qk, 2, d[k+1]);
       }
       Q->at(k) = Qk;
