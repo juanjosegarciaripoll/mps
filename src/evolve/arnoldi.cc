@@ -61,6 +61,9 @@ namespace mps {
 
     std::vector<CMPS> vectors(3);
     std::vector<cdouble> coeffs(3);
+    std::vector<double> errors;
+    double err;
+    int sense;
     for (int ndx = 1; ndx < max_states_; ndx++) {
       const CMPS &last = states[ndx-1];
       //
@@ -90,8 +93,8 @@ namespace mps {
 	truncate(&current, states[0], 2*Dmax, false, true);
 	simplify(&current, vectors, coeffs, NULL, 2, false);
 #else
-        int sense[1] = {+1};
-	simplify(&current, vectors, coeffs, 2*Dmax, -1, sense, 2, false);
+        sense = +1;
+	err = simplify(&current, vectors, coeffs, 2*Dmax, -1, &sense, 2, false);
 #endif
       }
       {
@@ -101,7 +104,15 @@ namespace mps {
           Heff = Heff(range(0,ndx-1),range(0,ndx-1));
           break;
         }
-        current = normal_form(current, -1);
+        /* We ensure that the states are normalized and with a canonical
+         * form opposite to the sense of the simplification above. This
+         * improves stability and speed in the SVDs. */
+        if (sense == -1) {
+          current.at(0) = current[0] / n;
+        } else {
+          current = normal_form(current, -1);
+        }
+        errors.push_back(err / n);
       }
 
       //
@@ -136,11 +147,12 @@ namespace mps {
     //
 #if 0
     truncate(psi, states[0], Dmax, false, true);
-    double err = simplify(psi, states, coef, NULL, 12, false);
+    err = simplify(psi, states, coef, NULL, 12, false);
 #else
-    int sense[1] = {+1};
-    double err = simplify(psi, states, coef, Dmax, -1, sense, 12, true);
+    sense = +1;
+    err = simplify(psi, states, coef, Dmax, -1, &sense, 12, true);
 #endif
+    err = err + scprod(RTensor(errors), square(abs(coef)));
     if (debug_flags & MPS_DEBUG_ARNOLDI) {
       std::cout << "Arnoldi final truncation error " << err << std::endl;
     }
