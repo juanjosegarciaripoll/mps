@@ -4,6 +4,7 @@ nobase_include_HEADERS = \
 	mps/cmps.h \
 	mps/dmrg.h \
 	mps/hamiltonian.h \
+	mps/io.h \
 	mps/itebd.h \
 	mps/mp_base.h \
 	mps/mpo.h \
