@@ -55,6 +55,10 @@ libmps_la_SOURCES = \
 	tools/propagate_mps_z.cc \
 	tools/truncate_rmps.cc \
 	tools/truncate_cmps.cc \
+	tools/dump_rmps.cc \
+	tools/dump_cmps.cc \
+	tools/load_rmps.cc \
+	tools/load_cmps.cc \
 	iTEBD/itebd_d.cc \
 	iTEBD/itebd_z.cc \
 	iTEBD/itebd_itime_d.cc \

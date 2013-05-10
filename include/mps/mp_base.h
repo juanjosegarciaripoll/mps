@@ -37,6 +37,7 @@ namespace mps {
 
     MP() : data_() {}
     MP(size_t size) : data_(size) {}
+    MP(const std::vector<Tensor> &other) : data_(other) {}
     MP(const MP<Tensor> &other) : data_(other.data_) {}
 
     index size() const { return data_.size(); }
@@ -55,6 +56,7 @@ namespace mps {
     const_iterator begin() const { return data_.begin(); }
     const_iterator end() const { return data_.end(); }
     iterator end() { return data_.end(); }
+    const std::vector<Tensor> to_vector() const { return data_; }
 
   private:
     data_type data_;

@@ -17,26 +17,15 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef MPS_IO_H
-#define MPS_IO_H
-
-#include <tensor/io.h>
-#include <tensor/sdf.h>
-#include <mps/mps.h>
-#include <mps/mpo.h>
+#include <mps/io.h>
 
 namespace mps {
 
-  std::ostream &operator<<(std::ostream &s, const RMPO &mpo);
-
-  std::ostream &operator<<(std::ostream &s, const CMPO &mpo);
-
-  void dump(sdf::OutDataFile &d, const RMPS &mps);
-  void dump(sdf::OutDataFile &d, const CMPS &mps);
-  const RMPS load_rmps(sdf::InDataFile &d);
-  const CMPS load_cmps(sdf::InDataFile &d);
+  const RMPS load_rmps(sdf::InDataFile &d, const std::string &name)
+  {
+    std::vector<RTensor> aux;
+    d.load(&aux, name);
+    return RMPS(aux);
+  }
 
 } // namespace mps
-
-#endif /* MPS_IO_H */
-
