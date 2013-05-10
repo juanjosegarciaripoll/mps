@@ -31,8 +31,8 @@ namespace mps {
 
   std::ostream &operator<<(std::ostream &s, const CMPO &mpo);
 
-  void dump(sdf::OutDataFile &d, const RMPS &mps);
-  void dump(sdf::OutDataFile &d, const CMPS &mps);
+  void dump(sdf::OutDataFile &d, const RMPS &mps, const std::string &name);
+  void dump(sdf::OutDataFile &d, const CMPS &mps, const std::string &name);
   const RMPS load_rmps(sdf::InDataFile &d);
   const CMPS load_cmps(sdf::InDataFile &d);
 
