@@ -74,14 +74,12 @@ namespace mps {
           Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op2[j]);
           output.at(i,j) = prop_matrix_close(aux2, auxRight[j])[0];
           aux = prop_matrix(aux, +1, a[j], b[j], jordan_wigner_op);
-          if (symmetric) {
-            output.at(j,i) = output.at(i,j);
-          }
+          output.at(j,i) = conj(output.at(i,j));
         }
       }
       if (!symmetric) {
         Tensor aux = prop_matrix(auxLeft[i], +1, a[i], b[i], &op2[i]);
-        for (size_t j = i+1; j < L; j++) {
+        for (size_t j = 0; j < i; j++) {
           Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op1[j]);
           output.at(i,j) = prop_matrix_close(aux2, auxRight[j])[0];
           aux = prop_matrix(aux, +1, a[j], b[j], 0);
