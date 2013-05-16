@@ -44,9 +44,9 @@ namespace mps {
   static inline const t do_prop_close(const t &L, const t &R)
   {
     if (R.is_empty())
-      return do_prop_close(L);
+      return do_prop_close<t>(L);
     else if (L.is_empty())
-      return do_prop_close(R);
+      return do_prop_close<t>(R);
     else {
       index a1, a2, b1, b2;
       L.get_dimensions(&a1, &a2, &b1, &b2);

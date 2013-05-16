@@ -37,7 +37,7 @@ namespace mps {
   {
     A = scale(A, -1, lA);
     t R0 = build_E_matrix(A);
-    t R = infinite_power(R0);
+    t R = infinite_power<t>(R0);
     t R2 = build_E_matrix(foldin(Op1, -1, A, 1), A);
     typename t::elt_t N = trace(mmult(R0, R));
     typename t::elt_t E = trace(mmult(R2, R));
@@ -65,14 +65,14 @@ namespace mps {
   static inline typename t::elt_t slow_string_order(const t &Op1, int i, const t &Opmid, const t &Op2, int j, const t &A, const t &lA, const t &B, const t &lB)
   {
     if (i > j)
-      return slow_string_order(Op1, j, Opmid, Op2, i, A, lA, B, lB);
+      return slow_string_order<t>(Op1, j, Opmid, Op2, i, A, lA, B, lB);
     if (i == j) {
       std::cerr << "In string_order(), the starting and ending indices "
         "cannot be the same.\n";
       abort();
     }
     if (i & 1) {
-      return slow_string_order(Op1, 0, Opmid, Op2, j-i, B, lB, A, lA);
+      return slow_string_order<t>(Op1, 0, Opmid, Op2, j-i, B, lB, A, lA);
     } else if (i > 0) {
       j = j - i;
       i = 0;
@@ -84,7 +84,7 @@ namespace mps {
     t EA = build_E_matrix(AlA);
     t EB = build_E_matrix(BlB);
 
-    t R0 = infinite_power(mmult(EA, EB));
+    t R0 = infinite_power<t>(mmult(EA, EB));
     t R1 = R0;
 
     t Op;
@@ -127,48 +127,48 @@ namespace mps {
   template<class t>
   static inline typename t::elt_t slow_expected12(const t &Op12, const t &A, const t &lA, const t &B, const t &lB)
   {
-    return slow_expected(Op12, ensure_3_indices(fold(scale(A, -1, lA), -1, B, 0)), lB);
+    return slow_expected<t>(Op12, ensure_3_indices<t>(fold(scale(A, -1, lA), -1, B, 0)), lB);
   }
 
   template<class t>
   static inline typename t::elt_t slow_expected12(const t &Op1, const t &Op2, const t &A, const t &lA, const t &B, const t &lB)
   {
-    return slow_expected12(kron2(Op1, Op2), A, lA, B, lB);
+    return slow_expected12<t>(kron2(Op1, Op2), A, lA, B, lB);
   }
 
   template<class t>
   static inline double slow_energy(const t &Op12, const t &A, const t &lA, const t &B, const t &lB)
   {
-    return real(slow_expected12(Op12, A, lA, B, lB) + 
-		slow_expected12(Op12, B, lB, A, lA));
+    return real(slow_expected12<t>(Op12, A, lA, B, lB) + 
+		slow_expected12<t>(Op12, B, lB, A, lA));
   }
 
   template<class t>
   static inline typename t::elt_t slow_expected1(const t &Op1, const t &A, const t &lA, const t &B, const t &lB)
   {
     t id = t::eye(B.get_dim(1));
-    return slow_expected12(Op1, id, A, lA, B, lB);
+    return slow_expected12<t>(Op1, id, A, lA, B, lB);
   }
 
   template<class t>
   static inline typename t::elt_t slow_expected2(const t &Op2, const t &A, const t &lA, const t &B, const t &lB)
   {
     t id = t::eye(A.get_dim(1));
-    return slow_expected12(id, Op2, A, lA, B, lB);
+    return slow_expected12<t>(id, Op2, A, lA, B, lB);
   }
 
   template<class t>
   static inline typename t::elt_t slow_expected12(const iTEBD<t> &psi, const t &Op12)
   {
-    return slow_expected12(Op12, psi.matrix(0), psi.right_vector(0),
-			   psi.matrix(1), psi.right_vector(1));
+    return slow_expected12<t>(Op12, psi.matrix(0), psi.right_vector(0),
+                              psi.matrix(1), psi.right_vector(1));
   }
 
   template<class t>
   static inline typename t::elt_t slow_energy(const iTEBD<t> &psi, const t &Op12)
   {
-    return slow_energy(Op12, psi.matrix(0), psi.right_vector(0),
-		       psi.matrix(1), psi.right_vector(1));
+    return slow_energy<t>(Op12, psi.matrix(0), psi.right_vector(0),
+                          psi.matrix(1), psi.right_vector(1));
   }
 
 } // namespace mps

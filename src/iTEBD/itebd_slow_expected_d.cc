@@ -34,8 +34,9 @@ namespace mps {
 
   double expected(const RiTEBD &psi, const RTensor &Op1, const RTensor &Op2)
   {
-    return slow_expected12(Op1, Op2, psi.matrix(0), psi.right_vector(0),
-			   psi.matrix(1), psi.right_vector(1));
+    return slow_expected12<RTensor>(Op1, Op2, psi.matrix(0),
+                                    psi.right_vector(0),
+                                    psi.matrix(1), psi.right_vector(1));
   }
 
 } // namespace mps

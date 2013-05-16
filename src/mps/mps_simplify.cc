@@ -204,8 +204,8 @@ namespace mps {
 	  Tensor Nr = k < (N-1)? B[k+1] : Tensor();
 	  Tensor Mr = k < (N-1)? A[k+1] : Tensor();
 
-	  build_next_projector(Pk, Ml, Mr, Nl, Nr, Qk);
-	  if (k < (N-1)) normalize_this(Pk, +1);
+	  build_next_projector<Tensor>(Pk, Ml, Mr, Nl, Nr, Qk);
+	  if (k < (N-1)) normalize_this<Tensor>(Pk, +1);
 	  P.at(k) = Pk;
 
 	  Ml = prop_matrix(Ml, +1, Pk, Qk);
@@ -230,8 +230,8 @@ namespace mps {
 	  Tensor Nl = k > 0? B[k-1] : Tensor();
 	  Tensor Ml = k > 0? A[k-1] : Tensor();
 
-	  build_next_projector(Pk, Ml, Mr, Nl, Nr, Qk);
-	  if (k > 0) normalize_this(Pk, -1);
+	  build_next_projector<Tensor>(Pk, Ml, Mr, Nl, Nr, Qk);
+	  if (k > 0) normalize_this<Tensor>(Pk, -1);
 	  P.at(k) = Pk;
 
 	  Mr = prop_matrix(Mr, -1, Pk, Qk);

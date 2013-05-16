@@ -34,6 +34,7 @@ namespace mps {
     } else {
       std::cerr << "Tensor with wrong dimensions in iTEBD" << std::endl;
       abort();
+      return Tensor();
     }
   }
 
@@ -69,7 +70,8 @@ namespace mps {
      *		R(a,a',b,b') = G(a,i,b)l(b) G*(a',i,b')l*(b')
      */
     tensor::index a, b;
-    Tensor R = build_E_matrix(scale(ensure_3_indices(G), -1, l), &a, &b);
+    Tensor R = build_E_matrix(scale(ensure_3_indices<Tensor>(G), -1, l),
+                              &a, &b);
     /*
      * 2) Search for the largest eigenvalue v(a,a') which
      *	  is also the orthogonality matrix of the basis
@@ -80,7 +82,7 @@ namespace mps {
     linalg::eig_power_right(R, &v);
     v = reshape(v, b,b);
     v = (v + adjoint(v));
-    ortho_basis(v, X, Xinv);
+    ortho_basis<Tensor>(v, X, Xinv);
   }
 
   template<class Tensor>
@@ -92,7 +94,8 @@ namespace mps {
      *		L(a,a',b,b') = l(a)G(a,i,b) l*(a')G*(a',i,b')
      */
     tensor::index a, b;
-    Tensor L = build_E_matrix(scale(ensure_3_indices(G), 0, l), &a, &b);
+    Tensor L = build_E_matrix(scale(ensure_3_indices<Tensor>(G), 0, l),
+                              &a, &b);
     /*
      * 2) Search for the largest eigenvalue v(a,a') which
      *	  is also the orthogonality matrix of the basis
@@ -103,7 +106,7 @@ namespace mps {
     linalg::eig_power_left(L, &v);
     v = reshape(v, b,b);
     v = (v + adjoint(v));
-    ortho_basis(v, Y, Yinv);
+    ortho_basis<Tensor>(v, Y, Yinv);
   }
 
   template<class Tensor>
@@ -113,11 +116,11 @@ namespace mps {
   {
     Tensor X;		/* X(b,c) */
     Tensor Xinv;	/* Xinv(c,b) */
-    ortho_right(G, l, &X, &Xinv);
+    ortho_right<Tensor>(G, l, &X, &Xinv);
 
     Tensor Y;		/* Y(a,d) */
     Tensor Yinv;	/* Yinv(d,a) */
-    ortho_left(G, l, &Y, &Yinv);
+    ortho_left<Tensor>(G, l, &Y, &Yinv);
 
     /* Y(a,d) G(a,i,b) X(b,c) -> G(d,i,c) */
     G = fold(Xinv, -1, fold(G, -1, Yinv, -1), 0);
@@ -144,7 +147,7 @@ namespace mps {
      * so that the left and right basis are orthogonalized.
      */
     GAB.get_dimensions(&a,&i,&j,&b);
-    canonical_form(reshape(GAB, a,i*j,b), lAB, &GAB, &lAB, tolerance, max_dim);
+    canonical_form<Tensor>(reshape(GAB, a,i*j,b), lAB, &GAB, &lAB, tolerance, max_dim);
     a = b = lAB.size();
     /*
      * Now the state is given by
@@ -170,7 +173,7 @@ namespace mps {
   iTEBD<Tensor>::iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance, tensor::index max_dim)
   : canonical_(true)
   {
-    split_tensor(AB, lAB, &A_, &lA_, &B_, &lB_, tolerance, max_dim);
+    split_tensor<Tensor>(AB, lAB, &A_, &lA_, &B_, &lB_, tolerance, max_dim);
     AlA_ = scale(A_, -1, lA_);
     BlB_ = scale(B_, -1, lB_);
   }

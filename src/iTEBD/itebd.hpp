@@ -32,8 +32,8 @@ namespace mps {
 
   template<class Tensor>
   iTEBD<Tensor>::iTEBD(tensor::index dimension) : 
-    A_(normalize(Tensor::random(1, dimension, 1))),
-    B_(normalize(Tensor::random(1, dimension, 1))),
+    A_(normalize<Tensor>(Tensor::random(1, dimension, 1))),
+    B_(normalize<Tensor>(Tensor::random(1, dimension, 1))),
     lA_(igen << 1, gen<elt_t>(1)),
     lB_(igen << 1, gen<elt_t>(1)),
     AlA_(A_), BlB_(B_), canonical_(true)
@@ -43,7 +43,7 @@ namespace mps {
     
   template<class Tensor>
   iTEBD<Tensor>::iTEBD(const Tensor &A)
-  : A_(reshape(normalize(A), igen << 1 << A.dimension(0) << 1)),
+    : A_(reshape(normalize<Tensor>(A), igen << 1 << A.dimension(0) << 1)),
     B_(A_),
     lA_(igen << 1, gen<elt_t>(1.0)),
     lB_(igen << 1, gen<elt_t>(1.0)),
@@ -54,8 +54,8 @@ namespace mps {
 
   template<class Tensor>
   iTEBD<Tensor>::iTEBD(const Tensor &A, const Tensor &B) :
-    A_(reshape(normalize(A), igen << 1 << A.dimension(0) << 1)),
-    B_(reshape(normalize(B), igen << 1 << B.dimension(0) << 1)),
+    A_(reshape(normalize<Tensor>(A), igen << 1 << A.dimension(0) << 1)),
+    B_(reshape(normalize<Tensor>(B), igen << 1 << B.dimension(0) << 1)),
     lA_(igen << 1, gen<elt_t>(1.0)),
     lB_(igen << 1, gen<elt_t>(1.0)),
     AlA_(A_), BlB_(B_), canonical_(true)

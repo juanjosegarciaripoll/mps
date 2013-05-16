@@ -197,7 +197,7 @@ namespace mps {
 
   template<class MPS>
   void
-  DMRG<MPS>::commutes_with(const DMRG<MPS>::elt_t &Q)
+  DMRG<MPS>::commutes_with(const elt_t &Q)
   {
     Q_operators.push_back(Q);
   }
@@ -527,14 +527,16 @@ namespace mps {
    * The Hamiltonian class always returns complex operators. We can
    * fix this by having a specialization depending on the DMRG class.
    */
-  static inline const RTensor to_tensor(const DMRG<RMPS> &dmrg, const CTensor &op)
-  {
-    return real(op);
-  }
+  namespace {
+    inline const RTensor to_tensor(const DMRG<RMPS> &dmrg, const CTensor &op)
+    {
+      return real(op);
+    }
 
-  static inline const CTensor to_tensor(const DMRG<CMPS> &dmrg, const CTensor &op)
-  {
-    return op;
+    inline const CTensor to_tensor(const DMRG<CMPS> &dmrg, const CTensor &op)
+    {
+      return op;
+    }
   }
 
   template<class MPS>
@@ -645,7 +647,7 @@ namespace mps {
 	Heff = Heff + kron2(interaction_left(k,m), Heffir[m]);
       }
     }
-    return ensure_Hermitian(Heff);
+    return ensure_Hermitian<elt_t>(Heff);
   }
 
   template<class MPS>
@@ -754,7 +756,7 @@ namespace mps {
     Pk = reshape(Pk, a1,i1*b1);
     elt_t Hblock = block_site_interaction_right(P, k)
       + kron2(local_term(k), elt_t::eye(b1));
-    Hblock = ensure_Hermitian(Hblock);
+    Hblock = ensure_Hermitian<elt_t>(Hblock);
     Hr_.at(k) = fold(foldc(Pk,-1, reshape(Hblock, i1*b1,i1*b1),0), -1, Pk, -1);
 
     // Conserved quantities:
