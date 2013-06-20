@@ -178,7 +178,7 @@ private:
 
   //** Expected value of two operators, acting on sites 'i' and 'j'. */
   cdouble expected(const CiTEBD &psi, const CTensor &Op1, int i,
-                  const CTensor &Op2, int j);
+                   const CTensor &Op2, int j);
 
   /** String order parameter between sites 'i' and 'j', both included. */
   cdouble string_order(const CiTEBD &psi, const CTensor &Opi, int i,
