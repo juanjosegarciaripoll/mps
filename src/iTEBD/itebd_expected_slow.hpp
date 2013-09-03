@@ -64,19 +64,13 @@ namespace mps {
   template<class t>
   static inline typename t::elt_t slow_string_order(const t &Op1, int i, const t &Opmid, const t &Op2, int j, const t &A, const t &lA, const t &B, const t &lB)
   {
-    if (i > j)
-      return slow_string_order<t>(Op1, j, Opmid, Op2, i, A, lA, B, lB);
-    if (i == j) {
-      std::cerr << "In string_order(), the starting and ending indices "
-        "cannot be the same.\n";
-      abort();
-    }
-    if (i & 1) {
-      return slow_string_order<t>(Op1, 0, Opmid, Op2, j-i, B, lB, A, lA);
-    } else if (i > 0) {
-      j = j - i;
-      i = 0;
-    }
+     if (i == j) {
+       return slow_string_order(mmult(Op1, Op2), i, Opmid,
+                                t::eye(Op2.rows()), i+1,
+                                A, lA, B, lB);
+     }
+     if (i > j)
+       return slow_string_order(Op2, j, Opmid, Op1, i, A, lA, B, lB);
 
     t AlA = scale(A, -1, lA);
     t BlB = scale(B, -1, lB);
@@ -88,27 +82,29 @@ namespace mps {
     t R1 = R0;
 
     t Op;
-    for (; i <= j; i++) {
-      const t &AorB = (i & 1)? BlB : AlA;
-      const t &E = (i & 1)? EB : EA;
+    // We have to cover an even number of A and B sites
+    // so that we can trace with a power of (EA * EB)
+    int first = (i & 1)? i-1 : i;
+    int last = (j & 1)? j : j-1;
+    for (int k = first; k <= last; k++) {
+      const t &AorB = (k & 1)? BlB : AlA;
+      const t &E = (k & 1)? EB : EA;
+      if (k < i || k > j)
+        Op = t();
+      else if (k == i)
+        Op = Op1;
+      else if (k == j)
+        Op = Op2;
+      else
+        Op = Opmid;
+      if (Op.is_empty())
+         R1 = mmult(R1, E);
+      else
+        R1 = mmult(R1, build_E_matrix(foldin(Op, -1, AorB, 1), AorB));
       R0 = mmult(R0, E);
-      if (i == 0) {
-	Op = Op1;
-      } else if (i == j) {
-	Op = Op2;
-      } else if (Opmid.is_empty()) {
-        R1 = mmult(R1, E);
-        continue;
-      } else {
-	Op = Opmid;
-      }
-      R1 = mmult(R1, build_E_matrix(foldin(Op, -1, AorB, 1), AorB));
-    }
-    if (i & 1) {
-      // The string order finishes on an 'A' site, but our transfer matrix
-      // R0 was initially computed for A * B. We thus add another empty site.
-      R0 = mmult(R0, EB);
-      R1 = mmult(R1, EB);
+      double n = norm2(R0);
+      R0 = R0 / n;
+      R1 = R1 / n;
     }
     typename t::elt_t norm = trace(R0);
     typename t::elt_t value = trace(R1);
