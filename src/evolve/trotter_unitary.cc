@@ -144,19 +144,21 @@ namespace mps {
        *   singular value decomposition above.
        * Notice that at the end, P is orthonormalized in both cases.
        */
-      index new_a2 = where_to_truncate(s, tolerance, max_a2? max_a2 : a2);
-      if (debug) {
-        std::cout << "a2=" << a2 << ", new_a2=" << new_a2
-                  << ", tol=" << tolerance
-                  << ", max=" << (max_a2? max_a2 : a2)
-                  << ", s=" << s << std::endl;
-      }
-      if (new_a2 != a2) {
-	P1 = change_dimension(P1, -1, new_a2);
-	P2 = change_dimension(P2, 0, new_a2);
-	a2 = new_a2;
-        for (index i = a2; i < s.size(); i++)
-          err += square(s[i]);
+      if (guifre) {
+        index new_a2 = where_to_truncate(s, tolerance, max_a2? max_a2 : a2);
+        if (debug) {
+          std::cout << "a2=" << a2 << ", new_a2=" << new_a2
+                    << ", tol=" << tolerance
+                    << ", max=" << (max_a2? max_a2 : a2)
+                    << ", s=" << s << std::endl;
+        }
+        if (new_a2 != a2) {
+          P1 = change_dimension(P1, -1, new_a2);
+          P2 = change_dimension(P2, 0, new_a2);
+          a2 = new_a2;
+          for (index i = a2; i < s.size(); i++)
+            err += square(s[i]);
+        }
       }
     }
     if (dk > 0) {

@@ -54,7 +54,6 @@ namespace mps {
       if (truncate(P, Pfull, Dmax, false)) {
 	return simplify(P, Pfull, &sense, false, sweeps, normalize);
       }
-      return 0.0;
     } else {
       double err = U.apply(P, sense, Dmax, true); sense = -sense;
       err += U.apply(P, sense, Dmax, true, true); sense = -sense;

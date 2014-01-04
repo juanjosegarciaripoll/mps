@@ -47,16 +47,16 @@ namespace mps {
       }
       sense = +1;
     }
-    double err;
     if (optimize) {
       CMPS Pfull = *P;
-      err = U2.apply(&Pfull, sense, Dmax, true); sense = -sense;
-      err += U1.apply(&Pfull, sense, Dmax, true); sense = -sense;
-      err += U2.apply(&Pfull, sense, Dmax, true); sense = -sense;
+      U2.apply(&Pfull, sense, Dmax, false); sense = -sense;
+      U1.apply(&Pfull, sense, Dmax, false); sense = -sense;
+      U2.apply(&Pfull, sense, Dmax, false, true); sense = -sense;
       if (truncate(P, Pfull, Dmax, false)) {
         return simplify(P, Pfull, &sense, false, sweeps, normalize);
       }
     } else {
+      double err;
       err = U2.apply(P, sense, Dmax, true); sense = -sense;
       err += U1.apply(P, sense, Dmax, true); sense = -sense;
       err += U2.apply(P, sense, Dmax, true); sense = -sense;
