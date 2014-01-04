@@ -55,13 +55,14 @@ namespace mps {
       if (truncate(P, Pfull, Dmax, false)) {
         return simplify(P, Pfull, &sense, false, sweeps, normalize);
       }
+      return 0.0;
     } else {
       double err;
       err = U2.apply(P, sense, Dmax, true); sense = -sense;
       err += U1.apply(P, sense, Dmax, true); sense = -sense;
       err += U2.apply(P, sense, Dmax, true); sense = -sense;
+      return err;
     }
-    return err;
   }
 
 } // namespace mps
