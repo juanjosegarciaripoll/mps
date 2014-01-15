@@ -28,7 +28,7 @@ namespace mps {
   static inline bool
   stop(double delta, double tol, double value)
   {
-    return delta < tol * std::max(abs(value), 1e-3);
+    return delta < tol * std::max<double>(abs(value), 1e-3);
   }
 
   static inline double
