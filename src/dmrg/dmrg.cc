@@ -173,7 +173,7 @@ namespace mps {
     } else {
       update_matrices_right(P, k);
     }
-    eigenvalues = real(aux);
+    eigenvalues = tensor::real(aux);
     return eigenvalues[0];
   }
 
@@ -211,9 +211,9 @@ namespace mps {
       RTensor Z = RTensor::zeros(1,1);
       Booleans flag;
       for (index n = 0; n < n_Q; n++) {
-	RTensor Nl = (k > 0)? real(Ql_[n][k-1]) : Z;
-	RTensor Nr = ((k+2)<Qr_[n].size())? real(Qr_[n][k+2]) : Z;
-	RTensor Ni = real(take_diag(Q_operators[n]));
+	RTensor Nl = (k > 0)? tensor::real(Ql_[n][k-1]) : Z;
+	RTensor Nr = ((k+2)<Qr_[n].size())? tensor::real(Qr_[n][k+2]) : Z;
+	RTensor Ni = tensor::real(take_diag(Q_operators[n]));
 	double desired_N = Q_values[n];
 	RTensor N = direct_sum(direct_sum(Nl, Ni), direct_sum(Ni, Nr));
 	if (n == 0) {
@@ -407,7 +407,7 @@ namespace mps {
     } else {
       update_matrices_right(P, k+1);
     }
-    eigenvalues = real(aux);
+    eigenvalues = tensor::real(aux);
     return eigenvalues[0];
   }
 
@@ -530,7 +530,7 @@ namespace mps {
   namespace {
     inline const RTensor to_tensor(const DMRG<RMPS> &dmrg, const CTensor &op)
     {
-      return real(op);
+      return tensor::real(op);
     }
 
     inline const CTensor to_tensor(const DMRG<CMPS> &dmrg, const CTensor &op)
@@ -765,7 +765,7 @@ namespace mps {
       elt_t prev_Q = (k+1 < size())? Qr_[n][k+1] : elt_t::zeros(1);
       prev_Q = direct_sum(elt_t(take_diag(Q_operators[n])), prev_Q);
       prev_Q = foldc(Pk, -1, scale(Pk, -1, prev_Q), -1);
-      Qr_.at(n).at(k) = round(real(take_diag(prev_Q)));
+      Qr_.at(n).at(k) = round(tensor::real(take_diag(prev_Q)));
       //std::cout << "Qr_(" << n << ',' << k  << ")=\n";
       //show_matrix(std::cout, Qr_[n][k]);
     }
@@ -800,7 +800,7 @@ namespace mps {
       elt_t prev_Q = (k > 0)? Ql_[n][k-1] : elt_t::zeros(1);
       prev_Q = direct_sum(prev_Q, elt_t(take_diag(Q_operators[n])));
       prev_Q = foldc(Pk, 0, scale(Pk, 0, prev_Q), 0);
-      Ql_[n].at(k) = round(real(take_diag(prev_Q)));
+      Ql_[n].at(k) = round(tensor::real(take_diag(prev_Q)));
       //std::cout << "Ql_(" << n << ',' << k << ")=\n";
       //show_matrix(std::cout, Ql_[n][k]);
     }
