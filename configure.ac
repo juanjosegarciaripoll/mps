@@ -36,6 +36,7 @@ AM_INIT_AUTOMAKE([1.9 foreign dist-bzip2 dist-zip subdir-objects])
 # Programs used to build the library
 AC_PROG_CC
 AC_PROG_CXX
+AM_PROG_CC_C_O # needed to build in subdirs
 AC_LANG([C++])
 AC_PROG_LIBTOOL
 
