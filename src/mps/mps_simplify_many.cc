@@ -114,7 +114,7 @@ namespace mps {
       number x = number_zero<number>();
       for (int i = 0; i < nvectors; i++) {
         for (int j = i; j < nvectors; j++) {
-          number y = scprod(Q[i], Q[j]) * conj(weights[i]) * weights[j];
+          number y = scprod(Q[i], Q[j]) * tensor::conj(weights[i]) * weights[j];
           if (i == j)
             x = x + y;
           else

@@ -124,9 +124,9 @@ namespace mps {
       for (int n = 0; n <= ndx; n++) {
 	cdouble aux;
 	N.at(n, ndx) = aux = scprod(states[n], current);
-	N.at(ndx, n) = conj(aux);
+	N.at(ndx, n) = tensor::conj(aux);
 	Heff.at(n, ndx) = aux = expected(states[n], H_, current);
-	Heff.at(ndx, n) = conj(aux);
+	Heff.at(ndx, n) = tensor::conj(aux);
       }
       N.at(ndx, ndx) = real(N(ndx,ndx));
       Heff.at(ndx, ndx) = real(Heff(ndx,ndx));

@@ -74,7 +74,7 @@ namespace mps {
           Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op2[j]);
           output.at(i,j) = prop_matrix_close(aux2, auxRight[j])[0];
           aux = prop_matrix(aux, +1, a[j], b[j], jordan_wigner_op);
-          output.at(j,i) = conj(output.at(i,j));
+          output.at(j,i) = tensor::conj(output.at(i,j));
         }
       }
       if (!symmetric) {

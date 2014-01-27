@@ -41,7 +41,7 @@ namespace mps {
     for (index i = 0; i < N; i++) {
       double sqrts = sqrt(s[i]);
       v1->at(i) = sqrts * tensor::reshape(O1(range(), range(i)), N, N);
-      v2->at(i) = conj(sqrts * tensor::reshape(O2(range(), range(i)), N, N));
+      v2->at(i) = tensor::conj(sqrts * tensor::reshape(O2(range(), range(i)), N, N));
     }
   }
 

@@ -703,7 +703,7 @@ namespace mps {
 	V = elt_t(Qk.size(), n_orth_states());
       V.at(range(), range(state)) = Qk;
     }
-    return conj(V);
+    return tensor::conj(V);
   }
 
   template<class MPS>
@@ -732,7 +732,7 @@ namespace mps {
 	V = elt_t(Qk.size(), n_orth_states());
       V.at(range(), range(state)) = Qk;
     }
-    return conj(V);
+    return tensor::conj(V);
   }
 
   template<class MPS>

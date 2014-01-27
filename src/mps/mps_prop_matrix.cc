@@ -66,9 +66,9 @@ namespace mps {
 
     t M = op ?
       // M(a1,b1,a2,b2) Op(j2,i2) Q'(a2,j2,a3) -> M(a1,b1,b2,i2,a3)
-      fold(M0, 2, fold(*op, 0, conj(Q), 1), 1) :
+      fold(M0, 2, fold(*op, 0, tensor::conj(Q), 1), 1) :
       // M(a1,b1,a2,b2) Q'(a2,i2,a3) -> M(a1,b1,b2,i2,a3)
-      fold(M0, 2, conj(Q), 0);
+      fold(M0, 2, tensor::conj(Q), 0);
     // M(a1,b1,[b2,i2],a3) P([b2,i2],b3) -> M(a1,b1,a3,b3)
     return fold(reshape(M, a1,b1,b2*i2,a3), 2, reshape(P, b2*i2,b3), 0);
   }
