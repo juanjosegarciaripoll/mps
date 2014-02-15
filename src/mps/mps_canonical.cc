@@ -47,7 +47,6 @@ namespace mps {
 	  U = change_dimension(U, 1, new_l);
 	  V = change_dimension(V, 0, new_l);
 	  s = change_dimension(s, 0, new_l);
-	  s = s / norm2(s);
 	  l = new_l;
 	}
 	psi.at(ndx) = reshape(U, b1,i1,l);
@@ -69,7 +68,6 @@ namespace mps {
 	  U = change_dimension(U, 0, new_l);
 	  V = change_dimension(V, 1, new_l);
 	  s = change_dimension(s, 0, new_l);
-	  s = s / norm2(s);
 	  l = new_l;
 	}
 	psi.at(ndx) = reshape(U, l,i1,b2);
