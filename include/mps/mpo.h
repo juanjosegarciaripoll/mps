@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef MPDO_MPDO_H
+#ifndef MPO_MPO_H
 #define MPO_MPO_H
 
 #include <mps/mps.h>
@@ -50,4 +50,4 @@ namespace mps {
 
 }
 
-#endif /* !TENSOR_MPO_H */
+#endif /* !MPO_MPO_H */
