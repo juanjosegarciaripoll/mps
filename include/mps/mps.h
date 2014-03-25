@@ -166,6 +166,12 @@ namespace mps {
   void set_canonical_2_sites(CMPS &P, const CTensor &Pij, index site, int sense,
                              index Dmax = 0, double tol = -1);
 
+  /* Return a single-site density matrix out of an MPS. */
+  const RTensor density_matrix(const RMPS &psi, index site);
+
+  /* Return a single-site density matrix out of an MPS. */
+  const CTensor density_matrix(const CMPS &psi, index site);
+
 }
 
 #endif /* !TENSOR_MPS_H */

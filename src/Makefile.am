@@ -86,6 +86,8 @@ libmps_la_SOURCES = \
 	mps/mps_norm_z.cc \
 	mps/mps_scprod_d.cc \
 	mps/mps_scprod_z.cc \
+	mps/mps_dty_matrix_d.cc \
+	mps/mps_dty_matrix_z.cc \
 	mps/mps_expected1_d.cc \
 	mps/mps_expected1_dz.cc \
 	mps/mps_expected1_z.cc \
