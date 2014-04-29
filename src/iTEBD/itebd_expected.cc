@@ -41,8 +41,7 @@ namespace mps {
   template<class Tensor>
   typename Tensor::elt_t
   string_order(const Tensor &Opi, int i, const Tensor &Opmiddle,
-                              const Tensor &Opj, i
-nt j) const
+               const Tensor &Opj, int j) const
   {
     if (i > j)
       return string_order(Opj, j, Opmiddle, Opi, i);
