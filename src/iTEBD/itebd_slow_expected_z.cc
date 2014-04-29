@@ -26,7 +26,7 @@ namespace mps {
 
   cdouble expected(const CiTEBD &psi, const CTensor &Op, int site)
   {
-    if (site == 0)
+    if ((site % 2) == 0)
       return expected(psi, Op, CTensor::eye(psi.matrix(1).dimension(1)));
     else
       return expected(psi, CTensor::eye(psi.matrix(0).dimension(1)), Op);

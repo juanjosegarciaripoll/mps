@@ -26,7 +26,7 @@ namespace mps {
 
   double expected(const RiTEBD &psi, const RTensor &Op, int site)
   {
-    if (site == 0)
+    if ((site % 2) == 0)
       return expected(psi, Op, RTensor::eye(psi.matrix(1).dimension(1)));
     else
       return expected(psi, RTensor::eye(psi.matrix(0).dimension(1)), Op);
