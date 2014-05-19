@@ -26,7 +26,8 @@ namespace mps {
   {
   }
 
-  CMPO::CMPO(index length, index physical_dimension)
+  CMPO::CMPO(index length, index physical_dimension) :
+    parent(length)
   {
     if (length < 2) {
       std::cerr << "Cannot create MPO with size 0 or 1.\n";
