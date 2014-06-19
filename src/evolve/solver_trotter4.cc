@@ -58,20 +58,20 @@ namespace mps {
       double err = 0;
       CMPS Pfull = *P;
       U1.apply(&Pfull, sense, 0, false); sense = -sense;
-      U2.apply(&Pfull, sense, 0, false); sense = -sense;
+      U2.apply(&Pfull, sense, 0, false, normalize); sense = -sense;
       if (truncate(P, Pfull, Dmax, false)) {
 	err += simplify(P, Pfull, &sense, false, sweeps, normalize);
       }
       Pfull = *P;
       U3.apply(&Pfull, sense, 0, false); sense = -sense;
       U4.apply(&Pfull, sense, 0, false); sense = -sense;
-      U3.apply(&Pfull, sense, 0, false); sense = -sense;
+      U3.apply(&Pfull, sense, 0, false, normalize); sense = -sense;
       if (truncate(P, Pfull, Dmax, false)) {
 	err += simplify(P, Pfull, &sense, false, sweeps, normalize);
       }
       Pfull = *P;
       U2.apply(&Pfull,-1, 0, false); sense = -sense;
-      U1.apply(&Pfull, 1, 0, false); sense = -sense;
+      U1.apply(&Pfull, 1, 0, false, normalize); sense = -sense;
       if (truncate(P, Pfull, Dmax, false)) {
 	err += simplify(P, Pfull, &sense, false, sweeps, normalize);
       }
@@ -83,7 +83,7 @@ namespace mps {
       U4.apply(P, sense, Dmax, true); sense = -sense;
       U3.apply(P, sense, Dmax, true); sense = -sense;
       U2.apply(P, sense, Dmax, true); sense = -sense;
-      U1.apply(P, sense, Dmax, true); sense = -sense;
+      U1.apply(P, sense, Dmax, true, normalize); sense = -sense;
       *P = normal_form(*P);
     }
 

@@ -51,7 +51,7 @@ namespace mps {
       CMPS Pfull = *P;
       U2.apply(&Pfull, sense, Dmax, false); sense = -sense;
       U1.apply(&Pfull, sense, Dmax, false); sense = -sense;
-      U2.apply(&Pfull, sense, Dmax, false, true); sense = -sense;
+      U2.apply(&Pfull, sense, Dmax, false, normalize); sense = -sense;
       if (truncate(P, Pfull, Dmax, false)) {
         return simplify(P, Pfull, &sense, false, sweeps, normalize);
       }
@@ -60,7 +60,7 @@ namespace mps {
       double err;
       err = U2.apply(P, sense, Dmax, true); sense = -sense;
       err += U1.apply(P, sense, Dmax, true); sense = -sense;
-      err += U2.apply(P, sense, Dmax, true); sense = -sense;
+      err += U2.apply(P, sense, Dmax, true, normalize); sense = -sense;
       return err;
     }
   }

@@ -50,13 +50,13 @@ namespace mps {
     if (optimize) {
       CMPS Pfull = *P;
       U.apply(&Pfull, sense, 0, false); sense = -sense;
-      U.apply(&Pfull, sense, 0, false, true); sense = -sense;
+      U.apply(&Pfull, sense, 0, false, normalize); sense = -sense;
       if (truncate(P, Pfull, Dmax, false)) {
 	return simplify(P, Pfull, &sense, false, sweeps, normalize);
       }
     } else {
       double err = U.apply(P, sense, Dmax, true); sense = -sense;
-      err += U.apply(P, sense, Dmax, true, true); sense = -sense;
+      err += U.apply(P, sense, Dmax, true, normalize); sense = -sense;
       return err;
     }
   }
