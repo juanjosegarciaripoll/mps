@@ -18,19 +18,18 @@
 */
 
 #include <tensor/linalg.h>
-#include <mps/time_evolve.h>
 #include <tensor/io.h>
+#include <tensor/tools.h>
+#include <mps/time_evolve.h>
+#include <mps/mps_algorithms.h>
 
 namespace mps {
 
   TrotterSolver::Unitary::Unitary(const Hamiltonian &H, index k, cdouble dt,
-                                  bool apply_pairwise, bool do_debug,
-                                  double the_tolerance) :
-    debug(do_debug), pairwise(apply_pairwise), tolerance(the_tolerance),
+                                  bool apply_pairwise, bool do_debug) :
+    debug(do_debug), pairwise(apply_pairwise),
     k0(k), kN(H.size()), U(H.size())
   {
-    if (the_tolerance >= 0.0)
-      abort();
     if (k > 1) {
       std::cerr << "In TrotterSolver::Unitary::Unitary(H, k, ...), "
         "the initial site k was neither 0 nor 1";
@@ -84,15 +83,16 @@ namespace mps {
   }
 
   void
-  TrotterSolver::Unitary::apply_onto_one_site(CMPS &P, const CTensor &Uloc, index k, int dk, bool guifre) const
+  TrotterSolver::Unitary::apply_onto_one_site(CMPS &P, const CTensor &Uloc,
+                                              index k, int dk) const
   {
     CTensor P1 = P[k];
     if (Uloc.is_empty()) {
-      if (debug) {
+      if (debug > 2) {
 	std::cout << "<" << k << ">";
       }
     } else {
-      if (debug) {
+      if (debug > 2) {
 	std::cout << "(" << k << ")";
       }
       index a1,i1,a2;
@@ -105,7 +105,8 @@ namespace mps {
   double
   TrotterSolver::Unitary::apply_onto_two_sites(CMPS &P, const CTensor &U12,
 					       index k1, index k2, int dk,
-					       index max_a2, bool guifre) const
+					       double tolerance, index max_a2)
+    const
   {
     index a1, i1, a2, i2, a3;
 
@@ -116,11 +117,11 @@ namespace mps {
 
     double err = 0.0;
     if (U12.is_empty()) {
-      if (debug) {
+      if (debug > 2) {
 	std::cout << "<" << k1 << "," << k2 << ">";
       }
     } else {
-      if (debug) {
+      if (debug > 2) {
 	std::cout << "(" << k1 << "," << k2 << ")";
       }
       /* Apply the unitary onto two neighboring sites. This creates a
@@ -138,27 +139,26 @@ namespace mps {
       /*
        * Here we perform a first truncation of the matrix.
        *   1) If we use Guifre's algorithm, the truncation is based on the
-       *   maximum size that we want to keep, or a tolerance.
+       *   maximum size that we want to keep and a tolerance.
        *   2) If we on the other hand use the simplify() routine, we just
        *   remove the zero elements which appear from the zeros in the
        *   singular value decomposition above.
        * Notice that at the end, P is orthonormalized in both cases.
        */
-      if (guifre) {
-        index new_a2 = where_to_truncate(s, tolerance, max_a2? max_a2 : a2);
-        if (debug) {
-          std::cout << "a2=" << a2 << ", new_a2=" << new_a2
-                    << ", tol=" << tolerance
-                    << ", max=" << (max_a2? max_a2 : a2)
-                    << ", s=" << s << std::endl;
-        }
-        if (new_a2 != a2) {
-          P1 = change_dimension(P1, -1, new_a2);
-          P2 = change_dimension(P2, 0, new_a2);
-          a2 = new_a2;
-          for (index i = a2; i < s.size(); i++)
-            err += square(s[i]);
-        }
+      index new_a2 = where_to_truncate(s, tolerance, max_a2? max_a2 : a2);
+      if (debug > 1) {
+        std::cout << "Truncating site " << k1
+                  << " to a2=" << a2 << ", new_a2=" << new_a2
+                  << ", tol=" << tolerance
+                  << ", max=" << (max_a2? max_a2 : a2)
+                  << ", s=" << s << std::endl;
+      }
+      if (new_a2 != a2) {
+        P1 = change_dimension(P1, -1, new_a2);
+        P2 = change_dimension(P2, 0, new_a2);
+        a2 = new_a2;
+        for (index i = a2; i < s.size(); i++)
+          err += square(s[i]);
       }
     }
     if (dk > 0) {
@@ -172,48 +172,83 @@ namespace mps {
   }
 
   double
-  TrotterSolver::Unitary::apply(CMPS *psi, int sense, index Dmax, bool guifre, bool normalize) const
+  TrotterSolver::Unitary::apply_and_simplify(CMPS *psi, int *sense,
+                                             double tolerance,
+                                             index Dmax, bool normalize) const
   {
+    double err = apply(psi, sense, tolerance, 0, normalize);
+    CMPS aux = *psi;
+    index sweeps = 12;
+    tic();
+    if (truncate(&aux, *psi, Dmax, false)) {
+      err += simplify(&aux, *psi, sense, false, sweeps, normalize);
+      *psi = aux;
+      if (debug) {
+        std::cout << "bond_dimension after truncating = "
+                  << largest_bond_dimension(*psi)
+                  << ", time=" << toc() << "s" << std::endl;
+      }
+    }
+    return err;
+  }
+
+  double
+  TrotterSolver::Unitary::apply(CMPS *psi, int *sense, double tolerance,
+                                index Dmax, bool normalize) const
+  {
+    if (*sense == 0) {
+      if (normalize) {
+        *psi = normal_form(*psi);
+      } else {
+        *psi = canonical_form(*psi);
+      }
+      *sense = +1;
+    }
+    tic();
+
     index L = psi->size();
     double err = 0;
     int dk = pairwise? 2 : 1;
-    if (sense > 0) {
+    if (*sense > 0) {
       if (pairwise) {
 	for (int k = 0; k < k0; k++) {
-	  apply_onto_one_site(*psi, U[k], k, sense, guifre);
+	  apply_onto_one_site(*psi, U[k], k, *sense);
 	}
       }
       for (int k = k0; k < kN; k += dk) {
-	err += apply_onto_two_sites(*psi, U[k], k, k+1, sense, Dmax, guifre);
+	err += apply_onto_two_sites(*psi, U[k], k, k+1, *sense, tolerance, Dmax);
       }
       if (pairwise) {
 	for (int k = kN; k < (int)L; k++) {
-	  apply_onto_one_site(*psi, U[k], k, sense, guifre);
+	  apply_onto_one_site(*psi, U[k], k, *sense);
 	}
       }
     } else {
       if (pairwise) {
 	for (int k = L-1; k >= kN; k--) {
-	  apply_onto_one_site(*psi, U[k], k, sense, guifre);
+	  apply_onto_one_site(*psi, U[k], k, *sense);
 	}
       }
       for (int k = kN - dk; k >= k0; k -= dk) {
-	err += apply_onto_two_sites(*psi, U[k], k, k+1, sense, Dmax, guifre);
+	err += apply_onto_two_sites(*psi, U[k], k, k+1, *sense, tolerance, Dmax);
       }
       if (pairwise) {
 	for (int k = k0 - 1; k >= 0; k--) {
-	  apply_onto_one_site(*psi, U[k], k, sense, guifre);
+	  apply_onto_one_site(*psi, U[k], k, *sense);
 	}
       }
     }
     if (debug) {
-      std::cout << std::endl;
+      std::cout << "bond_dimension = " << largest_bond_dimension(*psi)
+                << ", time = " << toc() << "s\n";
     }
     if (normalize) {
-      index k = (sense > 0)? L-1 : 0;
+      index k = (*sense > 0)? L-1 : 0;
       CTensor Pk = (*psi)[k];
       psi->at(k) = Pk / norm2(Pk);
     }
+
+    *sense = -*sense;
     return err;
   }
 

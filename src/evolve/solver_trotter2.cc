@@ -28,11 +28,8 @@ namespace mps {
    *	exp(-iHdt) = \prod_k={N-1}^1 exp(-iH_{kk+1} dt/2) \prod_k=1^{N-1} exp(-iH_{kk+1} dt/2)
    */
 
-  Trotter2Solver::Trotter2Solver(const Hamiltonian &H, cdouble dt, bool do_optimize,
-				 double tol) :
-  TrotterSolver(dt), U(H, 0, dt/2.0, false, false, tol),
-    optimize(do_optimize), sense(0),
-    sweeps(32), normalize(true), tolerance(tol)
+  Trotter2Solver::Trotter2Solver(const Hamiltonian &H, cdouble dt) :
+    TrotterSolver(dt), U(H, 0, dt/2.0, false), sense(0)
   {
   }
 
@@ -47,17 +44,32 @@ namespace mps {
       }
       sense = +1;
     }
-    if (optimize) {
-      CMPS Pfull = *P;
-      U.apply(&Pfull, sense, 0, false); sense = -sense;
-      U.apply(&Pfull, sense, 0, false, normalize); sense = -sense;
-      if (truncate(P, Pfull, Dmax, false)) {
-	return simplify(P, Pfull, &sense, false, sweeps, normalize);
-      }
-    } else {
-      double err = U.apply(P, sense, Dmax, true); sense = -sense;
-      err += U.apply(P, sense, Dmax, true, normalize); sense = -sense;
+    switch (strategy) {
+    case TRUNCATE_EACH_UNITARY: {
+      double err;
+      err = U.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      err += U.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax, normalize);
       return err;
+    }
+    case TRUNCATE_EACH_LAYER: {
+      CMPS Pfull = *P;
+      double err;
+      err = U.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, 0);
+      err += U.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, 0,
+                                  normalize);
+      return err;
+    }
+    case DO_NOT_TRUNCATE: {
+      U.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      U.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      return 0.0;
+    }
+    default: {
+      CMPS Pfull = *P;
+      U.apply(&Pfull, &sense, MPS_TRUNCATE_ZEROS, 0);
+      return U.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax,
+                                  normalize);
+    }
     }
   }
 

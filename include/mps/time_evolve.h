@@ -57,14 +57,23 @@ namespace mps {
   class TrotterSolver : public TimeSolver {
   public:
     enum {
-      TRUNCATE_AT_END = 0,
+      TRUNCATE_GROUPS = 0,
       TRUNCATE_EACH_LAYER = 1,
-      DO_NOT_TRUNCATE = 2
+      TRUNCATE_EACH_UNITARY = 2,
+      DO_NOT_TRUNCATE = 3
     } strategy;
 
+    int sweeps;
+    bool normalize;
+    int sense;
+    int debug;
+
     TrotterSolver(cdouble new_dt) :
-    TimeSolver(new_dt),
-    strategy(TRUNCATE_AT_END)
+      TimeSolver(new_dt),
+      strategy(TRUNCATE_EACH_LAYER),
+      sweeps(8),
+      normalize(true),
+      debug(0)
     {};
 
     virtual ~TrotterSolver();
@@ -79,27 +88,29 @@ namespace mps {
       use.
     */
     struct Unitary {
+      bool debug;
+
       /*Construct the unitary operator.*/
-      Unitary(const Hamiltonian &H, index k, cdouble dt, bool apply_pairwise = true,
-	      bool do_debug = false, double tolerance = MPS_TIME_EVOLVE_TOLERANCE);
+      Unitary(const Hamiltonian &H, index k, cdouble dt,
+	      bool apply_pairwise = true, bool do_debug = false);
 
       /*Apply the unitary on a MPS.*/
-      double apply(CMPS *psi, int dk, index Dmax, bool guifre = false,
+      double apply(CMPS *psi, int *dk, double tolerance, index Dmax,
                    bool normalize = false) const;
 
+      /*Apply the unitary on a MPS and optimize the output.*/
+      double apply_and_simplify(CMPS *psi, int *dk, double tolerance, index Dmax,
+				bool normalize = false) const;
+
     private:
-      bool debug;
       bool pairwise;
-      double tolerance;
       int k0, kN;
       std::vector<CTensor> U;
-      void apply_onto_one_site(CMPS &P, const CTensor &Uloc, index k,
-                               int dk, bool guifre) const;
+      void apply_onto_one_site(CMPS &P, const CTensor &Uloc, index k, int dk) const;
       double apply_onto_two_sites(CMPS &P, const CTensor &U12,
-				  index k1, index k2, int dk, index max_a2,
-				  bool guifre) const;
+				  index k1, index k2, int dk,
+				  double tolerance, index max_a2) const;
     };
-
   };
 
   /**Trotter method with only two passes. This solver uses the second order Trotter approximation:
@@ -107,16 +118,12 @@ namespace mps {
      exp(-iH\Delta t) = exp(-iH_{even} \Delta t/2) exp(-iH_{odd} \Delta t/2)\f]
   */
   class Trotter2Solver : public TrotterSolver {
-    const Unitary U;
+    Unitary U;
     bool optimize;
     int sense;
-    const double tolerance;
   public:
-    int sweeps;
-    bool normalize;
     /**Create a solver for the given nearest neighbor Hamiltonian and time step.*/
-    Trotter2Solver(const Hamiltonian &H, cdouble dt, bool do_optimize = true,
-                   double tol = MPS_TIME_EVOLVE_TOLERANCE);
+    Trotter2Solver(const Hamiltonian &H, cdouble dt);
     
     virtual double one_step(CMPS *P, index Dmax);
   };
@@ -130,16 +137,11 @@ namespace mps {
      exp(-iH_{even} \Delta t/2)\f]
   */
   class Trotter3Solver : public TrotterSolver {
-    const Unitary U1, U2;
-    bool optimize;
+    Unitary U1, U2;
     int sense;
-    const double tolerance;
   public:
-    int sweeps;
-    bool normalize;
     /**Create a solver for the given nearest neighbor Hamiltonian and time step.*/
-    Trotter3Solver(const Hamiltonian &H, cdouble dt, bool do_optimize = true,
-                   double tol = MPS_TIME_EVOLVE_TOLERANCE);
+    Trotter3Solver(const Hamiltonian &H, cdouble dt);
 
     virtual double one_step(CMPS *P, index Dmax);
   };
@@ -147,17 +149,14 @@ namespace mps {
   /**Forest-Ruth method. This method uses a fourth order Forest-Ruth decomposition
      (see http://xxx.arxiv.org/cond-mat/0610210)*/
   class ForestRuthSolver : public TrotterSolver {
-    const Unitary U1, U2, U3, U4;
-    bool optimize;
+    Unitary U1, U2, U3, U4;
     int sense;
-    const double tolerance;
   public:
     int sweeps;
     bool normalize;
     int debug;
     /**Create a solver for the given nearest neighbor Hamiltonian and time step.*/
-    ForestRuthSolver(const Hamiltonian &H, cdouble dt, bool do_optimize = true,
-                     double tol = MPS_TIME_EVOLVE_TOLERANCE);
+    ForestRuthSolver(const Hamiltonian &H, cdouble dt);
     
     virtual double one_step(CMPS *P, index Dmax);
   };
