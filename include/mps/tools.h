@@ -21,6 +21,7 @@
 #define MPS_TOOLS_H
 
 #include <tensor/tensor.h>
+#include <mps/flags.h>
 
 namespace mps {
 
