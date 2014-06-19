@@ -29,7 +29,6 @@ namespace mps {
 
   enum {
     MPS_DEBUG_NONE = 0,
-    MPS_DEBUG_SIMPLIFY = 1,
     MPS_DEBUG_SIMPLIFY_MANY = 2,
     MPS_DEBUG_ARNOLDI = 4
   };

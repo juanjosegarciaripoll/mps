@@ -179,14 +179,13 @@ namespace mps {
     double err = apply(psi, sense, tolerance, 0, normalize);
     CMPS aux = *psi;
     index sweeps = 12;
-    tic();
     if (truncate(&aux, *psi, Dmax, false)) {
       err += simplify(&aux, *psi, sense, false, sweeps, normalize);
       *psi = aux;
       if (debug) {
-        std::cout << "bond_dimension after truncating = "
+        std::cout << "Unitary: bond dimension after truncating = "
                   << largest_bond_dimension(*psi)
-                  << ", time=" << toc() << "s" << std::endl;
+                  << std::endl;
       }
     }
     return err;
@@ -239,8 +238,8 @@ namespace mps {
       }
     }
     if (debug) {
-      std::cout << "bond_dimension = " << largest_bond_dimension(*psi)
-                << ", time = " << toc() << "s\n";
+      std::cout << "Unitary: bond dimension = " << largest_bond_dimension(*psi)
+                << "\t[" << toc() << "s]\n";
     }
     if (normalize) {
       index k = (*sense > 0)? L-1 : 0;

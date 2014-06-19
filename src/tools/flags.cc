@@ -24,11 +24,19 @@ namespace mps {
 
   tensor::Flags FLAGS;
 
+  const double MPS_DEFAULT = 12345678912345e78;
+
   const double MPS_DO_NOT_TRUNCATE = 2.0;
   const double MPS_TRUNCATE_ZEROS = 0.0;
   const double MPS_DEFAULT_TOLERANCE = -4.0;
 
-  const unsigned MPS_TRUNCATION_TOLERANCE = mps::FLAGS.create_key(DBL_EPSILON);
+  const unsigned MPS_TRUNCATION_TOLERANCE = FLAGS.create_key(DBL_EPSILON);
 
-}
+  const unsigned MPS_DEBUG_TROTTER = FLAGS.create_key(0);
+
+  const unsigned MPS_DEBUG_SIMPLIFY = FLAGS.create_key(0);
+
+  const unsigned MPS_SIMPLIFY_MAX_SWEEPS = FLAGS.create_key(12);
+
+  const unsigned MPS_SIMPLIFY_TOLERANCE = FLAGS.create_key(1e-14);}
 

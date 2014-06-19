@@ -33,7 +33,18 @@ namespace mps {
   /**Default relative tolerance of the singular values dropped.*/
   extern const double MPS_DEFAULT_TOLERANCE;
 
+  /**Flag key for the default relative truncation tolerance.*/
   extern const unsigned int MPS_TRUNCATION_TOLERANCE;
+
+  /**Flag key for debugging the time evolution routines.*/
+  extern const unsigned int MPS_DEBUG_TROTTER;
+
+  /**Flag key for debugging the simplification routines.*/
+  extern const unsigned int MPS_DEBUG_SIMPLIFY;
+  /**Flag key indicating the sweeps in the simplification routines.*/
+  extern const unsigned int MPS_SIMPLIFY_MAX_SWEEPS;
+  /**Flag key indicating what relative error is acceptable when simplifying.*/
+  extern const unsigned int MPS_SIMPLIFY_TOLERANCE;
 
 } // namespace mps
 

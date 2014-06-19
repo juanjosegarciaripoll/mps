@@ -43,23 +43,25 @@ namespace mps {
   double
   ForestRuthSolver::one_step(CMPS *P, index Dmax)
   {
-    if (sense == 0) {
-      if (normalize) {
-	*P = normal_form(*P);
-      } else {
-	*P = canonical_form(*P);
-      }
-      sense = 1;
-    }
+    int debug = FLAGS.get(MPS_DEBUG_TROTTER);
+
     switch (strategy) {
     case TRUNCATE_EACH_UNITARY: {
       double err = 0.0;
+      if (debug) std::cout << "Trotter4 method: truncate unitaries:\n"
+                           << "Trotter4 Layer 1/7\n";
       err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 2/7\n";
       err += U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 3/7\n";
       err += U3.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 4/7\n";
       err += U4.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 5/7\n";
       err += U3.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 6/7\n";
       err += U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 7/7\n";
       err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax, normalize);
       return err;
     }
@@ -76,25 +78,41 @@ namespace mps {
     }
     case TRUNCATE_EACH_LAYER: {
       double err = 0.0;
-      err += U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
+      if (debug) std::cout << "Trotter4 method: truncate layers:\n"
+                           << "Trotter4 Layer 1/7\n";
+      err += U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 2/7\n";
+      err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 3/7\n";
+      err += U3.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 4/7\n";
+      err += U4.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 5/7\n";
+      err += U3.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 6/7\n";
       err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      err += U3.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      err += U4.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      err += U3.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
+      if (debug) std::cout << "Trotter3 Layer 7/7\n";
       err += U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0,
                                    normalize);
       return err;
     }
     default: {
       double err = 0.0;
+      if (debug) std::cout << "Trotter4 method: truncate groups:\n"
+                           << "Trotter4 Layer 1/7\n";
       err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
+      if (debug) std::cout << "Trotter3 Layer 2/7\n";
+      err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 3/7\n";
       err += U3.apply(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
+      if (debug) std::cout << "Trotter3 Layer 4/7\n";
       err += U4.apply(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      err += U3.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
+      if (debug) std::cout << "Trotter3 Layer 5/7\n";
+      err += U3.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 6/7\n";
       err += U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      err += U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0,
+      if (debug) std::cout << "Trotter3 Layer 7/7\n";
+      err += U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax,
                                    normalize);
       return err;
     }

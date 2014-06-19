@@ -34,11 +34,8 @@ namespace mps {
   */
   class TimeSolver {
   public:
-    /**Output informative messages.*/
-    int debug;
-
     /**Create Solver with fixed time step.*/
-    TimeSolver(cdouble new_dt) : dt_(new_dt), debug(0) {};
+    TimeSolver(cdouble new_dt) : dt_(new_dt) {};
     virtual ~TimeSolver();
 
     /**Compute next time step. Given the state \f$\psi(0)\f$ represented
@@ -66,14 +63,12 @@ namespace mps {
     int sweeps;
     bool normalize;
     int sense;
-    int debug;
 
     TrotterSolver(cdouble new_dt) :
       TimeSolver(new_dt),
       strategy(TRUNCATE_EACH_LAYER),
       sweeps(8),
-      normalize(true),
-      debug(0)
+      normalize(true)
     {};
 
     virtual ~TrotterSolver();
@@ -154,7 +149,6 @@ namespace mps {
   public:
     int sweeps;
     bool normalize;
-    int debug;
     /**Create a solver for the given nearest neighbor Hamiltonian and time step.*/
     ForestRuthSolver(const Hamiltonian &H, cdouble dt);
     

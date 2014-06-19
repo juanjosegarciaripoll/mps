@@ -36,37 +36,43 @@ namespace mps {
   double
   Trotter2Solver::one_step(CMPS *P, index Dmax)
   {
-    if (sense == 0) {
-      if (normalize) {
-	*P = normal_form(*P);
-      } else {
-	*P = canonical_form(*P);
-      }
-      sense = +1;
-    }
+    int debug = FLAGS.get(MPS_DEBUG_TROTTER);
+
     switch (strategy) {
     case TRUNCATE_EACH_UNITARY: {
       double err;
+      if (debug) std::cout << "Trotter2 method: truncate unitaries\n"
+                           << "Trotter2 Layer 1/2\n";
       err = U.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter2 Layer 2/2\n";
       err += U.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax, normalize);
       return err;
     }
     case TRUNCATE_EACH_LAYER: {
       CMPS Pfull = *P;
       double err;
+      if (debug) std::cout << "Trotter2 method: truncate layers\n"
+                           << "Trotter2 Layer 1/2\n";
       err = U.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, 0);
+      if (debug) std::cout << "Trotter2 Layer 2/2\n";
       err += U.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, 0,
                                   normalize);
       return err;
     }
     case DO_NOT_TRUNCATE: {
+      if (debug) std::cout << "Trotter2 method: no truncation\n"
+                           << "Trotter2 Layer 1/2\n";
       U.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      if (debug) std::cout << "Trotter2 Layer 2/2\n";
       U.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
       return 0.0;
     }
     default: {
       CMPS Pfull = *P;
+      if (debug) std::cout << "Trotter2 method: truncate group:\n"
+                           << "Trotter2 Layer 1/2\n";
       U.apply(&Pfull, &sense, MPS_TRUNCATE_ZEROS, 0);
+      if (debug) std::cout << "Trotter2 Layer 2/2\n";
       return U.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax,
                                   normalize);
     }

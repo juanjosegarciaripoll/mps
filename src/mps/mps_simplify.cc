@@ -19,6 +19,8 @@
 
 #include <algorithm>
 #include <tensor/linalg.h>
+#include <tensor/tools.h>
+#include <mps/flags.h>
 #include <mps/mps.h>
 #include <mps/mps_algorithms.h>
 #include "mps_prop_matrix.cc"
@@ -149,8 +151,11 @@ namespace mps {
    */
   template<class MPS>
   static double
-  do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc, index sweeps, bool normalize)
+  do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
+              index sweeps, bool normalize)
   {
+    bool debug = FLAGS.get(MPS_DEBUG_SIMPLIFY);
+    double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
     typedef typename MPS::elt_t Tensor;
     MPS &P = *ptrP;
 
@@ -197,6 +202,10 @@ namespace mps {
     double err = 1.0, olderr, scp, normP2;
     for (index sweep = 0; sweep < sweeps; sweep++) {
       Tensor Pk;
+      if (debug) {
+        tic();
+        std::cout << "Simplify: sweep #" << sweep << std::flush;
+      }
       if (*sense > 0) {
 	Tensor Ml, Nl;
 	for (index k = 0; k < N; k++) {
@@ -252,7 +261,11 @@ namespace mps {
       }
       olderr = err;
       err = 1 - scp/sqrt(normQ2*normP2);
-      if ((olderr-err) < 1e-5*abs(olderr) || (err < 1e-14)) {
+      if (debug) {
+        std::cout << ", truncation error = " << err
+                  << "\t[" << toc() << "s]\n";
+      }
+      if ((olderr-err) < 1e-5*abs(olderr) || (err < tolerance)) {
 	if (normalize) {
 	  P.at(*sense > 0? N-1 : 0) = Pk/sqrt(normP2);
 	  *sense = -*sense;

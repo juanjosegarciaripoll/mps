@@ -35,26 +35,30 @@ namespace mps {
   double
   Trotter3Solver::one_step(CMPS *P, index Dmax)
   {
+    int debug = FLAGS.get(MPS_DEBUG_TROTTER);
+
     U1.debug = U2.debug = debug;
     switch (strategy) {
     case TRUNCATE_EACH_UNITARY: {
       double err;
-      if (debug) std::cout << "Truncate unitaries:\nLayer 1/3\n";
+      if (debug) std::cout << "Trotter3 method: truncate unitaries:\n"
+                           << "Trotter3 Layer 1/3\n";
       err = U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Layer 2/3\n";
+      if (debug) std::cout << "Trotter3 Layer 2/3\n";
       err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Layer 3/3\n";
+      if (debug) std::cout << "Trotter3 Layer 3/3\n";
       err += U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax, normalize);
       return err;
     }
     case TRUNCATE_EACH_LAYER: {
       double err = 0.0;
       CMPS Pfull = *P;
-      if (debug) std::cout << "Truncate layers:\nLayer 1/3\n";
+      if (debug) std::cout << "Trotter3 method: truncate layers:\n"
+                           << "Trotter3 Layer 1/3\n";
       err = U2.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax);
-      if (debug) std::cout << "Layer 2/3\n";
+      if (debug) std::cout << "Trotter3 Layer 2/3\n";
       err += U1.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax);
-      if (debug) std::cout << "Layer 3/3\n";
+      if (debug) std::cout << "Trotter3 Layer 3/3\n";
       err += U2.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax,
                                    normalize);
       return err;
@@ -67,11 +71,12 @@ namespace mps {
     }
     default: {
       CMPS Pfull = *P;
-      if (debug) std::cout << "Truncate group:\nLayer 1/3\n";
+      if (debug) std::cout << "Trotter3 method: truncate group:\n"
+                           << "Trotter3 Layer 1/3\n";
       U2.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
-      if (debug) std::cout << "Layer 2/3\n";
+      if (debug) std::cout << "Trotter3 Layer 2/3\n";
       U1.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
-      if (debug) std::cout << "Layer 3/3\n";
+      if (debug) std::cout << "Trotter3 Layer 3/3\n";
       return U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_ZEROS, Dmax,
                                    normalize);
     }
