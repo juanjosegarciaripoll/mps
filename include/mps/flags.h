@@ -33,7 +33,7 @@ namespace mps {
   /**Default relative tolerance of the singular values dropped.*/
   extern const double MPS_DEFAULT_TOLERANCE;
 
-  extern unsigned int MPS_TRUNCATION_TOLERANCE;
+  extern const unsigned int MPS_TRUNCATION_TOLERANCE;
 
 } // namespace mps
 

@@ -17,11 +17,18 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <float.h>
 #include <mps/flags.h>
 
 namespace mps {
 
   tensor::Flags FLAGS;
+
+  const double MPS_DO_NOT_TRUNCATE = 2.0;
+  const double MPS_TRUNCATE_ZEROS = 0.0;
+  const double MPS_DEFAULT_TOLERANCE = -4.0;
+
+  const unsigned MPS_TRUNCATION_TOLERANCE = mps::FLAGS.create_key(DBL_EPSILON);
 
 }
 

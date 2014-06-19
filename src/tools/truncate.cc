@@ -22,37 +22,30 @@
 
 namespace mps {
 
-  const double MPS_DO_NOT_TRUNCATE = 2.0;
-  const double MPS_TRUNCATE_ZEROS = 0.0;
-  const double MPS_DEFAULT_TOLERANCE = DBL_EPSILON;
-
-  unsigned int MPS_TRUNCATION_TOLERANCE = Flags::create_key();
-
   size_t
-  where_to_truncate(const RTensor &s, double tol, tensor::index max_a2)
+  where_to_truncate(const RTensor &s, double tol, tensor::index max_dim)
   {
     /* S is a vector of positive numbers arranged in decreasing order.  This
      * routine looks for a point to truncate S such that the norm-2 error made
      * is smaller than the relative tolerance (TOL) or the length of the output
-     * is smaller than MAX_A2.
+     * is smaller than MAX_DIM.
      */
     size_t L = s.size();
-    if (max_a2 == 0 || max_a2 > L) {
-      max_a2 = L;
+    if (max_dim == 0 || max_dim > L) {
+      max_dim = L;
     }
-    if (tol == Flags::DEFAULT) {
-      tol = FLAGS.get(MPS_TRUNCATION_TOLERANCE,
-                      MPS_DEFAULT_TOLERANCE);
+    if (tol == MPS_DEFAULT_TOLERANCE) {
+      tol = FLAGS.get(MPS_TRUNCATION_TOLERANCE);
     }
     if (tol >= 1.0) {
-      return max_a2;
+      return max_dim;
     }
     if (tol == 0) {
       /* If the tolerance is zero, we only drop the trailing zero elements. There
        * is no need to accumulate values. */
       for (size_t i = L; i--; ) {
         if (s[i]) {
-          return (i < max_a2)? (i+1) : max_a2;
+          return (i < max_dim)? (i+1) : max_dim;
         }
       }
       return 0;
@@ -77,14 +70,14 @@ namespace mps {
       tol = DBL_EPSILON;
     }
     double limit = tol * total;
-    for (size_t i = 0; i < max_a2; i++) {
+    for (size_t i = 0; i < max_dim; i++) {
       if (cumulated[i] <= limit) {
-        max_a2 = i+1;
+        max_dim = i+1;
         break;
       }
     }
     delete[] cumulated;
-    return max_a2;
+    return max_dim;
   }
 
 }
