@@ -34,8 +34,11 @@ namespace mps {
   */
   class TimeSolver {
   public:
+    /**Output informative messages.*/
+    int debug;
+
     /**Create Solver with fixed time step.*/
-    TimeSolver(cdouble new_dt) : dt_(new_dt) {};
+    TimeSolver(cdouble new_dt) : dt_(new_dt), debug(0) {};
     virtual ~TimeSolver();
 
     /**Compute next time step. Given the state \f$\psi(0)\f$ represented
@@ -53,7 +56,17 @@ namespace mps {
 
   class TrotterSolver : public TimeSolver {
   public:
-    TrotterSolver(cdouble new_dt) : TimeSolver(new_dt) {};
+    enum {
+      TRUNCATE_AT_END = 0,
+      TRUNCATE_EACH_LAYER = 1,
+      DO_NOT_TRUNCATE = 2
+    } strategy;
+
+    TrotterSolver(cdouble new_dt) :
+    TimeSolver(new_dt),
+    strategy(TRUNCATE_AT_END)
+    {};
+
     virtual ~TrotterSolver();
 
   protected:
