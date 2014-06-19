@@ -85,7 +85,7 @@ namespace mps {
     // We have to cover an even number of A and B sites
     // so that we can trace with a power of (EA * EB)
     int first = (i & 1)? i-1 : i;
-    int last = (j & 1)? j : j-1;
+    int last = (j & 1)? j : j+1;
     for (int k = first; k <= last; k++) {
       const t &AorB = (k & 1)? BlB : AlA;
       const t &E = (k & 1)? EB : EA;

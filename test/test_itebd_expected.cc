@@ -183,7 +183,7 @@ namespace tensor_test {
    * state, for which it is an exact order.
    */
   template<class Tensor>
-  void test_aklt_string_order()
+  void test_aklt_string_order(int i)
   {
     iTEBD<Tensor> psi = infinite_aklt_state();
     Tensor Sz = RTensor(igen << 3 << 3,
@@ -199,14 +199,12 @@ namespace tensor_test {
     Tensor ExpSx = RTensor(igen << 3 << 3,
                            rgen << 0 << 0 << -1
                            << 0 << -1 << 0 << -1 << 0 << 0);
-    for (int i = 1; i < 20; i++) {
-      typename Tensor::elt_t vz =
-        string_order(psi, Sz, 0, ExpSz, Sz, i);
-      EXPECT_CEQ(vz, -4.0/9.0);
-      typename Tensor::elt_t vx =
-        string_order(psi, Sx, 0, ExpSx, Sx, i);
-      EXPECT_CEQ(vz, vx);
-    }
+    typename Tensor::elt_t vz =
+      string_order(psi, Sz, 0, ExpSz, Sz, i);
+    EXPECT_CEQ(vz, -4.0/9.0);
+    typename Tensor::elt_t vx =
+      string_order(psi, Sx, 0, ExpSx, Sx, i);
+    EXPECT_CEQ(vz, vx);
   }
 
   ////////////////////////////////////////////////////////////
@@ -229,8 +227,24 @@ namespace tensor_test {
     test_over_integers(1, 6, test_energy_projectors<RTensor>);
   }
 
-  TEST(RiTEBDTest, AKLTStringOrder) {
-    test_aklt_string_order<RTensor>();
+  TEST(RiTEBDTest, AKLTStringOrder1) {
+    test_aklt_string_order<RTensor>(1);
+  }
+
+  TEST(RiTEBDTest, AKLTStringOrder2) {
+    test_aklt_string_order<RTensor>(2);
+  }
+
+  TEST(RiTEBDTest, AKLTStringOrder4) {
+    test_aklt_string_order<RTensor>(4);
+  }
+
+  TEST(RiTEBDTest, AKLTStringOrder8) {
+    test_aklt_string_order<RTensor>(8);
+  }
+
+  TEST(RiTEBDTest, AKLTStringOrder16) {
+    test_aklt_string_order<RTensor>(16);
   }
 
   ////////////////////////////////////////////////////////////
@@ -253,8 +267,24 @@ namespace tensor_test {
     test_over_integers(1, 6, test_energy_projectors<CTensor>);
   }
 
-  TEST(CiTEBDTest, AKLTStringOrder) {
-    test_aklt_string_order<CTensor>();
+  TEST(CiTEBDTest, AKLTStringOrder1) {
+    test_aklt_string_order<CTensor>(1);
+  }
+
+  TEST(CiTEBDTest, AKLTStringOrder2) {
+    test_aklt_string_order<CTensor>(2);
+  }
+
+  TEST(CiTEBDTest, AKLTStringOrder4) {
+    test_aklt_string_order<CTensor>(4);
+  }
+
+  TEST(CiTEBDTest, AKLTStringOrder8) {
+    test_aklt_string_order<CTensor>(8);
+  }
+
+  TEST(CiTEBDTest, AKLTStringOrder16) {
+    test_aklt_string_order<CTensor>(16);
   }
 
 }
