@@ -491,7 +491,7 @@ namespace mps {
        * iterations.
        */
       if (iter) {
-	if (abs(newE-E) < tolerance) {
+	if (tensor::abs(newE-E) < tolerance) {
 	  if (debug) {
 	    std::cout << "Reached tolerance dE=" << newE-E
 		      << "<=" << tolerance << '\n' << std::flush;
@@ -499,7 +499,7 @@ namespace mps {
 	  E = newE;
 	  break;
 	}
-	if ((newE - E) > 1e-14*abs(newE)) {
+	if ((newE - E) > 1e-14*tensor::abs(newE)) {
 	  if (debug) {
 	    std::cout << "Energy does not decrease!\n" << std::flush;
 	  }

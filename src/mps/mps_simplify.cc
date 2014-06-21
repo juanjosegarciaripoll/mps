@@ -252,7 +252,8 @@ namespace mps {
       }
       olderr = err;
       err = 1 - scp/sqrt(normQ2*normP2);
-      if ((olderr-err) < 1e-5*abs(olderr) || (err < 1e-14)) {
+      if ((olderr-err) < 1e-5*tensor::abs(olderr)
+          || (err < 1e-14)) {
 	if (normalize) {
 	  P.at(*sense > 0? N-1 : 0) = Pk/sqrt(normP2);
 	  *sense = -*sense;

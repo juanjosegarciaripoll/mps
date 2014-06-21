@@ -32,6 +32,7 @@ namespace mps {
     typedef typename std::vector<Tensor> data_type;
   public:
     typedef Tensor elt_t;
+    typedef typename Tensor::elt_t number_t;
     typedef typename data_type::iterator iterator;
     typedef typename data_type::const_iterator const_iterator;
 

@@ -83,13 +83,14 @@ namespace mps {
   double iTEBD<Tensor>::entropy(int site) const
   {
     Tensor lambda = left_vector(site);
-    return mps::entropy(abs(lambda*lambda));
+    return mps::entropy(tensor::abs(lambda*lambda));
   }
 
   template<class Tensor>
   const Tensor iTEBD<Tensor>::schmidt(int site) const
   {
-    return abs(left_vector(site)) * abs(left_vector(site));
+    return tensor::abs(left_vector(site)) *
+      tensor::abs(left_vector(site));
   }
 
 }

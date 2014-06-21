@@ -17,18 +17,18 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "mpo_expected.cc"
+#include <mps/mpo.h>
 
 namespace mps {
 
   double expected(const RMPS &bra, const RMPO &op, const RMPS &ket)
   {
-    return do_expected(bra, op, ket);
+    return scprod(bra, apply(op, ket));
   }
 
   double expected(const RMPS &psi, const RMPO &op)
   {
-    return do_expected(psi, op, psi);
+    return expected(psi, op, psi);
   }
 
 } // namespace mps

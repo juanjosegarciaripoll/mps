@@ -79,7 +79,6 @@ namespace mps {
     index interaction_depth(index k) const;
 
     void init_matrices(const MPS &P, index k0, bool also_Q);
-    void update_matrices(const MPS &P, index k0, int sense);
     void update_matrices_right(const MPS &P, index k0);
     void update_matrices_left(const MPS &P, index k0);
 

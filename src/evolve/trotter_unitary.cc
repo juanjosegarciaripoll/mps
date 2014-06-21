@@ -49,7 +49,7 @@ namespace mps {
       kN = kN - 1;
     }
     if (debug) std::cout << "computing: ";
-    dt = to_complex(-abs(imag(dt)), -real(dt));
+    dt = to_complex(-tensor::abs(imag(dt)), -real(dt));
     for (int di = 1, i = 0; i < (int)H.size(); i += di) {
       CTensor Hi;
       if (i < k0 || i >= kN) {

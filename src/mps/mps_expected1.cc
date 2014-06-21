@@ -53,13 +53,13 @@ namespace mps {
     for (index k = 0; k < a.size(); k++) {
       M = prop_matrix(M, +1, a[k], a[k], NULL);
     }
-    return sqrt(abs(real(prop_matrix_close(M)[0])));
+    return sqrt(tensor::abs(real(prop_matrix_close(M)[0])));
   }
 
   /* STATE NORM */
 
   template <class MPS>
-  static const typename MPS::elt_t::elt_t scalar_product(const MPS &a, const MPS &b)
+  static const typename MPS::number_t scalar_product(const MPS &a, const MPS &b)
   {
     typename MPS::elt_t M;
     assert(a.size() == b.size());

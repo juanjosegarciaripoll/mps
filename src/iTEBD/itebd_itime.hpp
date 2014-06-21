@@ -28,7 +28,7 @@ namespace mps {
   static inline bool
   stop(double delta, double tol, double value)
   {
-    return delta < tol * std::max<double>(abs(value), 1e-3);
+    return delta < tol * std::max<double>(tensor::abs(value), 1e-3);
   }
 
   static inline double
@@ -109,7 +109,7 @@ namespace mps {
       S = newS;
       E = newE;
       time += dt;
-      if (i > E_growth.size() && ((abs(dSdt) < 1e-6) && (dEdt <= 1e-6))) {
+      if (i > E_growth.size() && ((tensor::abs(dSdt) < 1e-6) && (dEdt <= 1e-6))) {
 	std::cout << "Entropy and energy converged" << std::endl;
 	stop = true;
       }
