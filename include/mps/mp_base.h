@@ -62,6 +62,10 @@ namespace mps {
   private:
     data_type data_;
   };
+
+  int largest_bond_dimension(const MP<tensor::RTensor> &mp);
+  int largest_bond_dimension(const MP<tensor::CTensor> &mp);
+
 } // namespace mps
 
 #endif //!MPS_MP_BASE_H

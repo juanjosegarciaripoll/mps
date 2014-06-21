@@ -21,6 +21,7 @@
 #define MPS_TOOLS_H
 
 #include <tensor/tensor.h>
+#include <mps/flags.h>
 
 namespace mps {
 
@@ -28,15 +29,16 @@ namespace mps {
 
   enum {
     MPS_DEBUG_NONE = 0,
-    MPS_DEBUG_SIMPLIFY = 1,
     MPS_DEBUG_SIMPLIFY_MANY = 2,
     MPS_DEBUG_ARNOLDI = 4
   };
   extern int debug_flags;
 
-  size_t where_to_truncate(const RTensor &s, double tol = -1, tensor::index max_a2 = 0);
+  size_t where_to_truncate(const RTensor &s, double tol,
+                           tensor::index max_dim);
 
-  const RTensor limited_svd(RTensor A, RTensor *U, RTensor *V, double tolerance = -1, tensor::index max_dim = 0);
+  const RTensor limited_svd(RTensor A, RTensor *U, RTensor *V,
+                            double tolerance, tensor::index max_dim = 0);
 
   const RTensor build_E_matrix(const RTensor &A, tensor::index *a = 0, tensor::index *b = 0);
 
@@ -44,7 +46,8 @@ namespace mps {
 
   const RTensor propagate_right(const RTensor &v, const RTensor &A, const RTensor &op);
 
-  const RTensor limited_svd(CTensor A, CTensor *U, CTensor *V, double tolerance = -1, tensor::index max_dim = 0);
+  const RTensor limited_svd(CTensor A, CTensor *U, CTensor *V,
+                            double tolerance, tensor::index max_dim = 0);
 
   const CTensor build_E_matrix(const CTensor &A, tensor::index *a = 0, tensor::index *b = 0);
 

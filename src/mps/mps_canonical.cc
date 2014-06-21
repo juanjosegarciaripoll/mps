@@ -40,9 +40,10 @@ namespace mps {
 	t.get_dimensions(&b1, &i1, &b2);
 	RTensor s = linalg::svd(reshape(t, b1*i1, b2), &U, &V, SVD_ECONOMIC);
 	index l = s.size();
-	index new_l = truncate?
-	  where_to_truncate(s, -1.0, l) :
-	  std::min<index>(b1*i1,b2);
+	index new_l = where_to_truncate(s, truncate?
+                                        MPS_DEFAULT_TOLERANCE :
+                                        MPS_TRUNCATE_ZEROS,
+                                        std::min<index>(b1,i1*b2));
 	if (new_l != l) {
 	  U = change_dimension(U, 1, new_l);
 	  V = change_dimension(V, 0, new_l);
@@ -61,9 +62,10 @@ namespace mps {
 	t.get_dimensions(&b1, &i1, &b2);
 	RTensor s = linalg::svd(reshape(t, b1, i1*b2), &V, &U, SVD_ECONOMIC);
 	index l = s.size();
-	index new_l = truncate?
-	  where_to_truncate(s, -1.0, l) :
-	  std::min<index>(b1,i1*b2);
+	index new_l = where_to_truncate(s, truncate?
+                                        MPS_DEFAULT_TOLERANCE :
+                                        MPS_TRUNCATE_ZEROS,
+                                        std::min<index>(b1,i1*b2));
 	if (new_l != l) {
 	  U = change_dimension(U, 0, new_l);
 	  V = change_dimension(V, 1, new_l);

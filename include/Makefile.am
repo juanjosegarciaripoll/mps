@@ -14,4 +14,5 @@ nobase_include_HEADERS = \
 	mps/rmpo.h \
 	mps/rmps.h \
 	mps/time_evolve.h \
-	mps/tools.h
+	mps/tools.h \
+	mps/flags.h

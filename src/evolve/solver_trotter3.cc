@@ -18,7 +18,6 @@
 */
 
 #include <mps/time_evolve.h>
-#include <mps/mps_algorithms.h>
 
 namespace mps {
 
@@ -28,40 +27,59 @@ namespace mps {
    *	exp(-iHdt) = exp(-iH_even dt/2) exp(-iH_odd dt) exp(-iH_even dt/2)
    */
 
-  Trotter3Solver::Trotter3Solver(const Hamiltonian &H, cdouble dt,
-                                 bool do_optimize, double tol) :
-  TrotterSolver(dt), U1(H, 1, dt, true), U2(H, 0, dt/2.0, true),
-    optimize(do_optimize),
-    sweeps(32), normalize(true), sense(0), tolerance(tol)
+  Trotter3Solver::Trotter3Solver(const Hamiltonian &H, cdouble dt) :
+  TrotterSolver(dt), U1(H, 1, dt), U2(H, 0, dt/2.0), sense(0)
   {
   }
 
   double
   Trotter3Solver::one_step(CMPS *P, index Dmax)
   {
-    if (sense == 0) {
-      if (normalize) {
-        *P = normal_form(*P);
-      } else {
-        *P = canonical_form(*P);
-      }
-      sense = +1;
-    }
-    if (optimize) {
-      CMPS Pfull = *P;
-      U2.apply(&Pfull, sense, Dmax, false); sense = -sense;
-      U1.apply(&Pfull, sense, Dmax, false); sense = -sense;
-      U2.apply(&Pfull, sense, Dmax, false, true); sense = -sense;
-      if (truncate(P, Pfull, Dmax, false)) {
-        return simplify(P, Pfull, &sense, false, sweeps, normalize);
-      }
-      return 0.0;
-    } else {
+    int debug = FLAGS.get(MPS_DEBUG_TROTTER);
+
+    U1.debug = U2.debug = debug;
+    switch (strategy) {
+    case TRUNCATE_EACH_UNITARY: {
       double err;
-      err = U2.apply(P, sense, Dmax, true); sense = -sense;
-      err += U1.apply(P, sense, Dmax, true); sense = -sense;
-      err += U2.apply(P, sense, Dmax, true); sense = -sense;
+      if (debug) std::cout << "Trotter3 method: truncate unitaries:\n"
+                           << "Trotter3 Layer 1/3\n";
+      err = U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 2/3\n";
+      err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 3/3\n";
+      err += U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax, normalize);
       return err;
+    }
+    case TRUNCATE_EACH_LAYER: {
+      double err = 0.0;
+      CMPS Pfull = *P;
+      if (debug) std::cout << "Trotter3 method: truncate layers:\n"
+                           << "Trotter3 Layer 1/3\n";
+      err = U2.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 2/3\n";
+      err += U1.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax);
+      if (debug) std::cout << "Trotter3 Layer 3/3\n";
+      err += U2.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax,
+                                   normalize);
+      return err;
+    }
+    case DO_NOT_TRUNCATE: {
+      U2.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      U1.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      U2.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0, normalize);
+      return 0.0;
+    }
+    default: {
+      CMPS Pfull = *P;
+      if (debug) std::cout << "Trotter3 method: truncate group:\n"
+                           << "Trotter3 Layer 1/3\n";
+      U2.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      if (debug) std::cout << "Trotter3 Layer 2/3\n";
+      U1.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      if (debug) std::cout << "Trotter3 Layer 3/3\n";
+      return U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_ZEROS, Dmax,
+                                   normalize);
+    }
     }
   }
 

@@ -17,21 +17,16 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <tensor/linalg.h>
-#include <mps/tools.h>
+#include <mps/mp_base.h>
 
 namespace mps {
 
-  const RTensor
-  limited_svd(RTensor A, RTensor *U, RTensor *V, double tolerance,
-              tensor::index max_dim)
+  int largest_bond_dimension(const MP<tensor::RTensor> &mp)
   {
-    RTensor s = linalg::svd(A, U, V, true /* economic */);
-    tensor::index c = where_to_truncate(s, tolerance, max_dim);
-    *U = (*U)(range(), range(0,c-1));
-    *V = (*V)(range(0,c-1), range());
-    s = s(range(0,c-1));
-    return s / norm2(s);
+    int i = 0;
+    for (int j = 0; j < mp.size(); j++)
+      i = std::max<int>(i, mp[j].dimension(0));
+    return i;
   }
 
 }

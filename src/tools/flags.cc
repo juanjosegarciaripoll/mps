@@ -17,21 +17,26 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <tensor/linalg.h>
-#include <mps/tools.h>
+#include <float.h>
+#include <mps/flags.h>
 
 namespace mps {
 
-  const RTensor
-  limited_svd(RTensor A, RTensor *U, RTensor *V, double tolerance,
-              tensor::index max_dim)
-  {
-    RTensor s = linalg::svd(A, U, V, true /* economic */);
-    tensor::index c = where_to_truncate(s, tolerance, max_dim);
-    *U = (*U)(range(), range(0,c-1));
-    *V = (*V)(range(0,c-1), range());
-    s = s(range(0,c-1));
-    return s / norm2(s);
-  }
+  tensor::Flags FLAGS;
 
-}
+  const double MPS_DEFAULT = 12345678912345e78;
+
+  const double MPS_DO_NOT_TRUNCATE = 2.0;
+  const double MPS_TRUNCATE_ZEROS = 0.0;
+  const double MPS_DEFAULT_TOLERANCE = -4.0;
+
+  const unsigned MPS_TRUNCATION_TOLERANCE = FLAGS.create_key(DBL_EPSILON);
+
+  const unsigned MPS_DEBUG_TROTTER = FLAGS.create_key(0);
+
+  const unsigned MPS_DEBUG_SIMPLIFY = FLAGS.create_key(0);
+
+  const unsigned MPS_SIMPLIFY_MAX_SWEEPS = FLAGS.create_key(12);
+
+  const unsigned MPS_SIMPLIFY_TOLERANCE = FLAGS.create_key(1e-14);}
+

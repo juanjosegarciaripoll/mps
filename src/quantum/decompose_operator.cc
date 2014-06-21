@@ -52,7 +52,7 @@ namespace mps {
 
     tensor U = reshape(permute(reshape(U0, d1,d2,d1,d2), 1,2), d1*d1,d2*d2);
 #if 1
-    RTensor s = sqrt(limited_svd(U, O1, O2));
+    RTensor s = sqrt(limited_svd(U, O1, O2, MPS_DEFAULT_TOLERANCE));
     scale_inplace(*O1, -1, s);
     scale_inplace(*O2, 0, s);
 #else
