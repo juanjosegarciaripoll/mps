@@ -181,13 +181,13 @@ namespace mps {
     index sweeps = 12;
     if (truncate(&aux, *psi, Dmax, false)) {
       err += simplify(&aux, *psi, sense, false, sweeps, normalize);
-      *psi = aux;
       if (debug) {
         std::cout << "Unitary: bond dimension after truncating = "
                   << largest_bond_dimension(*psi)
                   << std::endl;
       }
     }
+    *psi = aux;
     return err;
   }
 
