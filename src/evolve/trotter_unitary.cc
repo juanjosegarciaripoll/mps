@@ -183,7 +183,7 @@ namespace mps {
       err += simplify(&aux, *psi, sense, false, sweeps, normalize);
       if (debug) {
         std::cout << "Unitary: bond dimension after truncating = "
-                  << largest_bond_dimension(*psi)
+                  << largest_bond_dimension(aux)
                   << std::endl;
       }
     }
