@@ -52,14 +52,13 @@ namespace mps {
     }
     case TRUNCATE_EACH_LAYER: {
       double err = 0.0;
-      CMPS Pfull = *P;
       if (debug) std::cout << "Trotter3 method: truncate layers:\n"
                            << "Trotter3 Layer 1/3\n";
-      err = U2.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax);
+      err = U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_ZEROS, Dmax);
       if (debug) std::cout << "Trotter3 Layer 2/3\n";
-      err += U1.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax);
+      err += U1.apply_and_simplify(P, &sense, MPS_TRUNCATE_ZEROS, Dmax);
       if (debug) std::cout << "Trotter3 Layer 3/3\n";
-      err += U2.apply_and_simplify(&Pfull, &sense, MPS_TRUNCATE_ZEROS, Dmax,
+      err += U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_ZEROS, Dmax,
                                    normalize);
       return err;
     }
