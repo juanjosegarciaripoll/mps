@@ -13,6 +13,7 @@
 #include <tensor/tensor.h>
 #include <tensor/io.h>
 #include <tensor/tools.h>
+#include <mps/hamiltonian.h>
 
 #define EPSILON 1e-12
 
@@ -368,6 +369,31 @@ namespace tensor_test {
   Tensor<double> random_permutation(int n, int iterations);
 
   static struct Foo { Foo() { tensor::tensor_abort_handler(); }} foo;
+
+  /*
+   * Test over spin models
+   */
+
+  class TestHamiltonian : public mps::ConstantHamiltonian {
+
+    tensor::index model;
+    RTensor coefs;
+    bool periodic;
+    bool translational_invariance;
+
+  public:
+
+    CTensor sx, sy, sz;
+
+    TestHamiltonian(tensor::index amodel, double spin, tensor::index size,
+                    bool ti, bool pbc);
+
+    static const char *model_name(tensor::index model);
+    static tensor::index last_model();
+  };
+
+  extern void test_over_H(bool test(const mps::Hamiltonian &H, double &err),
+                          int max_spins, bool pbc = false);
 
 } // namespace tensor_test
 

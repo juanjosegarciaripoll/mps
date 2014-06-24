@@ -111,9 +111,15 @@ check_PROGRAMS += test_time_solver_arnoldi
 test_time_solver_arnoldi_SOURCES = test_time_solver_arnoldi.cc
 test_time_solver_arnoldi_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
+TESTS += test_dmrg
+check_PROGRAMS += test_dmrg
+test_dmrg_SOURCES = test_dmrg.cc
+test_dmrg_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
+
 noinst_LIBRARIES += libtestmain.a
 libtestmain_a_SOURCES = test_main.cc \
-	 random_unitary_d.cc random_unitary_z.cc random_permutation.cc
+	 random_unitary_d.cc random_unitary_z.cc random_permutation.cc \
+	hamilt_test.cc
 
 #
 # Build the Google Test library. The way this library has changed: we now have to
