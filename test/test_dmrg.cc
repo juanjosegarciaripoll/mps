@@ -175,10 +175,10 @@ test_dmrg_inner(const mps::Hamiltonian &H, double &err)
 #if 1
     CTensor aux = linalg::eigs(sparse_hamiltonian(H),
 			       linalg::SmallestAlgebraic, 1);
-    double realE = std::min(real(aux));
+    double realE = min(real(aux));
 #else
     RTensor aux = eig_sym(full(H.sparse_matrix(0)));
-    double realE = std::min(aux);
+    double realE = tensor::min(aux);
 #endif
     double E, e;
     if (twosites) {
@@ -197,9 +197,6 @@ test_dmrg_inner(const mps::Hamiltonian &H, double &err)
 
 int main(int argc, char **argv)
 {
-  if (!mps_init(&argc, &argv)) {
-    exit(-1);
-  }
   test_dmrg_gap();
 
   std::cout << "Testing DMRG algorithm\n"
