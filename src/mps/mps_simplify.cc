@@ -265,7 +265,7 @@ namespace mps {
         std::cout << ", truncation error = " << err
                   << "\t[" << toc() << "s]\n";
       }
-      if ((olderr-err) < 1e-5*abs(olderr) || (err < tolerance)) {
+      if ((olderr-err) < 1e-5*tensor::abs(olderr) || (err < tolerance)) {
 	if (normalize) {
 	  P.at(*sense > 0? N-1 : 0) = Pk/sqrt(normP2);
 	  *sense = -*sense;
