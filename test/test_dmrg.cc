@@ -109,10 +109,12 @@ void test_dmrg_gap()
       solver.sweeps = 128;
       solver.debug = 0;
       solver.tolerance = 1e-10;
+      if (0) {
       solver.Q_operators = DMRG::elt_vector_t(1);
       solver.Q_operators.at(0) = real(sz);
       solver.Q_values = DMRG::elt_t(1);
       solver.Q_values.at(0) = 1;
+      }
 
       double E0 = solver.minimize(&psi0, Dmax);
 
