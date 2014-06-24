@@ -25,23 +25,32 @@
 namespace mps {
 
   using namespace tensor;
+  using tensor::index;
 
   void
   split_interaction(const CTensor &H12, std::vector<CTensor> *v1, std::vector<CTensor> *v2)
   {
     assert(H12.rank() == 2);
+    /*
+     * Notice the funny reordering of indices in O1 and O2, which is due to the
+     * following statement and which simplifies the application of O1 and O2 on a
+     * given vector.
+     */
+    index d1 = sqrt((double)H12.rows());
+    index d2 = d1;
 
     CTensor O1, O2;
-    RTensor s = linalg::svd(H12, &O1, &O2, SVD_ECONOMIC);
+    CTensor U = reshape(permute(reshape(H12, d1,d2,d1,d2), 1,2), d1*d1,d2*d2);
+    RTensor s = mps::limited_svd(U, &O1, &O2, 1e-13);
 
-    index N = sqrt(H12.dimension(0));
     index n_op = s.size();
     v1->resize(n_op);
     v2->resize(n_op);
-    for (index i = 0; i < N; i++) {
+    for (index i = 0; i < n_op; i++) {
       double sqrts = sqrt(s[i]);
-      v1->at(i) = sqrts * tensor::reshape(O1(range(), range(i)), N, N);
-      v2->at(i) = tensor::conj(sqrts * tensor::reshape(O2(range(), range(i)), N, N));
+      v1->at(i) = sqrts * tensor::reshape(O1(range(), range(i)), d1, d1);
+      v2->at(i) = tensor::conj(sqrts * tensor::reshape(O2(range(), range(i)),
+                                                       d2, d2));
     }
   }
 
