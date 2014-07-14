@@ -49,13 +49,13 @@ namespace mps {
   evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
 	       double dt, tensor::index nsteps,
 	       double tolerance, tensor::index max_dim,
-	       tensor::index deltan)
+	       tensor::index deltan, int method)
   {
     static const double FR_param[5] =
       {0.67560359597983, 1.35120719195966, -0.17560359597983, -1.70241438391932};
 
     Tensor eH12[4];
-    int method = 2;
+    //int method = 2;
     switch (method) {
     case 1:
       /* Second order Trotter expansion */
@@ -120,6 +120,7 @@ namespace mps {
 		  << std::endl;
 	std::cout << "\tdS=" << dS << ";\tdE=" << dE << std::endl;
 	std::cout << "\tdSdt=" << dSdt << ";\tdEdt=" << dEdt << std::endl;
+        std::cout << "l = " << psi.left_vector(0) << std::endl;
       }
     }
     return psi;

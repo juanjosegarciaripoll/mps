@@ -26,6 +26,6 @@ namespace mps {
   evolve_itime(iTEBD<RTensor> psi, const RTensor &H12,
 	       double dt, tensor::index nsteps,
 	       double tolerance, tensor::index max_dim,
-	       tensor::index deltan);
+	       tensor::index deltan, int method);
 
 }
