@@ -56,6 +56,9 @@ public:
         const Tensor &newB, const Tensor &newlB,
         bool canonical = false);
 
+  /* Given a two-site wavefunction, split it. */
+  iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance, tensor::index max_dim);
+
   /** Is this iTEBD state in canonical form? */
   bool is_canonical() const { return canonical_; }
 
@@ -63,7 +66,7 @@ public:
   const iTEBD<Tensor> apply_operator(const Tensor &U, int odd = 0, double tolerance = -1, tensor::index max_dim = 0) const;
 
   /** Return a new state which is in canonical form. */
-  const iTEBD<Tensor> canonical_form() const;
+  const iTEBD<Tensor> canonical_form(double tolerance = -1, tensor::index max_dim = 0) const;
 
   /** Estimate the entanglement entropy associated to splitting the state around 'site' */
   double entropy(int site) const;
@@ -126,9 +129,6 @@ public:
 private:
   /* Avoid initializing empty iTEBD states. */
   iTEBD();
-
-  /* Given a two-site wavefunction, split it. */
-  iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance, tensor::index max_dim);
 
   Tensor A_, B_;
   Tensor lA_, lB_;
@@ -202,7 +202,7 @@ private:
 template<class Tensor>
 const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12, double dt,
                                  tensor::index nsteps, double tolerance = -1,
-                                 tensor::index max_dim = 0, tensor::index deltan = 1);
+                                 tensor::index max_dim = 0, tensor::index deltan = 1, int method = 1);
 
 /* @} */
 
