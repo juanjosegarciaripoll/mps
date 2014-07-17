@@ -75,8 +75,8 @@ namespace mps {
     double E = energy(psi, H12), S = psi.entropy();
     std::cout.precision(5);
     std::cout << nsteps << ", " << dt << " x " << deltan << " = " << dt * deltan << std::endl;
-    RTensor S_growth(std::max(deltan, 10));
-    RTensor E_growth(std::max(deltan, 10));
+    RTensor S_growth(std::max<tensor::index>(deltan, 10));
+    RTensor E_growth(std::max<tensor::index>(deltan, 10));
     S_growth.fill_with_zeros();
     E_growth.fill_with_zeros();
     bool stop = false;
