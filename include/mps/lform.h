@@ -26,12 +26,11 @@
 namespace mps {
 
   /** Internal representation of a MPS as a linear form.  This object
-      works with a scalar product $$\langle\psi|\phi\rangle$$, where
-      the bra and ked, $\psi$ and $\phi$, are two MPS. This scalar
+      works with a scalar product $$\sum_i c_i\langle\phi_i|\psi\rangle$$, where
+      the bra and ked, $\phi_i$ and $\psi$, are two MPS. This scalar
       product, from the point of view of the k-th site, it may be seen
-      as a linear form $w^{T} v$, where $w$ and $v$ are the
-      elements of the tensors $\psi$[k] and $\phi$[k] of the MPS on
-      that given site.
+      as a linear form $w^{T} v$, where $w$ and $v$ are the k-th
+      elements of MPS associated to $\sum_ic_i\psi$ and $\phi$[k].
   */
   template<class MPS>
   class LinearForm {
@@ -40,18 +39,18 @@ namespace mps {
     typedef typename MPS::elt_t elt_t;
 
     LinearForm(const MPS &bra, const MPS &ket, int start = 0);
+    LinearForm(const elt_t &weights, const std::vector<MPS> &bra,
+	       const MPS &ket, int start = 0);
 
-    void propagate_right(const elt_t &braP, const elt_t &ketP);
-    void propagate_left(const elt_t &braP, const elt_t &ketP);
+    void propagate_right(const elt_t &ketP);
+    void propagate_left(const elt_t &ketP);
 
     /** The site at which the quadratic form is defined. */
     int here() const { return current_site_; }
-    /** Left bond dimension of the MPS at the present site. */
-    index left_dimension(index site) const { return bond_dimensions_[site]; }
-    /** Right bond dimension of the MPS at the present site. */
-    index right_dimension(index site) const { return bond_dimensions_[site+1]; }
     /** Number of sites in the lattice. */
-    index size() const { return bra_.size(); }
+    index size() const { return bra_[0].size(); }
+    /** Number of vectors that create the linear form. */
+    index number_of_bras() const { return bra_.size(); }
 
     /** Vector representation of the linear form with respect to site here().*/
     const elt_t single_site_vector() const;
@@ -62,14 +61,15 @@ namespace mps {
   private:
 
     typedef typename std::vector<elt_t> matrix_array_t;
+    typedef typename std::vector<matrix_array_t> matrix_database_t;
 
-    int current_site_;
-    Indices bond_dimensions_;
-    matrix_array_t left_matrix_, right_matrix_;
-    MPS bra_, ket_;
+    const elt_t weight_;
+    const std::vector<MPS> bra_;
+    index size_, current_site_;
+    matrix_database_t left_matrix_, right_matrix_;
 
-    static Indices mps_inner_dimensions(const MPS &mps);
-    static matrix_array_t make_matrix_array(const Indices &dimensions, bool left);
+    void initialize_matrices(int start, const MPS &ket);
+    matrix_database_t make_matrix_array();
   };
 
   extern template class LinearForm<RMPS>;

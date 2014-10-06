@@ -25,64 +25,76 @@ namespace mps {
 
   template<class MPS>
   LinearForm<MPS>::LinearForm(const MPS &bra, const MPS &ket, int start) :
-    bra_(bra), ket_(ket),
-    bond_dimensions_(mps_inner_dimensions(bra)),
-    left_matrix_(make_matrix_array(bond_dimensions_, true)),
-    right_matrix_(make_matrix_array(bond_dimensions_, false))
+    weight_(elt_t::ones(igen << 1)),
+    bra_(std::vector<MPS>(1,bra)),
+    left_matrix_(make_matrix_array()),
+    right_matrix_(make_matrix_array())
+  {
+    initialize_matrices(start, ket);
+  }
+
+  template<class MPS>
+  LinearForm<MPS>::LinearForm(const elt_t &weight, const std::vector<MPS> &bras,
+			      const MPS &ket, int start) :
+    weight_(weight), bra_(bras),
+    left_matrix_(make_matrix_array()),
+    right_matrix_(make_matrix_array())
+  {
+    initialize_matrices(start, ket);
+  }
+
+  template<class MPS>
+  void LinearForm<MPS>::initialize_matrices(int start, const MPS &ket)
   {
     if (start == 0) {
       current_site_ = size() - 1;
       while (here() != 0)
-	propagate_left(bra[here()], ket[here()]);
+	propagate_left(ket[here()]);
     } else {
       current_site_ = 0;
       while (here() != size()-1)
-	propagate_right(bra[here()], ket[here()]);
+	propagate_right(ket[here()]);
     }
   }
 
   template<class MPS>
-  Indices LinearForm<MPS>::mps_inner_dimensions(const MPS &mps)
+  typename LinearForm<MPS>::matrix_database_t
+  LinearForm<MPS>::make_matrix_array()
   {
-    index L = mps.size();
-    Indices output(L+1);
-    output.at(0) = 1;
-    output.at(L) = 1;
-    for (index i = 0; i < L; i++)
-      output.at(i+1) = mps[i].dimension(2);
-    return output;
+    return matrix_database_t(number_of_bras(), matrix_array_t(size(), elt_t()));
+  }
+
+  template<class tensor>
+  static void maybe_add(tensor *a, const tensor &b)
+  {
+    *a = (a->is_empty())? b : (*a + b);
   }
 
   template<class MPS>
-  typename LinearForm<MPS>::matrix_array_t
-  LinearForm<MPS>::make_matrix_array(const Indices &dimensions, bool left)
-  {
-    return matrix_array_t(dimensions.size()-1, elt_t());
-  }
-
-  template<class MPS>
-  void LinearForm<MPS>::propagate_left(const elt_t &braP, const elt_t &ketP)
+  void LinearForm<MPS>::propagate_left(const elt_t &ketP)
   {
     if (here() == 0) {
       std::cerr << "Cannot propagate_left() beyond site " << here();
       abort();
     }
-    bra_.at(here()) = braP;
-    ket_.at(here()) = ketP;
-    right_matrix_[here()-1] = prop_matrix(right_matrix_[here()], -1, braP, ketP);
+    for (int i = 0; i < number_of_bras(); i++) {
+      right_matrix_[i][here()-1] =
+	prop_matrix(right_matrix_[i][here()], -1, bra_[i][here()], ketP);
+    }
     --current_site_;
   }
 
   template<class MPS>
-  void LinearForm<MPS>::propagate_right(const elt_t &braP, const elt_t &ketP)
+  void LinearForm<MPS>::propagate_right(const elt_t &ketP)
   {
     if (here()+1 >= left_matrix_.size()) {
       std::cerr << "Cannot propagate_left() beyond site " << here();
       abort();
     }
-    bra_.at(here()) = braP;
-    ket_.at(here()) = ketP;
-    left_matrix_[here()+1] = prop_matrix(left_matrix_[here()], +1, braP, ketP);
+    for (int i = 0; i < number_of_bras(); i++) {
+      left_matrix_[i][here()+1] =
+	prop_matrix(left_matrix_[i][here()], -1, bra_[i][here()], ketP);
+    }
     ++current_site_;
   }
 
@@ -100,18 +112,24 @@ namespace mps {
     // Reshape L -> L(a2,b2), R -> R(a3,b3)
     // and return L(a2,b2) P(a2,i,a3) R(a3,b3)
     return fold(fold(reshape(L, a2,b2), 1, P, 0), -1,
-		reshape(R, a3, b3), 0);
+		     reshape(R, a3, b3), 0);
   }
 
   template<class MPS>
   const typename LinearForm<MPS>::elt_t
   LinearForm<MPS>::single_site_vector() const
   {
-    return compose(left_matrix_[here()], bra_[here()], right_matrix_[here()]);
+    elt_t output;
+    for (int i = 0; i < number_of_bras(); i++) {
+      maybe_add(&output,
+		compose<elt_t>(left_matrix_[i][here()], weight_[i] * bra_[i][here()],
+			       right_matrix_[i][here()]));
+    }
+    return output;
   }
 
   template<class elt_t>
-  static elt_t compose(const elt_t &L, const elt_t &P1, const elt_t &P2, const elt_t &R)
+  static elt_t compose4(const elt_t &L, const elt_t &P1, const elt_t &P2, const elt_t &R)
   {
     index a1,a2,b1,b2,a3,b3,a4,b4,i,j;
     L.get_dimensions(&a1, &a2, &b1, &b2);
@@ -122,9 +140,10 @@ namespace mps {
       std::cerr << "Due to laziness of their programmers, mps does not implement LForm for PBC";
       abort();
     }
+    // P(a2,i,j,a4) = P1(a2,i,a3)P2(a3,j,a4)
+    elt_t P = fold(P1, -1, P2, 0);
     // Reshape L -> L(a2,b2), R -> R(a4,b4)
     // and return L(a2,b2) P(a2,i,i,a4) R(a4,b4)
-    elt_t P = fold(P1, -1, P2, 0);
     return fold(fold(reshape(L, a2,b2), 1, P, 0), -1,
 		reshape(R, a4, b4), 0);
   }
@@ -138,8 +157,12 @@ namespace mps {
       std::cerr << "Cannot extract two-site matrix from site " << here();
       abort();
     }
-    return compose(left_matrix_[here()], bra_[here()], bra_[here()+1],
-		   right_matrix_[here()+1]);
+    for (int i = 0; i < number_of_bras(); i++) {
+      maybe_add(&output,
+		compose4<elt_t>(left_matrix_[i][here()], weight_[i] * bra_[i][here()],
+				bra_[i][here()+1], right_matrix_[i][here()+1]));
+    }
+    return output;
   }
 
 }
