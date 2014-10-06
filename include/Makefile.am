@@ -6,10 +6,12 @@ nobase_include_HEADERS = \
 	mps/hamiltonian.h \
 	mps/io.h \
 	mps/itebd.h \
+	mps/lform.h \
 	mps/mp_base.h \
 	mps/mpo.h \
 	mps/mps.h \
 	mps/mps_algorithms.h \
+	mps/qform.h \
 	mps/quantum.h \
 	mps/rmpo.h \
 	mps/rmps.h \
