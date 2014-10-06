@@ -97,15 +97,15 @@ namespace mps {
       std::cerr << "Cannot propagate_left() beyond site " << here();
       abort();
     }
-    const matrix_array_t &vr = left_matrix_[here()];
-    matrix_array_t &new_vr = left_matrix_[here()-1];
+    const matrix_array_t &vr = right_matrix_[here()];
+    matrix_array_t &new_vr = right_matrix_[here()-1];
     std::fill(new_vr.begin(), new_vr.end(), elt_t());
     for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
 	 it != end;
 	 it++)
       {
 	maybe_add<elt_t>(&new_vr.at(it->right_ndx),
-			 prop_matrix(vr[it->left_ndx], +1, braP, ketP, &it->op));
+			 prop_matrix(vr[it->left_ndx], -1, braP, ketP, &it->op));
       }
     --current_site_;
   }
@@ -114,7 +114,7 @@ namespace mps {
   void QuadraticForm<MPO>::propagate_right(const elt_t &braP, const elt_t &ketP)
   {
     if (here()+1 >= left_matrix_.size()) {
-      std::cerr << "Cannot propagate_left() beyond site " << here();
+      std::cerr << "Cannot propagate_right() beyond site " << here();
       abort();
     }
     const matrix_array_t &vl = left_matrix_[here()];
