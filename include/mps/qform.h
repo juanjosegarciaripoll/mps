@@ -57,10 +57,6 @@ namespace mps {
     void propagate_left(const elt_t &braP, const elt_t &ketP);
     /** The site at which the quadratic form is defined. */
     int here() const { return current_site_; }
-    /** Left bond dimension of the MPO at the present site. */
-    index left_dimension(index site) const { return bond_dimensions_[site]; }
-    /** Right bond dimension of the MPO at the present site. */
-    index right_dimension(index site) const { return bond_dimensions_[site+1]; }
     /** Number of sites in the lattice. */
     index size() const { return left_matrix_.size(); }
 
@@ -97,8 +93,7 @@ namespace mps {
     matrix_database_t left_matrix_, right_matrix_;
     pair_tree_t pairs_;
 
-    static Indices mpo_inner_dimensions(const MPO &mpo);
-    static matrix_database_t make_matrix_database(const Indices &dimensions, bool left);
+    static matrix_database_t make_matrix_database(const MPO &mpo, int dimension);
     static pair_tree_t make_pairs(const MPO &mpo);
   };
 

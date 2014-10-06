@@ -25,12 +25,17 @@ namespace mps {
 
   template<class MPO>
   QuadraticForm<MPO>::QuadraticForm(const MPO &mpo, const MPS &bra, const MPS &ket, int start) :
-    bond_dimensions_(mpo_inner_dimensions(mpo)),
-    left_matrix_(make_matrix_database(bond_dimensions_, true)),
-    right_matrix_(make_matrix_database(bond_dimensions_, false)),
+    left_matrix_(make_matrix_database(mpo, 0)),
+    right_matrix_(make_matrix_database(mpo, 1)),
     pairs_(make_pairs(mpo))
   {
+    if (bra[0].dimension(0) != 1 || ket[0].dimension(0) != 1) {
+      std::cerr << "Due to laziness of their programmers, mps does not implement QForm for PBC";
+      abort();
+    }
     if (start == 0) {
+      // Prepare the right matrices from site size()-1 to 0, incrementally
+      // There is only one left matrix, at 0, which is empty.
       current_site_ = size() - 1;
       while (here() != 0)
 	propagate_left(bra[here()], ket[here()]);
@@ -42,26 +47,13 @@ namespace mps {
   }
 
   template<class MPO>
-  Indices QuadraticForm<MPO>::mpo_inner_dimensions(const MPO &mpo)
+  typename QuadraticForm<MPO>::matrix_database_t
+  QuadraticForm<MPO>::make_matrix_database(const MPO &mpo, int dimension)
   {
     index L = mpo.size();
-    Indices output(L+1);
-    output.at(0) = 1;
-    output.at(L) = 1;
-    for (index i = 0; i < L; i++)
-      output.at(i+1) = mpo[i].dimension(3);
-    return output;
-  }
-
-  template<class MPO>
-  typename QuadraticForm<MPO>::matrix_database_t
-  QuadraticForm<MPO>::make_matrix_database(const Indices &dimensions, bool left)
-  {
-    index delta = left? 0 : 1;
-    index L = dimensions.size() - 1;
     matrix_database_t output(L);
     for (index i = 0; i < L; i++) {
-      output.at(i) = matrix_array_t(dimensions[i+delta], elt_t());
+      output.at(i) = matrix_array_t(mpo[i].dimension(dimension), elt_t());
     }
     return output;
   }
@@ -113,10 +105,7 @@ namespace mps {
   template<class MPO>
   void QuadraticForm<MPO>::propagate_right(const elt_t &braP, const elt_t &ketP)
   {
-    if (here()+1 >= left_matrix_.size()) {
-      std::cerr << "Cannot propagate_right() beyond site " << here();
-      abort();
-    }
+    assert(here()+1 < size());
     const matrix_array_t &vl = left_matrix_[here()];
     matrix_array_t &new_vl = left_matrix_[here()+1];
     std::fill(new_vl.begin(), new_vl.end(), elt_t());
@@ -133,15 +122,11 @@ namespace mps {
   template<class elt_t>
   static elt_t compose(const elt_t &L, const elt_t &op, const elt_t &R)
   {
+    index a1,a2,b1,b2,a3,b3;
     // L(a1,a2,b1,b2) op(i,j) R(a3,a1,b3,b1) -> H([a2,i,a3],[b2,j,b3])
-    index a1,a2,b1,b2;
     L.get_dimensions(&a1, &a2, &b1, &b2);
-    index a3,b3;
     R.get_dimensions(&a3, &a1, &b3, &b1);
-    if (a1 != 1 || b1 != 1) {
-      std::cerr << "Due to laziness of their programmers, mps does not implement QForm for PBC";
-      abort();
-    }
+    assert(a1 == 1 && b1 == 1);
     // Remember that kron(A(i,j),B(k,l)) -> C([k,i],[l,j])
     return kron(kron(reshape(R, a3,b3), op), reshape(L, a2,b2));
   }
@@ -150,14 +135,11 @@ namespace mps {
   static elt_t compose(const elt_t &L, const elt_t &op1, const elt_t &op2, const elt_t &R)
   {
     // L(a1,a2,b1,b2) op(i,j) R(a3,a1,b3,b1) -> H([a2,i,a3],[b2,j,b3])
-    index a1,a2,b1,b2;
+    index a1,a2,b1,b2,a3,b3;
     L.get_dimensions(&a1, &a2, &b1, &b2);
-    index a3,b3;
     R.get_dimensions(&a3, &a1, &b3, &b1);
-    if (a1 != 1 || b1 != 1) {
-      std::cerr << "Due to laziness of their programmers, mps does not implement QForm for PBC";
-      abort();
-    }
+    assert(a1 == 1 && b1 == 1);
+    // Remember that kron(A(i,j),B(k,l)) -> C([k,i],[l,j])
     return kron(kron(kron(reshape(R, a3,b3), op2), op1), reshape(L, a2,b2));
   }
 
@@ -184,11 +166,8 @@ namespace mps {
   const typename QuadraticForm<MPO>::elt_t
   QuadraticForm<MPO>::two_site_matrix() const
   {
+    assert(here() + 1 < size());
     elt_t output;
-    if (here() + 1 >= size()) {
-      std::cerr << "Cannot extract two-site matrix from site " << here();
-      abort();
-    }
     for (pair_iterator_t it1 = pairs_[here()].begin(), end1 = pairs_[here()].end();
 	 it1 != end1;
 	 it1++)
