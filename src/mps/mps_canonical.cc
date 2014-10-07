@@ -43,7 +43,7 @@ namespace mps {
 	index new_l = where_to_truncate(s, truncate?
                                         MPS_DEFAULT_TOLERANCE :
                                         MPS_TRUNCATE_ZEROS,
-                                        std::min<index>(b1,i1*b2));
+                                        std::min<index>(b1*i1,b2));
 	if (new_l != l) {
 	  U = change_dimension(U, 1, new_l);
 	  V = change_dimension(V, 0, new_l);
@@ -88,12 +88,12 @@ namespace mps {
 	--i;
 	set_canonical(psi, i, psi[i], sense);
       }
-      if (normalize) psi.at(0) = psi[0] / norm2(psi[0]);
+      if (normalize) psi.at(0) /= norm2(psi[0]);
     } else {
       for (index i = 0; i < L; i++) {
 	set_canonical(psi, i, psi[i], sense);
       }
-      if (normalize) psi.at(0) = psi[L-1] / norm2(psi[0]);
+      if (normalize) psi.at(L-1) /= norm2(psi[L-1]);
     }
     return psi;
   }
