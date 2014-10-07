@@ -87,14 +87,7 @@ namespace mps {
                                               index k, int dk) const
   {
     CTensor P1 = P[k];
-    if (Uloc.is_empty()) {
-      if (debug > 2) {
-	std::cout << "<" << k << ">";
-      }
-    } else {
-      if (debug > 2) {
-	std::cout << "(" << k << ")";
-      }
+    if (!Uloc.is_empty()) {
       index a1,i1,a2;
       P1.get_dimensions(&a1, &i1, &a2);
       P1 = foldin(Uloc, -1, P1, 1);
@@ -116,14 +109,7 @@ namespace mps {
     P2.get_dimensions(&a2, &i2, &a3);
 
     double err = 0.0;
-    if (U12.is_empty()) {
-      if (debug > 2) {
-	std::cout << "<" << k1 << "," << k2 << ">";
-      }
-    } else {
-      if (debug > 2) {
-	std::cout << "(" << k1 << "," << k2 << ")";
-      }
+    if (!U12.is_empty()) {
       /* Apply the unitary onto two neighboring sites. This creates a
        * larger tensor that we have to split into two new tensors, Pout[k1]
        * and Pout[k2], that represent the sites */
@@ -146,13 +132,6 @@ namespace mps {
        * Notice that at the end, P is orthonormalized in both cases.
        */
       index new_a2 = where_to_truncate(s, tolerance, max_a2? max_a2 : a2);
-      if (debug > 1) {
-        std::cout << "Truncating site " << k1
-                  << " to a2=" << a2 << ", new_a2=" << new_a2
-                  << ", tol=" << tolerance
-                  << ", max=" << (max_a2? max_a2 : a2)
-                  << ", s=" << s << std::endl;
-      }
       if (new_a2 != a2) {
         P1 = change_dimension(P1, -1, new_a2);
         P2 = change_dimension(P2, 0, new_a2);
