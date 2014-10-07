@@ -142,17 +142,34 @@ namespace mps {
   /**Store a tensor in a matrix product state in the canonical form.*/
   void set_canonical(CMPS &psi, index site, const CTensor &A, int sense, bool truncate = true);
 
-  /**Rewrite a RMPS in canonical form.*/
+  /**Rewrite a RMPS in canonical form. A value of 'sense' -1 or +1 determines
+     the right-to-left or left-to-right direction in this form. */
   const RMPS canonical_form(const RMPS &psi, int sense = -1);
 
-  /**Rewrite a CMPS in canonical form.*/
+  /**Rewrite a CMPS in canonical form. A value of 'sense' -1 or +1 determines
+     the right-to-left or left-to-right direction in this form.*/
   const CMPS canonical_form(const CMPS &psi, int sense = -1);
 
-  /**Rewrite a RMPS in canonical form, normalizing.*/
+  /**Rewrite a RMPS in canonical form, normalizing. A value of 'sense' -1 or +1 determines
+     the right-to-left or left-to-right direction in this form.*/
   const RMPS normal_form(const RMPS &psi, int sense = -1);
 
-  /**Rewrite a CMPS in canonical form, normalizing.*/
+  /**Rewrite a CMPS in canonical form, normalizing. A value of 'sense' -1 or +1 determines
+     the right-to-left or left-to-right direction in this form.*/
   const CMPS normal_form(const CMPS &psi, int sense = -1);
+
+  /**Rewrite a RMPS in canonical form on both sides of 'site'. */
+  const RMPS canonical_form_at(const RMPS &psi, index site);
+
+  /**Rewrite a CMPS in canonical form on both sides of 'site'. */
+  const CMPS canonical_form_at(const CMPS &psi, index site);
+
+  /**Rewrite a RMPS in canonical form, normalizing. */
+  const RMPS normal_form_at(const RMPS &psi, index site);
+
+  /**Rewrite a CMPS in canonical form, normalizing. */
+  const CMPS normal_form_at(const CMPS &psi, index site);
+
 
   /** Update an MPS with a tensor that spans two sites, (site,site+1). Dmax is
    * the maximum bond dimension that is used. Actually, tol and Dmax are the

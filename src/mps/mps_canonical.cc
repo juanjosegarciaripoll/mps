@@ -80,21 +80,15 @@ namespace mps {
   }
 
   template<class MPS>
-  static const MPS either_form_inner(MPS psi, int sense, bool normalize)
+  static const MPS either_form_inner(MPS psi, index site, bool normalize)
   {
-    index L = psi.size();
-    if (sense < 0) {
-      for (index i = L; i; ) {
-	--i;
-	set_canonical(psi, i, psi[i], sense);
-      }
-      if (normalize) psi.at(0) /= norm2(psi[0]);
-    } else {
-      for (index i = 0; i < L; i++) {
-	set_canonical(psi, i, psi[i], sense);
-      }
-      if (normalize) psi.at(L-1) /= norm2(psi[L-1]);
-    }
+    index last = psi.size() - 1;
+    assert((site >= 0) & (site <= last));
+    for (index i = last; i > site; i--)
+      set_canonical(psi, i, psi[i], -1);
+    for (index i = 0; i < site; i++)
+      set_canonical(psi, i, psi[i], +1);
+    if (normalize) psi.at(site) /= norm2(psi[site]);
     return psi;
   }
 

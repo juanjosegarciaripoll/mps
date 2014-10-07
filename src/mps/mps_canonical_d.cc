@@ -31,12 +31,22 @@ namespace mps {
 
   const RMPS canonical_form(const RMPS &psi, int sense)
   {
-    return either_form_inner(psi, sense, false);
+    return canonical_form_at(psi, (sense < 0)? 0 : (psi.size()-1));
   }
 
   const RMPS normal_form(const RMPS &psi, int sense)
   {
-    return either_form_inner(psi, sense, true);
+    return normal_form_at(psi, (sense < 0)? 0 : (psi.size()-1));
+  }
+
+  const RMPS canonical_form_at(const RMPS &psi, index site)
+  {
+    return either_form_inner(psi, site, false);
+  }
+
+  const RMPS normal_form_at(const RMPS &psi, index site)
+  {
+    return either_form_inner(psi, site, true);
   }
 
 }
