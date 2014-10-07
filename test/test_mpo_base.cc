@@ -19,7 +19,6 @@
 
 #include "loops.h"
 #include <gtest/gtest.h>
-#include <gtest/gtest-death-test.h>
 #include <mps/mpo.h>
 #include <mps/io.h>
 #include <mps/quantum.h>

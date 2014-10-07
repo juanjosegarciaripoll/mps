@@ -19,7 +19,6 @@
 
 #include "loops.h"
 #include <gtest/gtest.h>
-#include <gtest/gtest-death-test.h>
 #include <tensor/io.h>
 #include <mps/quantum.h>
 #include <mps/itebd.h>

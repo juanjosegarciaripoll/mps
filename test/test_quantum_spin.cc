@@ -18,7 +18,6 @@
 */
 
 #include <gtest/gtest.h>
-#include <gtest/gtest-death-test.h>
 #include "loops.h"
 #include <tensor/gen.h>
 #include <mps/quantum.h>

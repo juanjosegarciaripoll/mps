@@ -19,7 +19,6 @@
 
 #include "loops.h"
 #include <gtest/gtest.h>
-#include <gtest/gtest-death-test.h>
 #include <mps/mps.h>
 #include <mps/mps_algorithms.h>
 
@@ -50,7 +49,7 @@ namespace tensor_test {
     double tol = -1;
     for (int L = 1; L < 4; L++) {
       std::vector<MPS> states(L, psi);
-      typename MPS::elt_t weights = abs(RTensor::random(L));
+      typename MPS::elt_t weights = tensor::abs(RTensor::random(L));
       int sense;
 
       for (int sweeps = 1; sweeps < 3; sweeps++) {
@@ -60,7 +59,7 @@ namespace tensor_test {
         simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
 
         EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-        EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+        EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
         EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
 
         aux = psi;
@@ -68,7 +67,7 @@ namespace tensor_test {
         simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
 
         EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-        EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+        EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
         EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
       }
     }
@@ -87,7 +86,7 @@ namespace tensor_test {
 
     for (int L = 1; L < 4; L++) {
       std::vector<MPS> states(L, psi);
-      typename MPS::elt_t weights = abs(RTensor::random(L));
+      typename MPS::elt_t weights = tensor::abs(RTensor::random(L));
       int sense;
 
       for (int sweeps = 1; sweeps < 3; sweeps++) {
@@ -96,7 +95,7 @@ namespace tensor_test {
         simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
 
         EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-        EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+        EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
         EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
 
         aux = add_errors(psi);
@@ -104,7 +103,7 @@ namespace tensor_test {
         simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
 
         EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-        EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+        EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
         EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
       }
     }

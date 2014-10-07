@@ -20,7 +20,6 @@
 #include <vector>
 #include "loops.h"
 #include <gtest/gtest.h>
-#include <gtest/gtest-death-test.h>
 #include <mps/mps.h>
 #include <mps/time_evolve.h>
 #include <mps/hamiltonian.h>

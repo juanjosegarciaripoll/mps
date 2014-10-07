@@ -46,7 +46,7 @@ void test_dmrg_gap()
   CTensor sx, sy, sz;
   spin_operators(1, &sx, &sy, &sz);
   CTensor H1 = CTensor::zeros(sz.dimensions());
-  CTensor H12 = real(kron(sx,sx) + kron(sy,sy) + kron(sz,sz));
+  CTensor H12 = tensor::real(kron(sx,sx) + kron(sy,sy) + kron(sz,sz));
 
   //
   // These matrices are used to build an antiferromagnetic state which
@@ -111,7 +111,7 @@ void test_dmrg_gap()
       solver.tolerance = 1e-10;
       if (0) {
       solver.Q_operators = DMRG::elt_vector_t(1);
-      solver.Q_operators.at(0) = real(sz);
+      solver.Q_operators.at(0) = tensor::real(sz);
       solver.Q_values = DMRG::elt_t(1);
       solver.Q_values.at(0) = 1;
       }
@@ -121,7 +121,7 @@ void test_dmrg_gap()
       // 4) Repeat the procedure, but with an excited state
       solver.orthogonal_to(psi0);
       double E1 = solver.minimize(&psi1, Dmax);
-      double diff = abs(Exact(0, L-3, model) - E0) + abs(Exact(1, L-3, model) - E1);
+      double diff = tensor::abs(Exact(0, L-3, model) - E0) + tensor::abs(Exact(1, L-3, model) - E1);
       err = std::max(err, diff);
       if (diff < 3e-9) {
 	std::cout << '.';
@@ -177,7 +177,7 @@ test_dmrg_inner(const mps::Hamiltonian &H, double &err)
 #if 1
     CTensor aux = linalg::eigs(sparse_hamiltonian(H),
 			       linalg::SmallestAlgebraic, 1);
-    double realE = min(real(aux));
+    double realE = min(tensor::real(aux));
 #else
     RTensor aux = eig_sym(full(H.sparse_matrix(0)));
     double realE = tensor::min(aux);
@@ -189,7 +189,7 @@ test_dmrg_inner(const mps::Hamiltonian &H, double &err)
       E = s.minimize(&P0);
     }
     // accurate_svd = false;
-    e = abs(E - realE);
+    e = tensor::abs(E - realE);
     err = std::max(e,err);
     if (e > tol)
       return false;

@@ -20,6 +20,9 @@
 #include <cmath>
 #include <tensor/tensor.h>
 #include "loops.h"
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 namespace tensor_test {
 

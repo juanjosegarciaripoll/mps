@@ -19,7 +19,6 @@
 
 #include "loops.h"
 #include <gtest/gtest.h>
-#include <gtest/gtest-death-test.h>
 #include <mps/mps.h>
 #include <mps/time_evolve.h>
 #include <mps/hamiltonian.h>
@@ -56,7 +55,8 @@ namespace tensor_test {
   void test_Trotter2_no_truncation(const Hamiltonian &H, double dt, const CMPS &psi)
   {
     CMPS aux = psi;
-    Trotter2Solver solver(H, dt, false);
+    Trotter2Solver solver(H, dt);
+    solver.strategy = Trotter2Solver::DO_NOT_TRUNCATE;
     double err = solver.one_step(&aux, 0);
     EXPECT_CEQ(err, 0.0);
     EXPECT_CEQ(norm2(aux), 1.0);
@@ -68,19 +68,12 @@ namespace tensor_test {
   void test_Trotter2_truncated(const Hamiltonian &H, double dt, const CMPS &psi)
   {
     CMPS truncated_psi_t = psi;
-    Trotter2Solver solver(H, dt, true);
+    Trotter2Solver solver(H, dt);
+    solver.strategy = Trotter2Solver::TRUNCATE_EACH_LAYER;
     double err = solver.one_step(&truncated_psi_t, Dmax);
     EXPECT_CEQ(norm2(truncated_psi_t), 1.0);
     CTensor psi_t = apply_trotter2(H, to_complex(0.0,-dt), mps_to_vector(psi));
     EXPECT_CEQ(mps_to_vector(truncated_psi_t), psi_t);
-  }
-
-  CMPS apply_H_ForestRuth(const Hamiltonian &H, double dt, const CMPS &psi)
-  {
-    ForestRuthSolver solver(H, 0.1);
-    CMPS aux = psi;
-    solver.one_step(&aux, 2);
-    return aux;
   }
 
   ////////////////////////////////////////////////////////////

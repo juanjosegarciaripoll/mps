@@ -19,7 +19,6 @@
 
 #include "loops.h"
 #include <gtest/gtest.h>
-#include <gtest/gtest-death-test.h>
 #include <mps/mps.h>
 #include <mps/mps_algorithms.h>
 
@@ -37,13 +36,13 @@ namespace tensor_test {
     {
       MPS aux = canonical_form(psi, -1);
       EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
       EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
     }
     {
       MPS aux = canonical_form(psi, +1);
       EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
       EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
     }
   }
@@ -58,13 +57,13 @@ namespace tensor_test {
     {
       MPS aux = normal_form(psi, -1);
       EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
       EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
     }
     {
       MPS aux = normal_form(psi, +1);
       EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
       EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
     }
   }
