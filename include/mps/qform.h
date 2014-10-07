@@ -21,7 +21,7 @@
 #define MPS_QFORM_H
 
 #include <vector>
-#include <forward_list>
+#include <list>
 #include <mps/mpo.h>
 #include <mps/hamiltonian.h>
 
@@ -58,13 +58,13 @@ namespace mps {
     /** The site at which the quadratic form is defined. */
     int here() const { return current_site_; }
     /** Number of sites in the lattice. */
-    index size() const { return left_matrix_.size(); }
+    index size() const { return matrix_.size(); }
 
     /** Matrix representation of the quadratic form with respect to site here().*/
-    const elt_t single_site_matrix() const;
+    const elt_t single_site_matrix();
     /** Matrix representation of the quadratic form with respect to
 	sites here() and here()+1.*/
-    const elt_t two_site_matrix() const;
+    const elt_t two_site_matrix();
 
   private:
 
@@ -84,16 +84,29 @@ namespace mps {
 
     typedef typename std::vector<elt_t> matrix_array_t;
     typedef typename std::vector<matrix_array_t> matrix_database_t;
-    typedef typename std::forward_list<Pair> pair_list_t;
+    typedef typename std::list<Pair> pair_list_t;
     typedef typename std::vector<pair_list_t> pair_tree_t;
     typedef typename pair_list_t::const_iterator pair_iterator_t;
 
     int current_site_;
     Indices bond_dimensions_;
-    matrix_database_t left_matrix_, right_matrix_;
+    matrix_database_t matrix_;
     pair_tree_t pairs_;
 
-    static matrix_database_t make_matrix_database(const MPO &mpo, int dimension);
+    elt_t &left_matrix(index site, int n) {
+      return matrix_[site][n];
+    }
+    elt_t &right_matrix(index site, int n) {
+      return matrix_[site+1][n];
+    }
+    matrix_array_t &left_matrices(index site) {
+      return matrix_[site];
+    }
+    matrix_array_t &right_matrices(index site) {
+      return matrix_[site+1];
+    }
+
+    static matrix_database_t make_matrix_database(const MPO &mpo);
     static pair_tree_t make_pairs(const MPO &mpo);
   };
 

@@ -25,8 +25,7 @@ namespace mps {
 
   template<class MPO>
   QuadraticForm<MPO>::QuadraticForm(const MPO &mpo, const MPS &bra, const MPS &ket, int start) :
-    left_matrix_(make_matrix_database(mpo, 0)),
-    right_matrix_(make_matrix_database(mpo, 1)),
+    matrix_(make_matrix_database(mpo)),
     pairs_(make_pairs(mpo))
   {
     if (bra[0].dimension(0) != 1 || ket[0].dimension(0) != 1) {
@@ -48,12 +47,14 @@ namespace mps {
 
   template<class MPO>
   typename QuadraticForm<MPO>::matrix_database_t
-  QuadraticForm<MPO>::make_matrix_database(const MPO &mpo, int dimension)
+  QuadraticForm<MPO>::make_matrix_database(const MPO &mpo)
   {
+    // We only support open boundary condition problems
+    assert(mpo[0].dimension(0));
     index L = mpo.size();
-    matrix_database_t output(L);
+    matrix_database_t output(L+1, matrix_array_t(1, elt_t()));
     for (index i = 0; i < L; i++) {
-      output.at(i) = matrix_array_t(mpo[i].dimension(dimension), elt_t());
+      output.at(i) = matrix_array_t(mpo[i].dimension(0), elt_t());
     }
     return output;
   }
@@ -69,7 +70,7 @@ namespace mps {
 	for (index j = 0; j < tensor.dimension(3); j++) {
 	  Pair p(i, j, tensor);
 	  if (!p.is_empty())
-	    output.at(m).push_front(p);
+	    output.at(m).push_back(p);
 	}
       }
     }
@@ -85,19 +86,16 @@ namespace mps {
   template<class MPO>
   void QuadraticForm<MPO>::propagate_left(const elt_t &braP, const elt_t &ketP)
   {
-    if (here() == 0) {
-      std::cerr << "Cannot propagate_left() beyond site " << here();
-      abort();
-    }
-    const matrix_array_t &vr = right_matrix_[here()];
-    matrix_array_t &new_vr = right_matrix_[here()-1];
-    std::fill(new_vr.begin(), new_vr.end(), elt_t());
+    assert(here() >= 0);
+    const matrix_array_t &mr = right_matrices(here());
+    matrix_array_t &new_mr = right_matrices(here());
+    std::fill(new_mr.begin(), new_mr.end(), elt_t());
     for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
 	 it != end;
 	 it++)
       {
-	maybe_add<elt_t>(&new_vr.at(it->right_ndx),
-			 prop_matrix(vr[it->left_ndx], -1, braP, ketP, &it->op));
+	maybe_add<elt_t>(&new_mr.at(it->right_ndx),
+			 prop_matrix(mr[it->left_ndx], -1, braP, ketP, &it->op));
       }
     --current_site_;
   }
@@ -106,15 +104,15 @@ namespace mps {
   void QuadraticForm<MPO>::propagate_right(const elt_t &braP, const elt_t &ketP)
   {
     assert(here()+1 < size());
-    const matrix_array_t &vl = left_matrix_[here()];
-    matrix_array_t &new_vl = left_matrix_[here()+1];
-    std::fill(new_vl.begin(), new_vl.end(), elt_t());
+    const matrix_array_t &ml = left_matrices(here());
+    matrix_array_t &new_ml = left_matrices(here()+1);
+    std::fill(new_ml.begin(), new_ml.end(), elt_t());
     for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
 	 it != end;
 	 it++)
       {
-	maybe_add<elt_t>(&new_vl.at(it->right_ndx),
-			 prop_matrix(vl[it->left_ndx], +1, braP, ketP, &it->op));
+	maybe_add<elt_t>(&new_ml.at(it->right_ndx),
+			 prop_matrix(ml[it->left_ndx], +1, braP, ketP, &it->op));
       }
     ++current_site_;
   }
@@ -145,15 +143,15 @@ namespace mps {
 
   template<class MPO>
   const typename QuadraticForm<MPO>::elt_t
-  QuadraticForm<MPO>::single_site_matrix() const
+  QuadraticForm<MPO>::single_site_matrix()
   {
     elt_t output;
     for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
 	 it != end;
 	 it++)
       {
-	const elt_t &vl = left_matrix_[here()][it->left_ndx];
-	const elt_t &vr = right_matrix_[here()][it->right_ndx];
+	const elt_t &vl = left_matrix(here(), it->left_ndx);
+	const elt_t &vr = right_matrix(here(), it->right_ndx);
 	if (!vl.is_empty() && !vr.is_empty()) {
 	  maybe_add<elt_t>(&output, compose(vl, it->op, vr));
 	}
@@ -164,7 +162,7 @@ namespace mps {
 
   template<class MPO>
   const typename QuadraticForm<MPO>::elt_t
-  QuadraticForm<MPO>::two_site_matrix() const
+  QuadraticForm<MPO>::two_site_matrix()
   {
     assert(here() + 1 < size());
     elt_t output;
@@ -176,8 +174,8 @@ namespace mps {
 	     it2 != end2;
 	     it2++)
 	  if (it1->right_ndx == it2->left_ndx) {
-	    const elt_t &vl = left_matrix_[here()][it1->left_ndx];
-	    const elt_t &vr = right_matrix_[here()+1][it2->right_ndx];
+	    const elt_t &vl = left_matrix(here(), it1->left_ndx);
+	    const elt_t &vr = right_matrix(here()+1, it2->right_ndx);
 	    if (!vl.is_empty() && !vr.is_empty()) {
 	      maybe_add(&output, compose(vl, it1->op, it2->op, vr));
 	    }
