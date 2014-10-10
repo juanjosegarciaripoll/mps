@@ -133,5 +133,7 @@ libmps_la_SOURCES = \
 	dmrg/qform_z.cc \
 	dmrg/lform_d.cc \
 	dmrg/lform_z.cc \
+	dmrg/simplify_obc_d.cc \
+	dmrg/simplify_obc_z.cc \
 	dmrg/rdmrg.cc \
 	dmrg/cdmrg.cc
