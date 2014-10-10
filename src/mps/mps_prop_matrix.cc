@@ -59,6 +59,9 @@ namespace mps {
   template<typename t>
   static inline const t do_prop_right(const t &M0, const t &Q, const t &P, const t *op)
   {
+    if (M0.is_empty()) {
+      return do_prop_init(Q, P, op);
+    }
     index a1,b1,a2,b2,i2,a3,b3;
     M0.get_dimensions(&a1, &b1, &a2, &b2);
     Q.get_dimensions(&a2, &i2, &a3);
@@ -76,6 +79,9 @@ namespace mps {
   template<typename t>
   static inline const t do_prop_left(const t &M0, const t &Q, const t &P, const t *op)
   {
+    if (M0.is_empty()) {
+      return do_prop_init(Q, P, op);
+    }
     index a1,b1,a2,b2,a0,b0,i0;
     M0.get_dimensions(&a1,&b1,&a2,&b2);
     Q.get_dimensions(&a0,&i0,&a1);
