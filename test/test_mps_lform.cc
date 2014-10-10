@@ -26,6 +26,28 @@ namespace tensor_test {
 
   using namespace mps;
 
+  template<class MPS>
+  void test_lform_norm2(MPS psi)
+  {
+    {
+      typename MPS::elt_t w(1);
+      w.randomize();
+      std::vector<MPS> v(1);
+      v.at(0) = psi;
+      LinearForm<MPS> f(w, v, psi, 0);
+      EXPECT_CEQ(f.norm2(), norm2(w));
+    }
+    {
+      typename MPS::elt_t w(2);
+      w.randomize();
+      std::vector<MPS> v(2);
+      v.at(0) = v.at(1) = psi;
+      LinearForm<MPS> f(w, v, psi, 0);
+      double n = sqrt(tensor::abs(sum(kron(conj(w), w))));
+      EXPECT_CEQ(f.norm2(), n);
+    }
+  }
+
   //
   // Canonical form of a state that does not require simplification.
   //
@@ -37,13 +59,8 @@ namespace tensor_test {
     // are the identity.
     for (index i = 0; i < psi.size(); i++) {
       MPS aux = canonical_form_at(psi, i);
-      std::cout << "N=" << aux.size() << std::endl
-                << " i=" << i << std::endl
-                << " P=" << aux[i] << std::endl;
       LinearForm<MPS> f(aux, aux, i);
-      typename MPS::elt_t v = f.single_site_vector();
-      std::cout << "v=" << v << std::endl;
-      EXPECT_CEQ(aux[i], v);
+      EXPECT_CEQ(aux[i], f.single_site_vector());
     }
   }
 
@@ -58,8 +75,7 @@ namespace tensor_test {
       vs.at(0) = vs.at(1) = canonical_form_at(psi, i);
       w.at(0) = 0.13; w.at(1) = -1.57;
       LinearForm<MPS> f(w, vs, vs[0], i);
-      typename MPS::elt_t v = f.single_site_vector();
-      EXPECT_CEQ((w.at(0) + w.at(1)) * vs[0][i], v);
+      EXPECT_CEQ((w.at(0) + w.at(1)) * vs[0][i], f.single_site_vector());
     }
   }
 
@@ -72,6 +88,10 @@ namespace tensor_test {
   // SIMPLIFY RMPS
   //
 
+  TEST(RLForm, Norm2) {
+    test_over_integers(2, 10, try_over_states<RMPS,test_lform_norm2<RMPS> >);
+  }
+
   TEST(RLForm, Canonical1State) {
     test_over_integers(2, 10, try_over_states<RMPS,test_lform_canonical<RMPS> >);
   }
@@ -83,6 +103,10 @@ namespace tensor_test {
   ////////////////////////////////////////////////////////////
   // SIMPLIFY CMPS
   //
+
+  TEST(CLForm, Norm2) {
+    test_over_integers(2, 10, try_over_states<CMPS,test_lform_norm2<CMPS> >);
+  }
 
   TEST(CLForm, Canonical1State) {
     test_over_integers(2, 10, try_over_states<CMPS,test_lform_canonical<CMPS> >);

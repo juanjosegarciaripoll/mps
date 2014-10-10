@@ -184,4 +184,19 @@ namespace mps {
     return output;
   }
 
+  template<class MPS>
+  double
+  LinearForm<MPS>::norm2() const
+  {
+    typename elt_t::elt_t x, v = number_zero<elt_t::elt_t>();
+    for (int i = 0; i < number_of_bras(); i++) {
+      for (int j = 0; j <= i; j++) {
+        x = conj(weight_[i]) * weight_[j] * scprod(bra_[i], bra_[j]);
+        v += x;
+        if (i != j) v += conj(x);
+      }
+    }
+    return sqrt(tensor::abs(v));
+  }
+
 }

@@ -58,6 +58,9 @@ namespace mps {
 	sites here() and here()+1.*/
     const elt_t two_site_vector() const;
 
+    /** Norm-2 of the linear form. */
+    double norm2() const;
+
   private:
 
     typedef typename std::vector<elt_t> matrix_array_t;
