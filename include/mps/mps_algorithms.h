@@ -62,6 +62,21 @@ namespace mps {
   double simplify(CMPS *P, const std::vector<CMPS> &Q, const CTensor &weights,
                   index Dmax, double tol, int *sense, index sweeps, bool normalize);
 
+  /* Open boundary condition algorithms that simplify a state, optimizing over one site */
+
+  double simplify_obc(RMPS *P, const RMPS &Q, int *sense, bool periodicbc,
+                      index sweeps, bool normalize);
+
+  double simplify_obc(CMPS *P, const CMPS &Q, int *sense, bool periodicbc,
+                      index sweeps, bool normalize);
+
+  double simplify_obc(RMPS *P, const RTensor &weights, const std::vector<RMPS> &Q,
+                      int *sense, index sweeps, bool normalize);
+
+  double simplify_obc(CMPS *P, const CTensor &weights, const std::vector<CMPS> &Q,
+                      int *sense, index sweeps, bool normalize);
+
+
 } // namespace mps
 
 #endif // !MPS_MPS_ALGORITHM_H
