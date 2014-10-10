@@ -66,7 +66,12 @@ namespace mps {
     const elt_t weight_;
     const std::vector<MPS> bra_;
     index size_, current_site_;
-    matrix_database_t left_matrix_, right_matrix_;
+    matrix_database_t matrix_;
+
+    elt_t &left_matrix(index i, index site) { return matrix_[i][site]; }
+    elt_t &right_matrix(index i, index site) { return matrix_[i][site+1]; }
+    const elt_t &left_matrix(index i, index site) const { return matrix_[i][site]; }
+    const elt_t &right_matrix(index i, index site) const { return matrix_[i][site+1]; }
 
     void initialize_matrices(int start, const MPS &ket);
     matrix_database_t make_matrix_array();
