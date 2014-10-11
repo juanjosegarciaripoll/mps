@@ -28,18 +28,6 @@
 namespace mps {
 
   template<class MPS>
-  cdouble
-  xprod(const typename MPS::elt_t &w, const std::vector<MPS> &Q, const MPS &P)
-  {
-    return scprod(Q[0], P);
-    cdouble x = number_zero<cdouble>();
-    for (int i = 0; i < Q.size(); i++) {
-      x += conj(w[i])*scprod(Q[i], P);
-    }
-    return x;
-  }
-
-  template<class MPS>
   double
   do_simplify(MPS *ptrP, const typename MPS::elt_t &w, const std::vector<MPS> &Q,
               int *sense, index sweeps, bool normalize)
