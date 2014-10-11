@@ -13,6 +13,7 @@
 #include <tensor/tensor.h>
 #include <tensor/io.h>
 #include <tensor/tools.h>
+#include <mps/mps.h>
 #include <mps/hamiltonian.h>
 
 #define EPSILON 1e-12
@@ -367,6 +368,9 @@ namespace tensor_test {
   template<> Tensor<double> random_unitary(int n, int iterations);
   template<> Tensor<cdouble> random_unitary(int n, int iterations);
   Tensor<double> random_permutation(int n, int iterations);
+
+  mps::RMPS random_product_RPMS(int n, int dimension);
+  mps::CMPS random_product_CPMS(int n, int dimension);
 
   static struct Foo { Foo() { tensor::tensor_abort_handler(); }} foo;
 

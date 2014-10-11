@@ -129,7 +129,7 @@ test_dmrg_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 noinst_LIBRARIES += libtestmain.a
 libtestmain_a_SOURCES = test_main.cc \
 	 random_unitary_d.cc random_unitary_z.cc random_permutation.cc \
-	hamilt_test.cc
+	 hamilt_test.cc random_product_RMPS.cc random_product_CMPS.cc
 
 #
 # Build the Google Test library. The way this library has changed: we now have to
