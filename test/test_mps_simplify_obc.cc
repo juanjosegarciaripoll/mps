@@ -49,16 +49,16 @@ namespace tensor_test {
     int sense;
 
     for (int sweeps = 1; sweeps < 3; sweeps++) {
-      aux = psi;
       sense = +1;
+      aux = canonical_form(psi, sense);
       simplify_obc(&aux, psi, &sense, sweeps, true);
 
       EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
       EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
       EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
 
-      aux = psi;
       sense = -1;
+      aux = canonical_form(psi, sense);
       simplify_obc(&aux, psi, &sense, 1, true);
 
       EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
