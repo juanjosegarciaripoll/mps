@@ -28,12 +28,23 @@
 namespace mps {
 
   template<class MPS>
+  cdouble
+  xprod(const typename MPS::elt_t &w, const std::vector<MPS> &Q, const MPS &P)
+  {
+    return scprod(Q[0], P);
+    cdouble x = number_zero<cdouble>();
+    for (int i = 0; i < Q.size(); i++) {
+      x += conj(w[i])*scprod(Q[i], P);
+    }
+    return x;
+  }
+
+  template<class MPS>
   double
-  do_simplify(MPS *ptrP, const typename MPS::elt_t w, const std::vector<MPS> &Q,
+  do_simplify(MPS *ptrP, const typename MPS::elt_t &w, const std::vector<MPS> &Q,
               int *sense, index sweeps, bool normalize)
   {
     assert(sweeps > 0);
-    bool debug = FLAGS.get(MPS_DEBUG_SIMPLIFY);
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
     typedef typename MPS::elt_t Tensor;
     MPS &P = *ptrP;
@@ -52,34 +63,28 @@ namespace mps {
     LinearForm<MPS> lf(w, Q, P, (*sense > 0) ? last : 0);
     double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2, scp;
     for (index sweep = 0; sweep < sweeps; sweep++) {
-      if (debug) {
-        tic();
-        std::cout << "Simplify: sweep #" << sweep << std::flush;
-      }
-      if (*sense > 0) {
+      *sense = -*sense;
+      if (*sense < 0) {
         // Last iteration was left-to-right and state P is in canonical form with
         // respect to site (N-1)
         for (k = last; k > 0; k--) {
           set_canonical(P, k, conj(lf.single_site_vector()), -1);
           lf.propagate_left(P[k]);
         }
-        *sense = -1;
       } else {
         // Last iteration was left-to-right and state P is in canonical form with
         // respect to site (N-1)
-        for (index k = 0; k < last; k++) {
+        for (k = 0; k < last; k++) {
           set_canonical(P, k, conj(lf.single_site_vector()), +1);
           lf.propagate_right(P[k]);
         }
-        *sense = +1;
       }
+      P.at(k) = conj(lf.single_site_vector());
       normP2 = tensor::abs(scprod(P[k], P[k]));
       olderr = err;
-      err = sqrt(1 - normP2/normQ2);
-      if (debug) {
-        std::cout << ", truncation error = " << err
-                  << "\t[" << toc() << "s]\n";
-      }
+      err = sqrt(tensor::abs(1 - normP2/normQ2));
+      if (normP2 > normQ2+0.5)
+        abort();
       if ((olderr-err) < 1e-5*tensor::abs(olderr) || (err < tolerance)) {
 	break;
       }
