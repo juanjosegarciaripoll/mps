@@ -79,17 +79,57 @@ namespace tensor_test {
     if (psi[0].dimension(1) == 2) {
       TestHamiltonian H(model, 0.5, L, false, false);
       MPO mpo(H);
-      number psiHpsi = scprod(psi, apply(mpo, psi));
+      // We run over all sites
       for (index i = 0; i < L; i++) {
         QuadraticForm<MPO> qf(mpo, psi, psi, i);
-        Tensor psik = reshape(psi[i], psi[i].size());
         Tensor H = qf.single_site_matrix();
-        number psikHpsik = scprod(psik, mmult(H, psik));
-        EXPECT_CEQ(psiHpsi, psikHpsik);
+        // and on each site we try random matrices and verify
+        // that the total expectation value is the same one.
+        for (index j = 0; j < 10; j++) {
+          Tensor psik = reshape(psi[i], psi[i].size());
+          number psikHpsik = scprod(psik, mmult(H, psik));
+          number psiHpsi = scprod(psi, apply(mpo, psi));
+          EXPECT_CEQ(psiHpsi, psikHpsik);
+          psi.at(i).randomize();
+          psi.at(i) = psi[i] / norm2(psi[i]);
+        }
       }
     }
   }
 
+  // Create a random Hamiltonian in MPO form and verify that it is giving
+  // the same expected values as the Quadratic form.
+  template<class MPO, int model = TestHamiltonian::Z_FIELD>
+  void test_qform_expected2sites(typename MPO::MPS psi)
+  {
+    typedef typename MPO::MPS MPS;
+    typedef typename MPS::elt_t Tensor;
+    typedef typename Tensor::elt_t number;
+    // Random Hamiltonian of spin 1/2 model with the given
+    index L = psi.size();
+    if (psi[0].dimension(1) == 2) {
+      TestHamiltonian H(model, 0.5, L, false, false);
+      MPO mpo(H);
+      // We run over all sites
+      for (index i = 1; i < L; i++) {
+        QuadraticForm<MPO> qf(mpo, psi, psi, i-1);
+        Tensor H = qf.two_site_matrix();
+        // and on each site we try random matrices and verify
+        // that the total expectation value is the same one.
+        for (index j = 0; j < 10; j++) {
+          Tensor psik = fold(psi[i-1],-1,psi[i],0);
+          psik = reshape(psik, psik.size());
+          number psikHpsik = scprod(psik, mmult(H, psik));
+          number psiHpsi = scprod(psi, apply(mpo, psi));
+          EXPECT_CEQ(psiHpsi, psikHpsik);
+          psi.at(i-1).randomize();
+          psi.at(i-1) = psi[i-1] / norm2(psi[i-1]);
+          psi.at(i).randomize();
+          psi.at(i) = psi[i] / norm2(psi[i]);
+        }
+      }
+    }
+  }
 
   template<class MPS, void (*f)(MPS)>
   void try_over_states(int size) {
@@ -106,6 +146,8 @@ namespace tensor_test {
   TEST(RQForm, LocalCanonical) {
     test_over_integers(2, 10, try_over_states<RMPS,test_qform_canonical<RMPO> >);
   }
+
+  //--------------------------------------------------
 
   TEST(RQForm, ExpectedIsing) {
     test_over_integers(2, 10,
@@ -149,6 +191,50 @@ namespace tensor_test {
                        test_qform_expected<RMPO,TestHamiltonian::HEISENBERG> >);
   }
 
+  //--------------------------------------------------
+
+  TEST(RQForm, Expected2sitesIsing) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected2sites<RMPO,TestHamiltonian::ISING> >);
+  }
+
+  TEST(RQForm, Expected2sitesZField) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected2sites<RMPO,TestHamiltonian::Z_FIELD> >);
+  }
+
+  TEST(RQForm, Expected2sitesIsingZField) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected2sites<RMPO,TestHamiltonian::ISING_Z_FIELD> >);
+  }
+
+  TEST(RQForm, Expected2sitesIsingXField) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected2sites<RMPO,TestHamiltonian::ISING_X_FIELD> >);
+  }
+
+  TEST(RQForm, Expected2sitesXY) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected2sites<RMPO,TestHamiltonian::XY> >);
+  }
+
+  TEST(RQForm, Expected2sitesXXZ) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected2sites<RMPO,TestHamiltonian::XXZ> >);
+  }
+
+  TEST(RQForm, Expected2sitesHeisenberg) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected2sites<RMPO,TestHamiltonian::HEISENBERG> >);
+  }
+
   ////////////////////////////////////////////////////////////
   // CQFORM
   //
@@ -156,6 +242,8 @@ namespace tensor_test {
   TEST(CQForm, LocalCanonical) {
     test_over_integers(2, 10, try_over_states<CMPS,test_qform_canonical<CMPO> >);
   }
+
+  //--------------------------------------------------
 
   TEST(CQForm, ExpectedIsing) {
     test_over_integers(2, 10,
@@ -197,6 +285,50 @@ namespace tensor_test {
     test_over_integers(2, 10,
                        try_over_states<CMPS,
                        test_qform_expected<CMPO,TestHamiltonian::HEISENBERG> >);
+  }
+
+  //--------------------------------------------------
+
+  TEST(CQForm, Expected2sitesIsing) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected2sites<CMPO,TestHamiltonian::ISING> >);
+  }
+
+  TEST(CQForm, Expected2sitesZField) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected2sites<CMPO,TestHamiltonian::Z_FIELD> >);
+  }
+
+  TEST(CQForm, Expected2sitesIsingZField) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected2sites<CMPO,TestHamiltonian::ISING_Z_FIELD> >);
+  }
+
+  TEST(CQForm, Expected2sitesIsingXField) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected2sites<CMPO,TestHamiltonian::ISING_X_FIELD> >);
+  }
+
+  TEST(CQForm, Expected2sitesXY) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected2sites<CMPO,TestHamiltonian::XY> >);
+  }
+
+  TEST(CQForm, Expected2sitesXXZ) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected2sites<CMPO,TestHamiltonian::XXZ> >);
+  }
+
+  TEST(CQForm, Expected2sitesHeisenberg) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected2sites<CMPO,TestHamiltonian::HEISENBERG> >);
   }
 
 } // tensor_test
