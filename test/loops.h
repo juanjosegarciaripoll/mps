@@ -77,8 +77,8 @@ namespace tensor_test {
         std::cout << x << std::endl;
         return false;
       }
-      return true;
       }
+    return true;
   }
 
 #define EXPECT_CEQ(a, b) EXPECT_TRUE(simeq(a, b))
@@ -368,9 +368,6 @@ namespace tensor_test {
   template<> Tensor<double> random_unitary(int n, int iterations);
   template<> Tensor<cdouble> random_unitary(int n, int iterations);
   Tensor<double> random_permutation(int n, int iterations);
-
-  mps::RMPS random_product_RPMS(int n, int dimension);
-  mps::CMPS random_product_CPMS(int n, int dimension);
 
   static struct Foo { Foo() { tensor::tensor_abort_handler(); }} foo;
 
