@@ -384,6 +384,17 @@ namespace tensor_test {
 
   public:
 
+    enum {
+      Z_FIELD = 0,
+      ISING,
+      ISING_Z_FIELD,
+      ISING_X_FIELD,
+      XY,
+      XXZ,
+      HEISENBERG,
+      RANDOM
+    };
+
     CTensor sx, sy, sz;
 
     TestHamiltonian(tensor::index amodel, double spin, tensor::index size,

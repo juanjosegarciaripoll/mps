@@ -46,10 +46,9 @@ namespace tensor_test {
       aux = Vector<double>(4, data[model]);
       aux.at(0) = aux(0) * rand<double>(1.0);
     } else {
-      aux = RTensor(4);
-      aux.randomize();
+      aux = RTensor::random(4);
     }
-    coefs = RTensor(4,size);
+    coefs = RTensor::zeros(4,size);
     if (ti) {
       for (index j = 0; j < size; j++) {
 	coefs.at(range(), range(j)) = aux;
@@ -61,18 +60,19 @@ namespace tensor_test {
       }
     }
     if (!is_periodic())
-      coefs.at(range(1,-1), range(-1)) = 0;
+      coefs.at(range(1,-1), range(-1)) = 0.0;
 
     spin_operators(spin, &sx, &sy, &sz);
-    CTensor op[3] = {sx, sy, sz};
+    CTensor op[4] = {sz, sx, imag(sy), sz};
+    double sgn[4] = {1,  1,  -1,  1};
 
     for (tensor::index i = 0; i < size; i++) {
-      set_local_term(i, aux(0,i) * sz);
+      set_local_term(i, coefs(0,i) * op[0]);
     }
     for (tensor::index i = 1; i < size; i++) {
-      for (int n = 1; i < 4; i++) {
-	if (aux(n,i)) {
-	  add_interaction(i-1, aux(n,i) * op[n], op[n]);
+      for (int n = 1; n < 4; n++) {
+	if (coefs(n,i)) {
+	  add_interaction(i-1, sgn[n] * coefs(n,i) * op[n], op[n]);
 	}
       }
     }
