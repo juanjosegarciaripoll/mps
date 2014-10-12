@@ -21,27 +21,31 @@
 #include <gtest/gtest.h>
 #include <mps/mps.h>
 #include <mps/qform.h>
-
+#include <mps/quantum.h>
 
 namespace tensor_test {
 
   using namespace mps;
   using tensor::index;
 
+  // Create a MPO with a single, random operator acting on 'site'. All other
+  // sites get the identity.
   template<class MPO>
-  const MPO random_local_MPO(index size, int d)
+  const MPO random_local_MPO(index size, int d, index site)
   {
     typedef typename MPO::elt_t Tensor;
     MPO output(size, d);
+    Tensor id = reshape(Tensor::eye(d,d), 1,d,d,1);
+    Tensor op = reshape(Tensor::random(d,d), 1,d,d,1);
     for (index i = 0; i < size; i++) {
-      Tensor aux = Tensor::random(1,d,d,1);
-      output.at(i) = aux + conj(permute(aux, 1,2));
+      output.at(i) = (i == site)? op : id;
     }
     return output;
   }
 
   // When a state is in canonical form w.r.t. a given site, and we have a local
-  // MPO, the quadratic form is given by the operators on that site
+  // MPO, the quadratic form is given by the operators on that site, times the
+  // indentity on the bond dimensions.
   template<class MPO>
   void test_qform_canonical(typename MPO::MPS psi)
   {
@@ -49,19 +53,41 @@ namespace tensor_test {
     typedef typename MPS::elt_t Tensor;
     index L = psi.size();
     index d = psi[0].dimension(1);
-    std::cout << "L=" << L << ", d=" << d << std::endl;
-    MPO mpo = random_local_MPO<MPO>(L, d);
-    std::cout << "d=" << largest_bond_dimension(mpo) << std::endl;
     for (index i = 0; i < L; i++) {
+      MPO mpo = random_local_MPO<MPO>(L, d, i);
       MPS aux = canonical_form_at(psi, i);
-      std::cout << "aux=" << aux[0] << std::endl;
       QuadraticForm<MPO> f(mpo, aux, aux, i);
-      std::cout << "Qform built\n";
       Tensor H = f.single_site_matrix();
-      Tensor op = reshape(mpo[i], d,d);
+      Tensor op = reshape(mpo[i](range(0),range(),range(),range(0)), d,d);
+      Tensor L = Tensor::eye(psi[i].dimension(0));
+      Tensor R = Tensor::eye(psi[i].dimension(2));
+      op = kron(kron(R, op), L);
       EXPECT_CEQ(op, H);
     }
-    abort();
+  }
+
+  // Create a random Hamiltonian in MPO form and verify that it is giving
+  // the same expected values as the Quadratic form.
+  template<class MPO, int model = TestHamiltonian::Z_FIELD>
+  void test_qform_expected(typename MPO::MPS psi)
+  {
+    typedef typename MPO::MPS MPS;
+    typedef typename MPS::elt_t Tensor;
+    typedef typename Tensor::elt_t number;
+    // Random Hamiltonian of spin 1/2 model with the given
+    index L = psi.size();
+    if (psi[0].dimension(1) == 2) {
+      TestHamiltonian H(model, 0.5, L, false, false);
+      MPO mpo(H);
+      number psiHpsi = scprod(psi, apply(mpo, psi));
+      for (index i = 0; i < L; i++) {
+        QuadraticForm<MPO> qf(mpo, psi, psi, i);
+        Tensor psik = reshape(psi[i], psi[i].size());
+        Tensor H = qf.single_site_matrix();
+        number psikHpsik = scprod(psik, mmult(H, psik));
+        EXPECT_CEQ(psiHpsi, psikHpsik);
+      }
+    }
   }
 
 
@@ -81,12 +107,96 @@ namespace tensor_test {
     test_over_integers(2, 10, try_over_states<RMPS,test_qform_canonical<RMPO> >);
   }
 
+  TEST(RQForm, ExpectedIsing) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected<RMPO,TestHamiltonian::ISING> >);
+  }
+
+  TEST(RQForm, ExpectedZField) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected<RMPO,TestHamiltonian::Z_FIELD> >);
+  }
+
+  TEST(RQForm, ExpectedIsingZField) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected<RMPO,TestHamiltonian::ISING_Z_FIELD> >);
+  }
+
+  TEST(RQForm, ExpectedIsingXField) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected<RMPO,TestHamiltonian::ISING_X_FIELD> >);
+  }
+
+  TEST(RQForm, ExpectedXY) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected<RMPO,TestHamiltonian::XY> >);
+  }
+
+  TEST(RQForm, ExpectedXXZ) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected<RMPO,TestHamiltonian::XXZ> >);
+  }
+
+  TEST(RQForm, ExpectedHeisenberg) {
+    test_over_integers(2, 10,
+                       try_over_states<RMPS,
+                       test_qform_expected<RMPO,TestHamiltonian::HEISENBERG> >);
+  }
+
   ////////////////////////////////////////////////////////////
   // CQFORM
   //
 
   TEST(CQForm, LocalCanonical) {
     test_over_integers(2, 10, try_over_states<CMPS,test_qform_canonical<CMPO> >);
+  }
+
+  TEST(CQForm, ExpectedIsing) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected<CMPO,TestHamiltonian::ISING> >);
+  }
+
+  TEST(CQForm, ExpectedZField) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected<CMPO,TestHamiltonian::Z_FIELD> >);
+  }
+
+  TEST(CQForm, ExpectedIsingZField) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected<CMPO,TestHamiltonian::ISING_Z_FIELD> >);
+  }
+
+  TEST(CQForm, ExpectedIsingXField) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected<CMPO,TestHamiltonian::ISING_X_FIELD> >);
+  }
+
+  TEST(CQForm, ExpectedXY) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected<CMPO,TestHamiltonian::XY> >);
+  }
+
+  TEST(CQForm, ExpectedXXZ) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected<CMPO,TestHamiltonian::XXZ> >);
+  }
+
+  TEST(CQForm, ExpectedHeisenberg) {
+    test_over_integers(2, 10,
+                       try_over_states<CMPS,
+                       test_qform_expected<CMPO,TestHamiltonian::HEISENBERG> >);
   }
 
 } // tensor_test

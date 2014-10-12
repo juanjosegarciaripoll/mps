@@ -32,20 +32,16 @@ namespace mps {
   {
     // Boundary conditions not supported
     assert(bra[0].dimension(0) == 1 && ket[0].dimension(0) == 1);
-    if (start == 0) {
-      // Prepare the right matrices from site size()-1 to 0, incrementally
-      // There is only one left matrix, at 0, which is empty.
-      current_site_ = last_site();
-      while (here() != 0) {
-	propagate_left(bra[here()], ket[here()]);
-      }
-    } else {
-      current_site_ = 0;
-      while (here() != last_site()) {
-	propagate_right(bra[here()], ket[here()]);
-      }
+    // Prepare the right matrices from site start to size()-1 to 0
+    current_site_ = last_site();
+    while (here() > start) {
+      propagate_left(bra[here()], ket[here()]);
     }
-    dump_matrices();
+    current_site_ = 0;
+    while (here() != start) {
+      propagate_right(bra[here()], ket[here()]);
+    }
+    // dump_matrices();
   }
 
   template<class MPO>
@@ -86,21 +82,16 @@ namespace mps {
   {
     pair_tree_t output(mpo.size());
     for (index m = 0; m < mpo.size(); m++) {
-      std::cout << "Database pairs at " << m << std::endl;
       const elt_t &tensor = mpo[m];
-      std::cout << " mpo=" << tensor << std::endl;
       for (index i = 0; i < tensor.dimension(0); i++) {
 	for (index j = 0; j < tensor.dimension(3); j++) {
 	  Pair p(i, j, tensor);
 	  if (!p.is_empty()) {
-            std::cout << " (" << i << "," << j << ") = "
-                      << p.op << std::endl;
 	    output.at(m).push_back(p);
           }
 	}
       }
     }
-    std::cout << "Finished building pairs\n";
     return output;
   }
 
@@ -113,50 +104,65 @@ namespace mps {
   template<class MPO>
   void QuadraticForm<MPO>::propagate_left(const elt_t &braP, const elt_t &ketP)
   {
-    std::cout << "Propagating from site " << here() << " to " << here()-1 << std::endl;
     assert(here() >= 0);
     const matrix_array_t &mr = right_matrices(here());
     matrix_array_t &new_mr = right_matrices(here()-1);
+    // std::cout << "Original matrices\n";
+    // for (int i = 0; i < mr.size(); i++) {
+    //   std::cout << " mr[" << i << "]=" << mr[i] << std::endl;
+    // }
     std::fill(new_mr.begin(), new_mr.end(), elt_t());
     for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
 	 it != end;
 	 it++)
-      {
-	maybe_add<elt_t>(&new_mr.at(it->right_ndx),
-			 prop_matrix(mr[it->left_ndx], -1, braP, ketP, &it->op));
+      if (!mr[it->right_ndx].is_empty()) {
+	maybe_add<elt_t>(&new_mr.at(it->left_ndx),
+			 prop_matrix(mr[it->right_ndx], -1, braP, ketP, &it->op));
       }
+    // std::cout << "New matrix locations\n";
+    // for (int i = 0; i < new_mr.size(); i++) {
+    //   std::cout << " mr'[" << i << "]=" << new_mr[i] << std::endl;
+    // }
     --current_site_;
   }
 
   template<class MPO>
   void QuadraticForm<MPO>::propagate_right(const elt_t &braP, const elt_t &ketP)
   {
-    std::cout << "Propagating from site " << here() << " to " << here()+1 << std::endl;
     assert(here() < last_site());
     const matrix_array_t &ml = left_matrices(here());
     matrix_array_t &new_ml = left_matrices(here()+1);
+    // std::cout << "Original matrices\n";
+    // for (int i = 0; i < ml.size(); i++) {
+    //   std::cout << " ml[" << i << "]=" << ml[i] << std::endl;
+    // }
     std::fill(new_ml.begin(), new_ml.end(), elt_t());
     for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
 	 it != end;
 	 it++)
-      {
+      if (!ml[it->left_ndx].is_empty()) {
 	maybe_add<elt_t>(&new_ml.at(it->right_ndx),
 			 prop_matrix(ml[it->left_ndx], +1, braP, ketP, &it->op));
       }
+    // std::cout << "New matrix locations\n";
+    // for (int i = 0; i < new_ml.size(); i++) {
+    //   std::cout << " ml'[" << i << "]=" << new_ml[i] << std::endl;
+    // }
     ++current_site_;
   }
 
   template<class elt_t>
   static elt_t compose(const elt_t &L, const elt_t &op, const elt_t &R)
   {
-    std::cout << "Compose\n";
-    std::cout << " L=" << L << std::endl
-              << " R=" << R << std::endl
-              << " op=" << op << std::endl;
+    // std::cout << "Compose\n"
+    //           << " L=" << L << std::endl
+    //           << " R=" << R << std::endl
+    //           << " op=" << op << std::endl;
     index a1,a2,b1,b2,a3,b3;
-    // L(a1,a2,b1,b2) op(i,j) R(a3,a1,b3,b1) -> H([a2,i,a3],[b2,j,b3])
-    L.get_dimensions(&a1, &a2, &b1, &b2);
-    R.get_dimensions(&a3, &a1, &b3, &b1);
+    // L(a1,b1,a2,b2) op(i,j) R(a3,b3,a1,b1) -> H([a2,i,a3],[b2,j,b3])
+    L.get_dimensions(&a1, &b1, &a2, &b2);
+    R.get_dimensions(&a3, &b3, &a1, &b1);
+    assert(a1 == 1 && b1 == 1);
     // Remember that kron(A(i,j),B(k,l)) -> C([k,i],[l,j])
     return kron(kron(reshape(R, a3,b3), op), reshape(L, a2,b2));
   }
@@ -164,15 +170,15 @@ namespace mps {
   template<class elt_t>
   static elt_t compose(const elt_t &L, const elt_t &op1, const elt_t &op2, const elt_t &R)
   {
-    std::cout << "Compose\n";
-    std::cout << " L=" << L << std::endl
-              << " R=" << R << std::endl
-              << " op1=" << op1 << std::endl
-              << " op2=" << op2 << std::endl;
-    // L(a1,a2,b1,b2) op(i,j) R(a3,a1,b3,b1) -> H([a2,i,a3],[b2,j,b3])
+    // std::cout << "Compose\n"
+    //           << " L=" << L << std::endl
+    //           << " R=" << R << std::endl
+    //           << " op1=" << op1 << std::endl
+    //           << " op2=" << op2 << std::endl;
     index a1,a2,b1,b2,a3,b3;
-    L.get_dimensions(&a1, &a2, &b1, &b2);
-    R.get_dimensions(&a3, &a1, &b3, &b1);
+    // L(a1,b1,a2,b2) op(i,j) R(a3,b3,a1,b1) -> H([a2,i,a3],[b2,j,b3])
+    L.get_dimensions(&a1, &b1, &a2, &b2);
+    R.get_dimensions(&a3, &b3, &a1, &b1);
     assert(a1 == 1 && b1 == 1);
     // Remember that kron(A(i,j),B(k,l)) -> C([k,i],[l,j])
     return kron(kron(kron(reshape(R, a3,b3), op2), op1), reshape(L, a2,b2));
@@ -189,7 +195,8 @@ namespace mps {
       {
 	const elt_t &vl = left_matrix(here(), it->left_ndx);
 	const elt_t &vr = right_matrix(here(), it->right_ndx);
-        maybe_add<elt_t>(&output, compose(vl, it->op, vr));
+        if (!vl.is_empty() && !vr.is_empty())
+          maybe_add<elt_t>(&output, compose(vl, it->op, vr));
       }
     return output;
   }
@@ -211,7 +218,8 @@ namespace mps {
 	  if (it1->right_ndx == it2->left_ndx) {
 	    const elt_t &vl = left_matrix(here(), it1->left_ndx);
 	    const elt_t &vr = right_matrix(here()+1, it2->right_ndx);
-            maybe_add(&output, compose(vl, it1->op, it2->op, vr));
+            if (!vl.is_empty() && !vr.is_empty())
+              maybe_add(&output, compose(vl, it1->op, it2->op, vr));
 	  }
       }
     return output;
