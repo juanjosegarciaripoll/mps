@@ -57,7 +57,7 @@ namespace mps {
     const tensor_t single_site_vector() const;
     /** Vector representation of the linear form with respect to
 	sites here() and here()+1.*/
-    const tensor_t two_site_vector() const;
+    const tensor_t two_site_vector(int sense) const;
 
     /** Norm-2 of the linear form. */
     double norm2() const;

@@ -74,6 +74,20 @@ namespace mps {
   double simplify_obc(CMPS *P, const CTensor &weights, const std::vector<CMPS> &Q,
                       int *sense, index sweeps, bool normalize);
 
+  double simplify_obc_2_sites(RMPS *P, const RMPS &Q, int *sense, index sweeps,
+                              bool normalize, index Dmax = 0, double tol = -1);
+
+  double simplify_obc_2_sites(CMPS *P, const CMPS &Q, int *sense, index sweeps,
+                              bool normalize, index Dmax = 0, double tol = -1);
+
+  double simplify_obc_2_sites(RMPS *P, const RTensor &weights, const std::vector<RMPS> &Q,
+                              int *sense, index sweeps, bool normalize, index Dmax = 0,
+                              double tol = -1);
+
+  double simplify_obc_2_sites(CMPS *P, const CTensor &weights, const std::vector<CMPS> &Q,
+                              int *sense, index sweeps, bool normalize, index Dmax = 0,
+                              double tol = -1);
+
 
 } // namespace mps
 

@@ -118,6 +118,9 @@ namespace mps {
     L.get_dimensions(&a1, &b1, &a2, &b2);
     R.get_dimensions(&a3, &b3, &a1, &b1);
     P.get_dimensions(&a2, &i, &a3);
+    std::cout << "L=" << L << std::endl
+              << "R=" << R << std::endl
+              << "P=" << P << std::endl;
     if (a1 != 1 || b1 != 1) {
       std::cerr << "Due to laziness of their programmers, mps does not implement LForm for PBC";
       abort();
@@ -169,19 +172,29 @@ namespace mps {
 
   template<class MPS>
   const typename LinearForm<MPS>::tensor_t
-  LinearForm<MPS>::two_site_vector() const
+  LinearForm<MPS>::two_site_vector(int sense) const
   {
     tensor_t output;
+    index i, j;
+    if (sense > 0) {
+      i = here();
+      j = i+1;
+      assert(j < size());
+    } else {
+      j = here();
+      assert(j > 0);
+      i = j - 1;
+    }
     if (here() + 1 >= size()) {
       std::cerr << "Cannot extract two-site matrix from site " << here();
       abort();
     }
-    for (int i = 0; i < number_of_bras(); i++) {
+    for (int n = 0; n < number_of_bras(); n++) {
       maybe_add(&output,
-		compose4<tensor_t>(left_matrix(i, here()),
-                                   conj(weight_[i] * bra_[i][here()]),
-                                   conj(bra_[i][here()+1]),
-                                   right_matrix(i, here()+1)));
+		compose4<tensor_t>(left_matrix(n, i),
+                                   conj(weight_[n] * bra_[n][i]),
+                                   conj(bra_[n][j]),
+                                   right_matrix(n, j)));
     }
     return output;
   }
