@@ -25,38 +25,41 @@
 namespace tensor_test {
 
   using namespace mps;
+  using tensor::index;
 
+  // The norm of a Linear form associated to vector 'v' is the norm of the
+  // vector itself
+  template<class MPS>
+  void test_lform_norm(MPS psi)
+  {
+    typename MPS::elt_t w(1);
+    w.randomize();
+    std::vector<MPS> v(1);
+    v.at(0) = normal_form(psi);
+    LinearForm<MPS> f(w, v, psi, 0);
+    EXPECT_CEQ(f.norm2(), norm2(w));
+  }
+
+  // The norm of a Linear form associated to vector 'a*v + b*v' is the norm of the
+  // vector itself
   template<class MPS>
   void test_lform_norm2(MPS psi)
   {
-    {
-      typename MPS::elt_t w(1);
-      w.randomize();
-      std::vector<MPS> v(1);
-      v.at(0) = psi;
-      LinearForm<MPS> f(w, v, psi, 0);
-      EXPECT_CEQ(f.norm2(), norm2(w));
-    }
-    {
-      typename MPS::elt_t w(2);
-      w.randomize();
-      std::vector<MPS> v(2);
-      v.at(0) = v.at(1) = psi;
-      LinearForm<MPS> f(w, v, psi, 0);
-      double n = sqrt(tensor::abs(sum(kron(conj(w), w))));
-      EXPECT_CEQ(f.norm2(), n);
-    }
+    typename MPS::elt_t w(2);
+    w.randomize();
+    std::vector<MPS> v(2);
+    v.at(0) = v.at(1) = normal_form(psi);
+    LinearForm<MPS> f(w, v, psi, 0);
+    double n = sqrt(tensor::abs(sum(kron(conj(w), w))));
+    EXPECT_CEQ(f.norm2(), n);
   }
 
-  //
-  // Canonical form of a state that does not require simplification.
-  //
+  // When a state is in canonical form w.r.t. a given site, the linear form is
+  // described just by the tensor on that site, because the transfer matrices
+  // are the identity.
   template<class MPS>
   void test_lform_canonical(MPS psi)
   {
-    // When a state is in canonical form w.r.t. a given site, the linear form is
-    // described just by the tensor on that site, because the transfer matrices
-    // are the identity.
     for (index i = 0; i < psi.size(); i++) {
       MPS aux = canonical_form_at(psi, i);
       LinearForm<MPS> f(aux, aux, i);
@@ -64,11 +67,11 @@ namespace tensor_test {
     }
   }
 
+  // Same as before, but we use two or more vectors instead of one and assign
+  // them weights.
   template<class MPS>
   void test_lform_canonical2(MPS psi)
   {
-    // Same as before, but we use two or more vectors instead of one and assign
-    // them weights.
     std::vector<MPS> vs(2);
     typename MPS::elt_t w(2);
     for (index i = 0; i < psi.size(); i++) {
@@ -82,13 +85,20 @@ namespace tensor_test {
   template<class MPS, void (*f)(MPS)>
   void try_over_states(int size) {
     f(cluster_state(size));
+    f(MPS::random(size, 2, 1));
+    f(MPS::random(size, 3, 1));
+    f(MPS::random(size, 4, 1));
   }
 
   ////////////////////////////////////////////////////////////
   // SIMPLIFY RMPS
   //
 
-  TEST(RLForm, Norm2) {
+  TEST(RLForm, Norm1State) {
+    test_over_integers(2, 10, try_over_states<RMPS,test_lform_norm<RMPS> >);
+  }
+
+  TEST(RLForm, Norm2States) {
     test_over_integers(2, 10, try_over_states<RMPS,test_lform_norm2<RMPS> >);
   }
 
@@ -104,7 +114,11 @@ namespace tensor_test {
   // SIMPLIFY CMPS
   //
 
-  TEST(CLForm, Norm2) {
+  TEST(CLForm, Norm1State) {
+    test_over_integers(2, 10, try_over_states<CMPS,test_lform_norm<CMPS> >);
+  }
+
+  TEST(CLForm, Norm2States) {
     test_over_integers(2, 10, try_over_states<CMPS,test_lform_norm2<CMPS> >);
   }
 
