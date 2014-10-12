@@ -82,6 +82,20 @@ namespace tensor_test {
     }
   }
 
+  // When a state is in canonical form w.r.t. a given site, the linear form is
+  // described just by the tensor on that site, because the transfer matrices
+  // are the identity.
+  template<class MPS>
+  void test_lform_canonical_2_sites(MPS psi)
+  {
+    for (index i = 0; i < (psi.size()-1); i++) {
+      MPS aux = canonical_form_at(psi, i);
+      LinearForm<MPS> f(aux, aux, i);
+      typename MPS::elt_t P12 = fold(aux[i],-1, aux[i+1],0);
+      EXPECT_CEQ(P12, f.two_site_vector());
+    }
+  }
+
   template<class MPS, void (*f)(MPS)>
   void try_over_states(int size) {
     f(cluster_state(size));
@@ -110,6 +124,10 @@ namespace tensor_test {
     test_over_integers(2, 10, try_over_states<RMPS,test_lform_canonical2<RMPS> >);
   }
 
+  TEST(RLForm, Canonical1State2sites) {
+    test_over_integers(2, 10, try_over_states<RMPS,test_lform_canonical_2_sites<RMPS> >);
+  }
+
   ////////////////////////////////////////////////////////////
   // SIMPLIFY CMPS
   //
@@ -128,6 +146,10 @@ namespace tensor_test {
 
   TEST(CLForm, Canonical2States) {
     test_over_integers(2, 10, try_over_states<CMPS,test_lform_canonical2<CMPS> >);
+  }
+
+  TEST(CLForm, Canonical1State2sites) {
+    test_over_integers(2, 10, try_over_states<CMPS,test_lform_canonical_2_sites<CMPS> >);
   }
 
 
