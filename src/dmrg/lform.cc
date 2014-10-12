@@ -135,8 +135,8 @@ namespace mps {
     tensor_t output;
     for (int i = 0; i < number_of_bras(); i++) {
       maybe_add(&output,
-		compose<tensor_t>(left_matrix(i, here()), weight_[i] * bra_[i][here()],
-			       right_matrix(i, here())));
+		compose<tensor_t>(left_matrix(i, here()), conj(weight_[i] * bra_[i][here()]),
+                                  right_matrix(i, here())));
     }
     return output;
   }
@@ -178,8 +178,10 @@ namespace mps {
     }
     for (int i = 0; i < number_of_bras(); i++) {
       maybe_add(&output,
-		compose4<tensor_t>(left_matrix(i, here()), weight_[i] * bra_[i][here()],
-				bra_[i][here()+1], right_matrix(i, here()+1)));
+		compose4<tensor_t>(left_matrix(i, here()),
+                                   conj(weight_[i] * bra_[i][here()]),
+                                   conj(bra_[i][here()+1]),
+                                   right_matrix(i, here()+1)));
     }
     return output;
   }

@@ -63,7 +63,7 @@ namespace tensor_test {
     for (index i = 0; i < psi.size(); i++) {
       MPS aux = canonical_form_at(psi, i);
       LinearForm<MPS> f(aux, aux, i);
-      EXPECT_CEQ(aux[i], f.single_site_vector());
+      EXPECT_CEQ(aux[i], conj(f.single_site_vector()));
     }
   }
 
@@ -78,7 +78,7 @@ namespace tensor_test {
       vs.at(0) = vs.at(1) = canonical_form_at(psi, i);
       w.at(0) = 0.13; w.at(1) = -1.57;
       LinearForm<MPS> f(w, vs, vs[0], i);
-      EXPECT_CEQ((w.at(0) + w.at(1)) * vs[0][i], f.single_site_vector());
+      EXPECT_CEQ((w.at(0) + w.at(1)) * vs[0][i], conj(f.single_site_vector()));
     }
   }
 
@@ -92,7 +92,7 @@ namespace tensor_test {
       MPS aux = canonical_form_at(psi, i);
       LinearForm<MPS> f(aux, aux, i);
       typename MPS::elt_t P12 = fold(aux[i],-1, aux[i+1],0);
-      EXPECT_CEQ(P12, f.two_site_vector());
+      EXPECT_CEQ(P12, conj(f.two_site_vector()));
     }
   }
 
