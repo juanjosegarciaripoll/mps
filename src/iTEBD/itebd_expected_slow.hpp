@@ -49,7 +49,7 @@ namespace mps {
   {
     A = scale(A, -1, lA);
     t R0 = build_E_matrix(A);
-    t R = infinte_power<t>(R0);
+    t R = infinite_power<t>(R0);
     t R1 = build_E_matrix(foldin(Op1, -1, A, 1), A);
     t R2 = build_E_matrix(foldin(Op2, -1, A, 1), A);
     typename t::elt_t N = trace(mmult(R0, mmult(R0, R)));
