@@ -20,29 +20,32 @@
 #include <algorithm>
 #include <mps/qform.h>
 #include <mps/mps_algorithms.h>
+#include <tensor/io.h>
 
 namespace mps {
 
   template<class MPO>
   QuadraticForm<MPO>::QuadraticForm(const MPO &mpo, const mps_t &bra, const mps_t &ket, int start) :
+    size_(mpo.size()),
     matrix_(make_matrix_database(mpo)),
     pairs_(make_pairs(mpo))
   {
-    if (bra[0].dimension(0) != 1 || ket[0].dimension(0) != 1) {
-      std::cerr << "Due to laziness of their programmers, mps does not implement QForm for PBC";
-      abort();
-    }
+    // Boundary conditions not supported
+    assert(bra[0].dimension(0) == 1 && ket[0].dimension(0) == 1);
     if (start == 0) {
       // Prepare the right matrices from site size()-1 to 0, incrementally
       // There is only one left matrix, at 0, which is empty.
-      current_site_ = size() - 1;
-      while (here() != 0)
+      current_site_ = last_site();
+      while (here() != 0) {
 	propagate_left(bra[here()], ket[here()]);
+      }
     } else {
       current_site_ = 0;
-      while (here() != size()-1)
+      while (here() != last_site()) {
 	propagate_right(bra[here()], ket[here()]);
+      }
     }
+    dump_matrices();
   }
 
   template<class MPO>
@@ -51,13 +54,31 @@ namespace mps {
   {
     // We only support open boundary condition problems
     assert(mpo[0].dimension(0));
-    index L = mpo.size();
-    matrix_database_t output(L+1, matrix_array_t(1, elt_t()));
-    for (index i = 0; i < L; i++) {
-      output.at(i) = matrix_array_t(mpo[i].dimension(0), elt_t());
+    index d, L = mpo.size();
+    matrix_database_t output(L+1);
+    typename MPO::elt_t tensor;
+    for (index i = 1; i < L; i++) {
+      output.at(i) = matrix_array_t(mpo[i].dimension(0),elt_t());
     }
+    output.at(0) = output.at(L) =
+      matrix_array_t(1,elt_t::ones(1,1,1,1));
     return output;
   }
+
+  template<class MPO>
+  void
+  QuadraticForm<MPO>::dump_matrices()
+  {
+    // We only support open boundary condition problems
+    std::cout << "All matrices around " << here() << std::endl;
+    for (index i = 0; i < matrix_.size(); i++) {
+      for (index j = 0; j < matrix_[i].size(); j++) {
+        std::cout << " matrix(" << i << "," << j << ")="
+                  << matrix_[i][j]<< std::endl;
+      }
+    }
+  }
+
 
   template<class MPO>
   typename QuadraticForm<MPO>::pair_tree_t
@@ -65,15 +86,21 @@ namespace mps {
   {
     pair_tree_t output(mpo.size());
     for (index m = 0; m < mpo.size(); m++) {
+      std::cout << "Database pairs at " << m << std::endl;
       const elt_t &tensor = mpo[m];
+      std::cout << " mpo=" << tensor << std::endl;
       for (index i = 0; i < tensor.dimension(0); i++) {
 	for (index j = 0; j < tensor.dimension(3); j++) {
 	  Pair p(i, j, tensor);
-	  if (!p.is_empty())
+	  if (!p.is_empty()) {
+            std::cout << " (" << i << "," << j << ") = "
+                      << p.op << std::endl;
 	    output.at(m).push_back(p);
+          }
 	}
       }
     }
+    std::cout << "Finished building pairs\n";
     return output;
   }
 
@@ -86,9 +113,10 @@ namespace mps {
   template<class MPO>
   void QuadraticForm<MPO>::propagate_left(const elt_t &braP, const elt_t &ketP)
   {
+    std::cout << "Propagating from site " << here() << " to " << here()-1 << std::endl;
     assert(here() >= 0);
     const matrix_array_t &mr = right_matrices(here());
-    matrix_array_t &new_mr = right_matrices(here());
+    matrix_array_t &new_mr = right_matrices(here()-1);
     std::fill(new_mr.begin(), new_mr.end(), elt_t());
     for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
 	 it != end;
@@ -103,7 +131,8 @@ namespace mps {
   template<class MPO>
   void QuadraticForm<MPO>::propagate_right(const elt_t &braP, const elt_t &ketP)
   {
-    assert(here()+1 < size());
+    std::cout << "Propagating from site " << here() << " to " << here()+1 << std::endl;
+    assert(here() < last_site());
     const matrix_array_t &ml = left_matrices(here());
     matrix_array_t &new_ml = left_matrices(here()+1);
     std::fill(new_ml.begin(), new_ml.end(), elt_t());
@@ -120,11 +149,14 @@ namespace mps {
   template<class elt_t>
   static elt_t compose(const elt_t &L, const elt_t &op, const elt_t &R)
   {
+    std::cout << "Compose\n";
+    std::cout << " L=" << L << std::endl
+              << " R=" << R << std::endl
+              << " op=" << op << std::endl;
     index a1,a2,b1,b2,a3,b3;
     // L(a1,a2,b1,b2) op(i,j) R(a3,a1,b3,b1) -> H([a2,i,a3],[b2,j,b3])
     L.get_dimensions(&a1, &a2, &b1, &b2);
     R.get_dimensions(&a3, &a1, &b3, &b1);
-    assert(a1 == 1 && b1 == 1);
     // Remember that kron(A(i,j),B(k,l)) -> C([k,i],[l,j])
     return kron(kron(reshape(R, a3,b3), op), reshape(L, a2,b2));
   }
@@ -132,6 +164,11 @@ namespace mps {
   template<class elt_t>
   static elt_t compose(const elt_t &L, const elt_t &op1, const elt_t &op2, const elt_t &R)
   {
+    std::cout << "Compose\n";
+    std::cout << " L=" << L << std::endl
+              << " R=" << R << std::endl
+              << " op1=" << op1 << std::endl
+              << " op2=" << op2 << std::endl;
     // L(a1,a2,b1,b2) op(i,j) R(a3,a1,b3,b1) -> H([a2,i,a3],[b2,j,b3])
     index a1,a2,b1,b2,a3,b3;
     L.get_dimensions(&a1, &a2, &b1, &b2);
@@ -152,9 +189,7 @@ namespace mps {
       {
 	const elt_t &vl = left_matrix(here(), it->left_ndx);
 	const elt_t &vr = right_matrix(here(), it->right_ndx);
-	if (!vl.is_empty() && !vr.is_empty()) {
-	  maybe_add<elt_t>(&output, compose(vl, it->op, vr));
-	}
+        maybe_add<elt_t>(&output, compose(vl, it->op, vr));
       }
     return output;
   }
@@ -176,9 +211,7 @@ namespace mps {
 	  if (it1->right_ndx == it2->left_ndx) {
 	    const elt_t &vl = left_matrix(here(), it1->left_ndx);
 	    const elt_t &vr = right_matrix(here()+1, it2->right_ndx);
-	    if (!vl.is_empty() && !vr.is_empty()) {
-	      maybe_add(&output, compose(vl, it1->op, it2->op, vr));
-	    }
+            maybe_add(&output, compose(vl, it1->op, it2->op, vr));
 	  }
       }
     return output;

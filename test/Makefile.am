@@ -86,6 +86,11 @@ check_PROGRAMS += test_mpo_base
 test_mpo_base_SOURCES = test_mpo_base.cc
 test_mpo_base_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
+TESTS += test_mps_qform
+check_PROGRAMS += test_mps_qform
+test_mps_qform_SOURCES = test_mps_qform.cc
+test_mps_qform_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
+
 TESTS += test_itebd_base
 check_PROGRAMS += test_itebd_base
 test_itebd_base_SOURCES = test_itebd_base.cc

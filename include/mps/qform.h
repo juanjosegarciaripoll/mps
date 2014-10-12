@@ -59,7 +59,9 @@ namespace mps {
     /** The site at which the quadratic form is defined. */
     int here() const { return current_site_; }
     /** Number of sites in the lattice. */
-    index size() const { return matrix_.size(); }
+    index size() const { return size_; }
+    /** Last site in the lattice. */
+    index last_site() const { return size_-1; }
 
     /** Matrix representation of the quadratic form with respect to site here().*/
     const elt_t single_site_matrix();
@@ -89,8 +91,7 @@ namespace mps {
     typedef typename std::vector<pair_list_t> pair_tree_t;
     typedef typename pair_list_t::const_iterator pair_iterator_t;
 
-    int current_site_;
-    Indices bond_dimensions_;
+    int current_site_, size_;
     matrix_database_t matrix_;
     pair_tree_t pairs_;
 
@@ -106,6 +107,7 @@ namespace mps {
     matrix_array_t &right_matrices(index site) {
       return matrix_[site+1];
     }
+    void dump_matrices();
 
     static matrix_database_t make_matrix_database(const mpo_t &mpo);
     static pair_tree_t make_pairs(const mpo_t &mpo);
