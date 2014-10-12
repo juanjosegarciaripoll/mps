@@ -24,7 +24,7 @@
 namespace mps {
 
   template<class MPO>
-  QuadraticForm<MPO>::QuadraticForm(const MPO &mpo, const MPS &bra, const MPS &ket, int start) :
+  QuadraticForm<MPO>::QuadraticForm(const MPO &mpo, const mps_t &bra, const mps_t &ket, int start) :
     matrix_(make_matrix_database(mpo)),
     pairs_(make_pairs(mpo))
   {

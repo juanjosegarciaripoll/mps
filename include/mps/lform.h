@@ -35,15 +35,16 @@ namespace mps {
   template<class MPS>
   class LinearForm {
   public:
-    typedef MPS MPS;
-    typedef typename MPS::elt_t elt_t;
+    typedef MPS mps_t;
+    typedef typename MPS::elt_t tensor_t;
+    typedef typename tensor_t::elt_t number_t;
 
     LinearForm(const MPS &bra, const MPS &ket, int start = 0);
-    LinearForm(const elt_t &weights, const std::vector<MPS> &bra,
+    LinearForm(const tensor_t &weights, const std::vector<MPS> &bra,
 	       const MPS &ket, int start = 0);
 
-    void propagate_right(const elt_t &ketP);
-    void propagate_left(const elt_t &ketP);
+    void propagate_right(const tensor_t &ketP);
+    void propagate_left(const tensor_t &ketP);
 
     /** The site at which the quadratic form is defined. */
     int here() const { return current_site_; }
@@ -53,28 +54,28 @@ namespace mps {
     index number_of_bras() const { return bra_.size(); }
 
     /** Vector representation of the linear form with respect to site here().*/
-    const elt_t single_site_vector() const;
+    const tensor_t single_site_vector() const;
     /** Vector representation of the linear form with respect to
 	sites here() and here()+1.*/
-    const elt_t two_site_vector() const;
+    const tensor_t two_site_vector() const;
 
     /** Norm-2 of the linear form. */
     double norm2() const;
 
   private:
 
-    typedef typename std::vector<elt_t> matrix_array_t;
+    typedef typename std::vector<tensor_t> matrix_array_t;
     typedef typename std::vector<matrix_array_t> matrix_database_t;
 
-    const elt_t weight_;
+    const tensor_t weight_;
     const std::vector<MPS> bra_;
     index size_, current_site_;
     matrix_database_t matrix_;
 
-    elt_t &left_matrix(index i, index site) { return matrix_[i][site]; }
-    elt_t &right_matrix(index i, index site) { return matrix_[i][site+1]; }
-    const elt_t &left_matrix(index i, index site) const { return matrix_[i][site]; }
-    const elt_t &right_matrix(index i, index site) const { return matrix_[i][site+1]; }
+    tensor_t &left_matrix(index i, index site) { return matrix_[i][site]; }
+    tensor_t &right_matrix(index i, index site) { return matrix_[i][site+1]; }
+    const tensor_t &left_matrix(index i, index site) const { return matrix_[i][site]; }
+    const tensor_t &right_matrix(index i, index site) const { return matrix_[i][site+1]; }
 
     void initialize_matrices(int start, const MPS &ket);
     matrix_database_t make_matrix_array();

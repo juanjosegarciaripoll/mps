@@ -38,13 +38,14 @@ namespace mps {
   template<class MPO>
   class QuadraticForm {
   public:
-    typedef typename MPO::MPS MPS;
-    typedef typename MPS::elt_t elt_t;
+    typedef MPO mpo_t;
+    typedef typename MPO::MPS mps_t;
+    typedef typename mps_t::elt_t elt_t;
 
     /** Initialize with the given MPO and bra and ket states. This function
 	assumes that we are inspecting site 'start', which may be at the
 	beginning or the end of the chain.*/
-    QuadraticForm(const MPO &mpo, const MPS &bra, const MPS &ket, int start = 0);
+    QuadraticForm(const mpo_t &mpo, const mps_t &bra, const mps_t &ket, int start = 0);
     /** Update the form changing the tensors of the bra and ket states. The
 	function updates the $\psi$ and $\phi$ states in $\langle\psi|O|\phi\rangle$
 	changing the tensor of those states at the site here(), and moving to
@@ -106,8 +107,8 @@ namespace mps {
       return matrix_[site+1];
     }
 
-    static matrix_database_t make_matrix_database(const MPO &mpo);
-    static pair_tree_t make_pairs(const MPO &mpo);
+    static matrix_database_t make_matrix_database(const mpo_t &mpo);
+    static pair_tree_t make_pairs(const mpo_t &mpo);
   };
 
   extern template class QuadraticForm<RMPO>;
