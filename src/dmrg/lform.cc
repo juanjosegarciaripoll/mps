@@ -118,9 +118,6 @@ namespace mps {
     L.get_dimensions(&a1, &b1, &a2, &b2);
     R.get_dimensions(&a3, &b3, &a1, &b1);
     P.get_dimensions(&a2, &i, &a3);
-    std::cout << "L=" << L << std::endl
-              << "R=" << R << std::endl
-              << "P=" << P << std::endl;
     if (a1 != 1 || b1 != 1) {
       std::cerr << "Due to laziness of their programmers, mps does not implement LForm for PBC";
       abort();
@@ -184,10 +181,6 @@ namespace mps {
       j = here();
       assert(j > 0);
       i = j - 1;
-    }
-    if (here() + 1 >= size()) {
-      std::cerr << "Cannot extract two-site matrix from site " << here();
-      abort();
     }
     for (int n = 0; n < number_of_bras(); n++) {
       maybe_add(&output,

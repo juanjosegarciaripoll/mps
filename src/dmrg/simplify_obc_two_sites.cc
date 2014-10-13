@@ -52,25 +52,20 @@ namespace mps {
     index k, last = P.size() - 1;
     LinearForm<MPS> lf(w, Q, P, (*sense > 0) ? last : 0);
     double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2, scp;
-    std::cout << "**********\n";
     for (index sweep = 0; sweep < sweeps; sweep++) {
       *sense = -*sense;
       if (*sense < 0) {
         // Last iteration was left-to-right and state P is in canonical form with
         // respect to site (N-1)
         for (k = last; k > 0; k--) {
-          std::cout << " site=" << k << std::endl
-                    << " P12=" << conj(lf.two_site_vector(-1)) << std::endl;
-          set_canonical_2_sites(P, conj(lf.two_site_vector(-1)), k, -1, Dmax, tol);
-          lf.propagate_left(P[k+1]);
+          set_canonical_2_sites(P, conj(lf.two_site_vector(-1)), k-1, -1, Dmax, tol);
+          lf.propagate_left(P[k]);
         }
         normP2 = tensor::abs(scprod(P[0], P[0]));
       } else {
         // Last iteration was left-to-right and state P is in canonical form with
         // respect to site (N-1)
-        for (k = 0; k < last-1; k++) {
-          std::cout << " site=" << k << std::endl
-                    << " P12=" << conj(lf.two_site_vector(+1)) << std::endl;
+        for (k = 0; k < last; k++) {
           set_canonical_2_sites(P, conj(lf.two_site_vector(+1)), k, +1, Dmax, tol);
           lf.propagate_right(P[k]);
         }

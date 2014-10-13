@@ -117,14 +117,11 @@ namespace tensor_test {
 
     sense = -1;
     aux = canonical_form(psi, sense);
-    simplify_obc_2_sites(&aux, psi, &sense, 1, true);
+    simplify_obc_2_sites(&aux, psi, &sense, sweeps, true);
 
     EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
     EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
     EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
-
-    if (psi.size() == 3)
-      abort();
   }
 
   //
