@@ -37,10 +37,10 @@ namespace mps {
     if (tol == MPS_DEFAULT_TOLERANCE) {
       tol = FLAGS.get(MPS_TRUNCATION_TOLERANCE);
     }
-    if (tol >= 1.0) {
+    if (tol >= 1.0 /* MPS_DO_NOT_TRUNCATE */ ) {
       return max_dim;
     }
-    if (tol == 0) {
+    if (tol == 0 /* MPS_TRUNCATE_ZEROS */) {
       /* If the tolerance is zero, we only drop the trailing zero elements. There
        * is no need to accumulate values. */
       for (size_t i = L; i--; ) {
