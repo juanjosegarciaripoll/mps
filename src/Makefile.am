@@ -111,18 +111,18 @@ libmps_la_SOURCES = \
 	mps/mps_canonical2_z.cc \
 	mps/apply_local_operator_d.cc \
 	mps/apply_local_operator_z.cc \
-	mps/rmpo.cc \
-	mps/rmpo_from_hamiltonian.cc \
-	mps/cmpo.cc \
-	mps/cmpo_from_hamiltonian.cc \
-	mps/mpo_add_term_d.cc \
-	mps/mpo_add_term_z.cc \
-	mps/mpo_apply_d.cc \
-	mps/mpo_apply_z.cc \
-	mps/mpo_expected_d.cc \
-	mps/mpo_expected_z.cc \
-	mps/mpo_dump_d.cc \
-	mps/mpo_dump_z.cc \
+	mpo/rmpo.cc \
+	mpo/rmpo_from_hamiltonian.cc \
+	mpo/cmpo.cc \
+	mpo/cmpo_from_hamiltonian.cc \
+	mpo/mpo_add_term_d.cc \
+	mpo/mpo_add_term_z.cc \
+	mpo/mpo_apply_d.cc \
+	mpo/mpo_apply_z.cc \
+	mpo/mpo_expected_d.cc \
+	mpo/mpo_expected_z.cc \
+	mpo/mpo_dump_d.cc \
+	mpo/mpo_dump_z.cc \
 	evolve/solver_base.cc \
 	evolve/trotter_unitary.cc \
 	evolve/solver_trotter2.cc \
