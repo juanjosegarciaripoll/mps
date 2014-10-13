@@ -36,6 +36,9 @@ namespace mps {
       if (ndx+1 == psi.size()) {
 	psi.at(ndx) = t;
       } else {
+#if 1
+        Tensor V = split(&psi.at(ndx), t, +1, truncate);
+#else
 	Tensor U, V;
 	t.get_dimensions(&b1, &i1, &b2);
 	RTensor s = linalg::svd(reshape(t, b1*i1, b2), &U, &V, SVD_ECONOMIC);
@@ -52,12 +55,16 @@ namespace mps {
 	}
 	psi.at(ndx) = reshape(U, b1,i1,l);
 	scale_inplace(V, 0, s);
+#endif
 	psi.at(ndx+1) = fold(V, -1, psi[ndx+1], 0);
       }
     } else {
       if (ndx == 0) {
 	psi.at(ndx) = t;
       } else {
+#if 1
+        Tensor V = split(&psi.at(ndx), t, -1, truncate);
+#else
 	Tensor U, V;
 	t.get_dimensions(&b1, &i1, &b2);
 	RTensor s = linalg::svd(reshape(t, b1, i1*b2), &V, &U, SVD_ECONOMIC);
@@ -74,6 +81,7 @@ namespace mps {
 	}
 	psi.at(ndx) = reshape(U, l,i1,b2);
 	scale_inplace(V, -1, s);
+#endif
 	psi.at(ndx-1) = fold(psi[ndx-1], -1, V, 0);
       }
     }

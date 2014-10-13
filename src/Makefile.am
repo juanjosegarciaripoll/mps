@@ -52,6 +52,8 @@ libmps_la_SOURCES = \
 	tools/truncate.cc \
 	tools/limited_svd_d.cc \
 	tools/limited_svd_z.cc \
+	tools/split_tensor_d.cc \
+	tools/split_tensor_z.cc \
 	tools/build_E_matrix_d.cc \
 	tools/build_E_matrix_z.cc \
 	tools/propagate_mps_d.cc \

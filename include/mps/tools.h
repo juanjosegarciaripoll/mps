@@ -40,6 +40,8 @@ namespace mps {
   const RTensor limited_svd(RTensor A, RTensor *U, RTensor *V,
                             double tolerance, tensor::index max_dim = 0);
 
+  const RTensor split(RTensor *A, const RTensor &origA, int sense, bool truncate);
+
   const RTensor build_E_matrix(const RTensor &A, tensor::index *a = 0, tensor::index *b = 0);
 
   const RTensor build_E_matrix(const RTensor &A, const RTensor &B, tensor::index *a = 0, tensor::index *b = 0);
@@ -48,6 +50,8 @@ namespace mps {
 
   const RTensor limited_svd(CTensor A, CTensor *U, CTensor *V,
                             double tolerance, tensor::index max_dim = 0);
+
+  const CTensor split(CTensor *A, const CTensor &origA, int sense, bool truncate);
 
   const CTensor build_E_matrix(const CTensor &A, tensor::index *a = 0, tensor::index *b = 0);
 
