@@ -92,7 +92,7 @@ namespace tensor_test {
       MPS aux = canonical_form_at(psi, i);
       LinearForm<MPS> f(aux, aux, i);
       typename MPS::elt_t P12 = fold(aux[i],-1, aux[i+1],0);
-      EXPECT_CEQ(P12, conj(f.two_site_vector()));
+      EXPECT_CEQ(P12, conj(f.two_site_vector(+1)));
     }
   }
 
