@@ -52,6 +52,10 @@ namespace mps {
 
   const RMPO adjoint(const RMPO &mpo);
 
+  const CMPO mmult(const CMPO &A, const CMPO &B);
+
+  const RMPO mmult(const RMPO &A, const RMPO &B);
+
 }
 
 #endif /* !MPO_MPO_H */
