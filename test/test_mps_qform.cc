@@ -68,7 +68,7 @@ namespace tensor_test {
 
   // Create a random Hamiltonian in MPO form and verify that it is giving
   // the same expected values as the Quadratic form.
-  template<class MPO, int model = TestHamiltonian::Z_FIELD>
+  template<class MPO, int model>
   void test_qform_expected(typename MPO::MPS psi)
   {
     typedef typename MPO::MPS MPS;
@@ -99,7 +99,7 @@ namespace tensor_test {
 
   // Create a random Hamiltonian in MPO form and verify that it is giving
   // the same expected values as the Quadratic form.
-  template<class MPO, int model = TestHamiltonian::Z_FIELD>
+  template<class MPO, int model>
   void test_qform_expected2sites(typename MPO::MPS psi)
   {
     typedef typename MPO::MPS MPS;
