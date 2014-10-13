@@ -118,10 +118,7 @@ namespace mps {
     L.get_dimensions(&a1, &b1, &a2, &b2);
     R.get_dimensions(&a3, &b3, &a1, &b1);
     P.get_dimensions(&a2, &i, &a3);
-    if (a1 != 1 || b1 != 1) {
-      std::cerr << "Due to laziness of their programmers, mps does not implement LForm for PBC";
-      abort();
-    }
+    assert(a1 == 1 && b1 == 1);
     // Reshape L -> L(a2,b2), R -> R(a3,b3)
     // and return L(a2,b2) P(a2,i,a3) R(a3,b3)
     return fold(fold(reshape(L, a2,b2), 0, P, 0), -1,
@@ -153,12 +150,9 @@ namespace mps {
     index a1,a2,b1,b2,a3,b3,a4,b4,i,j;
     L.get_dimensions(&a1, &b1, &a2, &b2);
     R.get_dimensions(&a4, &b4, &a1, &b1);
+    assert(a1 == 1 && b1 == 1);
     P1.get_dimensions(&a2, &i, &a3);
     P2.get_dimensions(&a3, &j, &a4);
-    if (a1 != 1 || b1 != 1) {
-      std::cerr << "Due to laziness of their programmers, mps does not implement LForm for PBC";
-      abort();
-    }
     // P(a2,i,j,a4) = P1(a2,i,a3)P2(a3,j,a4)
     tensor_t P = fold(P1, -1, P2, 0);
     // Reshape L -> L(a2,b2), R -> R(a4,b4)
