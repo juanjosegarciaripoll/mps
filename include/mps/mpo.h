@@ -48,6 +48,10 @@ namespace mps {
 
   cdouble expected(const CMPS &bra, const CMPO &op);
 
+  const CMPO adjoint(const CMPO &mpo);
+
+  const RMPO adjoint(const RMPO &mpo);
+
 }
 
 #endif /* !MPO_MPO_H */
