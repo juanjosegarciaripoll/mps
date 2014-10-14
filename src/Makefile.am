@@ -91,6 +91,8 @@ libmps_la_SOURCES = \
 	mps/mps_norm_z.cc \
 	mps/mps_scprod_d.cc \
 	mps/mps_scprod_z.cc \
+	mps/mps_dimensions_d.cc \
+	mps/mps_dimensions_z.cc \
 	mps/mps_dty_matrix_d.cc \
 	mps/mps_dty_matrix_z.cc \
 	mps/mps_expected1_d.cc \
@@ -144,4 +146,6 @@ libmps_la_SOURCES = \
 	dmrg/simplify_obc_two_sites_d.cc \
 	dmrg/simplify_obc_two_sites_z.cc \
 	dmrg/rdmrg.cc \
-	dmrg/cdmrg.cc
+	dmrg/cdmrg.cc \
+	dmrg/inverse_d.cc \
+	dmrg/inverse_z.cc

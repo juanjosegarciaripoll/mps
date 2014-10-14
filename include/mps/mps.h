@@ -61,6 +61,12 @@ namespace mps {
    obtain a vector that represents the same state with to_basis().
 */
 
+  /**Physical dimensions of the state. */
+  const Indices dimensions(const RMPS &psi);
+
+  /**Physical dimensions of the state. */
+  const Indices dimensions(const CMPS &psi);
+
   /**Create a product state. */
   const RMPS product_state(index length, const tensor::RTensor &local_state);
 
