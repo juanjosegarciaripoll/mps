@@ -27,61 +27,18 @@ namespace mps {
   static void set_canonical_inner(MPS &psi, index ndx, const Tensor &t,
 				  int sense, bool truncate)
   {
-    index b1, i1, b2;
-    if (sense == 0) {
-      std::cerr << "In MPS::set_canonical(), " << sense
-		<< " is not a valid direction.";
-      abort();
-    } else if (sense > 0) {
+    if (sense > 0) {
       if (ndx+1 == psi.size()) {
 	psi.at(ndx) = t;
       } else {
-#if 1
         Tensor V = split(&psi.at(ndx), t, +1, truncate);
-#else
-	Tensor U, V;
-	t.get_dimensions(&b1, &i1, &b2);
-	RTensor s = linalg::svd(reshape(t, b1*i1, b2), &U, &V, SVD_ECONOMIC);
-	index l = s.size();
-	index new_l = where_to_truncate(s, truncate?
-                                        MPS_DEFAULT_TOLERANCE :
-                                        MPS_TRUNCATE_ZEROS,
-                                        std::min<index>(b1*i1,b2));
-	if (new_l != l) {
-	  U = change_dimension(U, 1, new_l);
-	  V = change_dimension(V, 0, new_l);
-	  s = change_dimension(s, 0, new_l);
-	  l = new_l;
-	}
-	psi.at(ndx) = reshape(U, b1,i1,l);
-	scale_inplace(V, 0, s);
-#endif
 	psi.at(ndx+1) = fold(V, -1, psi[ndx+1], 0);
       }
     } else {
       if (ndx == 0) {
 	psi.at(ndx) = t;
       } else {
-#if 1
         Tensor V = split(&psi.at(ndx), t, -1, truncate);
-#else
-	Tensor U, V;
-	t.get_dimensions(&b1, &i1, &b2);
-	RTensor s = linalg::svd(reshape(t, b1, i1*b2), &V, &U, SVD_ECONOMIC);
-	index l = s.size();
-	index new_l = where_to_truncate(s, truncate?
-                                        MPS_DEFAULT_TOLERANCE :
-                                        MPS_TRUNCATE_ZEROS,
-                                        std::min<index>(b1,i1*b2));
-	if (new_l != l) {
-	  U = change_dimension(U, 0, new_l);
-	  V = change_dimension(V, 1, new_l);
-	  s = change_dimension(s, 0, new_l);
-	  l = new_l;
-	}
-	psi.at(ndx) = reshape(U, l,i1,b2);
-	scale_inplace(V, -1, s);
-#endif
 	psi.at(ndx-1) = fold(psi[ndx-1], -1, V, 0);
       }
     }
