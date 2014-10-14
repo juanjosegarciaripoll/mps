@@ -21,6 +21,7 @@
 #define MPS_MPS_ALGORITHM_H
 
 #include <mps/mps.h>
+#include <mps/mpo.h>
 
 namespace mps {
 
@@ -88,6 +89,11 @@ namespace mps {
                               int *sense, index sweeps, bool normalize, index Dmax = 0,
                               double tol = -1);
 
+  double solve(const RMPO &H, RMPS *ptrP, const RMPS &Q, int *sense, index sweeps,
+               bool normalize = false);
+
+  double solve(const CMPO &H, CMPS *ptrP, const CMPS &Q, int *sense, index sweeps,
+               bool normalize = false);
 
 } // namespace mps
 
