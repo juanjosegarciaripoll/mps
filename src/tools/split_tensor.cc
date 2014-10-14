@@ -64,6 +64,7 @@ namespace mps {
         l = new_l;
       }
       d.at(0) = l;
+      scale_inplace(V, -1, s);
     }
     U = reshape(U, d);
     return V;
