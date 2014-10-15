@@ -35,6 +35,15 @@ namespace tensor_test {
     index size = d.size();
     RTensor phases = linspace(0, 1.0, size + 2);
     ConstantHamiltonian H(size);
+    if (0) {
+      for (index i = 0; i < size; i++) {
+        H.set_local_term(i, (i? 0.0 : 1.0) * mps::Pauli_z);
+      }
+      if (Hsparse) {
+        *Hsparse = sparse_hamiltonian(H);
+      }
+      return H;
+    }
     for (index i = 0; i < size; i++) {
       RTensor op = diag(linspace(0.1, 0.8, d[i]));
       H.set_local_term(i, op * phases(i+1));
@@ -54,25 +63,26 @@ namespace tensor_test {
     CMPS phi = psi;
     CSparse A;
     CMPO H = diagonal_MPO(dimensions(psi), &A);
-    std::cout << "A=" << matrix_form(A) << std::endl;
-    solve(H, &phi, psi, &sense, 10);
+    solve(H, &phi, psi, &sense, 1);
     
     CTensor vpsi = mps_to_vector(psi);
     CTensor vphi = mps_to_vector(phi);
     CTensor Aphi = mmult(A, vphi);
 
-    std::cout << "psi=" << vpsi << std::endl
-              << "phi=" << vphi << std::endl
-              << "A*phi=" << Aphi << std::endl;
+    std::cout << "In vectors:\n"
+              << " psi=" << vpsi << std::endl
+              << " phi=" << vphi << std::endl
+              << " A*phi=" << Aphi << std::endl
+              << "A=" << matrix_form(A) << std::endl;
 
     double scp = tensor::abs(scprod(Aphi, vpsi)) / norm2(vpsi) / norm2(Aphi);
     double err = norm2(Aphi - vpsi) / norm2(vpsi);
-    std::cout << "scprod=" << scp << ", err=" << err << std::endl;
+    std::cout << " scprod=" << scp << ", err=" << err << std::endl;
   }
 
   template<class MPS, void (*f)(MPS)>
   void try_over_states(int size) {
-    f(cluster_state(size));
+    //f(cluster_state(size));
     f(MPS::random(size, 2, 1));
   }
 
@@ -81,7 +91,7 @@ namespace tensor_test {
   //
 
   TEST(CQForm, Diagonal) {
-    test_over_integers(2, 10, &try_over_states<CMPS,test_solve_diagonal>);
+    test_over_integers(2, 2, &try_over_states<CMPS,test_solve_diagonal>);
   }
 
 } // tensor_test
