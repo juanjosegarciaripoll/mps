@@ -28,61 +28,98 @@ namespace tensor_test {
   using namespace mps;
   using tensor::index;
 
-  // Create a MPO with a single, random operator acting on 'site'. All other
-  // sites get the identity.
-  const CMPO diagonal_MPO(Indices d, CSparse *Hsparse)
+  const CMPO build_MPO(void (*fH)(ConstantHamiltonian &H, const Indices &d),
+                       const Indices &d,
+                       CSparse *Hsparse)
   {
-    index size = d.size();
-    RTensor phases = linspace(0, 1.0, size + 2);
-    ConstantHamiltonian H(size);
-    if (0) {
-      for (index i = 0; i < size; i++) {
-        H.set_local_term(i, (i? 0.0 : 1.0) * mps::Pauli_z);
-      }
-      if (Hsparse) {
-        *Hsparse = sparse_hamiltonian(H);
-      }
-      return H;
-    }
-    for (index i = 0; i < size; i++) {
-      RTensor op = diag(linspace(0.1, 0.8, d[i]));
-      H.set_local_term(i, op * phases(i+1));
-    }
+    ConstantHamiltonian H(d.size());
+    fH(H, d);
     if (Hsparse) {
       *Hsparse = sparse_hamiltonian(H);
     }
     return H;
   }
 
-  // When a state is in canonical form w.r.t. a given site, and we have a local
-  // MPO, the quadratic form is given by the operators on that site, times the
-  // indentity on the bond dimensions.
-  void test_solve_diagonal(CMPS psi)
+  // Given an input state, 'psi', it creates some random Hamiltonian
+  // using the function fH and solves the equation
+  //		H*xi = y
+  // where y = H*psi. Of course, the answer is xi = psi and it is
+  // therefore verifiable.
+  //
+  template<void (*fH)(ConstantHamiltonian &H, const Indices &d)>
+  void test_solve(CMPS psi)
   {
+    /*
+     * We create a random Hamiltonian H and solve
+     *		
+     */
     int sense = -1;
-    CMPS phi = psi;
-    CSparse A;
-    CMPO H = diagonal_MPO(dimensions(psi), &A);
-    solve(H, &phi, psi, &sense, 1);
+    CSparse Hsp;
+    CMPO H = build_MPO(fH, dimensions(psi), &Hsp);
+    CMPS Hpsi = apply(H, psi);
+    CMPS xi = Hpsi;
+    solve(H, &xi, Hpsi, &sense, 1);
     
-    CTensor vpsi = mps_to_vector(psi);
-    CTensor vphi = mps_to_vector(phi);
-    CTensor Aphi = mmult(A, vphi);
+    CTensor vxi = mps_to_vector(xi);
+    CTensor vHxi = mmult(Hsp, vxi);
+    CTensor vHpsi = mps_to_vector(Hpsi);
+    double scp = tensor::abs(scprod(vHxi, vHxi)) / norm2(vHxi) / norm2(vHpsi);
+    double err = norm2(vHxi - vHxi) / norm2(vHxi);
 
-    std::cout << "In vectors:\n"
-              << " psi=" << vpsi << std::endl
-              << " phi=" << vphi << std::endl
-              << " A*phi=" << Aphi << std::endl
-              << "A=" << matrix_form(A) << std::endl;
+    EXPECT_CEQ(err, 0.0);
+    EXPECT_CEQ(scp, 1.0);
+  }
 
-    double scp = tensor::abs(scprod(Aphi, vpsi)) / norm2(vpsi) / norm2(Aphi);
-    double err = norm2(Aphi - vpsi) / norm2(vpsi);
-    std::cout << " scprod=" << scp << ", err=" << err << std::endl;
+  // Create a non-negative operator made of \sigma_x*\sigma_x interactions or
+  // generalizations thereby to higher dimensions.
+  void xx_H(ConstantHamiltonian &H, const Indices &d)
+  {
+    index size = H.size();
+    RTensor phases = linspace(0, 1.0, size + 2);
+    for (index i = 0; i < size; i++) {
+      H.set_local_term(i, CTensor::zeros(d[i]));
+    }
+    for (index i = 1; i < size; i++) {
+      RTensor op = RTensor::zeros(d[i],d[i]);
+      for (index j = 0; j < d[i]; j++) {
+        op.at(j, d[i]-1-j) = 1.0;
+        op.at(j, j) = 1.0;
+      }
+      H.set_interaction(i-1, phases[i]*op, op);
+    }
+  }
+
+  // Create a non-negative operator made of interactions between nearest
+  // neighbor sites, where the interaction Hamiltonian is built from diagonal,
+  // non-negative operators.
+  void zz_H(ConstantHamiltonian &H, const Indices &d)
+  {
+    index size = H.size();
+    RTensor phases = linspace(0, 1.0, size + 2);
+    for (index i = 0; i < size; i++) {
+      H.set_local_term(i, CTensor::zeros(d[i]));
+    }
+    for (index i = 1; i < size; i++) {
+      RTensor op = diag(linspace(0.1, 0.8, d[i]));
+      H.set_interaction(i-1, op, op);
+    }
+  }
+
+  // Create a non-negative operator that is a sum of local operators, all
+  // diagonal, but all acting with different weights on different sites.
+  void diagonal_H(ConstantHamiltonian &H, const Indices &d)
+  {
+    index size = H.size();
+    RTensor phases = linspace(0, 1.0, size + 2);
+    for (index i = 0; i < size; i++) {
+      RTensor op = diag(linspace(0.1, 0.8, d[i]));
+      H.set_local_term(i, op * phases(i+1));
+    }
   }
 
   template<class MPS, void (*f)(MPS)>
   void try_over_states(int size) {
-    //f(cluster_state(size));
+    f(cluster_state(size));
     f(MPS::random(size, 2, 1));
   }
 
@@ -90,8 +127,16 @@ namespace tensor_test {
   // RQFORM
   //
 
-  TEST(CQForm, Diagonal) {
-    test_over_integers(2, 2, &try_over_states<CMPS,test_solve_diagonal>);
+  TEST(CQForm, DiagonalLocal) {
+    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<diagonal_H> >);
+  }
+
+  TEST(CQForm, ZZInt) {
+    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<zz_H> >);
+  }
+
+  TEST(CQForm, XXInt) {
+    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<xx_H> >);
   }
 
 } // tensor_test
