@@ -60,6 +60,11 @@ namespace mps {
     if (!P.size()) P = Q;
 
     double normQ2 = tensor::abs(scprod(Q, Q));
+    if (normQ2 < 1e-16) {
+      std::cerr << "Right-hand side in solve(MPO, MPS, ...) is zero\n";
+      abort();
+    }
+
     double normHP, olderr, err = 0.0;
     typename Tensor::elt_t scp;
 
