@@ -22,9 +22,10 @@
 namespace mps {
 
   double
-  solve(const RMPO &H, RMPS *ptrP, const RMPS &Q, int *sense, index sweeps, bool normalize)
+  solve(const RMPO &H, RMPS *ptrP, const RMPS &Q, int *sense, index sweeps, bool normalize,
+        index Dmax, double tol)
   {
-    return do_solve(H, ptrP, Q, sense, sweeps, normalize);
+    return do_solve(H, ptrP, Q, sense, sweeps, normalize, Dmax, tol);
   }
 
 } // namespace mps

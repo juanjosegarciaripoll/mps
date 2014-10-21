@@ -67,7 +67,7 @@ namespace mps {
     const elt_t single_site_matrix();
     /** Matrix representation of the quadratic form with respect to
 	sites here() and here()+1.*/
-    const elt_t two_site_matrix();
+    const elt_t two_site_matrix(int sense = +1);
 
   private:
 

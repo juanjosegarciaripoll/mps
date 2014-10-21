@@ -90,10 +90,10 @@ namespace mps {
                               double tol = -1);
 
   double solve(const RMPO &H, RMPS *ptrP, const RMPS &Q, int *sense, index sweeps,
-               bool normalize = false);
+               bool normalize = false, index Dmax = 0, double tol = -1);
 
   double solve(const CMPO &H, CMPS *ptrP, const CMPS &Q, int *sense, index sweeps,
-               bool normalize = false);
+               bool normalize = false, index Dmax = 0, double tol = -1);
 
 } // namespace mps
 

@@ -141,6 +141,14 @@ namespace mps {
     cdouble idt = to_complex(0, -1) * time_step();
     coef.at(0) = to_complex(1.0);
     coef = mmult(expm(idt * solve_with_svd(N, Heff)), coef);
+    // std::cout << "N=" << matrix_form(tensor::abs(N)) << std::endl
+    //           << "H=" << matrix_form(tensor::abs(Heff)) << std::endl
+    //           << "U=" << expm(idt * solve_with_svd(N, Heff)) << std::endl
+    //           << "H/N=" << solve_with_svd(N, Heff) << std::endl
+    //           << "v=" << coef << std::endl
+    //           << "|v|=" << norm2(coef) << std::endl
+    //           << "|v|=" << scprod(coef, mmult(N, coef)) << std::endl
+    //           << "idt=" << idt << std::endl;
 
     //
     // 4) Here is where we perform the truncation from our basis to a single MPS.

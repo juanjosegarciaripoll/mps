@@ -38,8 +38,8 @@ namespace mps {
   new_tensor(const Tensor &H2, const Tensor &vHQ, const MPS &psi, index k,
              double normQ2)
   {
-    Tensor vP = linalg::solve_with_svd(H2, vHQ);
-    return reshape(vP, psi[k].dimensions());
+    Tensor vP = linalg::solve_with_svd(H2, to_vector(vHQ));
+    return reshape(vP, vHQ.dimensions());
   }
   
   /*
@@ -50,7 +50,8 @@ namespace mps {
    */
   template<class MPO, class MPS>
   double
-  do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense, index sweeps, bool normalize)
+  do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense, index sweeps, bool normalize,
+           index Dmax, double tol)
   {
     MPS Q = canonical_form(oQ, -1);
     assert(sweeps > 0);
@@ -85,7 +86,7 @@ namespace mps {
           vP = new_tensor(Heff = qf.two_site_matrix(-1),
                           vHQ = conj(lf.two_site_vector(-1)),
                           P, k, normQ2);
-          set_canonical_2_sites(P, k-1, vP, -1);
+          set_canonical_2_sites(P, vP, k-1, -1, Dmax, tol);
           lf.propagate_left(P[k]);
           qf.propagate_left(P[k],P[k]);
         }
@@ -96,7 +97,7 @@ namespace mps {
           vP = new_tensor(Heff = qf.two_site_matrix(+1),
                           vHQ = conj(lf.two_site_vector(+1)),
                           P, k, normQ2);
-          set_canonical_2_sites(P, k, vP, +1);
+          set_canonical_2_sites(P, vP, k, +1, Dmax, tol);
           lf.propagate_right(P[k]);
           qf.propagate_right(P[k],P[k]);
         }

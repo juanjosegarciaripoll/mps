@@ -204,20 +204,29 @@ namespace mps {
 
   template<class MPO>
   const typename QuadraticForm<MPO>::elt_t
-  QuadraticForm<MPO>::two_site_matrix()
+  QuadraticForm<MPO>::two_site_matrix(int sense)
   {
-    assert(here() + 1 < size());
     elt_t output;
-    for (pair_iterator_t it1 = pairs_[here()].begin(), end1 = pairs_[here()].end();
+    index i, j;
+    if (sense > 0) {
+      i = here();
+      j = i+1;
+      assert(j < size());
+    } else {
+      j = here();
+      assert(j > 0);
+      i = j - 1;
+    }
+    for (pair_iterator_t it1 = pairs_[i].begin(), end1 = pairs_[here()].end();
 	 it1 != end1;
 	 it1++)
       {
-	for (pair_iterator_t it2 = pairs_[here()+1].begin(), end2 = pairs_[here()+1].end();
+	for (pair_iterator_t it2 = pairs_[j].begin(), end2 = pairs_[here()+1].end();
 	     it2 != end2;
 	     it2++)
 	  if (it1->right_ndx == it2->left_ndx) {
-	    const elt_t &vl = left_matrix(here(), it1->left_ndx);
-	    const elt_t &vr = right_matrix(here()+1, it2->right_ndx);
+	    const elt_t &vl = left_matrix(i, it1->left_ndx);
+	    const elt_t &vr = right_matrix(j, it2->right_ndx);
             if (!vl.is_empty() && !vr.is_empty())
               maybe_add(&output, compose(vl, it1->op, it2->op, vr));
 	  }
