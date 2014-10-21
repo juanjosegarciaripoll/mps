@@ -39,6 +39,7 @@ namespace mps {
              double normQ2)
   {
     Tensor vP = linalg::solve_with_svd(H2, to_vector(vHQ));
+    std::cout << "     H=" << H2.dimensions() << "\n";
     return reshape(vP, vHQ.dimensions());
   }
   
@@ -75,14 +76,16 @@ namespace mps {
     index k, last = P.size() - 1;
     LinearForm<MPS> lf(HQ, P, (*sense > 0) ? last : 0);
     QuadraticForm<MPO> qf(HH, P, P, (*sense > 0) ? last : 0);
-
+    
     Tensor vP, Heff, vHQ;
+    std::cout << "psi.size()=" << P.size() << ", last=" << last << std::endl;
     for (index sweep = 0; sweep < sweeps; sweep++) {
       *sense = -*sense;
       if (*sense < 0) {
         // Last iteration was left-to-right and state P is in canonical form with
         // respect to site (N-1)
         for (k = last; k > 0; k--) {
+          std::cout << "site k=" << k << "\n";
           vP = new_tensor(Heff = qf.two_site_matrix(-1),
                           vHQ = conj(lf.two_site_vector(-1)),
                           P, k, normQ2);
@@ -94,6 +97,7 @@ namespace mps {
         // Last iteration was left-to-right and state P is in canonical form with
         // respect to site (N-1)
         for (k = 0; k < last; k++) {
+          std::cout << "site k=" << k << "\n";
           vP = new_tensor(Heff = qf.two_site_matrix(+1),
                           vHQ = conj(lf.two_site_vector(+1)),
                           P, k, normQ2);
@@ -106,6 +110,7 @@ namespace mps {
 	vP = to_vector(vP);
 	normHP = real(scprod(vP, mmult(Heff, vP)));
 	scp = scprod(vHQ, vP);
+        std::cout << "err = " << normHP + normQ2 - 2*real(scp) << std::endl;
       }
       olderr = err;
       err = normHP + normQ2 - 2*real(scp);
