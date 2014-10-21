@@ -217,11 +217,11 @@ namespace mps {
       assert(j > 0);
       i = j - 1;
     }
-    for (pair_iterator_t it1 = pairs_[i].begin(), end1 = pairs_[here()].end();
+    for (pair_iterator_t it1 = pairs_[i].begin(), end1 = pairs_[i].end();
 	 it1 != end1;
 	 it1++)
       {
-	for (pair_iterator_t it2 = pairs_[j].begin(), end2 = pairs_[here()+1].end();
+	for (pair_iterator_t it2 = pairs_[j].begin(), end2 = pairs_[j].end();
 	     it2 != end2;
 	     it2++)
 	  if (it1->right_ndx == it2->left_ndx) {
