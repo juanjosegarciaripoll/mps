@@ -86,8 +86,10 @@ namespace mps {
         vHQ = conj(lf.single_site_vector());
         vP = linalg::solve_with_svd(Heff, to_vector(vHQ));
         set_canonical(P, s.site(), reshape(vP, vHQ.dimensions()), s.sense());
-        lf.propagate(P[s.site()], s.sense());
-        qf.propagate(P[s.site()], P[s.site()], s.sense());
+
+        const Tensor &newP = P[s.site()];
+        lf.propagate(newP, s.sense());
+        qf.propagate(newP, newP, s.sense());
       }
       normHP = real(scprod(vP, mmult(Heff, vP)));
       scp = scprod(to_vector(vHQ), vP);
