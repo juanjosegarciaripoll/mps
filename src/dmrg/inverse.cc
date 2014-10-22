@@ -33,15 +33,6 @@ namespace mps {
   template<class Tensor>
   static const Tensor to_vector(const Tensor &v) { return reshape(v, v.size()); }
 
-  template<class Tensor, class MPS>
-  static const Tensor
-  new_tensor(const Tensor &H2, const Tensor &vHQ, const MPS &psi, index k,
-             double normQ2)
-  {
-    Tensor vP = linalg::solve_with_svd(H2, vHQ);
-    return reshape(vP, vHQ.dimensions());
-  }
-  
   /*
    * We solve the problem
    *	H * P = Q
@@ -50,42 +41,61 @@ namespace mps {
    */
   template<class MPO, class MPS>
   double
-  do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense, index sweeps, bool normalize)
+  do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense, index sweeps, bool normalize,
+           index Dmax, double tol)
   {
+    bool single_site = FLAGS.get(MPS_SOLVE_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM;
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
     typedef typename MPS::elt_t Tensor;
 
+    // We set Q in canonical form to "stabilize" all the transfer matrices.
+    MPS Q = canonical_form(oQ, -1);
+
+    // We need an initial state. We assume that if P is an empty matrix product state
+    // we can start directly with 'Q'. Note that in this single-site algorithm that
+    // leads to poor results.
     assert(ptrP);
     MPS &P = *ptrP;
     if (!P.size()) P = Q;
-    int aux = +1;
+
+    // 'sense' can be NULL.
+    int aux = -1;
     if (!sense) sense = &aux;
     assert(sweeps > 0);
 
-    MPS Q = canonical_form(oQ, -1);
-    double normQ2 = abs(scprod(Q[0], Q[0]));
+    double olderr = 0.0, err = 0.0;          // err = <P|H^2|P> + <Q|Q> - 2re<Q|H|P>
+    double normHP;                           // <P|H^2|P>
+    typename Tensor::elt_t scp;              // <Q|H|P>
+    double normQ2 = abs(scprod(Q[0], Q[0])); // <Q|Q>
     if (normQ2 < 1e-16) {
       std::cerr << "Right-hand side in solve(MPO, MPS, ...) is zero\n";
       abort();
     }
 
-    double normHP, olderr = 0.0, err = 0.0;
-    typename Tensor::elt_t scp;
+    // Iterator object to run over the MPS
+    Sweeper s = P.sweeper(*sense);
 
-    MPS HQ = canonical_form(apply(H, Q), -1);
-    MPO HH = mmult(adjoint(H), H);
+    // LinearForm object implementing <Q|H|P>
+    LinearForm<MPS> lf(canonical_form(apply(H, Q), -1), P, s.site());
 
-    Sweeper s = P.sweeper();
-    LinearForm<MPS> lf(HQ, P, s.site());
-    QuadraticForm<MPO> qf(HH, P, P, s.site());
+    // QuadraticForm object implementing <P|H^2|P>
+    QuadraticForm<MPO> qf(mmult(adjoint(H), H), P, P, s.site());
 
     Tensor Heff, vHQ, vP;
     while (sweeps--) {
       for (s.flip(); !s.is_last(); ++s) {
-        Heff = qf.single_site_matrix();
-        vHQ = conj(lf.single_site_vector());
-        vP = linalg::solve_with_svd(Heff, to_vector(vHQ));
-        set_canonical(P, s.site(), reshape(vP, vHQ.dimensions()), s.sense());
+        if (single_site) {
+          Heff = qf.single_site_matrix();
+          vHQ = conj(lf.single_site_vector());
+          vP = linalg::solve_with_svd(Heff, to_vector(vHQ));
+          set_canonical(P, s.site(), reshape(vP, vHQ.dimensions()), s.sense());
+        } else {
+          Heff = qf.two_site_matrix(s.sense());
+          vHQ = conj(lf.two_site_vector(s.sense()));
+          vP = linalg::solve_with_svd(Heff, to_vector(vHQ));
+          set_canonical_2_sites(P, reshape(vP, vHQ.dimensions()),
+                                s.site(), s.sense(), Dmax, tol);
+        }
 
         const Tensor &newP = P[s.site()];
         lf.propagate(newP, s.sense());
@@ -102,7 +112,7 @@ namespace mps {
       }
     }
     if (normalize) {
-      P.at(k) = P[k] / norm2(P[k]);
+      P.at(s.site()) /= norm2(P[s.site()]);
     }
     *sense = s.sense();
     return err;

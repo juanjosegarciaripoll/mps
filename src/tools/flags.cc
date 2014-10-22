@@ -38,5 +38,11 @@ namespace mps {
 
   const unsigned MPS_SIMPLIFY_MAX_SWEEPS = FLAGS.create_key(12);
 
-  const unsigned MPS_SIMPLIFY_TOLERANCE = FLAGS.create_key(1e-14);}
+  const unsigned MPS_SIMPLIFY_TOLERANCE = FLAGS.create_key(1e-14);
+
+  const unsigned MPS_SINGLE_SITE_ALGORITHM = 1;
+  const unsigned MPS_TWO_SITE_ALGORITHM = 2;
+
+  const unsigned MPS_SOLVE_ALGORITHM = FLAGS.create_key(MPS_SINGLE_SITE_ALGORITHM);
+}
 

@@ -33,6 +33,11 @@ namespace mps {
   /**Default relative tolerance of the singular values dropped.*/
   extern const double MPS_DEFAULT_TOLERANCE;
 
+  /**Algorithms acting on one site.*/
+  extern const unsigned int MPS_SINGLE_SITE_ALGORITHM;
+  /**Algorithms acting on two sites.*/
+  extern const unsigned int MPS_TWO_SITE_ALGORITHM;
+
   /**Flag key for the default relative truncation tolerance.*/
   extern const unsigned int MPS_TRUNCATION_TOLERANCE;
 
@@ -45,6 +50,9 @@ namespace mps {
   extern const unsigned int MPS_SIMPLIFY_MAX_SWEEPS;
   /**Flag key indicating what relative error is acceptable when simplifying.*/
   extern const unsigned int MPS_SIMPLIFY_TOLERANCE;
+
+  /**Flag keys for the solve() algorithms.*/
+  extern const unsigned int MPS_SOLVE_ALGORITHM;
 
 } // namespace mps
 
