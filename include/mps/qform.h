@@ -56,6 +56,8 @@ namespace mps {
 	changing the tensor of those states at the site here(), and moving to
 	the next site, here()-1.*/
     void propagate_left(const elt_t &braP, const elt_t &ketP);
+    /** Implement propagate_right (sense>0) or propagate_left (sense<0). */
+    void propagate(const elt_t &braP, const elt_t &ketP, int sense);
     /** The site at which the quadratic form is defined. */
     int here() const { return current_site_; }
     /** Number of sites in the lattice. */

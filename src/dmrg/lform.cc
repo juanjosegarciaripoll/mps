@@ -71,6 +71,12 @@ namespace mps {
   }
 
   template<class MPS>
+  void LinearForm<MPS>::propagate(const tensor_t &ketP, int sense)
+  {
+    if (sense > 0) propagate_right(ketP); else propagate_left(ketP);
+  }
+
+  template<class MPS>
   void LinearForm<MPS>::propagate_left(const tensor_t &ketP)
   {
     assert(here() > 0);

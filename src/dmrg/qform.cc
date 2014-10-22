@@ -102,6 +102,12 @@ namespace mps {
   }
 
   template<class MPO>
+  void QuadraticForm<MPO>::propagate(const elt_t &braP, const elt_t &ketP, int sense)
+  {
+    if (sense > 0) propagate_right(braP,ketP); else propagate_left(braP, ketP);
+  }
+
+  template<class MPO>
   void QuadraticForm<MPO>::propagate_left(const elt_t &braP, const elt_t &ketP)
   {
     assert(here() >= 0);

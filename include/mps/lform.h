@@ -43,8 +43,12 @@ namespace mps {
     LinearForm(const tensor_t &weights, const std::vector<MPS> &bra,
 	       const MPS &ket, int start = 0);
 
+    /** Update the linear form, with a new value of the state it is applied on. */
     void propagate_right(const tensor_t &ketP);
+    /** Update the linear form, with a new value of the state it is applied on. */
     void propagate_left(const tensor_t &ketP);
+    /** Implement propagate_right (sense>0) or left (sense<0). */
+    void propagate(const tensor_t &ketP, int sense);
 
     /** The site at which the quadratic form is defined. */
     int here() const { return current_site_; }
