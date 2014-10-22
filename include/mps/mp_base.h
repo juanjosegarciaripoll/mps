@@ -27,6 +27,18 @@ namespace mps {
 
   using tensor::index;
 
+  class Sweeper {
+  public:
+    Sweeper(index L, index sense);
+    index operator*() const;
+    index operator++();
+    bool is_last() const;
+    index sense() const;
+    void flip();
+  private:
+    index k_, k0_, kN_, dk_;
+  };
+
   template<class Tensor>
   class MP {
     typedef typename std::vector<Tensor> data_type;
@@ -42,6 +54,7 @@ namespace mps {
     MP(const MP<Tensor> &other) : data_(other.data_) {}
 
     index size() const { return data_.size(); }
+    index last() const { return size() - 1; }
     void resize(index new_size) { data_.resize(new_size); }
 
     const Tensor &operator[](index n) const {
@@ -58,6 +71,8 @@ namespace mps {
     const_iterator end() const { return data_.end(); }
     iterator end() { return data_.end(); }
     const std::vector<Tensor> to_vector() const { return data_; }
+
+    Sweeper sweeper(index sense) const { return Sweeper(size(), sense); }
 
   private:
     data_type data_;

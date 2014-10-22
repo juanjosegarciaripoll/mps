@@ -64,6 +64,7 @@ libmps_la_SOURCES = \
 	tools/dump_cmps.cc \
 	tools/load_rmps.cc \
 	tools/load_cmps.cc \
+	tools/sweeper.cc \
 	iTEBD/itebd_d.cc \
 	iTEBD/itebd_z.cc \
 	iTEBD/itebd_itime_d.cc \
