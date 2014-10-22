@@ -411,7 +411,7 @@ namespace mps {
         } else {
           for (index k = L-1; k > 0; k--) {
             Pk = next_projector_2_sites(k-1);
-            set_canonical_2_sites(P, Pk, k-1, -1, Dmax, tol);
+            set_canonical_2_sites(P, Pk, k, -1, Dmax, tol);
             update_matrices(k, P[k], -1);
           }
           update_matrices(0, Pk = P[0], -1);

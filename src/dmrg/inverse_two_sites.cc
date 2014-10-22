@@ -79,32 +79,21 @@ namespace mps {
     
     Tensor vP, Heff, vHQ;
     std::cout << "psi.size()=" << P.size() << ", last=" << last << std::endl;
-    for (index sweep = 0; sweep < sweeps; sweep++) {
+    for (index sweep = 0, k0, kN, dk; sweep < sweeps; sweep++) {
       *sense = -*sense;
       if (*sense < 0) {
-        // Last iteration was left-to-right and state P is in canonical form with
-        // respect to site (N-1)
-        for (k = last; k > 0; k--) {
-          std::cout << "site k=" << k << "\n";
-          vP = new_tensor(Heff = qf.two_site_matrix(-1),
-                          vHQ = conj(lf.two_site_vector(-1)),
-                          P, k, normQ2);
-          set_canonical_2_sites(P, vP, k-1, -1, Dmax, tol);
-          lf.propagate_left(P[k]);
-          qf.propagate_left(P[k],P[k]);
-        }
+        k0 = last; kN = 0; dk = -1;
       } else {
-        // Last iteration was left-to-right and state P is in canonical form with
-        // respect to site (N-1)
-        for (k = 0; k < last; k++) {
-          std::cout << "site k=" << k << "\n";
-          vP = new_tensor(Heff = qf.two_site_matrix(+1),
-                          vHQ = conj(lf.two_site_vector(+1)),
-                          P, k, normQ2);
-          set_canonical_2_sites(P, vP, k, +1, Dmax, tol);
-          lf.propagate_right(P[k]);
-          qf.propagate_right(P[k],P[k]);
-        }
+        k0 = 0; kN = last; dk = +1;
+      }
+      for (k = k0; k != kN; k += dk) {
+        std::cout << "site k=" << k << "\n";
+        vP = new_tensor(Heff = qf.two_site_matrix(*sense),
+                        vHQ = conj(lf.two_site_vector(*sense)),
+                        P, k, normQ2);
+        set_canonical_2_sites(P, vP, k, *sense, Dmax, tol);
+        lf.propagate(P[k], *sense);
+        qf.propagate(P[k], P[k], *sense);
       }
       {
 	vP = to_vector(vP);

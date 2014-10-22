@@ -49,9 +49,9 @@ namespace mps {
       scale_inplace(Pj, 0, s);
       set_canonical(P, site+1, Pj, sense, true);
     } else {
-      P.at(site+1) = Pj;
+      P.at(site) = Pj;
       scale_inplace(Pi,-1, s);
-      set_canonical(P, site, Pi, sense, true);
+      set_canonical(P, site-1, Pi, sense, true);
     }
   }
 

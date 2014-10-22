@@ -396,7 +396,7 @@ namespace mps {
      * Since the projector that we obtained spans two sites, we have to split
      * it, ensuring that we remain below the desired dimension Dmax.
      */
-    set_canonical_2_sites(P, Pi, svd_tolerance, Dmax,
+    set_canonical_2_sites(P, Pi, k, svd_tolerance, Dmax,
                           false /* Do not canonicalize the tensor, since we
                                  * are going to change it soon */);
     /*
