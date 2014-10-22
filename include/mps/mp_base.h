@@ -30,10 +30,11 @@ namespace mps {
   class Sweeper {
   public:
     Sweeper(index L, index sense);
-    index operator*() const;
+    index operator*() const { return k_; };
     index operator++();
-    bool is_last() const;
-    index sense() const;
+    bool is_last() const { return k_ == kN_; };
+    index sense() const { return dk_; };
+    index site() const { return k_; };
     void flip();
   private:
     index k_, k0_, kN_, dk_;

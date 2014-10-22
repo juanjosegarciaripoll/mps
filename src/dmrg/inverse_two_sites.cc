@@ -54,64 +54,60 @@ namespace mps {
   do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense, index sweeps, bool normalize,
            index Dmax, double tol)
   {
-    MPS Q = canonical_form(oQ, -1);
-    assert(sweeps > 0);
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
     typedef typename MPS::elt_t Tensor;
-    MPS &P = *ptrP;
-    if (!P.size()) P = Q;
 
-    double normQ2 = tensor::abs(scprod(Q, Q));
+    assert(ptrP);
+    MPS &P = *ptrP;
+    if (!P.size()) P = oQ;
+    int aux = +1;
+    if (!sense) sense = &aux;
+    assert(sweeps > 0);
+
+    MPS Q = canonical_form(oQ, -1);
+    double normQ2 = abs(scprod(Q[0], Q[0]));
     if (normQ2 < 1e-16) {
       std::cerr << "Right-hand side in solve(MPO, MPS, ...) is zero\n";
       abort();
     }
 
-    double normHP, olderr, err = 0.0;
+    double normHP, olderr = 0.0, err = 0.0;
     typename Tensor::elt_t scp;
 
     MPS HQ = canonical_form(apply(H, Q), -1);
     MPO HH = mmult(adjoint(H), H);
 
-    index k, last = P.size() - 1;
-    LinearForm<MPS> lf(HQ, P, (*sense > 0) ? last : 0);
-    QuadraticForm<MPO> qf(HH, P, P, (*sense > 0) ? last : 0);
+    Sweeper s = P.sweeper(*sense);
+    LinearForm<MPS> lf(HQ, P, s.site());
+    QuadraticForm<MPO> qf(HH, P, P, s.site());
     
     Tensor vP, Heff, vHQ;
-    std::cout << "psi.size()=" << P.size() << ", last=" << last << std::endl;
-    for (index sweep = 0, k0, kN, dk; sweep < sweeps; sweep++) {
-      *sense = -*sense;
-      if (*sense < 0) {
-        k0 = last; kN = 0; dk = -1;
-      } else {
-        k0 = 0; kN = last; dk = +1;
+    while (sweeps--) {
+      for (s.flip(); !s.is_last(); ++s) {
+        std::cout << "site k=" << s.site() << "\n";
+        Heff = qf.two_site_matrix(s.sense());
+        vHQ = conj(lf.two_site_vector(s.sense()));
+        vP = linalg::solve_with_svd(Heff, to_vector(vHQ));
+        set_canonical_2_sites(P, reshape(vP, vHQ.dimensions()),
+                              s.site(), s.sense(), Dmax, tol);
+        lf.propagate(P[s.site()], s.sense());
+        qf.propagate(P[s.site()], P[s.site()], s.sense());
       }
-      for (k = k0; k != kN; k += dk) {
-        std::cout << "site k=" << k << "\n";
-        vP = new_tensor(Heff = qf.two_site_matrix(*sense),
-                        vHQ = conj(lf.two_site_vector(*sense)),
-                        P, k, normQ2);
-        set_canonical_2_sites(P, vP, k, *sense, Dmax, tol);
-        lf.propagate(P[k], *sense);
-        qf.propagate(P[k], P[k], *sense);
-      }
-      {
-	vP = to_vector(vP);
-	normHP = real(scprod(vP, mmult(Heff, vP)));
-	scp = scprod(vHQ, vP);
-        std::cout << "err = " << normHP + normQ2 - 2*real(scp) << std::endl;
-      }
+      normHP = real(scprod(vP, mmult(Heff, vP)));
+      scp = scprod(vHQ, vP);
       olderr = err;
       err = normHP + normQ2 - 2*real(scp);
-      if (sweep) {
+      std::cout << "err = " << err << std::endl;
+      if (olderr) {
 	if ((olderr-err) < 1e-5*tensor::abs(olderr) || (err < tolerance)) {
 	  break;
 	}
       }
     }
     if (normalize) {
-      P.at(k) = P[k] / norm2(P[k]);
+      P.at(s.site()) /= norm2(P[s.site()]);
     }
+    *sense = s.sense();
     return err;
   }
 

@@ -36,25 +36,10 @@ namespace mps {
     }
   }
 
-  index Sweeper::operator*() const
-  {
-    return k_;
-  }
-
   index Sweeper::operator++()
   {
     assert(!is_last());
     return (k_ += dk_);
-  }
-
-  index Sweeper::sense() const
-  {
-    return dk_;
-  }
-
-  bool Sweeper::is_last() const
-  {
-    return k_ == kN_;
   }
 
   void Sweeper::flip()

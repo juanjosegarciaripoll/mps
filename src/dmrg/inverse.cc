@@ -39,7 +39,7 @@ namespace mps {
              double normQ2)
   {
     Tensor vP = linalg::solve_with_svd(H2, vHQ);
-    return reshape(vP, psi[k].dimensions());
+    return reshape(vP, vHQ.dimensions());
   }
   
   /*
@@ -52,66 +52,48 @@ namespace mps {
   double
   do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense, index sweeps, bool normalize)
   {
-    MPS Q = canonical_form(oQ, -1);
-    assert(sweeps > 0);
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
     typedef typename MPS::elt_t Tensor;
+
+    assert(ptrP);
     MPS &P = *ptrP;
     if (!P.size()) P = Q;
+    int aux = +1;
+    if (!sense) sense = &aux;
+    assert(sweeps > 0);
 
-    double normQ2 = tensor::abs(scprod(Q, Q));
+    MPS Q = canonical_form(oQ, -1);
+    double normQ2 = abs(scprod(Q[0], Q[0]));
     if (normQ2 < 1e-16) {
       std::cerr << "Right-hand side in solve(MPO, MPS, ...) is zero\n";
       abort();
     }
 
-    double normHP, olderr, err = 0.0;
+    double normHP, olderr = 0.0, err = 0.0;
     typename Tensor::elt_t scp;
 
     MPS HQ = canonical_form(apply(H, Q), -1);
     MPO HH = mmult(adjoint(H), H);
 
-    index k, last = P.size() - 1;
-    LinearForm<MPS> lf(HQ, P, (*sense > 0) ? last : 0);
-    QuadraticForm<MPO> qf(HH, P, P, (*sense > 0) ? last : 0);
+    Sweeper s = P.sweeper();
+    LinearForm<MPS> lf(HQ, P, s.site());
+    QuadraticForm<MPO> qf(HH, P, P, s.site());
 
-    for (index sweep = 0; sweep < sweeps; sweep++) {
-      *sense = -*sense;
-      if (*sense < 0) {
-        // Last iteration was left-to-right and state P is in canonical form with
-        // respect to site (N-1)
-        for (k = last; k > 0; k--) {
-          Tensor vP = new_tensor(qf.single_site_matrix(),
-                                 to_vector(conj(lf.single_site_vector())),
-                                 P, k, normQ2);
-          set_canonical(P, k, vP, -1);
-          lf.propagate_left(P[k]);
-          qf.propagate_left(P[k],P[k]);
-        }
-      } else {
-        // Last iteration was left-to-right and state P is in canonical form with
-        // respect to site (N-1)
-        for (k = 0; k < last; k++) {
-          Tensor vP = new_tensor(qf.single_site_matrix(),
-                                 to_vector(conj(lf.single_site_vector())),
-                                 P, k, normQ2);
-          set_canonical(P, k, vP, +1);
-          lf.propagate_right(P[k]);
-          qf.propagate_right(P[k],P[k]);
-        }
+    Tensor Heff, vHQ, vP;
+    while (sweeps--) {
+      for (s.flip(); !s.is_last(); ++s) {
+        Heff = qf.single_site_matrix();
+        vHQ = conj(lf.single_site_vector());
+        vP = linalg::solve_with_svd(Heff, to_vector(vHQ));
+        set_canonical(P, s.site(), reshape(vP, vHQ.dimensions()), s.sense());
+        lf.propagate(P[s.site()], s.sense());
+        qf.propagate(P[s.site()], P[s.site()], s.sense());
       }
-      {
-	Tensor Heff = qf.single_site_matrix();
-	Tensor vHQ = to_vector(conj(lf.single_site_vector()));
-	Tensor vP = new_tensor(Heff, vHQ, P, k, normQ2);
-	P.at(k) = vP;
-        vP = to_vector(vP);
-	normHP = real(scprod(vP, mmult(Heff, vP)));
-	scp = scprod(vHQ, vP);
-      }
+      normHP = real(scprod(vP, mmult(Heff, vP)));
+      scp = scprod(to_vector(vHQ), vP);
       olderr = err;
       err = normHP + normQ2 - 2*real(scp);
-      if (sweep) {
+      if (olderr) {
 	if ((olderr-err) < 1e-5*tensor::abs(olderr) || (err < tolerance)) {
 	  break;
 	}
@@ -120,6 +102,7 @@ namespace mps {
     if (normalize) {
       P.at(k) = P[k] / norm2(P[k]);
     }
+    *sense = s.sense();
     return err;
   }
 

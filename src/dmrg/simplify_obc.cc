@@ -47,39 +47,25 @@ namespace mps {
     //	    normQ2 - norm(Pk)^2
     // and the relative error
     //	    err^2 = 1 - (norm(Pk)^2/normQ2)
-    index k, last = P.size() - 1;
-    LinearForm<MPS> lf(w, Q, P, (*sense > 0) ? last : 0);
+    Sweeper s = P.sweeper(*sense);
+    LinearForm<MPS> lf(w, Q, P, s.site());
     double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2, scp;
-    for (index sweep = 0; sweep < sweeps; sweep++) {
-      *sense = -*sense;
-      if (*sense < 0) {
-        // Last iteration was left-to-right and state P is in canonical form with
-        // respect to site (N-1)
-        for (k = last; k > 0; k--) {
-          set_canonical(P, k, conj(lf.single_site_vector()), -1);
-          lf.propagate_left(P[k]);
-        }
-      } else {
-        // Last iteration was left-to-right and state P is in canonical form with
-        // respect to site (N-1)
-        for (k = 0; k < last; k++) {
-          set_canonical(P, k, conj(lf.single_site_vector()), +1);
-          lf.propagate_right(P[k]);
-        }
+    while (sweeps--) {
+      for (s.flip(); !s.is_last(); ++s) {
+        set_canonical(P, s.site(), conj(lf.single_site_vector()), s.sense());
+        lf.propagate(P[s.site()], s.sense());
       }
-      P.at(k) = conj(lf.single_site_vector());
-      normP2 = tensor::abs(scprod(P[k], P[k]));
+      normP2 = abs(scprod(P[s.site()], P[s.site()]));
       olderr = err;
-      err = sqrt(tensor::abs(1 - normP2/normQ2));
-      if (normP2 > normQ2+0.5)
-        abort();
-      if ((olderr-err) < 1e-5*tensor::abs(olderr) || (err < tolerance)) {
+      err = sqrt(abs(1 - normP2/normQ2));
+      if ((olderr-err) < 1e-5*abs(olderr) || (err < tolerance)) {
 	break;
       }
     }
     if (normalize) {
-      P.at(k) = P[k] / sqrt(normP2);
+      P.at(s.site()) /= sqrt(normP2);
     }
+    *sense = s.sense();
     return err;
   }
 
