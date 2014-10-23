@@ -47,13 +47,12 @@ namespace mps {
   template<class MPS>
   static const MPS either_form_inner(MPS psi, index site, bool normalize)
   {
-    index last = psi.size() - 1;
-    assert((site >= 0) & (site <= last));
-    for (index i = last; i > site; i--)
+    index i;
+    for (i = psi.last(); i > site; i--)
       set_canonical(psi, i, psi[i], -1);
-    for (index i = 0; i < site; i++)
+    for (i = 0; i < site; i++)
       set_canonical(psi, i, psi[i], +1);
-    if (normalize) psi.at(site) /= norm2(psi[site]);
+    if (normalize) psi.at(i) /= norm2(psi[i]);
     return psi;
   }
 
