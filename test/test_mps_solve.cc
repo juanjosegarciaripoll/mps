@@ -117,8 +117,12 @@ namespace tensor_test {
     }
   }
 
-  template<class MPS, void (*f)(MPS)>
+  template<class MPS, void (*f)(MPS), bool two_sites>
   void try_over_states(int size) {
+    if (two_sites)
+      mps::FLAGS.set(MPS_SOLVE_ALGORITHM, MPS_TWO_SITE_ALGORITHM);
+    else
+      mps::FLAGS.set(MPS_SOLVE_ALGORITHM, MPS_SINGLE_SITE_ALGORITHM);
     f(cluster_state(size));
     f(MPS::random(size, 2, 1));
   }
@@ -127,16 +131,28 @@ namespace tensor_test {
   // RQFORM
   //
 
-  TEST(CQForm, DiagonalLocal) {
-    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<diagonal_H> >);
+  TEST(CQForm, DiagonalLocal1site) {
+    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<diagonal_H>,false>);
   }
 
-  TEST(CQForm, ZZInt) {
-    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<zz_H> >);
+  TEST(CQForm, ZZInt1site) {
+    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<zz_H>,false>);
   }
 
-  TEST(CQForm, XXInt) {
-    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<xx_H> >);
+  TEST(CQForm, XXInt1site) {
+    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<xx_H>,false>);
+  }
+
+  TEST(CQForm, DiagonalLocal2site) {
+    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<diagonal_H>,true>);
+  }
+
+  TEST(CQForm, ZZInt2site) {
+    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<zz_H>,true>);
+  }
+
+  TEST(CQForm, XXInt2site) {
+    test_over_integers(2, 10, &try_over_states<CMPS,test_solve<xx_H>,true>);
   }
 
 } // tensor_test

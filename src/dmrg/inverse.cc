@@ -73,7 +73,7 @@ namespace mps {
     }
 
     // Iterator object to run over the MPS
-    Sweeper s = P.sweeper(*sense);
+    Sweeper s = P.sweeper(-*sense);
 
     // LinearForm object implementing <Q|H|P>
     LinearForm<MPS> lf(canonical_form(apply(H, Q), -1), P, s.site());
@@ -83,24 +83,30 @@ namespace mps {
 
     Tensor Heff, vHQ, vP;
     while (sweeps--) {
-      s.flip();
-      do {
-        if (single_site) {
+      if (single_site) {
+        do {
           Heff = qf.single_site_matrix();
           vHQ = conj(lf.single_site_vector());
           vP = linalg::solve_with_svd(Heff, to_vector(vHQ));
           set_canonical(P, s.site(), reshape(vP, vHQ.dimensions()), s.sense());
-        } else {
+          const Tensor &newP = P[s.site()];
+          lf.propagate(newP, s.sense());
+          qf.propagate(newP, newP, s.sense());
+        } while(--s);
+      } else {
+        do {
           Heff = qf.two_site_matrix(s.sense());
           vHQ = conj(lf.two_site_vector(s.sense()));
           vP = linalg::solve_with_svd(Heff, to_vector(vHQ));
           set_canonical_2_sites(P, reshape(vP, vHQ.dimensions()),
                                 s.site(), s.sense(), Dmax, tol);
-        }
-        const Tensor &newP = P[s.site()];
-        lf.propagate(newP, s.sense());
-        qf.propagate(newP, newP, s.sense());
-      } while (--s);
+          const Tensor &newP = P[s.site()];
+          lf.propagate(newP, s.sense());
+          qf.propagate(newP, newP, s.sense());
+          --s;
+        } while (!s.is_last());
+      }
+      s.flip();
       normHP = real(scprod(vP, mmult(Heff, vP)));
       scp = scprod(to_vector(vHQ), vP);
       olderr = err;
@@ -114,7 +120,7 @@ namespace mps {
     if (normalize) {
       P.at(s.site()) /= norm2(P[s.site()]);
     }
-    *sense = s.sense();
+    *sense = -s.sense();
     return err;
   }
 
