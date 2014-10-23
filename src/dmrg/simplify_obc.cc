@@ -48,11 +48,10 @@ namespace mps {
     //	    normQ2 - norm(Pk)^2
     // and the relative error
     //	    err^2 = 1 - (norm(Pk)^2/normQ2)
-    Sweeper s = P.sweeper(*sense);
+    Sweeper s = P.sweeper(-*sense);
     LinearForm<MPS> lf(w, Q, P, s.site());
     double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2, scp;
     while (sweeps--) {
-      s.flip();
       if (single_site) {
         do {
           set_canonical(P, s.site(), conj(lf.single_site_vector()), s.sense());
@@ -66,6 +65,7 @@ namespace mps {
           --s;
         } while (!s.is_last());
       }
+      s.flip();
       normP2 = abs(scprod(P[s.site()], P[s.site()]));
       olderr = err;
       err = sqrt(abs(1 - normP2/normQ2));
@@ -76,7 +76,7 @@ namespace mps {
     if (normalize) {
       P.at(s.site()) /= sqrt(normP2);
     }
-    *sense = s.sense();
+    *sense = -s.sense();
     return err;
   }
 
