@@ -26,11 +26,11 @@ namespace mps {
   {
     assert(L>0);
     if (sense > 0) {
-      k0_ = 0;
+      k_ = k0_ = 0;
       kN_ = L-1;
       dk_ = +1;
     } else {
-      k0_ = L-1;
+      k_ = k0_ = L-1;
       kN_ = 0;
       dk_ = -1;
     }
