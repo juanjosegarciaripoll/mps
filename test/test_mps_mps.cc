@@ -142,13 +142,11 @@ namespace tensor_test {
   }
 
   const RMPS apply_cluster_state_stabilizer(RMPS state, int site) {
-    int left = site - 1;
-    if (left >= 0)
-      state = apply_local_operator(state, mps::Pauli_z, left);
     state = apply_local_operator(state, mps::Pauli_x, site);
-    int right = site + 1;
-    if (right < state.size())
-      state = apply_local_operator(state, mps::Pauli_z, site);
+    if (site >= 0)
+      state = apply_local_operator(state, mps::Pauli_z, site - 1);
+    if (site < state.last())
+      state = apply_local_operator(state, mps::Pauli_z, site + 1);
     return state;
   }
 
@@ -161,9 +159,10 @@ namespace tensor_test {
     for (index i = 1; i < cluster.size(); i++) {
       RTensor psi2 = mps_to_vector(apply_cluster_state_stabilizer(cluster, i));
       if (!simeq(psi, psi2)) {
+        RMPS aux = apply_cluster_state_stabilizer(cluster,i);
+        std::cout << "site=" << i << std::endl;
         std::cout << "psi2=" << psi2 << std::endl;
-        std::cout << "psi=" << psi << std::endl;
-        abort();
+        std::cout << "psi1=" << psi << std::endl;
       }
       EXPECT_CEQ(psi, psi2);
     }
@@ -190,7 +189,7 @@ namespace tensor_test {
   }
 
   TEST(RMPS, ClusterState) {
-    test_over_integers(4,10,test_cluster_state);
+    test_over_integers(3,10,test_cluster_state);
   }
 
   //////////////////////////////////////////////////////////////////////
