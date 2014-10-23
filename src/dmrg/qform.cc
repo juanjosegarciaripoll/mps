@@ -110,7 +110,8 @@ namespace mps {
   template<class MPO>
   void QuadraticForm<MPO>::propagate_left(const elt_t &braP, const elt_t &ketP)
   {
-    assert(here() >= 0);
+    if (here() == 0)
+      return;
     const matrix_array_t &mr = right_matrices(here());
     matrix_array_t &new_mr = right_matrices(here()-1);
     // std::cout << "Original matrices\n";
@@ -135,7 +136,8 @@ namespace mps {
   template<class MPO>
   void QuadraticForm<MPO>::propagate_right(const elt_t &braP, const elt_t &ketP)
   {
-    assert(here() < last_site());
+    if (here() == last_site())
+      return;
     const matrix_array_t &ml = left_matrices(here());
     matrix_array_t &new_ml = left_matrices(here()+1);
     // std::cout << "Original matrices\n";

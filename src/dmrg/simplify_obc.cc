@@ -30,9 +30,10 @@ namespace mps {
   template<class MPS>
   double
   do_simplify(MPS *ptrP, const typename MPS::elt_t &w, const std::vector<MPS> &Q,
-              int *sense, index sweeps, bool normalize)
+              int *sense, index sweeps, bool normalize, index Dmax, double tol)
   {
     assert(sweeps > 0);
+    bool single_site = FLAGS.get(MPS_SIMPLIFY_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM;
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
     typedef typename MPS::elt_t Tensor;
     MPS &P = *ptrP;
@@ -51,9 +52,19 @@ namespace mps {
     LinearForm<MPS> lf(w, Q, P, s.site());
     double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2, scp;
     while (sweeps--) {
-      for (s.flip(); !s.is_last(); ++s) {
-        set_canonical(P, s.site(), conj(lf.single_site_vector()), s.sense());
-        lf.propagate(P[s.site()], s.sense());
+      s.flip();
+      if (single_site) {
+        do {
+          set_canonical(P, s.site(), conj(lf.single_site_vector()), s.sense());
+          lf.propagate(P[s.site()], s.sense());
+        } while (--s);
+      } else {
+        do {
+          set_canonical_2_sites(P, conj(lf.two_site_vector(s.sense())),
+                                s.site(), s.sense(), Dmax, tol);
+          lf.propagate(P[s.site()], s.sense());
+          --s;
+        } while (!s.is_last());
       }
       normP2 = abs(scprod(P[s.site()], P[s.site()]));
       olderr = err;

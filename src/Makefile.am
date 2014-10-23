@@ -144,8 +144,6 @@ libmps_la_SOURCES = \
 	dmrg/lform_z.cc \
 	dmrg/simplify_obc_d.cc \
 	dmrg/simplify_obc_z.cc \
-	dmrg/simplify_obc_two_sites_d.cc \
-	dmrg/simplify_obc_two_sites_z.cc \
 	dmrg/rdmrg.cc \
 	dmrg/cdmrg.cc \
 	dmrg/inverse_d.cc \

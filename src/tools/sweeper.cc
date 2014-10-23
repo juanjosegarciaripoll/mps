@@ -36,10 +36,14 @@ namespace mps {
     }
   }
 
-  index Sweeper::operator++()
+  bool Sweeper::operator--()
   {
-    assert(!is_last());
-    return (k_ += dk_);
+    if (k_ == kN_) {
+      return false;
+    } else {
+      k_ += dk_;
+      return true;
+    }
   }
 
   void Sweeper::flip()

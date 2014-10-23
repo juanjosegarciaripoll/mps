@@ -79,7 +79,8 @@ namespace mps {
   template<class MPS>
   void LinearForm<MPS>::propagate_left(const tensor_t &ketP)
   {
-    assert(here() > 0);
+    if (here() == 0)
+      return;
     for (int i = 0; i < number_of_bras(); i++) {
       // std::cout << "PL @ " << i << std::endl
       //           << "Q=" << bra_[i][here()] << std::endl
@@ -95,7 +96,8 @@ namespace mps {
   template<class MPS>
   void LinearForm<MPS>::propagate_right(const tensor_t &ketP)
   {
-    assert((here()+1) <= size());
+    if (here()+1 == size())
+      return;
     for (int i = 0; i < number_of_bras(); i++) {
       // std::cout << "PR @ " << i << std::endl
       //           << "L=" << left_matrix(i,here()) << std::endl

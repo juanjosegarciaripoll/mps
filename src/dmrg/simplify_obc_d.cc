@@ -23,17 +23,19 @@ namespace mps {
 
   double
   simplify_obc(RMPS *ptrP, const RMPS::elt_t w, const std::vector<RMPS> &Q,
-              int *sense, index sweeps, bool normalize)
+               int *sense, index sweeps, bool normalize,
+               index Dmax, double tol)
   {
-    return do_simplify(ptrP, w, Q, sense, sweeps, normalize);
+    return do_simplify(ptrP, w, Q, sense, sweeps, normalize, Dmax, tol);
   }
 
   double
-  simplify_obc(RMPS *ptrP, const RMPS &Q, int *sense, index sweeps, bool normalize)
+  simplify_obc(RMPS *ptrP, const RMPS &Q, int *sense, index sweeps, bool normalize,
+               index Dmax, double tol)
   {
     static const RTensor w = RTensor::ones(1);
     std::vector<RMPS> vQ(1, Q);
-    return do_simplify(ptrP, w, vQ, sense, sweeps, normalize);
+    return do_simplify(ptrP, w, vQ, sense, sweeps, normalize, Dmax, tol);
   }
 
 } // namespace mps

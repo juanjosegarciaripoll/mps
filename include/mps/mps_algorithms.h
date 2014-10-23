@@ -65,29 +65,19 @@ namespace mps {
 
   /* Open boundary condition algorithms that simplify a state, optimizing over one site */
 
-  double simplify_obc(RMPS *P, const RMPS &Q, int *sense, index sweeps, bool normalize);
+  double simplify_obc(RMPS *P, const RMPS &Q, int *sense, index sweeps, bool normalize,
+                      index Dmax = 0, double tol = -1);
 
-  double simplify_obc(CMPS *P, const CMPS &Q, int *sense, index sweeps, bool normalize);
+  double simplify_obc(CMPS *P, const CMPS &Q, int *sense, index sweeps, bool normalize,
+                      index Dmax = 0, double tol = -1);
 
   double simplify_obc(RMPS *P, const RTensor &weights, const std::vector<RMPS> &Q,
-                      int *sense, index sweeps, bool normalize);
+                      int *sense, index sweeps, bool normalize,
+                      index Dmax = 0, double tol = -1);
 
   double simplify_obc(CMPS *P, const CTensor &weights, const std::vector<CMPS> &Q,
-                      int *sense, index sweeps, bool normalize);
-
-  double simplify_obc_2_sites(RMPS *P, const RMPS &Q, int *sense, index sweeps,
-                              bool normalize, index Dmax = 0, double tol = -1);
-
-  double simplify_obc_2_sites(CMPS *P, const CMPS &Q, int *sense, index sweeps,
-                              bool normalize, index Dmax = 0, double tol = -1);
-
-  double simplify_obc_2_sites(RMPS *P, const RTensor &weights, const std::vector<RMPS> &Q,
-                              int *sense, index sweeps, bool normalize, index Dmax = 0,
-                              double tol = -1);
-
-  double simplify_obc_2_sites(CMPS *P, const CTensor &weights, const std::vector<CMPS> &Q,
-                              int *sense, index sweeps, bool normalize, index Dmax = 0,
-                              double tol = -1);
+                      int *sense, index sweeps, bool normalize,
+                      index Dmax = 0, double tol = -1);
 
   double solve(const RMPO &H, RMPS *ptrP, const RMPS &Q, int *sense, index sweeps,
                bool normalize = false, index Dmax = 0, double tol = -1);

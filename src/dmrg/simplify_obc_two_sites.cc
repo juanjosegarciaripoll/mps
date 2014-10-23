@@ -53,7 +53,7 @@ namespace mps {
     LinearForm<MPS> lf(w, Q, P, s.site());
     double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2, scp;
     while (sweeps--) {
-      for (s.flip(); !s.is_last(); ++s) {
+      for (s.flip(); !s.is_last(); --s) {
         set_canonical_2_sites(P, conj(lf.two_site_vector(s.sense())),
                               s.site(), s.sense(), Dmax, tol);
         lf.propagate(P[s.site()], s.sense());

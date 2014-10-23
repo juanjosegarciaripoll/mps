@@ -83,7 +83,8 @@ namespace mps {
 
     Tensor Heff, vHQ, vP;
     while (sweeps--) {
-      for (s.flip(); !s.is_last(); ++s) {
+      s.flip();
+      do {
         if (single_site) {
           Heff = qf.single_site_matrix();
           vHQ = conj(lf.single_site_vector());
@@ -96,11 +97,10 @@ namespace mps {
           set_canonical_2_sites(P, reshape(vP, vHQ.dimensions()),
                                 s.site(), s.sense(), Dmax, tol);
         }
-
         const Tensor &newP = P[s.site()];
         lf.propagate(newP, s.sense());
         qf.propagate(newP, newP, s.sense());
-      }
+      } while (--s);
       normHP = real(scprod(vP, mmult(Heff, vP)));
       scp = scprod(to_vector(vHQ), vP);
       olderr = err;

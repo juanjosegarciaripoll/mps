@@ -31,7 +31,7 @@ namespace mps {
   public:
     Sweeper(index L, index sense);
     index operator*() const { return k_; };
-    index operator++();
+    bool operator--();
     bool is_last() const { return k_ == kN_; };
     index sense() const { return dk_; };
     index site() const { return k_; };

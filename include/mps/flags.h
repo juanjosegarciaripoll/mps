@@ -51,6 +51,9 @@ namespace mps {
   /**Flag key indicating what relative error is acceptable when simplifying.*/
   extern const unsigned int MPS_SIMPLIFY_TOLERANCE;
 
+  /**Flag keys for the simplify_obc() algorithms.*/
+  extern const unsigned int MPS_SIMPLIFY_ALGORITHM;
+
   /**Flag keys for the solve() algorithms.*/
   extern const unsigned int MPS_SOLVE_ALGORITHM;
 
