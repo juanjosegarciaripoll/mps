@@ -289,10 +289,10 @@ namespace mps {
               //                     P12(b2,k,l,b3) R(a3,b3,a1,b1)
               // where a1=b1 = 1, because of periodic boundary conditions
               elt_t Q12 =
-                fold(fold(reshape(L, a2,b2), -1,
+                fold(fold(reshape(L, a2,b2), 1,
                             foldin(it1->op, -1,
                                    foldin(it2->op, -1, aux, 2), 1), 0), 3,
-                       reshape(R, a3,b3), -1);
+                       reshape(R, a3,b3), 1);
               maybe_add(&output, Q12);
             }
 	  }
