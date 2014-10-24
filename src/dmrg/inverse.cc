@@ -50,6 +50,7 @@ namespace mps {
   {
     bool single_site = FLAGS.get(MPS_SOLVE_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM;
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
+    bool debug = FLAGS.get(MPS_DEBUG_SOLVE);
     typedef typename MPS::elt_t Tensor;
 
     if (tol <= 0) {
@@ -93,10 +94,16 @@ namespace mps {
     while (sweeps--) {
       if (single_site) {
         do {
+          //
+          // Single-site algorithm. We solve directly for the state on a given
+          // site, constructing the full quadratic form matrix.
+          //
           Heff = qf.single_site_matrix();
           vHQ = conj(lf.single_site_vector());
           vP = linalg::solve_with_svd(Heff, flatten(vHQ));
           set_canonical(P, s.site(), reshape(vP, vHQ.dimensions()), s.sense());
+
+          // Update quadratic and linear form with the new site
           const Tensor &newP = P[s.site()];
           lf.propagate(newP, s.sense());
           qf.propagate(newP, newP, s.sense());
@@ -105,6 +112,11 @@ namespace mps {
         normHP = real(scprod(vP, mmult(Heff, vP)));
       } else {
         do {
+          //
+          // Two-site algorithm. We solve iteratively, using a conjugate
+          // gradient algorithm with a map that applies the quadratic form
+          // without actually constructing any matrices.
+          //
           vHQ = conj(lf.two_site_vector(s.sense()));
           if (s.sense()>0) {
             vP = fold(P[s.site()], -1, P[s.site()+1], 0);
@@ -114,6 +126,8 @@ namespace mps {
           vP = linalg::cgs(with_args(apply<QuadraticForm<MPO> >, &qf, s.sense()),
                            vHQ, &vP, 2*vHQ.size(), tol);
           set_canonical_2_sites(P, vP, s.site(), s.sense(), Dmax, tol);
+
+          // Update quadratic and linear form with the new site
           const Tensor &newP = P[s.site()];
           lf.propagate(newP, s.sense());
           qf.propagate(newP, newP, s.sense());
@@ -122,9 +136,15 @@ namespace mps {
         s.flip();
         normHP = real(scprod(vP, qf.apply_two_site_matrix(vP, s.sense())));
       }
+
+      // Compute stop criteria.
       scp = scprod(vHQ, vP);
       olderr = err;
       err = normHP + normQ2 - 2*real(scp);
+      if (debug) {
+        std::cout << "[mps::solve] sweeps=" << sweeps << ", err=" << err << ", derr="
+                  << olderr - err << std::endl;
+      }
       if (olderr) {
 	if ((olderr-err) < 1e-5*tensor::abs(olderr) || (err < tolerance)) {
 	  break;

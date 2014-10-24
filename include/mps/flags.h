@@ -54,6 +54,8 @@ namespace mps {
   /**Flag keys for the simplify_obc() algorithms.*/
   extern const unsigned int MPS_SIMPLIFY_ALGORITHM;
 
+  /**Flag key for debugging the mps::solve routines.*/
+  extern const unsigned int MPS_DEBUG_SOLVE;
   /**Flag keys for the solve() algorithms.*/
   extern const unsigned int MPS_SOLVE_ALGORITHM;
   /**Flag key indicating what relative error is acceptable when inverting.*/
