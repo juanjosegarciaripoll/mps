@@ -66,10 +66,12 @@ namespace mps {
     index last_site() const { return size_-1; }
 
     /** Matrix representation of the quadratic form with respect to site here().*/
-    const elt_t single_site_matrix();
+    const elt_t single_site_matrix() const;
     /** Matrix representation of the quadratic form with respect to
 	sites here() and here()+1.*/
-    const elt_t two_site_matrix(int sense = +1);
+    const elt_t two_site_matrix(int sense = +1) const;
+    /** Apply the two_site_matrix() onto a tensor representing two sites. */
+    const elt_t apply_two_site_matrix(const elt_t &P12, int sense = +1) const;
 
   private:
 
@@ -101,6 +103,12 @@ namespace mps {
       return matrix_[site][n];
     }
     elt_t &right_matrix(index site, int n) {
+      return matrix_[site+1][n];
+    }
+    const elt_t &left_matrix(index site, int n) const {
+      return matrix_[site][n];
+    }
+    const elt_t &right_matrix(index site, int n) const {
       return matrix_[site+1][n];
     }
     matrix_array_t &left_matrices(index site) {

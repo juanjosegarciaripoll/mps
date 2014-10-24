@@ -86,7 +86,7 @@ namespace tensor_test {
         // and on each site we try random matrices and verify
         // that the total expectation value is the same one.
         for (index j = 0; j < 10; j++) {
-          Tensor psik = reshape(psi[i], psi[i].size());
+          Tensor psik = flatten(psi[i]);
           number psikHpsik = scprod(psik, mmult(H, psik));
           number psiHpsi = scprod(psi, apply(mpo, psi));
           EXPECT_CEQ(psiHpsi, psikHpsik);
@@ -117,11 +117,21 @@ namespace tensor_test {
         // and on each site we try random matrices and verify
         // that the total expectation value is the same one.
         for (index j = 0; j < 10; j++) {
-          Tensor psik = fold(psi[i-1],-1,psi[i],0);
-          psik = reshape(psik, psik.size());
-          number psikHpsik = scprod(psik, mmult(H, psik));
-          number psiHpsi = scprod(psi, apply(mpo, psi));
-          EXPECT_CEQ(psiHpsi, psikHpsik);
+
+          // for that we first use the two_site_matrix()
+          {
+            Tensor psik = flatten(fold(psi[i-1],-1,psi[i],0));
+            number psikHpsik = scprod(psik, mmult(H, psik));
+            number psiHpsi = scprod(psi, apply(mpo, psi));
+            EXPECT_CEQ(psiHpsi, psikHpsik);
+          }
+          // and then we use the light-weight application of the tensors
+          {
+            Tensor psik = fold(psi[i-1],-1,psi[i],0);
+            number psikHpsik = scprod(psik, qf.apply_two_site_matrix(psik, +1));
+            number psiHpsi = scprod(psi, apply(mpo, psi));
+            EXPECT_CEQ(psiHpsi, psikHpsik);
+          }
           psi.at(i-1).randomize();
           psi.at(i-1) = psi[i-1] / norm2(psi[i-1]);
           psi.at(i).randomize();

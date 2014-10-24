@@ -194,7 +194,7 @@ namespace mps {
 
   template<class MPO>
   const typename QuadraticForm<MPO>::elt_t
-  QuadraticForm<MPO>::single_site_matrix()
+  QuadraticForm<MPO>::single_site_matrix() const
   {
     elt_t output;
     for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
@@ -212,7 +212,7 @@ namespace mps {
 
   template<class MPO>
   const typename QuadraticForm<MPO>::elt_t
-  QuadraticForm<MPO>::two_site_matrix(int sense)
+  QuadraticForm<MPO>::two_site_matrix(int sense) const
   {
     elt_t output;
     index i, j;
@@ -237,6 +237,64 @@ namespace mps {
 	    const elt_t &vr = right_matrix(j, it2->right_ndx);
             if (!vl.is_empty() && !vr.is_empty())
               maybe_add(&output, compose(vl, it1->op, it2->op, vr));
+	  }
+      }
+    return output;
+  }
+
+  template<class MPO>
+  const typename QuadraticForm<MPO>::elt_t
+  QuadraticForm<MPO>::apply_two_site_matrix(const elt_t &P12, int sense) const
+  {
+    elt_t output;
+    index i, j;
+    if (sense > 0) {
+      i = here();
+      j = i+1;
+      assert(j < size());
+    } else {
+      j = here();
+      assert(j > 0);
+      i = j - 1;
+    }
+    elt_t aux;
+    for (pair_iterator_t it1 = pairs_[i].begin(), end1 = pairs_[i].end();
+	 it1 != end1;
+	 it1++)
+      {
+	for (pair_iterator_t it2 = pairs_[j].begin(), end2 = pairs_[j].end();
+	     it2 != end2;
+	     it2++)
+	  if (it1->right_ndx == it2->left_ndx) {
+            // L(a1,b1,a2,b2)
+	    const elt_t &L = left_matrix(i, it1->left_ndx);
+            // R(a3,b3,a1,b1)
+	    const elt_t &R = right_matrix(j, it2->right_ndx);
+            if (!L.is_empty() && !R.is_empty()) {
+              index a2 = L.dimension(2);
+              index b2 = L.dimension(3);
+              index a3 = R.dimension(0);
+              index b3 = R.dimension(1);
+              // Sometimes the input of this function may be a vector.
+              // In that case we reinterpret it.
+              if (P12.rank() == 1) {
+                index k = it1->op.dimension(1);
+                index l = it2->op.dimension(1);
+                aux = reshape(P12, b2, k, l, b3);
+              } else {
+                aux = P12;
+              }
+              // We implement this
+              // Q12(a2,i,a3) = L(a1,b1,a2,b2) O1(i,k) O2(j,l)
+              //                     P12(b2,k,l,b3) R(a3,b3,a1,b1)
+              // where a1=b1 = 1, because of periodic boundary conditions
+              elt_t Q12 =
+                fold(fold(reshape(L, a2,b2), -1,
+                            foldin(it1->op, -1,
+                                   foldin(it2->op, -1, aux, 2), 1), 0), 3,
+                       reshape(R, a3,b3), -1);
+              maybe_add(&output, Q12);
+            }
 	  }
       }
     return output;
