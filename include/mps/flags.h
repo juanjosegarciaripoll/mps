@@ -56,6 +56,8 @@ namespace mps {
 
   /**Flag keys for the solve() algorithms.*/
   extern const unsigned int MPS_SOLVE_ALGORITHM;
+  /**Flag key indicating what relative error is acceptable when inverting.*/
+  extern const unsigned int MPS_SOLVE_TOLERANCE;
 
 } // namespace mps
 

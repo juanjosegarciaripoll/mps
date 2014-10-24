@@ -46,5 +46,7 @@ namespace mps {
   const unsigned MPS_SIMPLIFY_ALGORITHM = FLAGS.create_key(MPS_SINGLE_SITE_ALGORITHM);
 
   const unsigned MPS_SOLVE_ALGORITHM = FLAGS.create_key(MPS_SINGLE_SITE_ALGORITHM);
+  const unsigned MPS_SOLVE_TOLERANCE = FLAGS.create_key(1e-10);
+
 }
 

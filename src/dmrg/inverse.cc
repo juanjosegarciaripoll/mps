@@ -30,8 +30,12 @@
 
 namespace mps {
 
-  template<class Tensor>
-  static const Tensor to_vector(const Tensor &v) { return reshape(v, v.size()); }
+  template<class QuadraticForm>
+  const typename QuadraticForm::elt_t
+  apply(const typename QuadraticForm::elt_t &x, QuadraticForm *qf, int sense)
+  {
+    return qf->apply_two_site_matrix(x, sense);
+  }
 
   /*
    * We solve the problem
@@ -47,6 +51,10 @@ namespace mps {
     bool single_site = FLAGS.get(MPS_SOLVE_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM;
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
     typedef typename MPS::elt_t Tensor;
+
+    if (tol <= 0) {
+      tol = mps::FLAGS.get(MPS_SOLVE_TOLERANCE);
+    }
 
     // We set Q in canonical form to "stabilize" all the transfer matrices.
     MPS Q = canonical_form(oQ, -1);
@@ -87,28 +95,34 @@ namespace mps {
         do {
           Heff = qf.single_site_matrix();
           vHQ = conj(lf.single_site_vector());
-          vP = linalg::solve_with_svd(Heff, to_vector(vHQ));
+          vP = linalg::solve_with_svd(Heff, flatten(vHQ));
           set_canonical(P, s.site(), reshape(vP, vHQ.dimensions()), s.sense());
           const Tensor &newP = P[s.site()];
           lf.propagate(newP, s.sense());
           qf.propagate(newP, newP, s.sense());
         } while(--s);
+        s.flip();
+        normHP = real(scprod(vP, mmult(Heff, vP)));
       } else {
         do {
-          Heff = qf.two_site_matrix(s.sense());
           vHQ = conj(lf.two_site_vector(s.sense()));
-          vP = linalg::solve_with_svd(Heff, to_vector(vHQ));
-          set_canonical_2_sites(P, reshape(vP, vHQ.dimensions()),
-                                s.site(), s.sense(), Dmax, tol);
+          if (s.sense()>0) {
+            vP = fold(P[s.site()], -1, P[s.site()+1], 0);
+          } else {
+            vP = fold(P[s.site()-1], -1, P[s.site()], 0);
+          }
+          vP = linalg::cgs(with_args(apply<QuadraticForm<MPO> >, &qf, s.sense()),
+                           vHQ, &vP, 2*vHQ.size(), tol);
+          set_canonical_2_sites(P, vP, s.site(), s.sense(), Dmax, tol);
           const Tensor &newP = P[s.site()];
           lf.propagate(newP, s.sense());
           qf.propagate(newP, newP, s.sense());
           --s;
         } while (!s.is_last());
+        s.flip();
+        normHP = real(scprod(vP, qf.apply_two_site_matrix(vP, s.sense())));
       }
-      s.flip();
-      normHP = real(scprod(vP, mmult(Heff, vP)));
-      scp = scprod(to_vector(vHQ), vP);
+      scp = scprod(vHQ, vP);
       olderr = err;
       err = normHP + normQ2 - 2*real(scp);
       if (olderr) {

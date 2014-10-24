@@ -58,7 +58,7 @@ namespace tensor_test {
     CMPO H = build_MPO(fH, dimensions(psi), &Hsp);
     CMPS Hpsi = apply(H, psi);
     CMPS xi = Hpsi;
-    solve(H, &xi, Hpsi, &sense, 1);
+    solve(H, &xi, Hpsi, &sense, 4);
     
     CTensor vxi = mps_to_vector(xi);
     CTensor vHxi = mmult(Hsp, vxi);
@@ -66,8 +66,8 @@ namespace tensor_test {
     double scp = tensor::abs(scprod(vHxi, vHxi)) / norm2(vHxi) / norm2(vHpsi);
     double err = norm2(vHxi - vHxi) / norm2(vHxi);
 
-    EXPECT_CEQ(err, 0.0);
-    EXPECT_CEQ(scp, 1.0);
+    EXPECT_CEQ3(err, 0.0, mps::FLAGS.get(MPS_SOLVE_TOLERANCE));
+    EXPECT_CEQ3(scp, 1.0, mps::FLAGS.get(MPS_SOLVE_TOLERANCE));
   }
 
   // Create a non-negative operator made of \sigma_x*\sigma_x interactions or
@@ -130,7 +130,7 @@ namespace tensor_test {
   ////////////////////////////////////////////////////////////
   // RQFORM
   //
-
+  /*
   TEST(CQForm, DiagonalLocal1site) {
     test_over_integers(2, 10, &try_over_states<CMPS,test_solve<diagonal_H>,false>);
   }
@@ -142,7 +142,7 @@ namespace tensor_test {
   TEST(CQForm, XXInt1site) {
     test_over_integers(2, 10, &try_over_states<CMPS,test_solve<xx_H>,false>);
   }
-
+  */
   TEST(CQForm, DiagonalLocal2site) {
     test_over_integers(2, 10, &try_over_states<CMPS,test_solve<diagonal_H>,true>);
   }
