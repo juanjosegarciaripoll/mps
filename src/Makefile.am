@@ -72,7 +72,7 @@ libmps_la_SOURCES = \
 	iTEBD/itebd_ghz_state.cc \
 	iTEBD/itebd_cluster_state.cc \
 	iTEBD/itebd_aklt_state.cc \
-	$(itebd_expected_slow) \
+	$(itebd_expected) \
 	iTEBD/itebd_energy_d.cc \
 	iTEBD/itebd_energy_z.cc \
 	mps/rmps.cc \
