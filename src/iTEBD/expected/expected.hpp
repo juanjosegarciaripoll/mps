@@ -31,14 +31,13 @@ namespace mps {
     } else {
       tensor::index a, i, b, j, c;
       const Tensor &AlA = psi.combined_matrix(site);
-      const Tensor &B = psi.matrix(site+1);
-      const Tensor &lB = psi.right_vector(site+1);
+      const Tensor &BlB = psi.combined_matrix(site+1);
       AlA.get_dimensions(&a, &i, &b);
-      B.get_dimensions(&b, &j, &c);
-      Tensor AlAB = reshape(fold(AlA, -1, B, 0), a, i*j, c);
+      BlB.get_dimensions(&b, &j, &c);
+      Tensor AlABlB = reshape(fold(AlA, -1, BlB, 0), a, i*j, c);
       Tensor v = psi.left_boundary(site);
-      typename Tensor::elt_t value = trace(propagate_right(v, AlAB, Op12));
-      typename Tensor::elt_t norm = trace(propagate_right(v, AlAB));
+      typename Tensor::elt_t value = trace(propagate_right(v, AlABlB, Op12));
+      typename Tensor::elt_t norm = trace(propagate_right(v, AlABlB));
       return value / real(norm);
     }
   }
@@ -54,19 +53,26 @@ namespace mps {
     } else if (!psi.is_canonical()) {
       return do_string_order(psi.canonical_form(), Opj, j, Opmiddle, Opi, i);
     } else {
-      int site = i;
-      Tensor v1 = psi.left_boundary(site);
+      j = j - i;
+      i = i & 1;
+      j = j + i;
+      Tensor v1 = psi.left_boundary(0);
       Tensor v2 = v1;
-      v1 = propagate_right(v1, psi.combined_matrix(site), Opi);
-      v2 = propagate_right(v2, psi.combined_matrix(site));
-      ++site;
-      while (site < j) {
-	v1 = propagate_right(v1, psi.combined_matrix(site), Opmiddle);
-	v2 = propagate_right(v2, psi.combined_matrix(site));
-	++site;
+      const Tensor none;
+      const Tensor *op;
+      for (int site = 0; (site <= j) || !(site & 1); ++site) {
+        if (site == i)
+          op = &Opi;
+        else if (site == j)
+          op = &Opj;
+        else if (site > i && site < j)
+          op = &Opmiddle;
+        else
+          op = &none;
+        v1 = propagate_right(v1, psi.combined_matrix(site), *op);
+        v2 = propagate_right(v2, psi.combined_matrix(site));
       }
-      return trace(propagate_right(v1, psi.combined_matrix(site), Opj)) /
-	trace(propagate_right(v2, psi.combined_matrix(site)));
+      return trace(v1) / trace(v2);
     }
   }
 
