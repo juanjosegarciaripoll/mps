@@ -62,6 +62,9 @@ namespace mps {
     if (M0.is_empty()) {
       return do_prop_init(Q, P, op);
     }
+    if (M0.rank() == 2) {
+      return do_prop_right(reshape(M0, 1,1,M0.dimension(0),M0.dimension(1)), Q, P, op);
+    }
     index a1,b1,a2,b2,i2,a3,b3;
     M0.get_dimensions(&a1, &b1, &a2, &b2);
     Q.get_dimensions(&a2, &i2, &a3);
@@ -81,6 +84,9 @@ namespace mps {
   {
     if (M0.is_empty()) {
       return do_prop_init(Q, P, op);
+    }
+    if (M0.rank() == 2) {
+      return do_prop_left(reshape(M0, M0.dimension(0),M0.dimension(1),1,1), Q, P, op);
     }
     index a1,b1,a2,b2,a0,b0,i0;
     M0.get_dimensions(&a1,&b1,&a2,&b2);
