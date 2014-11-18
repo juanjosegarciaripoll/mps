@@ -26,9 +26,9 @@ namespace mps {
   expected(const iTEBD<CTensor> &psi, const CTensor &Op, int site)
   {
     if (site & 1)
-      return string_order(psi, RTensor(), 0, RTensor(), Op, 1);
+      return string_order(psi, CTensor(), 0, CTensor(), Op, 1);
     else 
-      return string_order(psi, Op, 0, RTensor(), RTensor(), 1);
+      return string_order(psi, Op, 0, CTensor(), CTensor(), 1);
   }
 
 }
