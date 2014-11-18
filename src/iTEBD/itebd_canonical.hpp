@@ -168,7 +168,8 @@ namespace mps {
   }
 
   template<class Tensor>
-  iTEBD<Tensor>::iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance, tensor::index max_dim)
+  iTEBD<Tensor>::iTEBD(const Tensor &AB, const Tensor &lAB,
+                       double tolerance, tensor::index max_dim)
   : canonical_(true)
   {
     split_tensor<Tensor>(AB, lAB, &A_, &lA_, &B_, &lB_, tolerance, max_dim);
@@ -176,11 +177,92 @@ namespace mps {
     BlB_ = scale(B_, -1, lB_);
   }
 
+  /**********************************************************************
+   * CANONICAL FORM TWO SITES
+   */
+
+  template<class Tensor>
+  const Tensor px4(const Tensor &v, int sense, const Tensor *A, const Tensor *B)
+  {
+    return prop_matrix(prop_matrix(v, sense, *A, *A), sense, *B, *B);
+  }
+
+  template<class Tensor>
+  static Tensor
+  itebd_power_eig(const Tensor &A, const Tensor &lA, const Tensor &B, const Tensor &lB,
+                  int sense, tensor::index iter = 0, double tol = 1e-11)
+  {
+    typedef typename Tensor::elt_t elt_t;
+    tensor::index a = lB.size();
+    Tensor v = ((sense > 0)?
+                reshape(Tensor::eye(a), 1,1,a,a) :
+                reshape(Tensor::eye(a), a,a,1,1)) / (double)a;
+    if (sense > 0) {
+      Tensor A1 = scale(A, 0, lB);
+      Tensor A2 = scale(B, 0, lA);
+      linalg::eig_power(with_args(px4<Tensor>, sense, &A1, &A2), v.size(), &v);
+    } else {
+      Tensor A2 = scale(A, -1, lA);
+      Tensor A1 = scale(B, -1, lB);
+      linalg::eig_power(with_args(px4<Tensor>, sense, &A1, &A2), v.size(), &v);
+    }
+    v = reshape(v, a, a);
+    v = (v + adjoint(v)) / 2.0;
+    return v;
+  }
+
+  template<class Tensor>
+  static void
+  ortho_right(const Tensor &A, const Tensor &lA, const Tensor &B, const Tensor &lB,
+              Tensor *X, Tensor *Xinv)
+  {
+    Tensor v = itebd_power_eig(A, lA, B, lB, -1);
+    ortho_basis<Tensor>(v, X, Xinv);
+  }
+
+  template<class Tensor>
+  static void
+  ortho_left(const Tensor &A, const Tensor &lA, const Tensor &B, const Tensor &lB,
+             Tensor *Y, Tensor *Yinv)
+  {
+    Tensor v = itebd_power_eig(A, lA, B, lB, +1);
+    ortho_basis<Tensor>(v, Y, Yinv);
+  }
+
   template<class Tensor>
   const iTEBD<Tensor>
   iTEBD<Tensor>::canonical_form(double tolerance, tensor::index max_dim) const
   {
+#if 0
     return iTEBD<Tensor>(fold(AlA_, -1, B_, 0), lB_, tolerance, max_dim);
+#else
+    Tensor X;		/* X(b,c) */
+    Tensor Xinv;	/* Xinv(c,b) */
+    ortho_right<Tensor>(A_, lA_, B_, lB_, &X, &Xinv);
+
+    Tensor Y;		/* Y(a,d) */
+    Tensor Yinv;	/* Yinv(d,a) */
+    ortho_left<Tensor>(A_, lA_, B_, lB_, &Y, &Yinv);
+
+    /* We implement http://arxiv.org/pdf/0711.3960v4.pdf */
+
+    /* Xinv(c,a) (A*lA*B)(a,i,b) Yinv(d,b) -> (A'*lA*B')(c,i,d) */
+    Tensor newA = fold(Xinv, -1, A_, 0);
+    Tensor newB = fold(B_, -1, Yinv, -1);
+
+    /* Y(a,d) lB(b) X(b,c) = aux(d,c) */
+    Tensor aux = fold(Y, 0, scale(X, 0, lB_), 0);
+
+    /* aux(d,c) = U(d,x) l(x) V(x,c) */
+    Tensor U, V;
+    Tensor newlB = limited_svd(aux, &U, &V, tolerance, max_dim);
+
+    /* V(x,c) (A'*lA*B')(c,i,d) U(d,x') -> (A''*lA*B'')(x,i,x') */
+    newA = fold(V, -1, newA, 0);
+    newB = fold(newB, -1, U, 0);
+
+    return iTEBD<Tensor>(newA, lA_, newB, newlB, true);
+#endif
   }
 
   template<class Tensor>
@@ -203,14 +285,14 @@ namespace mps {
       GBA.get_dimensions(&a, &i, &j, &b);
       GBA = reshape(foldin(U, -1, reshape(GBA, a, i*j, b), 1), a, i, j, b);
       split_tensor(GBA, lA_, &B, &lB, &A, &lA, tolerance, max_dim);
-      return iTEBD<Tensor>(A, lA, B, lB, false);
+      return iTEBD<Tensor>(A, lA, B, lB, true);
     } else {
       Tensor GAB = fold(AlA_, -1, B_, 0);
       tensor::index a, i, j, b;
       GAB.get_dimensions(&a, &i, &j, &b);
       GAB = reshape(foldin(U, -1, reshape(GAB, a, i*j, b), 1), a, i, j, b);
       split_tensor(GAB, lB_, &A, &lA, &B, &lB, tolerance, max_dim);
-      return iTEBD<Tensor>(A, lA, B, lB, false);
+      return iTEBD<Tensor>(A, lA, B, lB, true);
     }
 #endif
   }
