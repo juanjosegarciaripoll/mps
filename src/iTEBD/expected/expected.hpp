@@ -24,14 +24,36 @@ namespace mps {
 
   template<class Tensor>
   static inline const typename Tensor::elt_t
+  do_expected12(const iTEBD<Tensor> &psi, const Tensor &Op12, int site)
+  {
+    if (!psi.is_canonical()) {
+      return do_expected12(psi.canonical_form(), Op12, site);
+    } else {
+      tensor::index a, i, b, j, c;
+      const Tensor &AlA = psi.combined_matrix(site);
+      const Tensor &B = psi.matrix(site+1);
+      const Tensor &lB = psi.right_vector(site+1);
+      AlA.get_dimensions(&a, &i, &b);
+      B.get_dimensions(&b, &j, &c);
+      Tensor AlAB = reshape(fold(AlA, -1, B, 0), a, i*j, c);
+      Tensor v = psi.left_boundary(site);
+      typename Tensor::elt_t value = trace(propagate_right(v, AlAB, Op12));
+      typename Tensor::elt_t norm = trace(propagate_right(v, AlAB));
+      return value / real(norm);
+    }
+  }
+
+  template<class Tensor>
+  static inline const typename Tensor::elt_t
   do_string_order(const iTEBD<Tensor> &psi,
 		  const Tensor &Opi, int i, const Tensor &Opmiddle,
 		  const Tensor &Opj, int j)
   {
     if (i > j) {
       return do_string_order(psi, Opj, j, Opmiddle, Opi, i);
+    } else if (!psi.is_canonical()) {
+      return do_string_order(psi.canonical_form(), Opj, j, Opmiddle, Opi, i);
     } else {
-      assert(psi.is_canonical());
       int site = i;
       Tensor v1 = psi.left_boundary(site);
       Tensor v2 = v1;

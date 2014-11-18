@@ -22,22 +22,13 @@
 
 namespace mps {
 
-  template<class Tensor>
-  static inline const typename Tensor::elt_t
-  do_expected12(const iTEBD<Tensor> &psi, const Tensor &Op12, int site)
+  double
+  expected(const RiTEBD &psi, const RTensor &Op, int site)
   {
-    tensor::index a, i, b, j, c;
-    const Tensor &AlA = psi.combined_matrix(site);
-    const Tensor &B = psi.matrix(site+1);
-    const Tensor &lB = psi.right_vector(site+1);
-    AlA.get_dimensions(&a, &i, &b);
-    B.get_dimensions(&b, &j, &c);
-    Tensor AlAB = reshape(fold(AlA, -1, B, 0), a, i*j, c);
-    Tensor v = psi.left_boundary(site);
-    typename Tensor::elt_t value = trace(propagate_right(v, AlAB, Op12));
-    typename Tensor::elt_t norm = trace(propagate_right(v, AlAB));
-    return value / real(norm);
+    if (site & 1)
+      return string_order(psi, RTensor(), 0, RTensor(), Op, 1);
+    else 
+      return string_order(psi, Op, 0, RTensor(), RTensor(), 1);
   }
 
 }
-

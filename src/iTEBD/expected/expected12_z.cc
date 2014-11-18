@@ -17,11 +17,11 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "itebd_expected12.cc"
+#include "expected12.hpp"
 
 namespace mps {
 
-  double expected12(const RiTEBD &psi, const RTensor &Op12, int site)
+  cdouble expected12(const CiTEBD &psi, const CTensor &Op12, int site)
   {
     return do_expected12(psi, Op12, site);
   }

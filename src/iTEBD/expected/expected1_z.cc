@@ -17,16 +17,18 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "itebd_string_order.cc"
+#include <mps/tools.h>
+#include <mps/itebd.h>
 
 namespace mps {
 
   cdouble
-  string_order(const iTEBD<CTensor> &psi,
-	       const CTensor &Opi, int i, const CTensor &Opmiddle,
-	       const CTensor &Opj, int j)
+  expected(const iTEBD<CTensor> &psi, const CTensor &Op, int site)
   {
-    return do_string_order(psi, Opj, j, Opmiddle, Opi, i);
+    if (site & 1)
+      return string_order(psi, RTensor(), 0, RTensor(), Op, 1);
+    else 
+      return string_order(psi, Op, 0, RTensor(), RTensor(), 1);
   }
 
 }

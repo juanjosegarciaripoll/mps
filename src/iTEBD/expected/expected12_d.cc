@@ -17,19 +17,13 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <mps/tools.h>
-#include <mps/itebd.h>
+#include "expected.hpp"
 
 namespace mps {
 
-  double
-  expected(const RiTEBD &psi, const RTensor &Op, int site)
+  double expected12(const RiTEBD &psi, const RTensor &Op12, int site)
   {
-    assert(psi.is_canonical());
-    RTensor v = psi.left_boundary(site);
-    double value = trace(propagate_right(v, psi.combined_matrix(site), Op));
-    double norm = trace(propagate_right(v, psi.combined_matrix(site)));
-    return value / real(norm);
+    return do_expected12(psi, Op12, site);
   }
 
 }

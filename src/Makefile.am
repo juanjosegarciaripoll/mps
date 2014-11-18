@@ -18,15 +18,15 @@ itebd_expected_slow = \
 	iTEBD/slow_expected/string_order_z.cc \
 	iTEBD/slow_expected/expected12_d.cc \
 	iTEBD/slow_expected/expected12_z.cc
-itebd_expected_wrong = \
-	iTEBD/itebd_expected1_d.cc \
-	iTEBD/itebd_expected1_z.cc \
-	iTEBD/itebd_expected2_d.cc \
-	iTEBD/itebd_expected2_z.cc \
-	iTEBD/itebd_string_order_d.cc \
-	iTEBD/itebd_string_order_z.cc \
-	iTEBD/itebd_expected12_d.cc \
-	iTEBD/itebd_expected12_z.cc
+itebd_expected = \
+	iTEBD/expected/expected1_d.cc \
+	iTEBD/expected/expected1_z.cc \
+	iTEBD/expected/expected2_d.cc \
+	iTEBD/expected/expected2_z.cc \
+	iTEBD/expected/string_order_d.cc \
+	iTEBD/expected/string_order_z.cc \
+	iTEBD/expected/expected12_d.cc \
+	iTEBD/expected/expected12_z.cc
 
 libmps_la_SOURCES = \
 	quantum/spin.cc \
