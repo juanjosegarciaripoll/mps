@@ -1,6 +1,6 @@
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
-    Copyright (c) 2012 Juan Jose Garcia Ripoll
+    Copyright (c) 2010 Juan Jose Garcia Ripoll
 
     Tensor is free software; you can redistribute it and/or modify it
     under the terms of the GNU Library General Public License as published
@@ -17,20 +17,21 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <mps/tools.h>
 #include <mps/itebd.h>
+#include <mps/tools.h>
 
-#include "itebd_expected_slow.hpp"
+#include "expected.hpp"
 
 namespace mps {
 
-  cdouble string_order(const CiTEBD &psi, const CTensor &Opi, int i,
-		       const CTensor &Opmiddle,
-		       const CTensor &Opj, int j)
+  cdouble expected12(const CiTEBD &psi, const CTensor &Op12, int site)
   {
-    return slow_string_order(Opi, i, Opmiddle, Opj, j,
-			     psi.matrix(0), psi.right_vector(0),
+    if (site & 1)
+      return slow_expected12(Op12, psi.matrix(1), psi.right_vector(1),
+			     psi.matrix(0), psi.right_vector(0));
+    else
+      return slow_expected12(Op12, psi.matrix(0), psi.right_vector(0),
 			     psi.matrix(1), psi.right_vector(1));
   }
 
-}
+} // namespace mps

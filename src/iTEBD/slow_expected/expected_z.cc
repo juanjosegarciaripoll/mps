@@ -20,18 +20,23 @@
 #include <mps/itebd.h>
 #include <mps/tools.h>
 
-#include "itebd_expected_slow.hpp"
+#include "expected.hpp"
 
 namespace mps {
 
-  cdouble expected12(const CiTEBD &psi, const CTensor &Op12, int site)
+  cdouble expected(const CiTEBD &psi, const CTensor &Op, int site)
   {
-    if (site & 1)
-      return slow_expected12(Op12, psi.matrix(1), psi.right_vector(1),
-			     psi.matrix(0), psi.right_vector(0));
+    if ((site % 2) == 0)
+      return expected(psi, Op, CTensor::eye(psi.matrix(1).dimension(1)));
     else
-      return slow_expected12(Op12, psi.matrix(0), psi.right_vector(0),
-			     psi.matrix(1), psi.right_vector(1));
+      return expected(psi, CTensor::eye(psi.matrix(0).dimension(1)), Op);
+  }
+
+  cdouble expected(const CiTEBD &psi, const CTensor &Op1, const CTensor &Op2)
+  {
+    return slow_expected12<CTensor>(Op1, Op2, psi.matrix(0),
+                                    psi.right_vector(0),
+                                    psi.matrix(1), psi.right_vector(1));
   }
 
 } // namespace mps

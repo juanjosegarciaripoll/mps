@@ -20,7 +20,7 @@
 #include <mps/itebd.h>
 #include <mps/tools.h>
 
-#include "itebd_expected_slow.hpp"
+#include "expected.hpp"
 
 namespace mps {
 

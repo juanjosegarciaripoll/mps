@@ -21,7 +21,6 @@
 #include <tensor/linalg.h>
 #include <tensor/io.h>
 #include <mps/itebd.h>
-#include "itebd_expected_slow.hpp"
 
 namespace mps {
 

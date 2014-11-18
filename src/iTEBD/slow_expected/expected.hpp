@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#ifndef ITEBD_SLOW_EXPECTED_HPP
 #include <mps/itebd.h>
 #include <mps/tools.h>
 
@@ -164,3 +165,5 @@ namespace mps {
   }
 
 } // namespace mps
+
+#endif // ITEBD_SLOW_EXPECTED_HPP

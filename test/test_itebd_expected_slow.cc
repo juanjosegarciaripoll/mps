@@ -18,7 +18,7 @@
 */
 
 #include "loops.h"
-#include "../src/iTEBD/itebd_expected_slow.hpp"
+#include "../src/iTEBD/slow_expected/expected.hpp"
 #include <gtest/gtest.h>
 #include <mps/itebd.h>
 #include <mps/tools.h>
