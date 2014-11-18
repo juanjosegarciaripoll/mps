@@ -182,8 +182,8 @@ private:
 
   /** String order parameter between sites 'i' and 'j', both included. */
   cdouble string_order(const CiTEBD &psi, const CTensor &Opi, int i,
-                      const CTensor &Opmiddle,
-                      const CTensor &Opj, int j);
+                       const CTensor &Opmiddle,
+                       const CTensor &Opj, int j);
 
   /** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
   cdouble expected12(const CiTEBD &psi, const CTensor &Op12, int site = 0);
