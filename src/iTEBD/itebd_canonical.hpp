@@ -54,7 +54,7 @@ namespace mps {
      *		|b> = U(b,c) |c>
      * we obtain, given <c|c'>=delta(c,c')
      *		V(b,b') = U(b,c) * U*(b',c') <c|c'> = U * U'
-     * so that U = R * sqrt(s)
+     * so that U = R * sqrt(s) and V = U * U';
      */
     Tensor R;
     Tensor s = abs(linalg::eig_sym(V, &R));
@@ -118,16 +118,18 @@ namespace mps {
     Tensor Yinv;	/* Yinv(d,a) */
     ortho_left<Tensor>(G, l, &Y, &Yinv);
 
-    /* Xinv(d,a) G(a,i,b) Yinv(b,c) -> G(d,i,c) */
+    /* We implement http://arxiv.org/pdf/0711.3960v4.pdf */
+
+    /* Xinv(c,a) G(a,i,b) Yinv(d,b) -> G(c,i,d) */
     G = fold(Xinv, -1, fold(G, -1, Yinv, -1), 0);
 
-    /* Y(a,d) l(a)delta(a,b) X(b,c) = aux(c,d) */
+    /* Y(a,d) l(b) X(b,c) = aux(d,c) */
     Tensor aux = fold(Y, 0, scale(X, 0, l), 0);
 
-    /* l(c,d) = U(c,x) l(x) V(x,d) */
+    /* aux(d,c) = U(d,x) l(x) V(x,c) */
     Tensor U, V;
     *plout = limited_svd(aux, &U, &V, tolerance, max_dim);
-    /* V(x,d) G(d,i,c) U(c,x') -> G(x,i,x') */
+    /* V(x,c) G(c,i,d) U(d,x') -> G(x,i,x') */
     *pGout = fold(fold(V, -1, G, 0), -1, U, 0);
   }
 
