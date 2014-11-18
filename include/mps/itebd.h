@@ -163,6 +163,11 @@ private:
                       const RTensor &Opmiddle,
                       const RTensor &Opj, int j);
 
+  /** String order parameter between sites '0' and up to 'N-1', both included. */
+  RTensor string_order(const RiTEBD &psi, const RTensor &Opi,
+                       const RTensor &Opmiddle,
+                       const RTensor &Opj, int N);
+
   /** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
   double expected12(const RiTEBD &psi, const RTensor &Op12, int site = 0);
 
@@ -184,6 +189,11 @@ private:
   cdouble string_order(const CiTEBD &psi, const CTensor &Opi, int i,
                        const CTensor &Opmiddle,
                        const CTensor &Opj, int j);
+
+  /** String order parameter between sites '0' and up to 'N-1', both included. */
+  CTensor string_order(const CiTEBD &psi, const CTensor &Opi,
+                       const CTensor &Opmiddle,
+                       const CTensor &Opj, int N);
 
   /** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
   cdouble expected12(const CiTEBD &psi, const CTensor &Op12, int site = 0);

@@ -59,10 +59,12 @@ namespace mps {
 		  const Tensor &Opi, int i, const Tensor &Opmiddle,
 		  const Tensor &Opj, int j)
   {
-    if (i > j) {
+    if (i == j) {
+      return expected(psi, mmult(Opi, Opj), i);
+    } else if (i > j) {
       return do_string_order(psi, Opj, j, Opmiddle, Opi, i);
     } else if (!psi.is_canonical()) {
-      return do_string_order(psi.canonical_form(), Opj, j, Opmiddle, Opi, i);
+      return do_string_order(psi.canonical_form(), Opi, i, Opmiddle, Opj, j);
     } else {
       j = j - i;
       i = i & 1;
@@ -84,6 +86,46 @@ namespace mps {
         v2 = propagate_right(v2, psi.combined_matrix(site));
       }
       return trace(v1) / trace(v2);
+    }
+  }
+
+  template<class Tensor>
+  static inline const Tensor
+  do_string_order_many(const iTEBD<Tensor> &psi,
+                       const Tensor &Opi, const Tensor &Opmiddle,
+                       const Tensor &Opj, int N)
+  {
+    if (!psi.is_canonical()) {
+      return do_string_order_many(psi.canonical_form(), Opi, Opmiddle, Opj, N);
+    } else {
+      Tensor v1 = psi.left_boundary(0);
+      Tensor v2 = v1;
+      Tensor output(N);
+      Tensor nextv2;
+      for (int site = 0; (site < N); ++site) {
+        const Tensor &aux = psi.combined_matrix(site);
+        Tensor v = propagate_right(v1, aux, site? Opj : mmult(Opi,Opj));
+        if (nextv2.size()) {
+          v2 = nextv2;
+        } else {
+          v2 = propagate_right(v2, aux);
+        }
+        if (!(site & 1)) {
+          const Tensor &aux = psi.combined_matrix(site+1);
+          nextv2 = propagate_right(v2, aux);
+          v = propagate_right(v, aux);
+          output.at(site) = trace(v) / trace(nextv2);
+        } else {
+          nextv2 = Tensor();
+          output.at(site) = trace(v) / trace(v2);
+        }
+        if (site) {
+          v1 = propagate_right(v1, aux, Opmiddle);
+        } else {
+          v1 = propagate_right(v1, aux, Opi);
+        }
+      }
+      return output;
     }
   }
 

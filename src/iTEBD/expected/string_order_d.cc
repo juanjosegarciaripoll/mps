@@ -26,7 +26,7 @@ namespace mps {
 	       const RTensor &Opi, int i, const RTensor &Opmiddle,
 	       const RTensor &Opj, int j)
   {
-    return do_string_order(psi, Opj, j, Opmiddle, Opi, i);
+    return do_string_order(psi, Opi, i, Opmiddle, Opj, j);
   }
 
 }

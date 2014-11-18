@@ -25,6 +25,8 @@ itebd_expected = \
 	iTEBD/expected/expected2_z.cc \
 	iTEBD/expected/string_order_d.cc \
 	iTEBD/expected/string_order_z.cc \
+	iTEBD/expected/string_order_many_d.cc \
+	iTEBD/expected/string_order_many_z.cc \
 	iTEBD/expected/expected12_d.cc \
 	iTEBD/expected/expected12_z.cc
 

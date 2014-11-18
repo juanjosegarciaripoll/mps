@@ -21,12 +21,11 @@
 
 namespace mps {
 
-  cdouble
-  string_order(const iTEBD<CTensor> &psi,
-	       const CTensor &Opi, int i, const CTensor &Opmiddle,
-	       const CTensor &Opj, int j)
+  RTensor
+  string_order(const iTEBD<RTensor> &psi,
+	       const RTensor &Opi, const RTensor &Opmiddle, const RTensor &Opj, int N)
   {
-    return do_string_order(psi, Opi, i, Opmiddle, Opj, j);
+    return do_string_order_many(psi, Opi, Opmiddle, Opj, N);
   }
 
 }
