@@ -53,7 +53,7 @@ namespace mps {
 
   const unsigned MPS_ITEBD_CANONICAL_EXPECTED = 1;
   const unsigned MPS_ITEBD_SLOW_EXPECTED = 1;
-  const unsgined MPS_ITEBD_EXPECTED_METHOD = FLAGS.create_key(MPS_ITEBD_SLOW_EXPECTED);
+  const unsigned MPS_ITEBD_EXPECTED_METHOD = FLAGS.create_key(MPS_ITEBD_SLOW_EXPECTED);
 
 }
 
