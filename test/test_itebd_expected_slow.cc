@@ -18,7 +18,6 @@
 */
 
 #include "loops.h"
-#include "../src/iTEBD/slow_expected/expected.hpp"
 #include <gtest/gtest.h>
 #include <mps/itebd.h>
 #include <mps/tools.h>
@@ -65,9 +64,13 @@ namespace tensor_test {
     iTEBD<t> psi = test_state(&H12);
     iTEBD<t> psic = psi.canonical_form();
 
+    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_SLOW_EXPECTED);
+    typename t::elt_t slow_exp = expected12(psi, H12);
+
+    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
     EXPECT_TRUE(simeq(expected12(psi, H12), expected12(psic, H12), 2e-6));
-    EXPECT_TRUE(simeq(expected12(psi, H12), slow_expected12(psi, H12), 2e-6));
-    EXPECT_TRUE(simeq(expected12(psic, H12), slow_expected12(psi, H12), 2e-6));
+    EXPECT_TRUE(simeq(expected12(psi, H12), slow_exp, 2e-6));
+    EXPECT_TRUE(simeq(expected12(psic, H12), slow_exp, 2e-6));
 
     /*
     std::cout << expected12(psi, H12) << std::endl
@@ -76,9 +79,13 @@ namespace tensor_test {
 	      << slow_expected12(psi, H12) << std::endl;
     */
 
+    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_SLOW_EXPECTED);
+    typename t::elt_t slow_E = energy(psi, H12);
+
+    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
     EXPECT_TRUE(simeq(energy(psi, H12), energy(psic, H12), 2e-6));
-    EXPECT_TRUE(simeq(energy(psi, H12), slow_energy(psi, H12), 2e-6));
-    EXPECT_TRUE(simeq(energy(psic, H12), slow_energy(psi, H12), 2e-6));
+    EXPECT_TRUE(simeq(energy(psi, H12), slow_E, 2e-6));
+    EXPECT_TRUE(simeq(energy(psic, H12), slow_E, 2e-6));
   }
 
   ////////////////////////////////////////////////////////////

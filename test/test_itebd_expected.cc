@@ -42,6 +42,7 @@ namespace tensor_test {
   template<class Tensor>
   void test_expected_product_norm(int d)
   {
+    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
     for (int i = 1; i < 100; i++) {
       Tensor id = Tensor::eye(d,d);
       typename Tensor::elt_t one = id(0,0);
@@ -76,6 +77,7 @@ namespace tensor_test {
   template<class Tensor>
   void test_expected_projectors(int d)
   {
+    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
     for (int i = 1; i < 100; i++) {
       Tensor A, B;
       iTEBD<Tensor> psi = random_product<Tensor>(d, true, &A, &B);
@@ -116,6 +118,7 @@ namespace tensor_test {
   template<class Tensor>
   void test_expected12_projectors(int d)
   {
+    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
     for (int i = 1; i < 100; i++) {
       Tensor A, B;
       iTEBD<Tensor> psi = random_product<Tensor>(d, false, &A, &B);
@@ -156,6 +159,7 @@ namespace tensor_test {
   template<class Tensor>
   void test_energy_projectors(int d)
   {
+    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
     for (int i = 1; i < 100; i++) {
       Tensor A, B;
       iTEBD<Tensor> psi = random_product<Tensor>(d, true, &A, &B);
@@ -184,6 +188,7 @@ namespace tensor_test {
   template<class Tensor>
   void test_aklt_string_order(int i)
   {
+    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
     iTEBD<Tensor> psi = infinite_aklt_state();
     Tensor Sz = RTensor(igen << 3 << 3,
                         rgen << 1 << 0 << 0
