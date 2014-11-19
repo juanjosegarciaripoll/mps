@@ -9,10 +9,6 @@ AM_CPPFLAGS = \
 #
 lib_LTLIBRARIES = libmps.la
 
-itebd_expected = \
-	iTEBD/expected/string_order_many_d.cc \
-	iTEBD/expected/string_order_many_z.cc
-
 libmps_la_SOURCES = \
 	quantum/spin.cc \
 	quantum/fock.cc \
@@ -67,6 +63,8 @@ libmps_la_SOURCES = \
 	iTEBD/itebd_expected12_z.cc \
 	iTEBD/itebd_energy_d.cc \
 	iTEBD/itebd_energy_z.cc \
+	iTEBD/itebd_string_order_many_d.cc \
+	iTEBD/itebd_string_order_many_z.cc \
 	mps/rmps.cc \
 	mps/rmps_random.cc \
 	mps/rmps_product_state.cc \
