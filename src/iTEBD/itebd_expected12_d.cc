@@ -19,6 +19,7 @@
 
 #include <mps/flags.h>
 #include "slow_expected.hpp"
+#include "bdry_expected.hpp"
 #include "canonical_expected.hpp"
 
 namespace mps {
@@ -27,8 +28,10 @@ namespace mps {
   {
     if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_CANONICAL_EXPECTED) {
       return do_expected12(psi, Op12, site);
-    } else {
+    } else if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_SLOW_EXPECTED){
       return slow_expected12(psi, Op12, site);
+    } else {
+      return bdry_expected12(psi, Op12, site);
     }
   }
 

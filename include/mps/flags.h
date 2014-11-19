@@ -63,8 +63,10 @@ namespace mps {
 
   /**iTEBD expectation values assuming canonical form.*/
   extern const unsigned int MPS_ITEBD_CANONICAL_EXPECTED;
-  /**iTEBD expectation values computing boundary conditions.*/
+  /**iTEBD expectation values computing powers of transfer matrices.*/
   extern const unsigned int MPS_ITEBD_SLOW_EXPECTED;
+  /**iTEBD expectation values computing boundary states by power method.*/
+  extern const unsigned int MPS_ITEBD_BDRY_EXPECTED;
   /**iTEBD expectation value method selector.*/
   extern const unsigned int MPS_ITEBD_EXPECTED_METHOD;
 

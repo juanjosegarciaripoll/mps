@@ -18,6 +18,7 @@
 */
 
 #ifndef ITEBD_SLOW_EXPECTED_HPP
+#define ITEBD_SLOW_EXPECTED_HPP
 #include <mps/itebd.h>
 #include <mps/tools.h>
 
