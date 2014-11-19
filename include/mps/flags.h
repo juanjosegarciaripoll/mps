@@ -61,6 +61,13 @@ namespace mps {
   /**Flag key indicating what relative error is acceptable when inverting.*/
   extern const unsigned int MPS_SOLVE_TOLERANCE;
 
+  /**iTEBD expectation values assuming canonical form.*/
+  extern const unsigned int MPS_ITEBD_CANONICAL_EXPECTED;
+  /**iTEBD expectation values computing boundary conditions.*/
+  extern const unsigned int MPS_ITEBD_SLOW_EXPECTED;
+  /**iTEBD expectation value method selector.*/
+  extern const unsigned int MPS_ITEBD_EXPECTED_METHOD;
+
 } // namespace mps
 
 #endif // MPS_FLAGS_H
