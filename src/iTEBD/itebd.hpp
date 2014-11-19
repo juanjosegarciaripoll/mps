@@ -82,8 +82,13 @@ namespace mps {
   template<class Tensor>
   double iTEBD<Tensor>::entropy(int site) const
   {
-    Tensor lambda = left_vector(site);
-    return mps::entropy(tensor::abs(lambda*lambda));
+    if (!is_canonical()) {
+      return canonical_form().entropy();
+    } else {
+      /* In canonical form, the 'lA' is the vector of Schmidt coefficients
+       * for the bipartition in between sites A and B */
+      return mps::entropy(tensor::abs(lA_*lA_));
+    }
   }
 
   template<class Tensor>
