@@ -46,26 +46,8 @@ namespace mps {
   }
 
   template<class t>
-  static inline typename t::elt_t slow_expected12(const t &Op1, const t &Op2, t A, const t &lA)
-  {
-    A = scale(A, -1, lA);
-    t R0 = build_E_matrix(A);
-    t R = infinite_power<t>(R0);
-    t R1 = build_E_matrix(foldin(Op1, -1, A, 1), A);
-    t R2 = build_E_matrix(foldin(Op2, -1, A, 1), A);
-    typename t::elt_t N = trace(mmult(R0, mmult(R0, R)));
-    typename t::elt_t E = trace(mmult(R1, mmult(R2, R)));
-    return (E / N);
-  }
-
-  template<class t>
   static inline typename t::elt_t slow_string_order(const t &Op1, int i, const t &Opmid, const t &Op2, int j, const t &A, const t &lA, const t &B, const t &lB)
   {
-     if (i == j) {
-       return slow_string_order(mmult(Op1, Op2), i, Opmid,
-                                t::eye(Op2.rows()), i+1,
-                                A, lA, B, lB);
-     }
      if (i > j)
        return slow_string_order(Op2, j, Opmid, Op1, i, A, lA, B, lB);
 
@@ -86,16 +68,20 @@ namespace mps {
     for (int k = first; k <= last; k++) {
       const t &AorB = (k & 1)? BlB : AlA;
       const t &E = (k & 1)? EB : EA;
-      if (k < i || k > j)
+      if (k < i || k > j) {
         Op = t();
-      else if (k == i)
-        Op = Op1;
-      else if (k == j)
+      } else if (k == i) {
+        if (i == j)
+          Op = mmult(Op1, Op2);
+        else
+          Op = Op1;
+      } else if (k == j) {
         Op = Op2;
-      else
+      } else {
         Op = Opmid;
+      }
       if (Op.is_empty())
-         R1 = mmult(R1, E);
+        R1 = mmult(R1, E);
       else
         R1 = mmult(R1, build_E_matrix(foldin(Op, -1, AorB, 1), AorB));
       R0 = mmult(R0, E);
