@@ -70,6 +70,8 @@ namespace mps {
     /** Matrix representation of the quadratic form with respect to
 	sites here() and here()+1.*/
     const elt_t two_site_matrix(int sense = +1) const;
+    /** Apply the two_site_matrix() onto a tensor representing one site. */
+    const elt_t apply_one_site_matrix(const elt_t &P) const;
     /** Apply the two_site_matrix() onto a tensor representing two sites. */
     const elt_t apply_two_site_matrix(const elt_t &P12, int sense = +1) const;
 

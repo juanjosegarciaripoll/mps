@@ -244,6 +244,44 @@ namespace mps {
 
   template<class MPO>
   const typename QuadraticForm<MPO>::elt_t
+  QuadraticForm<MPO>::apply_one_site_matrix(const elt_t &P) const
+  {
+    elt_t output, aux;
+    for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
+	 it != end;
+	 it++)
+      {
+        // L(a1,b1,a2,b2)
+        const elt_t &L = left_matrix(here(), it->left_ndx);
+        // R(a3,b3,a1,b1)
+        const elt_t &R = right_matrix(here(), it->right_ndx);
+        if (!L.is_empty() && !R.is_empty()) {
+          index a2 = L.dimension(2);
+          index b2 = L.dimension(3);
+          index a3 = R.dimension(0);
+          index b3 = R.dimension(1);
+          // Sometimes the input of this function may be a vector.
+          // In that case we reinterpret it.
+          if (P.rank() == 1) {
+            index k = it->op.dimension(1);
+            aux = reshape(P, b2, k, b3);
+          } else {
+            aux = P;
+          }
+          // We implement this
+          // Q(a2,i,a3) = L(a1,b1,a2,b2) O1(i,k) P(b2,k,b3) R(a3,b3,a1,b1)
+          // where a1=b1 = 1, because of periodic boundary conditions
+          elt_t Q =
+            fold(fold(reshape(L, a2,b2), 1, foldin(it->op, -1, aux, 1), 0), 2,
+                 reshape(R, a3,b3), 1);
+          maybe_add(&output, Q);
+        }
+      }
+    return output;
+  }
+
+  template<class MPO>
+  const typename QuadraticForm<MPO>::elt_t
   QuadraticForm<MPO>::apply_two_site_matrix(const elt_t &P12, int sense) const
   {
     elt_t output;
@@ -299,5 +337,4 @@ namespace mps {
       }
     return output;
   }
-
 }
