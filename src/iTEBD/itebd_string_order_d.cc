@@ -17,20 +17,24 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <mps/tools.h>
-#include <mps/itebd.h>
-
-#include "expected.hpp"
+#include <mps/flags.h>
+#include "slow_expected.hpp"
+#include "canonical_expected.hpp"
 
 namespace mps {
 
-  cdouble string_order(const CiTEBD &psi, const CTensor &Opi, int i,
-		       const CTensor &Opmiddle,
-		       const CTensor &Opj, int j)
+  double
+  string_order(const iTEBD<RTensor> &psi,
+	       const RTensor &Opi, int i, const RTensor &Opmiddle,
+	       const RTensor &Opj, int j)
   {
-    return slow_string_order(Opi, i, Opmiddle, Opj, j,
-			     psi.matrix(0), psi.right_vector(0),
-			     psi.matrix(1), psi.right_vector(1));
+    if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_CANONICAL_EXPECTED) {
+      return do_string_order(psi, Opi, i, Opmiddle, Opj, j);
+    } else {
+      return slow_string_order(Opi, i, Opmiddle, Opj, j,
+                               psi.matrix(0), psi.right_vector(0),
+                               psi.matrix(1), psi.right_vector(1));
+    }
   }
 
 }

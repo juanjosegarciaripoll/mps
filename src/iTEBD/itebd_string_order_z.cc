@@ -17,7 +17,9 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "expected.hpp"
+#include <mps/flags.h>
+#include "slow_expected.hpp"
+#include "canonical_expected.hpp"
 
 namespace mps {
 
@@ -26,7 +28,13 @@ namespace mps {
 	       const CTensor &Opi, int i, const CTensor &Opmiddle,
 	       const CTensor &Opj, int j)
   {
-    return do_string_order(psi, Opi, i, Opmiddle, Opj, j);
+    if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_CANONICAL_EXPECTED) {
+      return do_string_order(psi, Opi, i, Opmiddle, Opj, j);
+    } else {
+      return slow_string_order(Opi, i, Opmiddle, Opj, j,
+                               psi.matrix(0), psi.right_vector(0),
+                               psi.matrix(1), psi.right_vector(1));
+    }
   }
 
 }

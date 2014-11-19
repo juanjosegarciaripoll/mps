@@ -17,13 +17,20 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "expected.hpp"
+#include <mps/flags.h>
+#include "slow_expected.hpp"
+#include "canonical_expected.hpp"
 
 namespace mps {
 
   double expected12(const RiTEBD &psi, const RTensor &Op12, int site)
   {
-    return do_expected12(psi, Op12, site);
+    if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_CANONICAL_EXPECTED) {
+      return do_expected12(psi, Op12, site);
+    } else {
+      return slow_expected12(psi, Op12, site);
+    }
   }
 
-}
+} // namespace mps
+

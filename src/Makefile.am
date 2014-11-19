@@ -9,26 +9,9 @@ AM_CPPFLAGS = \
 #
 lib_LTLIBRARIES = libmps.la
 
-itebd_expected_slow = \
-	iTEBD/slow_expected/expected_d.cc \
-	iTEBD/slow_expected/expected_z.cc \
-	iTEBD/slow_expected/expected2_d.cc \
-	iTEBD/slow_expected/expected2_z.cc \
-	iTEBD/slow_expected/string_order_d.cc \
-	iTEBD/slow_expected/string_order_z.cc \
-	iTEBD/slow_expected/expected12_d.cc \
-	iTEBD/slow_expected/expected12_z.cc
 itebd_expected = \
-	iTEBD/expected/expected1_d.cc \
-	iTEBD/expected/expected1_z.cc \
-	iTEBD/expected/expected2_d.cc \
-	iTEBD/expected/expected2_z.cc \
-	iTEBD/expected/string_order_d.cc \
-	iTEBD/expected/string_order_z.cc \
 	iTEBD/expected/string_order_many_d.cc \
-	iTEBD/expected/string_order_many_z.cc \
-	iTEBD/expected/expected12_d.cc \
-	iTEBD/expected/expected12_z.cc
+	iTEBD/expected/string_order_many_z.cc
 
 libmps_la_SOURCES = \
 	quantum/spin.cc \
@@ -74,7 +57,14 @@ libmps_la_SOURCES = \
 	iTEBD/itebd_ghz_state.cc \
 	iTEBD/itebd_cluster_state.cc \
 	iTEBD/itebd_aklt_state.cc \
-	$(itebd_expected_slow) \
+	iTEBD/itebd_string_order_d.cc \
+	iTEBD/itebd_string_order_z.cc \
+	iTEBD/itebd_expected1_d.cc \
+	iTEBD/itebd_expected1_z.cc \
+	iTEBD/itebd_expected2_d.cc \
+	iTEBD/itebd_expected2_z.cc \
+	iTEBD/itebd_expected12_d.cc \
+	iTEBD/itebd_expected12_z.cc \
 	iTEBD/itebd_energy_d.cc \
 	iTEBD/itebd_energy_z.cc \
 	mps/rmps.cc \
