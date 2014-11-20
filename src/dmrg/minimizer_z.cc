@@ -17,33 +17,19 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef MPS_MINIMIZER_H
-#define MPS_MINIMIZER_H
-
-#include <mps/mps.h>
-#include <mps/mpo.h>
+#include "minimizer.cc"
 
 namespace mps {
 
-  struct MinimizerOptions {
+  double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt)
+  {
+    Minimizer<CMPO> min(opt, H, *psi);
+    return min.full_sweep(psi);
+  }
 
-    MinimizerOptions() :
-      sweeps(32), display(false), debug(false), tolerance(1e-10),
-      svd_tolerance(1e-11), allow_E_growth(1), Dmax(0)
-    {}
+  double minimize(const CMPO &H, CMPS *psi)
+  {
+    return minimize(H, psi, MinimizerOptions());
+  }
 
-    index sweeps;
-    bool display;
-    index debug;
-    double tolerance;
-    double svd_tolerance;
-    int allow_E_growth;
-    index Dmax;
-  };
-
-  double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt);
-  double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt);
-
-} // namespace dmrg
-
-#endif /* !MPS_MINIMIZER_H */
+} // namespace mps

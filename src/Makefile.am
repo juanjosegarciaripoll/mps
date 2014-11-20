@@ -137,4 +137,7 @@ libmps_la_SOURCES = \
 	dmrg/rdmrg.cc \
 	dmrg/cdmrg.cc \
 	dmrg/inverse_d.cc \
-	dmrg/inverse_z.cc
+	dmrg/inverse_z.cc \
+	dmrg/minimizer_d.cc \
+	dmrg/minimizer_z.cc
+
