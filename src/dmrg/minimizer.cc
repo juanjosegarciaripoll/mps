@@ -31,9 +31,9 @@ namespace mps {
   }
 
   template<class Tensor, class QForm>
-  const Tensor apply_qform2(const Tensor &P, const Indices *d, const QForm *qform)
+  const Tensor apply_qform2(const Tensor &P, int sense, const Indices *d, const QForm *qform)
   {
-    return reshape(qform->apply_two_site_matrix(reshape(P, *d)), P.size());
+    return reshape(qform->apply_two_site_matrix(reshape(P, *d), sense), P.size());
   }
 
   template<class MPO>
@@ -103,9 +103,12 @@ namespace mps {
     }
 
     double two_site_step() {
-      tensor_t P12 = fold(psi[site], -1, psi[site+1], 0);
+      tensor_t P12 =
+        (step > 0) ?
+        fold(psi[site], -1, psi[site+1], 0) :
+        fold(psi[site-1], -1, psi[site], 0);
       const Indices d = P12.dimensions();
-      tensor_t E = linalg::eigs(with_args(apply_qform2<tensor_t,qform_t>, &d, &Hqform),
+      tensor_t E = linalg::eigs(with_args(apply_qform2<tensor_t,qform_t>, step, &d, &Hqform),
                                 P12.size(), linalg::SmallestAlgebraic, 1, &P12,
                                 &converged);
       if (converged) {
@@ -126,11 +129,9 @@ namespace mps {
 	}
 	step = -1;
       } else {
-	site = size()-1;
-	do {
-	  site--;
+        for (site = size()-1; site; site--) {
 	  E = two_site_step();
-	} while (site);
+	}
 	step = +1;
       }
       return E;
@@ -142,6 +143,10 @@ namespace mps {
 
     double full_sweep(mps_t *psi) {
       double E = 1e28;
+      if (debug) {
+        std::cout << "***\n*** Algorithm with " << size() << " sites, " << Dmax
+                  << "two-sites = " << !single_site() << std::endl;
+      }
       for (index failures = 0, i = 0; i < sweeps; i++) {
         double newE = single_site()? single_site_sweep() : two_site_sweep();
         if (debug) {
