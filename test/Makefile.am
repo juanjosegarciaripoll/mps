@@ -131,6 +131,11 @@ check_PROGRAMS += test_time_solver_arnoldi
 test_time_solver_arnoldi_SOURCES = test_time_solver_arnoldi.cc
 test_time_solver_arnoldi_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
+TESTS += test_mps_minimizer
+check_PROGRAMS += test_mps_minimizer
+test_mps_minimizer_SOURCES = test_mps_minimizer.cc
+test_mps_minimizer_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
+
 TESTS += test_dmrg
 check_PROGRAMS += test_dmrg
 test_dmrg_SOURCES = test_dmrg.cc

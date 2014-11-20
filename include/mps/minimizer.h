@@ -44,6 +44,9 @@ namespace mps {
   double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt);
   double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt);
 
+  double minimize(const RMPO &H, RMPS *psi);
+  double minimize(const CMPO &H, CMPS *psi);
+
 } // namespace dmrg
 
 #endif /* !MPS_MINIMIZER_H */

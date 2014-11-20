@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <tensor/io.h>
 #include <tensor/linalg.h>
 #include <mps/minimizer.h>
 #include <mps/qform.h>
@@ -24,15 +25,15 @@
 namespace mps {
 
   template<class Tensor, class QForm>
-  const Tensor apply_qform1(const Tensor &P, const QForm *qform)
+  const Tensor apply_qform1(const Tensor &P, const Indices *d, const QForm *qform)
   {
-    return qform->apply_one_site_matrix(P);
+    return reshape(qform->apply_one_site_matrix(reshape(P, *d)), P.size());
   }
 
   template<class Tensor, class QForm>
-  const Tensor apply_qform2(const Tensor &P, const QForm *qform)
+  const Tensor apply_qform2(const Tensor &P, const Indices *d, const QForm *qform)
   {
-    return qform->apply_two_site_matrix(P);
+    return reshape(qform->apply_two_site_matrix(reshape(P, *d)), P.size());
   }
 
   template<class MPO>
@@ -47,6 +48,7 @@ namespace mps {
     qform_t Hqform;
     index site;
     int step;
+    bool converged;
 
     Minimizer(const MinimizerOptions &opt, const mpo_t &H, const mps_t &state) :
       MinimizerOptions(opt),
@@ -54,7 +56,7 @@ namespace mps {
       Hqform(H, psi, psi, 0),
       site(0),
       step(+1)
-    {}
+    { debug = 1; }
 
     ~Minimizer()
     {}
@@ -69,11 +71,16 @@ namespace mps {
 
     double single_site_step() {
       tensor_t P = psi[site];
-      P = reshape(P, P.size());
-      tensor_t E = linalg::eigs(with_args(apply_qform1<tensor_t,qform_t>, &Hqform),
-                                P.size(), linalg::SmallestAlgebraic, 1, &P);
-      set_canonical(psi, site, reshape(P, psi[site].dimensions()), step);
+      const Indices d = P.dimensions();
+      tensor_t E = linalg::eigs(with_args(apply_qform1<tensor_t,qform_t>, &d, &Hqform),
+                                P.size(), linalg::SmallestAlgebraic, 1, &P, &converged);
+      if (converged) {
+        set_canonical(psi, site, reshape(P, psi[site].dimensions()), step, false);
+      }
       Hqform.propagate(psi[site], psi[site], step);
+      if (debug > 1) {
+        std::cout << "site=" << site << ", E=" << E << std::endl;
+      }
       return real(E[0]);
     }
 
@@ -97,12 +104,17 @@ namespace mps {
 
     double two_site_step() {
       tensor_t P12 = fold(psi[site], -1, psi[site+1], 0);
-      Indices dims = P12.dimensions();
-      P12 = reshape(P12, P12.size());
-      tensor_t E = linalg::eigs(with_args(apply_qform2<tensor_t,qform_t>, &Hqform),
-                                P12.size(), linalg::SmallestAlgebraic, 1, &P12);
-      set_canonical_2_sites(psi, reshape(P12, dims), site, step, Dmax, svd_tolerance);
+      const Indices d = P12.dimensions();
+      tensor_t E = linalg::eigs(with_args(apply_qform2<tensor_t,qform_t>, &d, &Hqform),
+                                P12.size(), linalg::SmallestAlgebraic, 1, &P12,
+                                &converged);
+      if (converged) {
+        set_canonical_2_sites(psi, reshape(P12, d), site, step, Dmax, svd_tolerance);
+      }
       Hqform.propagate(psi[site], psi[site], step);
+      if (debug > 1) {
+        std::cout << "site=" << site << ", E=" << E << std::endl;
+      }
       return real(E[0]);
     }
 
@@ -132,8 +144,10 @@ namespace mps {
       double E = 1e28;
       for (index failures = 0, i = 0; i < sweeps; i++) {
         double newE = single_site()? single_site_sweep() : two_site_sweep();
-        if (debug > 1) {
-          std::cout << "iteration=" << i << "; E=" << newE << std::endl;
+        if (debug) {
+          std::cout << "iteration=" << i << "; E=" << newE
+                    << "; dE=" << newE - E << "; tol=" << tolerance
+                    << std::endl;
         }
         if (i) {
           if (tensor::abs(newE-E) < tolerance) {
@@ -155,6 +169,7 @@ namespace mps {
             failures++;
           }
         }
+        E = newE;
       }
       *psi = state();
       return E;
