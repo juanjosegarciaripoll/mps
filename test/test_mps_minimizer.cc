@@ -38,7 +38,7 @@ namespace tensor_test {
     MPS psi(L);
     index D = 1 << (L/2);
     for (index i = 0; i < mpo.size(); i++) {
-      Tensor P = RTensor::random(D,2,D);
+      Tensor P = RTensor::random(D,2,D) - 0.5;
       psi.at(i) = P / norm2(P);
     }
     psi.at(0) = psi[0](range(0),range(),range());
@@ -82,7 +82,7 @@ namespace tensor_test {
     double angle = abs(E)/norm2(psi2);
     std::cout << "E=" << E << ", dmrgE=" << minE << ", angle=" << angle << std::endl;
     EXPECT_CEQ(minE, E);
-    EXPECT_CEQ(angle, 1.0);
+    EXPECT_CEQ3(angle, 1.0, 1e-10);
   }
 
   ////////////////////////////////////////////////////////////
@@ -101,6 +101,22 @@ namespace tensor_test {
     test_over_integers(2, 10, test_minimizer_model<RMPO,TestHamiltonian::ISING_Z_FIELD>);
   }
 
+  TEST(RMinimize, IsingXField) {
+    test_over_integers(2, 10, test_minimizer_model<RMPO,TestHamiltonian::ISING_X_FIELD>);
+  }
+
+  TEST(RMinimize, XY) {
+    test_over_integers(2, 10, test_minimizer_model<RMPO,TestHamiltonian::XY>);
+  }
+
+  TEST(RMinimize, XXZ) {
+    test_over_integers(2, 10, test_minimizer_model<RMPO,TestHamiltonian::XXZ>);
+  }
+
+  TEST(RMinimize, Heisenberg) {
+    test_over_integers(2, 10, test_minimizer_model<RMPO,TestHamiltonian::HEISENBERG>);
+  }
+
   ////////////////////////////////////////////////////////////
   // MINIMIZE CMPO
   //
@@ -115,6 +131,22 @@ namespace tensor_test {
 
   TEST(CMinimize, IsingZField) {
     test_over_integers(2, 10, test_minimizer_model<CMPO,TestHamiltonian::ISING_Z_FIELD>);
+  }
+
+  TEST(CMinimize, IsingXField) {
+    test_over_integers(2, 10, test_minimizer_model<CMPO,TestHamiltonian::ISING_X_FIELD>);
+  }
+
+  TEST(CMinimize, XY) {
+    test_over_integers(2, 10, test_minimizer_model<CMPO,TestHamiltonian::XY>);
+  }
+
+  TEST(CMinimize, XXZ) {
+    test_over_integers(2, 10, test_minimizer_model<CMPO,TestHamiltonian::XXZ>);
+  }
+
+  TEST(CMinimize, Heisenberg) {
+    test_over_integers(2, 10, test_minimizer_model<CMPO,TestHamiltonian::HEISENBERG>);
   }
 
 } // tensor_test
