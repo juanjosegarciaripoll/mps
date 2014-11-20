@@ -145,7 +145,7 @@ namespace mps {
     elt_t aux;
     if (a1*i1*b1 <= 10) {
       elt_t Heff = kron2(Opli, elt_t::eye(b1)) + kron2(elt_t::eye(a1), Opir);
-      aux = eigs(Heff, linalg::SmallestAlgebraic, neig, &Pk, Pk.begin());
+      aux = eigs(Heff, linalg::SmallestAlgebraic, neig, &Pk);
     } else {
       linalg::Arpack<elt_t> eigs(Pk.size(), linalg::SmallestAlgebraic, neig);
       eigs.set_maxiter(Pk.size());
@@ -327,7 +327,7 @@ namespace mps {
 	  Heff_full = mmult(adjoint(V), mmult(Heff_full, V));
 	}
 	sparse_t Heff(Heff_full);
-	aux = eigs(Heff, linalg::SmallestAlgebraic, neig, &Pi, Pi.begin());
+	aux = eigs(Heff, linalg::SmallestAlgebraic, neig, &Pi);
       } else {
 	sparse_t Sli(Opli);
 	sparse_t Sjr(Opjr);
@@ -365,7 +365,7 @@ namespace mps {
 	  V = elt_t::eye(V.rows()) - mmult(V, adjoint(V));
 	  Heff = mmult(adjoint(V), mmult(Heff, V));
 	}
-	aux = eigs(Heff, linalg::SmallestAlgebraic, neig, &Pi, Pi.begin());
+	aux = eigs(Heff, linalg::SmallestAlgebraic, neig, &Pi);
       } else {
 	linalg::Arpack<elt_t> eigs(smallL, linalg::SmallestAlgebraic, neig);
 	eigs.set_start_vector(Pi.begin());
