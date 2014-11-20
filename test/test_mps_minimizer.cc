@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <tensor/io.h>
 #include "loops.h"
 #include <gtest/gtest.h>
 #include <mps/mps.h>
@@ -37,13 +38,15 @@ namespace tensor_test {
     MPS psi(L);
     index D = 1 << (L/2);
     for (index i = 0; i < mpo.size(); i++) {
-      Tensor P = Tensor::random(D,2,D);
+      Tensor P = RTensor::random(D,2,D);
       psi.at(i) = P / norm2(P);
     }
     psi.at(0) = psi[0](range(0),range(),range());
     psi.at(L-1) = psi[L-1](range(),range(),range(0));
 
-    double E = minimize(mpo, &psi);
+    MinimizerOptions opts;
+    opts.Dmax = 1<<(L/2);
+    double E = minimize(mpo, &psi, opts);
     *output = psi;
     return E;
   }
@@ -67,6 +70,8 @@ namespace tensor_test {
     // the expectation value (we are using QuadraticForm, which
     // fulfills this)
     psi = canonical_form(psi, 0);
+    //std::cout << "psi=" << mps_to_vector(psi) << std::endl;
+    //std::cout << "H=" << matrix_form(sparse_hamiltonian(H)) << std::endl;
     double expectedE = expected(psi, H, 0.0);
     EXPECT_CEQ(minE, expectedE);
 
@@ -96,10 +101,6 @@ namespace tensor_test {
     test_over_integers(2, 10, test_minimizer_model<RMPO,TestHamiltonian::ISING_Z_FIELD>);
   }
 
-  TEST(RMinimize, IsingXField) {
-    test_over_integers(2, 10, test_minimizer_model<RMPO,TestHamiltonian::ISING_X_FIELD>);
-  }
-
   ////////////////////////////////////////////////////////////
   // MINIMIZE CMPO
   //
@@ -114,10 +115,6 @@ namespace tensor_test {
 
   TEST(CMinimize, IsingZField) {
     test_over_integers(2, 10, test_minimizer_model<CMPO,TestHamiltonian::ISING_Z_FIELD>);
-  }
-
-  TEST(CMinimize, IsingXField) {
-    test_over_integers(2, 10, test_minimizer_model<CMPO,TestHamiltonian::ISING_X_FIELD>);
   }
 
 } // tensor_test
