@@ -144,7 +144,7 @@ namespace mps {
     double full_sweep(mps_t *psi) {
       double E = 1e28;
       if (debug) {
-        std::cout << "***\n*** Algorithm with " << size() << " sites, " << Dmax
+        std::cout << "***\n*** Algorithm with " << size() << " sites, "
                   << "two-sites = " << !single_site() << std::endl;
       }
       for (index failures = 0, i = 0; i < sweeps; i++) {
