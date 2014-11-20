@@ -80,7 +80,6 @@ namespace tensor_test {
     MPS psi2 = apply(mpo, psi);
     number E = scprod(psi, psi2);
     double angle = abs(E)/norm2(psi2);
-    std::cout << "E=" << E << ", dmrgE=" << minE << ", angle=" << angle << std::endl;
     EXPECT_CEQ(minE, E);
     EXPECT_CEQ3(angle, 1.0, 1e-10);
   }
