@@ -56,7 +56,7 @@ namespace mps {
       Hqform(H, psi, psi, 0),
       site(0),
       step(+1)
-    { debug = 1; }
+    {}
 
     ~Minimizer()
     {}
