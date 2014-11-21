@@ -36,7 +36,7 @@ namespace tensor_test {
 
     index L = mpo.size();
     MPS psi(L);
-    index D = 1 << (L/2);
+    index D = 2;
     for (index i = 0; i < mpo.size(); i++) {
       Tensor P = RTensor::random(D,2,D) - 0.5;
       psi.at(i) = P / norm2(P);
@@ -45,7 +45,7 @@ namespace tensor_test {
     psi.at(L-1) = psi[L-1](range(),range(),range(0));
 
     MinimizerOptions opts;
-    opts.Dmax = 1<<(L/2);
+    opts.Dmax = std::min(1<<(L/2),50);
     double E = minimize(mpo, &psi, opts);
     *output = psi;
     return E;
