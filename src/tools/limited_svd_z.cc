@@ -26,7 +26,7 @@ namespace mps {
   limited_svd(CTensor A, CTensor *U, CTensor *V, double tolerance,
               tensor::index max_dim)
   {
-    RTensor s = linalg::svd(A, U, V, true /* economic */);
+    RTensor s = linalg::block_svd(A, U, V, SVD_ECONOMIC);
     tensor::index c = where_to_truncate(s, tolerance, max_dim);
     *U = (*U)(range(), range(0,c-1));
     *V = (*V)(range(0,c-1), range());

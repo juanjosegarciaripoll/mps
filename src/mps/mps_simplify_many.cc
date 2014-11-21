@@ -67,11 +67,11 @@ namespace mps {
     Tensor U;
     if (sense > 0) {
       Pk.get_dimensions(&a1,&i1,&a2);
-      linalg::svd(reshape(Pk, a1*i1,a2), &U, NULL, SVD_ECONOMIC);
+      linalg::block_svd(reshape(Pk, a1*i1,a2), &U, NULL, SVD_ECONOMIC);
       a2 = std::min(a1*i1, a2);
     } else {
       Pk.get_dimensions(&a1,&i1,&a2);
-      linalg::svd(reshape(Pk, a1,i1*a2), NULL, &U, SVD_ECONOMIC);
+      linalg::block_svd(reshape(Pk, a1,i1*a2), NULL, &U, SVD_ECONOMIC);
       a1 = std::min(a1, i1*a2);
     }
     Pk = reshape(U, a1,i1,a2);

@@ -35,7 +35,7 @@ namespace mps {
     index a1, i1, j1, c1;
     Pij.get_dimensions(&a1, &i1, &j1, &c1);
     Tensor Pi, Pj;
-    RTensor s = linalg::svd(reshape(Pij, a1*i1,j1*c1), &Pi, &Pj, SVD_ECONOMIC);
+    RTensor s = linalg::block_svd(reshape(Pij, a1*i1,j1*c1), &Pi, &Pj, SVD_ECONOMIC);
     index b1 = where_to_truncate(s, tol, Dmax);
     if (b1 != s.size()) {
 	Pi = change_dimension(Pi, -1, b1);
