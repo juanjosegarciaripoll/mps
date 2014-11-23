@@ -78,7 +78,9 @@ namespace mps {
         set_canonical(psi, site, reshape(P, psi[site].dimensions()), step, false);
         Hqform.propagate(psi[site], psi[site], step);
         if (debug > 1) {
-          std::cout << "site=" << site << ", E=" << E << std::endl;
+          std::cout << "site=" << site << ", E=" << real(E[0])
+                    << ", P.dimensions()" << psi[site].dimensions()
+                    << std::endl;
         }
       }
       return real(E[0]);
@@ -116,7 +118,10 @@ namespace mps {
       }
       Hqform.propagate(psi[site], psi[site], step);
       if (debug > 1) {
-        std::cout << "site=" << site << ", E=" << E << std::endl;
+        std::cout << "site=" << site << ", E=" << real(E[0])
+                  << ", P1.dimensions()" << psi[site].dimensions()
+                  << ", P2.dimensions()" << psi[site+1].dimensions()
+                  << std::endl;
       }
       return real(E[0]);
     }
