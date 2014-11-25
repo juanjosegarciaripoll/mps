@@ -246,7 +246,7 @@ namespace mps {
   const typename QuadraticForm<MPO>::elt_t
   QuadraticForm<MPO>::apply_one_site_matrix(const elt_t &P) const
   {
-    elt_t output, aux;
+    elt_t output;
     for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
 	 it != end;
 	 it++)
@@ -260,19 +260,11 @@ namespace mps {
           index b2 = L.dimension(3);
           index a3 = R.dimension(0);
           index b3 = R.dimension(1);
-          // Sometimes the input of this function may be a vector.
-          // In that case we reinterpret it.
-          if (P.rank() == 1) {
-            index k = it->op.dimension(1);
-            aux = reshape(P, b2, k, b3);
-          } else {
-            aux = P;
-          }
           // We implement this
           // Q(a2,i,a3) = L(a1,b1,a2,b2) O1(i,k) P(b2,k,b3) R(a3,b3,a1,b1)
           // where a1=b1 = 1, because of periodic boundary conditions
           elt_t Q =
-            fold(fold(reshape(L, a2,b2), 1, foldin(it->op, -1, aux, 1), 0), 2,
+            fold(fold(reshape(L, a2,b2), 1, foldin(it->op, -1, P, 1), 0), 2,
                  reshape(R, a3,b3), 1);
           maybe_add(&output, Q);
         }
@@ -295,7 +287,6 @@ namespace mps {
       assert(j > 0);
       i = j - 1;
     }
-    elt_t aux;
     for (pair_iterator_t it1 = pairs_[i].begin(), end1 = pairs_[i].end();
 	 it1 != end1;
 	 it1++)
@@ -313,15 +304,6 @@ namespace mps {
               index b2 = L.dimension(3);
               index a3 = R.dimension(0);
               index b3 = R.dimension(1);
-              // Sometimes the input of this function may be a vector.
-              // In that case we reinterpret it.
-              if (P12.rank() == 1) {
-                index k = it1->op.dimension(1);
-                index l = it2->op.dimension(1);
-                aux = reshape(P12, b2, k, l, b3);
-              } else {
-                aux = P12;
-              }
               // We implement this
               // Q12(a2,i,a3) = L(a1,b1,a2,b2) O1(i,k) O2(j,l)
               //                     P12(b2,k,l,b3) R(a3,b3,a1,b1)
@@ -329,7 +311,7 @@ namespace mps {
               elt_t Q12 =
                 fold(fold(reshape(L, a2,b2), 1,
                             foldin(it1->op, -1,
-                                   foldin(it2->op, -1, aux, 2), 1), 0), 3,
+                                   foldin(it2->op, -1, P12, 2), 1), 0), 3,
                        reshape(R, a3,b3), 1);
               maybe_add(&output, Q12);
             }
