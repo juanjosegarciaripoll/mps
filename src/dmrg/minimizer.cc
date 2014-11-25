@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <tensor/tools.h>
 #include <tensor/io.h>
 #include <tensor/linalg.h>
 #include <mps/minimizer.h>
@@ -78,8 +79,8 @@ namespace mps {
         set_canonical(psi, site, reshape(P, psi[site].dimensions()), step, false);
         Hqform.propagate(psi[site], psi[site], step);
         if (debug > 1) {
-          std::cout << "site=" << site << ", E=" << real(E[0])
-                    << ", P.dimensions()" << psi[site].dimensions()
+          std::cout << "\tsite=" << site << ", E=" << real(E[0])
+                    << ", P.d" << psi[site].dimensions()
                     << std::endl;
         }
       }
@@ -118,9 +119,9 @@ namespace mps {
       }
       Hqform.propagate(psi[site], psi[site], step);
       if (debug > 1) {
-        std::cout << "site=" << site << ", E=" << real(E[0])
-                  << ", P1.dimensions()" << psi[site].dimensions()
-                  << ", P2.dimensions()" << psi[site+1].dimensions()
+        std::cout << "\tsite=" << site << ", E=" << real(E[0])
+                  << ", P1.d=" << psi[site].dimensions()
+                  << ", P2.d=" << psi[site+step].dimensions()
                   << std::endl;
       }
       return real(E[0]);
@@ -129,12 +130,12 @@ namespace mps {
     double two_site_sweep() {
       double E;
       if (step > 0) {
-	for (site = 0; site+1 < size(); site++) {
+	for (site = 0; site+1 < size(); ++site) {
 	  E = two_site_step();
 	}
 	step = -1;
       } else {
-        for (site = size()-1; site; site--) {
+        for (site = size()-1; site; --site) {
 	  E = two_site_step();
 	}
 	step = +1;
