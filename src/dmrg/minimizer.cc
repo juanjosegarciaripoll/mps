@@ -56,7 +56,8 @@ namespace mps {
       psi(canonical_form(state, 0)),
       Hqform(H, psi, psi, 0),
       site(0),
-      step(+1)
+      step(+1),
+      converged(true)
     {}
 
     ~Minimizer()
@@ -90,7 +91,7 @@ namespace mps {
     double single_site_sweep() {
       double E;
       if (step > 0) {
-	for (site = 0; site < size(); site++) {
+	for (site = 0; (site < size()) && converged; site++) {
 	  E = single_site_step();
 	}
 	step = -1;
@@ -99,7 +100,7 @@ namespace mps {
 	do {
 	  site--;
 	  E = single_site_step();
-	} while (site);
+	} while (site && converged);
 	step = +1;
       }
       return E;
@@ -130,12 +131,12 @@ namespace mps {
     double two_site_sweep() {
       double E;
       if (step > 0) {
-	for (site = 0; site+1 < size(); ++site) {
+	for (site = 0; (site+1 < size()) && converged; ++site) {
 	  E = two_site_step();
 	}
 	step = -1;
       } else {
-        for (site = size()-1; site; --site) {
+        for (site = size()-1; site && converged; --site) {
 	  E = two_site_step();
 	}
 	step = +1;
@@ -162,7 +163,8 @@ namespace mps {
                     << std::endl;
         }
         if (!converged) {
-          break;
+          *psi = mps_t();
+          return E;
         }
         if (i) {
           if (tensor::abs(newE-E) < tolerance) {
