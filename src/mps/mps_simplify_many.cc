@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <tensor/linalg.h>
 #include <mps/mps_algorithms.h>
+#include <mps/flags.h>
 #include <tensor/io.h>
 #include "mps_prop_matrix.cc"
 
@@ -281,6 +282,8 @@ namespace mps {
     double
     simplify(MPS &P, int *sense, index sweeps, bool normalize)
     {
+      bool debug = mps::FLAGS.get(MPS_DEBUG_SIMPLIFY);
+
       int aux_sense = 1;
       if (!sense) {
         sense = &aux_sense;
@@ -290,7 +293,7 @@ namespace mps {
 
       initialize_matrices(P, *sense);
 
-      if (debug_flags & MPS_DEBUG_SIMPLIFY_MANY) {
+      if (debug) {
         std::cout << "----------\nSimplifying " << Q.size()
                   <<" states with norm " << normQ2 << std::endl;
       }
@@ -318,7 +321,7 @@ namespace mps {
         }
         double olderr = err;
         err = tensor::abs(normQ2 + normP2 - 2 * scp);
-        if (debug_flags & MPS_DEBUG_SIMPLIFY_MANY) {
+        if (debug) {
           std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
         }
         if (tensor::abs(olderr-err) < 1e-5*tensor::abs(normQ2) ||
@@ -382,6 +385,8 @@ namespace mps {
     simplify_2_sites(MPS &P, index Dmax, double tol, int *sense,
                      index sweeps, bool normalize)
     {
+      bool debug = mps::FLAGS.get(MPS_DEBUG_SIMPLIFY);
+
       int aux_sense = 1;
       if (!sense) {
         sense = &aux_sense;
@@ -391,7 +396,7 @@ namespace mps {
 
       initialize_matrices(P, *sense);
 
-      if (debug_flags & MPS_DEBUG_SIMPLIFY_MANY) {
+      if (debug) {
         std::cout << "----------\nSimplifying " << Q.size()
                   <<" states with norm " << normQ2 << std::endl;
       }
@@ -420,7 +425,7 @@ namespace mps {
         }
         double olderr = err;
         err = tensor::abs(normQ2 + normP2 - 2 * scp);
-        if (debug_flags & MPS_DEBUG_SIMPLIFY_MANY) {
+        if (debug) {
           std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
         }
         if (tensor::abs(olderr-err) < 1e-5*tensor::abs(normQ2) ||
