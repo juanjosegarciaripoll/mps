@@ -283,6 +283,7 @@ namespace mps {
     simplify(MPS &P, int *sense, index sweeps, bool normalize)
     {
       bool debug = mps::FLAGS.get(MPS_DEBUG_SIMPLIFY);
+      double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
 
       int aux_sense = 1;
       if (!sense) {
@@ -325,7 +326,7 @@ namespace mps {
           std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
         }
         if (tensor::abs(olderr-err) < 1e-5*tensor::abs(normQ2) ||
-            (err < 1e-14 * normQ2) ||
+            (err < tolerance * normQ2) ||
             (err < 1e-14))
           {
             if (normalize) {
@@ -386,6 +387,7 @@ namespace mps {
                      index sweeps, bool normalize)
     {
       bool debug = mps::FLAGS.get(MPS_DEBUG_SIMPLIFY);
+      double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
 
       int aux_sense = 1;
       if (!sense) {
@@ -429,7 +431,7 @@ namespace mps {
           std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
         }
         if (tensor::abs(olderr-err) < 1e-5*tensor::abs(normQ2) ||
-            (err < 1e-14 * normQ2) ||
+            (err < tolerance * normQ2) ||
             (err < 1e-14))
           {
             if (normalize) {
