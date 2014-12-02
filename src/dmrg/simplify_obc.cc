@@ -30,7 +30,8 @@ namespace mps {
   template<class MPS>
   double
   do_simplify(MPS *ptrP, const typename MPS::elt_t &w, const std::vector<MPS> &Q,
-              int *sense, index sweeps, bool normalize, index Dmax, double tol)
+              int *sense, index sweeps, bool normalize, index Dmax, double tol,
+              double *norm)
   {
     assert(sweeps > 0);
     bool single_site = !Dmax && (FLAGS.get(MPS_SIMPLIFY_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM);
@@ -73,6 +74,9 @@ namespace mps {
       if ((olderr-err) < 1e-5*abs(olderr) || (err < tolerance)) {
 	break;
       }
+    }
+    if (norm) {
+      *norm = normP2;
     }
     if (normalize) {
       P.at(s.site()) /= sqrt(normP2);
