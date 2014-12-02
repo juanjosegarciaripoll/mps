@@ -28,7 +28,7 @@ namespace mps {
   using namespace linalg;
 
   ArnoldiSolver::ArnoldiSolver(const Hamiltonian &H, cdouble dt, int nvectors) :
-    TimeSolver(dt), H_(H, 0.0), max_states_(nvectors), tolerance_(1e-10)
+    TimeSolver(dt), H_(H, 0.0), max_states_(nvectors), tolerance_(0)
   {
     if (max_states_ <= 0 || max_states_ >= 30) {
       std::cerr << "In ArnoldiSolver(...), the number of states exceeds the limits [1,30]"
@@ -38,7 +38,7 @@ namespace mps {
   }
 
   ArnoldiSolver::ArnoldiSolver(const CMPO &H, cdouble dt, int nvectors) :
-    TimeSolver(dt), H_(H), max_states_(nvectors), tolerance_(1e-10)
+    TimeSolver(dt), H_(H), max_states_(nvectors), tolerance_(0)
   {
     if (max_states_ <= 0 || max_states_ >= 30) {
       std::cerr << "In ArnoldiSolver(...), the number of states exceeds the limits [1,30]"
@@ -52,29 +52,30 @@ namespace mps {
   {
     CTensor N = CTensor::zeros(max_states_, max_states_);
     CTensor Heff = N;
+    CMPS current = normal_form(*psi, -1);
+    CMPS Hcurrent = apply(H_, current);
 
     std::vector<CMPS> states;
     states.reserve(max_states_);
-    states.push_back(normal_form(*psi, -1));
+    states.push_back(current);
     N.at(0,0) = to_complex(1.0);
-    Heff.at(0,0) = expected(*psi, H_);
+    Heff.at(0,0) = real(scprod(current, Hcurrent));
 
     std::vector<CMPS> vectors(3);
     std::vector<cdouble> coeffs(3);
     std::vector<double> errors;
-    double err;
+    double err, n;
     int sense;
     for (int ndx = 1; ndx < max_states_; ndx++) {
       const CMPS &last = states[ndx-1];
       //
       // 0) Estimate a new vector of the basis.
-      //	current = H v[0] - <v[1]|H|v[0]> v[1] - <v[2]|H|v[0]> v[2]
+      //	scurrent = H v[0] - <v[1]|H|v[0]> v[1] - <v[2]|H|v[0]> v[2]
       //    where
       //	v[0] = states[ndx-1]
       //	v[1] = states[ndx-2]
       //
-      CMPS current = apply(H_, states.back());
-      double n0 = norm2(current);
+      current = Hcurrent;
       {
 	vectors.clear();
 	coeffs.clear();
@@ -89,30 +90,21 @@ namespace mps {
 	  vectors.push_back(states[ndx-2]);
           coeffs.push_back(-scprod(current, states[ndx-2]));
 	}
-#if 0
-	truncate(&current, states[0], 2*Dmax, false, true);
-	simplify(&current, vectors, coeffs, NULL, 2, false);
-#elif 0
-        sense = +1;
-	err = simplify(&current, vectors, coeffs, 2*Dmax, -1, &sense, 2, false);
-#else
-        sense = +1;
-	err = simplify_obc(&current, coeffs, vectors, &sense, 2, false, 2*Dmax, -1);
-#endif
-      }
-      {
-        double n = norm2(current);
-        if (n < tolerance_ * std::max(n0, 1.0)) {
-          N = N(range(0,ndx-1),range(0,ndx-1));
-          Heff = Heff(range(0,ndx-1),range(0,ndx-1));
-          break;
+        int sense = +1;
+	err = simplify_obc(&current, coeffs, vectors, &sense, 2, true,
+                           2*Dmax, -1, &n);
+        if (tolerance_) {
+          double n0 = norm2(Hcurrent);
+          if (n < tolerance_ * std::max(n0, 1.0)) {
+            N = N(range(0,ndx-1),range(0,ndx-1));
+            Heff = Heff(range(0,ndx-1),range(0,ndx-1));
+            break;
+          }
         }
         /* We ensure that the states are normalized and with a canonical
          * form opposite to the sense of the simplification above. This
          * improves stability and speed in the SVDs. */
-        if (sense == -1) {
-          current.at(0) = current[0] / n;
-        } else {
+        if (sense > 0) {
           current = normal_form(current, -1);
         }
         errors.push_back(err / n);
@@ -124,15 +116,16 @@ namespace mps {
       //    Also compute the matrix elements of the Hamiltonian in this new basis.
       //
       states.push_back(current);
-      for (int n = 0; n <= ndx; n++) {
+      for (int n = 0; n < ndx; n++) {
 	cdouble aux;
 	N.at(n, ndx) = aux = scprod(states[n], current);
 	N.at(ndx, n) = tensor::conj(aux);
 	Heff.at(n, ndx) = aux = expected(states[n], H_, current);
 	Heff.at(ndx, n) = tensor::conj(aux);
       }
-      N.at(ndx, ndx) = real(N(ndx,ndx));
-      Heff.at(ndx, ndx) = real(Heff(ndx,ndx));
+      N.at(ndx, ndx) = 1.0;
+      Hcurrent = apply(H_, current);
+      Heff.at(ndx, ndx) = real(scprod(current, Hcurrent));
     }
     //
     // 2) Once we have the basis, we compute the exponential on it. Notice that, since
@@ -156,16 +149,8 @@ namespace mps {
     //
     // 4) Here is where we perform the truncation from our basis to a single MPS.
     //
-#if 0
-    truncate(psi, states[0], Dmax, false, true);
-    err = simplify(psi, states, coef, NULL, 12, false);
-#elif 0
-    sense = +1;
-    err = simplify(psi, states, coef, Dmax, -1, &sense, 12, true);
-#else
     sense = +1;
     err = simplify_obc(psi, coef, states, &sense, 12, true, Dmax, -1);
-#endif
     err += scprod(RTensor(errors), square(abs(coef)));
     if (debug_flags & MPS_DEBUG_ARNOLDI) {
       std::cout << "Arnoldi final truncation error " << err << std::endl;
