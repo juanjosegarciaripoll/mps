@@ -60,7 +60,8 @@ namespace mps {
       } else {
         do {
           set_canonical_2_sites(P, conj(lf.two_site_vector(s.sense())),
-                                s.site(), s.sense(), Dmax, tol);
+                                s.site(), s.sense(), Dmax, tol,
+                                false);
           lf.propagate(P[s.site()], s.sense());
           --s;
         } while (!s.is_last());
