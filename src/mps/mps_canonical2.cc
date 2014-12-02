@@ -26,7 +26,7 @@ namespace mps {
 
   template<class MPS, class Tensor>
   static void set_canonical_2_sites_inner(MPS &P, const Tensor &Pij, index site,
-					  int sense, index Dmax, double tol)
+					  int sense, index Dmax, double tol, bool canonicalize_both)
   {
     /*
      * Since the projector that we obtained spans two sites, we have to split
@@ -47,11 +47,17 @@ namespace mps {
     if (sense > 0) {
       P.at(site) = Pi;
       scale_inplace(Pj, 0, s);
-      set_canonical(P, site+1, Pj, sense, true);
+      if (canonicalize_both)
+        set_canonical(P, site+1, Pj, sense, true);
+      else
+        P.at(site+1) = Pj;
     } else {
       P.at(site) = Pj;
       scale_inplace(Pi,-1, s);
-      set_canonical(P, site-1, Pi, sense, true);
+      if (canonicalize_both)
+        set_canonical(P, site-1, Pj, sense, true);
+      else
+        P.at(site-1) = Pj;
     }
   }
 

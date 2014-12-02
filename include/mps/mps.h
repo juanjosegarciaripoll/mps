@@ -181,13 +181,13 @@ namespace mps {
    * the maximum bond dimension that is used. Actually, tol and Dmax are the
    * arguments to where_to_truncate. */
   void set_canonical_2_sites(RMPS &P, const RTensor &Pij, index site, int sense,
-                             index Dmax = 0, double tol = -1);
+                             index Dmax = 0, double tol = -1, bool canonicalize_both = true);
 
   /** Update an MPS with a tensor that spans two sites, (site,site+1). Dmax is
    * the maximum bond dimension that is used. Actually, tol and Dmax are the
    * arguments to where_to_truncate. */
   void set_canonical_2_sites(CMPS &P, const CTensor &Pij, index site, int sense,
-                             index Dmax = 0, double tol = -1);
+                             index Dmax = 0, double tol = -1, bool canonicalize_both = true);
 
   /* Return a single-site density matrix out of an MPS. */
   const RTensor density_matrix(const RMPS &psi, index site);

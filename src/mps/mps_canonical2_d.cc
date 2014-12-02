@@ -22,9 +22,11 @@
 namespace mps {
 
   void set_canonical_2_sites(RMPS &P, const RTensor &Pij, index site,
-			     int sense, index Dmax, double tol)
+			     int sense, index Dmax, double tol,
+                             bool canonicalize_both)
   {
-    set_canonical_2_sites_inner(P, Pij, site, sense, Dmax, tol);
+    set_canonical_2_sites_inner(P, Pij, site, sense, Dmax, tol,
+                                canonicalize_both);
   }
 
 } // namespace mps
