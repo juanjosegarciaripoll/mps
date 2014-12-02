@@ -33,7 +33,7 @@ namespace mps {
               int *sense, index sweeps, bool normalize, index Dmax, double tol)
   {
     assert(sweeps > 0);
-    bool single_site = FLAGS.get(MPS_SIMPLIFY_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM;
+    bool single_site = !Dmax && (FLAGS.get(MPS_SIMPLIFY_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM);
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
     typedef typename MPS::elt_t Tensor;
     MPS &P = *ptrP;
