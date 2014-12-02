@@ -22,7 +22,7 @@
 namespace mps {
 
   double
-  simplify_obc(CMPS *ptrP, const CMPS::elt_t w, const std::vector<CMPS> &Q,
+  simplify_obc(CMPS *ptrP, const CTensor &w, const std::vector<CMPS> &Q,
                int *sense, index sweeps, bool normalize,
                index Dmax, double tol)
   {
