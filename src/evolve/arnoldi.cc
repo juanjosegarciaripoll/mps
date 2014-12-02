@@ -92,9 +92,12 @@ namespace mps {
 #if 0
 	truncate(&current, states[0], 2*Dmax, false, true);
 	simplify(&current, vectors, coeffs, NULL, 2, false);
-#else
+#elif 0
         sense = +1;
 	err = simplify(&current, vectors, coeffs, 2*Dmax, -1, &sense, 2, false);
+#else
+        sense = +1;
+	err = simplify_obc(&current, coeffs, vectors, &sense, 2, false, 2*Dmax, -1);
 #endif
       }
       {
@@ -156,11 +159,14 @@ namespace mps {
 #if 0
     truncate(psi, states[0], Dmax, false, true);
     err = simplify(psi, states, coef, NULL, 12, false);
-#else
+#elif 0
     sense = +1;
     err = simplify(psi, states, coef, Dmax, -1, &sense, 12, true);
+#else
+    sense = +1;
+    err = simplify_obc(psi, coef, states, &sense, 12, true, Dmax, -1);
 #endif
-    err = err + scprod(RTensor(errors), square(abs(coef)));
+    err += scprod(RTensor(errors), square(abs(coef)));
     if (debug_flags & MPS_DEBUG_ARNOLDI) {
       std::cout << "Arnoldi final truncation error " << err << std::endl;
     }
