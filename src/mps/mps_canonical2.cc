@@ -55,9 +55,9 @@ namespace mps {
       P.at(site) = Pj;
       scale_inplace(Pi,-1, s);
       if (canonicalize_both)
-        set_canonical(P, site-1, Pj, sense, true);
+        set_canonical(P, site-1, Pi, sense, true);
       else
-        P.at(site-1) = Pj;
+        P.at(site-1) = Pi;
     }
   }
 
