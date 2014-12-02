@@ -84,11 +84,13 @@ namespace mps {
 	coeffs.push_back(number_one<cdouble>());
 
 	vectors.push_back(states[ndx-1]);
-	coeffs.push_back(-scprod(current, states[ndx-1]));
+	//coeffs.push_back(-scprod(current, states[ndx-1]));
+        coeffs.push_back(-Heff(ndx-1,ndx-1));
 
 	if (ndx > 1) {
 	  vectors.push_back(states[ndx-2]);
-          coeffs.push_back(-scprod(current, states[ndx-2]));
+          //coeffs.push_back(-scprod(current, states[ndx-2]));
+          coeffs.push_back(-Heff(ndx-1,ndx-2));
 	}
         int sense = +1;
 	err = simplify_obc(&current, coeffs, vectors, &sense, 2, true,
@@ -116,15 +118,15 @@ namespace mps {
       //    Also compute the matrix elements of the Hamiltonian in this new basis.
       //
       states.push_back(current);
+      Hcurrent = apply(H_, current);
       for (int n = 0; n < ndx; n++) {
 	cdouble aux;
 	N.at(n, ndx) = aux = scprod(states[n], current);
 	N.at(ndx, n) = tensor::conj(aux);
-	Heff.at(n, ndx) = aux = expected(states[n], H_, current);
+	Heff.at(n, ndx) = aux = scprod(states[n], Hcurrent);
 	Heff.at(ndx, n) = tensor::conj(aux);
       }
       N.at(ndx, ndx) = 1.0;
-      Hcurrent = apply(H_, current);
       Heff.at(ndx, ndx) = real(scprod(current, Hcurrent));
     }
     //
