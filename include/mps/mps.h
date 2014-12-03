@@ -106,14 +106,20 @@ namespace mps {
   /**Compute a single-site expected value.*/
   double expected(const RMPS &a, const RTensor &Op1, index k);
 
-  /**Add the expectation values a single-site operator over the lattice.*/
-  double expected(const RMPS &a, const RTensor &Op1);
+  /**Compute all expected values of a single operator over the chain.*/
+  RTensor expected_vector(const RMPS &a, const RTensor &Op1);
+
+  /**Compute all expected values, with a different operator over each site of the chain.*/
+  RTensor expected_vector(const RMPS &a, const std::vector<RTensor> &Op1);
 
   /**Compute a single-site expected value.*/
   cdouble expected(const RMPS &a, const CTensor &Op1, index k);
 
-  /**Add the expectation values a single-site operator over the lattice.*/
-  cdouble expected(const RMPS &a, const CTensor &Op1);
+  /**Compute all expected values of a single operator over the chain.*/
+  CTensor expected_vector(const CMPS &a, const CTensor &Op1);
+
+  /**Compute all expected values, with a different operator over each site of the chain.*/
+  CTensor expected_vector(const CMPS &a, const std::vector<CTensor> &Op1);
 
   /**Compute a single-site expected value.*/
   cdouble expected(const CMPS &a, const CTensor &Op1, index k);
