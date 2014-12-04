@@ -98,7 +98,10 @@ namespace mps {
   template<class tensor>
   static void maybe_add(tensor *a, const tensor &b)
   {
-    *a = (a->is_empty())? b : (*a + b);
+    if (a->is_empty())
+      *a = b;
+    else
+      *a += b;
   }
 
   template<class MPO>
