@@ -36,6 +36,7 @@ namespace mps {
     assert(sweeps > 0);
     bool single_site = !Dmax && (FLAGS.get(MPS_SIMPLIFY_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM);
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
+    int debug = FLAGS.get(MPS_DEBUG_SIMPLIFY);
     typedef typename MPS::elt_t Tensor;
     MPS &P = *ptrP;
 
@@ -52,6 +53,12 @@ namespace mps {
     Sweeper s = P.sweeper(-*sense);
     LinearForm<MPS> lf(w, Q, P, s.site());
     double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2, scp;
+    if (debug) {
+      std::cout << "simplify_obc: "
+                << (single_site? "single_site" : "two-sites")
+                << std::endl
+                << "\tweights=" << w << std::endl;
+    }
     while (sweeps--) {
       if (single_site) {
         do {
@@ -71,6 +78,9 @@ namespace mps {
       normP2 = abs(scprod(P[s.site()], P[s.site()]));
       olderr = err;
       err = sqrt(abs(1 - normP2/normQ2));
+      if (debug) {
+        std::cout << "\terr=" << err << std::endl;
+      }
       if ((olderr-err) < 1e-5*abs(olderr) || (err < tolerance)) {
 	break;
       }
