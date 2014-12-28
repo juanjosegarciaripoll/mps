@@ -57,6 +57,7 @@ namespace mps {
     if (debug) {
       std::cout << "simplify_obc: "
                 << (single_site? "single_site" : "two-sites")
+                << ", dmax=" << Dmax << ", tol=" << tol
                 << std::endl
                 << "\tweights=" << w << std::endl;
     }
@@ -75,13 +76,14 @@ namespace mps {
           --s;
         } while (!s.is_last());
       }
-      s.flip();
       normP2 = abs(scprod(P[s.site()], P[s.site()]));
       olderr = err;
       err = sqrt(abs(1 - normP2/normQ2));
       if (debug) {
-        std::cout << "\terr=" << err << std::endl;
+        std::cout << "\terr=" << err << ", sense=" << s.sense()
+                  << std::endl;
       }
+      s.flip();
       if ((olderr-err) < 1e-5*abs(olderr) || (err < tolerance)) {
 	break;
       }
