@@ -22,6 +22,7 @@
 #include <mps/mps_algorithms.h>
 #include <mps/time_evolve.h>
 #include <mps/tools.h>
+#include <mps/io.h>
 
 namespace mps {
 
@@ -76,7 +77,7 @@ namespace mps {
       //	v[0] = states[ndx-1]
       //	v[1] = states[ndx-2]
       //
-      current = Hcurrent;
+      current = Hcurrent = canonical_form(Hcurrent, -1);
       {
 	vectors.clear();
 	coeffs.clear();
@@ -96,10 +97,13 @@ namespace mps {
         int sense = +1;
 	err = simplify_obc(&current, coeffs, vectors, &sense, 2, true,
                            2*Dmax, -1, &n);
+        if (sense < 0) {
+          current = canonical_form(current, -1);
+        }
         if (debug >= 2) {
           std::cout << "ndx=" << ndx << ", err=" << err
                     << ", n=" << norm2(current) << "=" << n << ", tol="
-                    << tolerance_ << std::endl;
+                    << tolerance_ << ", sense=" << sense << std::endl;
         }
         if (n < 1e-15 ||
             (tolerance_ && (n < tolerance_*std::max(norm2(Hcurrent), 1.0))))
