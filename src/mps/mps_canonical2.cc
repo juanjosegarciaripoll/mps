@@ -44,6 +44,7 @@ namespace mps {
       file.close();
 #endif
       std::cerr << "NaN found when doing canonical form" << std::endl;
+      std::cerr << "s=" << s << std::endl;
       abort();
     }
     index b1 = where_to_truncate(s, tol, Dmax);
