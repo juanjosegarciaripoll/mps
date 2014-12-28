@@ -96,6 +96,11 @@ namespace mps {
         int sense = +1;
 	err = simplify_obc(&current, coeffs, vectors, &sense, 2, true,
                            2*Dmax, -1, &n);
+        if (debug > 2) {
+          std::cout << "ndx=" << ndx << ", err=" << err
+                    << ", n=" << norm2(current) << "=" << n << ", tol="
+                    << tolerance_ << std::endl;
+        }
         if (tolerance_) {
           double n0 = norm2(Hcurrent);
           if (n < tolerance_ * std::max(n0, 1.0)) {
@@ -143,8 +148,10 @@ namespace mps {
     if (debug >= 2) {
       std::cout << "N=" << matrix_form(tensor::abs(N)) << std::endl
                 << "H=" << matrix_form(tensor::abs(Heff)) << std::endl
-                << "U=" << expm(idt * solve_with_svd(N, Heff)) << std::endl
-                << "H/N=" << solve_with_svd(N, Heff) << std::endl
+                << "U=" << matrix_form(expm(idt * solve_with_svd(N, Heff)))
+                << std::endl
+                << "H/N=" << matrix_form(solve_with_svd(N, Heff))
+                << std::endl
                 << "v=" << coef << std::endl
                 << "|v|=" << norm2(coef) << std::endl
                 << "|v|=" << scprod(coef, mmult(N, coef)) << std::endl
