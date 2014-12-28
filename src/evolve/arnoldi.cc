@@ -96,7 +96,7 @@ namespace mps {
         int sense = +1;
 	err = simplify_obc(&current, coeffs, vectors, &sense, 2, true,
                            2*Dmax, -1, &n);
-        if (debug > 2) {
+        if (debug >= 2) {
           std::cout << "ndx=" << ndx << ", err=" << err
                     << ", n=" << norm2(current) << "=" << n << ", tol="
                     << tolerance_ << std::endl;
