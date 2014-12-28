@@ -21,6 +21,7 @@
 #include <tensor/linalg.h>
 #include <mps/mps.h>
 #include <tensor/io.h>
+#include <tensor/sdf.h>
 
 namespace mps {
 
@@ -36,6 +37,15 @@ namespace mps {
     Pij.get_dimensions(&a1, &i1, &j1, &c1);
     Tensor Pi, Pj;
     RTensor s = linalg::block_svd(reshape(Pij, a1*i1,j1*c1), &Pi, &Pj, SVD_ECONOMIC);
+    if (isnan(s(0))) {
+#if 0
+      sdf::OutDataFile file("aux.dat", sdf::DataFile::SDF_PARANOID);
+      file.dump(reshape(Pij, a1*i1, j1*c1), "Pij");
+      file.close();
+#endif
+      std::cerr << "NaN found when doing canonical form" << std::endl;
+      abort();
+    }
     index b1 = where_to_truncate(s, tol, Dmax);
     if (b1 != s.size()) {
 	Pi = change_dimension(Pi, -1, b1);
