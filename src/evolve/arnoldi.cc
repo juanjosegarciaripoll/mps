@@ -104,6 +104,9 @@ namespace mps {
         if (n < 1e-15 ||
             (tolerance_ && (n < tolerance_*std::max(norm2(Hcurrent), 1.0))))
         {
+          if (debug >= 2) {
+            std::cout << "Arnoldi method converged before tolerance\n";
+          }
           N = N(range(0,ndx-1),range(0,ndx-1));
           Heff = Heff(range(0,ndx-1),range(0,ndx-1));
           break;
@@ -151,7 +154,7 @@ namespace mps {
                 << std::endl
                 << "H/N=" << matrix_form(solve_with_svd(N, Heff))
                 << std::endl
-                << "v=" << coef << std::endl
+                << "v=" << matrix_form(coef) << std::endl
                 << "|v|=" << norm2(coef) << std::endl
                 << "|v|=" << scprod(coef, mmult(N, coef)) << std::endl
                 << "idt=" << idt << std::endl;
