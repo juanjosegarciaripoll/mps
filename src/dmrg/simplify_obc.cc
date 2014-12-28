@@ -63,11 +63,18 @@ namespace mps {
     while (sweeps--) {
       if (single_site) {
         do {
+          if (debug >= 3) {
+            std::cout << "\tP=" << conj(lf.single_site_vector()) << std::endl;
+          }
           set_canonical(P, s.site(), conj(lf.single_site_vector()), s.sense());
           lf.propagate(P[s.site()], s.sense());
         } while (--s);
       } else {
         do {
+          if (debug >= 3) {
+            std::cout << "\tP=" << conj(lf.two_site_vector(s.sense()))
+                      << std::endl;
+          }
           set_canonical_2_sites(P, conj(lf.two_site_vector(s.sense())),
                                 s.site(), s.sense(), Dmax, tol,
                                 false);
