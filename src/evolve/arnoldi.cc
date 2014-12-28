@@ -54,6 +54,7 @@ namespace mps {
     CTensor Heff = N;
     CMPS current = normal_form(*psi, -1);
     CMPS Hcurrent = apply(H_, current);
+    int debug = mps::FLAGS.get(MPS_DEBUG_ARNOLDI);
 
     std::vector<CMPS> states;
     states.reserve(max_states_);
@@ -139,14 +140,16 @@ namespace mps {
     cdouble idt = to_complex(0, -1) * time_step();
     coef.at(0) = to_complex(1.0);
     coef = mmult(expm(idt * solve_with_svd(N, Heff)), coef);
-    // std::cout << "N=" << matrix_form(tensor::abs(N)) << std::endl
-    //           << "H=" << matrix_form(tensor::abs(Heff)) << std::endl
-    //           << "U=" << expm(idt * solve_with_svd(N, Heff)) << std::endl
-    //           << "H/N=" << solve_with_svd(N, Heff) << std::endl
-    //           << "v=" << coef << std::endl
-    //           << "|v|=" << norm2(coef) << std::endl
-    //           << "|v|=" << scprod(coef, mmult(N, coef)) << std::endl
-    //           << "idt=" << idt << std::endl;
+    if (debug >= 2) {
+      std::cout << "N=" << matrix_form(tensor::abs(N)) << std::endl
+                << "H=" << matrix_form(tensor::abs(Heff)) << std::endl
+                << "U=" << expm(idt * solve_with_svd(N, Heff)) << std::endl
+                << "H/N=" << solve_with_svd(N, Heff) << std::endl
+                << "v=" << coef << std::endl
+                << "|v|=" << norm2(coef) << std::endl
+                << "|v|=" << scprod(coef, mmult(N, coef)) << std::endl
+                << "idt=" << idt << std::endl;
+    }
 
     //
     // 4) Here is where we perform the truncation from our basis to a single MPS.
@@ -154,7 +157,7 @@ namespace mps {
     sense = +1;
     err = simplify_obc(psi, coef, states, &sense, 12, true, Dmax, -1);
     err += scprod(RTensor(errors), square(abs(coef)));
-    if (debug_flags & MPS_DEBUG_ARNOLDI) {
+    if (debug) {
       std::cout << "Arnoldi final truncation error " << err << std::endl;
     }
     return err;

@@ -43,6 +43,8 @@ namespace mps {
 
   /**Flag key for debugging the time evolution routines.*/
   extern const unsigned int MPS_DEBUG_TROTTER;
+  /**Flag key for debugging the Arnoldi method.*/
+  extern const unsigned int MPS_DEBUG_ARNOLDI;
 
   /**Flag key for debugging the simplification routines.*/
   extern const unsigned int MPS_DEBUG_SIMPLIFY;
