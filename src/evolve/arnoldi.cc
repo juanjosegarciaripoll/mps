@@ -101,13 +101,12 @@ namespace mps {
                     << ", n=" << norm2(current) << "=" << n << ", tol="
                     << tolerance_ << std::endl;
         }
-        if (tolerance_) {
-          double n0 = norm2(Hcurrent);
-          if (n < tolerance_ * std::max(n0, 1.0)) {
-            N = N(range(0,ndx-1),range(0,ndx-1));
-            Heff = Heff(range(0,ndx-1),range(0,ndx-1));
-            break;
-          }
+        if (n < 1e-15 ||
+            (tolerance_ && (n < tolerance_*std::max(norm2(Hcurrent), 1.0))))
+        {
+          N = N(range(0,ndx-1),range(0,ndx-1));
+          Heff = Heff(range(0,ndx-1),range(0,ndx-1));
+          break;
         }
         /* We ensure that the states are normalized and with a canonical
          * form opposite to the sense of the simplification above. This
