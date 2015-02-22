@@ -26,15 +26,33 @@
 namespace mps {
 
   template<class Tensor, class QForm>
-  const Tensor apply_qform1(const Tensor &P, const Indices *d, const QForm *qform)
+  const Tensor apply_qform1(const Tensor &P, const Indices *d,
+                            const QForm *qform, const QForm *projector)
   {
-    return reshape(qform->apply_one_site_matrix(reshape(P, *d)), P.size());
+    Tensor v = reshape(P, *d);
+    if (projector) {
+      v = projector->apply_one_site_matrix(v);
+    }
+    v = qform->apply_one_site_matrix(v);
+    if (projector) {
+      v = projector->apply_one_site_matrix(v);
+    }
+    return reshape(v, P.size());
   }
 
   template<class Tensor, class QForm>
-  const Tensor apply_qform2(const Tensor &P, int sense, const Indices *d, const QForm *qform)
+  const Tensor apply_qform2(const Tensor &P, int sense, const Indices *d,
+                            const QForm *qform, const QForm *projector)
   {
-    return reshape(qform->apply_two_site_matrix(reshape(P, *d), sense), P.size());
+    Tensor v = reshape(P, *d);
+    if (projector) {
+      v = projector->apply_two_site_matrix(v, sense);
+    }
+    v = qform->apply_two_site_matrix(v, sense);
+    if (projector) {
+      v = projector->apply_two_site_matrix(v, sense);
+    }
+    return reshape(v, P.size());
   }
 
   template<class MPO>
@@ -46,22 +64,26 @@ namespace mps {
     typedef QuadraticForm<mpo_t> qform_t;
 
     mps_t psi;
-    qform_t Hqform;
+    qform_t Hqform, *Nqform;
     index site;
     int step;
     bool converged;
 
-    Minimizer(const MinimizerOptions &opt, const mpo_t &H, const mps_t &state) :
+    Minimizer(const MinimizerOptions &opt, const mpo_t &H, const mps_t &state,
+              const mpo_t *constraints) :
       MinimizerOptions(opt),
       psi(canonical_form(state, 0)),
       Hqform(H, psi, psi, 0),
+      Nqform(constraints? new qform_t(*constraints, psi, psi) : 0),
       site(0),
       step(+1),
       converged(true)
     {}
 
     ~Minimizer()
-    {}
+    {
+      if (Nqform) delete Nqform;
+    }
 
     index size() {
       return psi.size();
@@ -74,11 +96,14 @@ namespace mps {
     double single_site_step() {
       tensor_t P = psi[site];
       const Indices d = P.dimensions();
-      tensor_t E = linalg::eigs(with_args(apply_qform1<tensor_t,qform_t>, &d, &Hqform),
-                                P.size(), linalg::SmallestAlgebraic, 1, &P, &converged);
+      tensor_t E = linalg::eigs(with_args(apply_qform1<tensor_t,qform_t>,
+                                          &d, &Hqform, Nqform),
+                                P.size(), linalg::SmallestAlgebraic, 1,
+                                &P, &converged);
       if (converged) {
         set_canonical(psi, site, reshape(P, psi[site].dimensions()), step, false);
         Hqform.propagate(psi[site], psi[site], step);
+        if (Nqform) Nqform->propagate(psi[site], psi[site], step);
         if (debug > 1) {
           std::cout << "\tsite=" << site << ", E=" << real(E[0])
                     << ", P.d" << psi[site].dimensions()
@@ -112,13 +137,15 @@ namespace mps {
         fold(psi[site], -1, psi[site+1], 0) :
         fold(psi[site-1], -1, psi[site], 0);
       const Indices d = P12.dimensions();
-      tensor_t E = linalg::eigs(with_args(apply_qform2<tensor_t,qform_t>, step, &d, &Hqform),
+      tensor_t E = linalg::eigs(with_args(apply_qform2<tensor_t,qform_t>,
+                                          step, &d, &Hqform, Nqform),
                                 P12.size(), linalg::SmallestAlgebraic, 1, &P12,
                                 &converged);
       if (converged) {
         set_canonical_2_sites(psi, reshape(P12, d), site, step, Dmax, svd_tolerance);
       }
       Hqform.propagate(psi[site], psi[site], step);
+      if (Nqform) Nqform->propagate(psi[site], psi[site], step);
       if (debug > 1) {
         std::cout << "\tsite=" << site << ", E=" << real(E[0])
                   << ", P1.d=" << psi[site].dimensions()

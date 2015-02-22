@@ -41,8 +41,10 @@ namespace mps {
     index Dmax;
   };
 
-  double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt);
-  double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt);
+  double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt,
+                  const RMPO *constraints = 0);
+  double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt,
+                  const CMPO *constraints = 0);
 
   double minimize(const RMPO &H, RMPS *psi);
   double minimize(const CMPO &H, CMPS *psi);
