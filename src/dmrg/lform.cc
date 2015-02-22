@@ -142,7 +142,7 @@ namespace mps {
     tensor_t output;
     for (int i = 0; i < number_of_bras(); i++) {
       maybe_add(&output,
-		compose<tensor_t>(left_matrix(i, here()), conj(weight_[i] * bra_[i][here()]),
+		compose<tensor_t>(left_matrix(i, here()), tensor::conj(weight_[i] * bra_[i][here()]),
                                   right_matrix(i, here())));
     }
     return output;
@@ -189,8 +189,8 @@ namespace mps {
     for (int n = 0; n < number_of_bras(); n++) {
       maybe_add(&output,
 		compose4<tensor_t>(left_matrix(n, i),
-                                   conj(weight_[n] * bra_[n][i]),
-                                   conj(bra_[n][j]),
+                                   tensor::conj(weight_[n] * bra_[n][i]),
+                                   tensor::conj(bra_[n][j]),
                                    right_matrix(n, j)));
     }
     return output;
@@ -203,9 +203,9 @@ namespace mps {
     number_t x, v = number_zero<number_t>();
     for (int i = 0; i < number_of_bras(); i++) {
       for (int j = 0; j <= i; j++) {
-        x = conj(weight_[i]) * weight_[j] * scprod(bra_[i], bra_[j]);
+        x = tensor::conj(weight_[i]) * weight_[j] * scprod(bra_[i], bra_[j]);
         v += x;
-        if (i != j) v += conj(x);
+        if (i != j) v += tensor::conj(x);
       }
     }
     return sqrt(tensor::abs(v));
