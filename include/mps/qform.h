@@ -74,6 +74,10 @@ namespace mps {
     const elt_t apply_one_site_matrix(const elt_t &P) const;
     /** Apply the two_site_matrix() onto a tensor representing two sites. */
     const elt_t apply_two_site_matrix(const elt_t &P12, int sense = +1) const;
+    /** Efficiently take the diagonal part of the single_site_matrix(). */
+    const elt_t take_single_site_matrix_diag() const;
+    /** Efficiently take the diagonal part of the two_site_matrix(). */
+    const elt_t take_two_site_matrix_diag(int sense = +1) const;
 
   private:
 

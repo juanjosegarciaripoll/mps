@@ -277,6 +277,36 @@ namespace mps {
 
   template<class MPO>
   const typename QuadraticForm<MPO>::elt_t
+  QuadraticForm<MPO>::take_single_site_matrix_diag() const
+  {
+    elt_t output;
+    for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
+	 it != end;
+	 it++)
+      {
+        // L(a1,b1,a2,b2)
+        const elt_t &L = left_matrix(here(), it->left_ndx);
+        // R(a3,b3,a1,b1)
+        const elt_t &R = right_matrix(here(), it->right_ndx);
+        if (!L.is_empty() && !R.is_empty()) {
+          index a2 = L.dimension(2);
+          index b2 = L.dimension(3);
+          index a3 = R.dimension(0);
+          index b3 = R.dimension(1);
+          // We implement this
+          // Q(a2,i,a3) = L(a1,b1,a2,a2) O1(i,i) R(a3,a3,a1,b1)
+          // where a1=b1 = 1, because of periodic boundary conditions
+          elt_t Q = kron2_sum(kron2_sum(take_diag(reshape(L, a2,b2)),
+                                        take_diag(it->op)),
+                              take_diag(reshape(R, a3,b3)));
+          maybe_add(&output, Q);
+        }
+      }
+    return output;
+  }
+
+  template<class MPO>
+  const typename QuadraticForm<MPO>::elt_t
   QuadraticForm<MPO>::apply_two_site_matrix(const elt_t &P12, int sense) const
   {
     elt_t output;
@@ -322,4 +352,51 @@ namespace mps {
       }
     return output;
   }
+
+  template<class MPO>
+  const typename QuadraticForm<MPO>::elt_t
+  QuadraticForm<MPO>::take_two_site_matrix_diag(int sense) const
+  {
+    elt_t output;
+    index i, j;
+    if (sense > 0) {
+      i = here();
+      j = i+1;
+      assert(j < size());
+    } else {
+      j = here();
+      assert(j > 0);
+      i = j - 1;
+    }
+    for (pair_iterator_t it1 = pairs_[i].begin(), end1 = pairs_[i].end();
+	 it1 != end1;
+	 it1++)
+      {
+	for (pair_iterator_t it2 = pairs_[j].begin(), end2 = pairs_[j].end();
+	     it2 != end2;
+	     it2++)
+	  if (it1->right_ndx == it2->left_ndx) {
+            // L(a1,b1,a2,b2)
+	    const elt_t &L = left_matrix(i, it1->left_ndx);
+            // R(a3,b3,a1,b1)
+	    const elt_t &R = right_matrix(j, it2->right_ndx);
+            if (!L.is_empty() && !R.is_empty()) {
+              index a2 = L.dimension(2);
+              index b2 = L.dimension(3);
+              index a3 = R.dimension(0);
+              index b3 = R.dimension(1);
+              // We implement this
+              // Q12(a2,i,j,a3) = L(a1,a1,a2,a2) O1(i,i) O2(j,j) R(a3,a3,a1,a1)
+              // where a1 = 1, because of periodic boundary conditions
+              elt_t Q12 = kron2_sum(kron2_sum(take_diag(reshape(L, a2,b2)),
+                                              take_diag(it1->op)),
+                                    kron2_sum(take_diag(it2->op),
+                                              take_diag(reshape(R,a3,b3))));
+              maybe_add(&output, Q12);
+            }
+	  }
+      }
+    return output;
+  }
+
 }
