@@ -368,14 +368,13 @@ namespace mps {
       assert(j > 0);
       i = j - 1;
     }
-    std::cout << "Build take_diag\n" << std::flush;
     for (pair_iterator_t it1 = pairs_[i].begin(), end1 = pairs_[i].end();
 	 it1 != end1;
 	 it1++)
       {
 	for (pair_iterator_t it2 = pairs_[j].begin(), end2 = pairs_[j].end();
 	     it2 != end2;
-	     it2++)
+	     it2++) {
 	  if (it1->right_ndx == it2->left_ndx) {
             // L(a1,b1,a2,b2)
 	    const elt_t &L = left_matrix(i, it1->left_ndx);
@@ -396,8 +395,8 @@ namespace mps {
               maybe_add(&output, Q12);
             }
 	  }
+        }
       }
-    std::cout << "...end take_diag\n";
     return output;
   }
 
