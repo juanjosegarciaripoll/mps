@@ -368,6 +368,7 @@ namespace mps {
       assert(j > 0);
       i = j - 1;
     }
+    std::cout << "Build take_diag\n" << std::flush;
     for (pair_iterator_t it1 = pairs_[i].begin(), end1 = pairs_[i].end();
 	 it1 != end1;
 	 it1++)
@@ -396,6 +397,7 @@ namespace mps {
             }
 	  }
       }
+    std::cout << "...end take_diag\n";
     return output;
   }
 

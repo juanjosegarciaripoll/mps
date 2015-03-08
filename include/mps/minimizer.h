@@ -42,9 +42,12 @@ namespace mps {
   };
 
   double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt,
-                  const RMPO *constraints = 0);
+                  const RMPO &constraint, double value);
   double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt,
-                  const CMPO *constraints = 0);
+                  const CMPO &constraint, cdouble value);
+
+  double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt);
+  double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt);
 
   double minimize(const RMPO &H, RMPS *psi);
   double minimize(const CMPO &H, CMPS *psi);

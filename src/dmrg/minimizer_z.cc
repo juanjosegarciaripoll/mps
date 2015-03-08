@@ -22,15 +22,22 @@
 namespace mps {
 
   double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt,
-                  const CMPO *constraints)
+                  const CMPO &constraint, cdouble value)
   {
-    Minimizer<CMPO> min(opt, H, *psi, constraints);
+    Minimizer<CMPO> min(opt, H, *psi);
+    min.add_constraint(constraint, value);
+    return min.full_sweep(psi);
+  }
+
+  double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt)
+  {
+    Minimizer<CMPO> min(opt, H, *psi);
     return min.full_sweep(psi);
   }
 
   double minimize(const CMPO &H, CMPS *psi)
   {
-    return minimize(H, psi, MinimizerOptions(), 0);
+    return minimize(H, psi, MinimizerOptions());
   }
 
 } // namespace mps

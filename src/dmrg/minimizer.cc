@@ -42,15 +42,13 @@ namespace mps {
 
   template<class Tensor, class QForm>
   const Tensor apply_qform2(const Tensor &P, int sense, const Indices *d,
-                            const QForm *qform, const QForm *projector)
+                            const QForm *qform, const Tensor &projector)
   {
     Tensor v = reshape(P, *d);
-    if (projector) {
-      v = projector->apply_two_site_matrix(v, sense);
-    }
-    v = qform->apply_two_site_matrix(v, sense);
-    if (projector) {
-      v = projector->apply_two_site_matrix(v, sense);
+    if (projector.size()) {
+      v = projector * qform->apply_two_site_matrix(projector * v, sense);
+    } else {
+      v = qform->apply_two_site_matrix(v, sense);
     }
     return reshape(v, P.size());
   }
@@ -65,16 +63,19 @@ namespace mps {
 
     mps_t psi;
     qform_t Hqform, *Nqform;
+    number_t Nvalue;
+    double Ntol;
     index site;
     int step;
     bool converged;
 
-    Minimizer(const MinimizerOptions &opt, const mpo_t &H, const mps_t &state,
-              const mpo_t *constraints) :
+    Minimizer(const MinimizerOptions &opt, const mpo_t &H, const mps_t &state) :
       MinimizerOptions(opt),
       psi(canonical_form(state, 0)),
       Hqform(H, psi, psi, 0),
-      Nqform(constraints? new qform_t(*constraints, psi, psi) : 0),
+      Nqform(0),
+      Nvalue(0),
+      Ntol(1e-6),
       site(0),
       step(+1),
       converged(true)
@@ -91,6 +92,13 @@ namespace mps {
 
     const mps_t &state() {
       return psi;
+    }
+
+    void add_constraint(const mpo_t &constraint, number_t value)
+    {
+      if (Nqform) delete Nqform;
+      Nqform = new qform_t(constraint, psi, psi);
+      Nvalue = value;
     }
 
     double single_site_step() {
@@ -137,15 +145,26 @@ namespace mps {
         fold(psi[site], -1, psi[site+1], 0) :
         fold(psi[site-1], -1, psi[site], 0);
       const Indices d = P12.dimensions();
+      tensor_t projector;
+      if (Nqform) {
+        projector = Nqform->take_two_site_matrix_diag(step);
+        for (typename tensor_t::iterator it = projector.begin();
+             it != projector.end();
+             it++) {
+          *it = abs(*it - Nvalue) < Ntol;
+        }
+      }
       tensor_t E = linalg::eigs(with_args(apply_qform2<tensor_t,qform_t>,
-                                          step, &d, &Hqform, Nqform),
+                                          step, &d, &Hqform, projector),
                                 P12.size(), linalg::SmallestAlgebraic, 1, &P12,
                                 &converged);
       if (converged) {
         set_canonical_2_sites(psi, reshape(P12, d), site, step, Dmax, svd_tolerance);
       }
       Hqform.propagate(psi[site], psi[site], step);
-      if (Nqform) Nqform->propagate(psi[site], psi[site], step);
+      if (Nqform) {
+        Nqform->propagate(psi[site], psi[site], step);
+      }
       if (debug > 1) {
         std::cout << "\tsite=" << site << ", E=" << real(E[0])
                   << ", P1.d=" << psi[site].dimensions()
