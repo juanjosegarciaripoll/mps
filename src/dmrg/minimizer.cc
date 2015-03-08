@@ -46,7 +46,7 @@ namespace mps {
   {
     Tensor v = reshape(P, *d);
     if (projector.size()) {
-      v = projector * qform->apply_two_site_matrix(projector * v, sense);
+      v = projector * (qform->apply_two_site_matrix(projector * v, sense));
     } else {
       v = qform->apply_two_site_matrix(v, sense);
     }
@@ -147,7 +147,7 @@ namespace mps {
       const Indices d = P12.dimensions();
       tensor_t projector;
       if (Nqform) {
-        projector = Nqform->take_two_site_matrix_diag(step);
+        projector = reshape(Nqform->take_two_site_matrix_diag(step), d);
         for (typename tensor_t::iterator it = projector.begin();
              it != projector.end();
              it++) {
