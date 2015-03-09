@@ -34,7 +34,7 @@ namespace mps {
       int r = psi.rank();
       index b = d[r-1];
       index ai = psi.size() / b;
-      RTensor s = linalg::svd(reshape(psi, ai, b), &U, &V, SVD_ECONOMIC);
+      RTensor s = linalg::block_svd(reshape(psi, ai, b), &U, &V, SVD_ECONOMIC);
       index l = s.size();
       index new_l = where_to_truncate(s, truncate?
                                       MPS_DEFAULT_TOLERANCE :
@@ -51,7 +51,7 @@ namespace mps {
     } else {
       index a = d[0];
       index ib = psi.size() / a;
-      RTensor s = linalg::svd(reshape(psi, a, ib), &V, &U, SVD_ECONOMIC);
+      RTensor s = linalg::block_svd(reshape(psi, a, ib), &V, &U, SVD_ECONOMIC);
       index l = s.size();
       index new_l = where_to_truncate(s, truncate?
                                       MPS_DEFAULT_TOLERANCE :
