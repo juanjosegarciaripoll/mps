@@ -117,19 +117,20 @@ namespace mps {
       return;
     const matrix_array_t &mr = right_matrices(here());
     matrix_array_t &new_mr = right_matrices(here()-1);
-    // std::cout << "Original matrices\n";
+    // std::cout << "Original right matrices\n";
     // for (int i = 0; i < mr.size(); i++) {
     //   std::cout << " mr[" << i << "]=" << mr[i] << std::endl;
     // }
     std::fill(new_mr.begin(), new_mr.end(), elt_t());
     for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
 	 it != end;
-	 it++)
+	 it++) {
       if (!mr[it->right_ndx].is_empty()) {
 	maybe_add<elt_t>(&new_mr.at(it->left_ndx),
 			 prop_matrix(mr[it->right_ndx], -1, braP, ketP, &it->op));
       }
-    // std::cout << "New matrix locations\n";
+    }
+    // std::cout << "New matrix right locations\n";
     // for (int i = 0; i < new_mr.size(); i++) {
     //   std::cout << " mr'[" << i << "]=" << new_mr[i] << std::endl;
     // }
@@ -143,7 +144,7 @@ namespace mps {
       return;
     const matrix_array_t &ml = left_matrices(here());
     matrix_array_t &new_ml = left_matrices(here()+1);
-    // std::cout << "Original matrices\n";
+    // std::cout << "Original left matrices\n";
     // for (int i = 0; i < ml.size(); i++) {
     //   std::cout << " ml[" << i << "]=" << ml[i] << std::endl;
     // }
@@ -155,7 +156,7 @@ namespace mps {
 	maybe_add<elt_t>(&new_ml.at(it->right_ndx),
 			 prop_matrix(ml[it->left_ndx], +1, braP, ketP, &it->op));
       }
-    // std::cout << "New matrix locations\n";
+    // std::cout << "New matrix left locations\n";
     // for (int i = 0; i < new_ml.size(); i++) {
     //   std::cout << " ml'[" << i << "]=" << new_ml[i] << std::endl;
     // }
@@ -388,10 +389,19 @@ namespace mps {
               // We implement this
               // Q12(a2,i,j,a3) = L(a1,a1,a2,a2) O1(i,i) O2(j,j) R(a3,a3,a1,a1)
               // where a1 = 1, because of periodic boundary conditions
-              elt_t Q12 = kron2_sum(kron2_sum(take_diag(reshape(L, a2,b2)),
-                                              take_diag(it1->op)),
-                                    kron2_sum(take_diag(it2->op),
-                                              take_diag(reshape(R,a3,b3))));
+              elt_t Q12 = kron2(kron2(take_diag(reshape(L, a2,b2)),
+                                      take_diag(it1->op)),
+                                kron2(take_diag(it2->op),
+                                      take_diag(reshape(R,a3,b3))));
+              // std::cout << "L= " << matrix_form(take_diag(reshape(L, a2,b2)))
+              //           << std::endl
+              //           << "o1=" << matrix_form(take_diag(it1->op))
+              //           << std::endl
+              //           << "o2=" << matrix_form(take_diag(it2->op))
+              //           << std::endl
+              //           << "R= " << matrix_form(take_diag(reshape(R, a3,b3)))
+              //           << std::endl;
+              // std::cout << "Q= " << matrix_form(Q12) << std::endl;
               maybe_add(&output, Q12);
             }
 	  }
