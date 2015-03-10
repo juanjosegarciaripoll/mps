@@ -165,8 +165,7 @@ namespace mps {
         P12.fill_with_zeros();
         P12.at(range(projector)) = subP12;
         if (converged) {
-          set_canonical_2_sites(psi, reshape(subP12, P12.dimensions()),
-                                site, step, Dmax, svd_tolerance);
+          set_canonical_2_sites(psi, P12, site, step, Dmax, svd_tolerance);
         }
         Hqform.propagate(psi[site], psi[site], step);
         Nqform->propagate(psi[site], psi[site], step);
