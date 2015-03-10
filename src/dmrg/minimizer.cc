@@ -146,8 +146,17 @@ namespace mps {
         fold(psi[site-1], -1, psi[site], 0);
       if (Nqform) {
         Indices projector;
-        projector = which(abs(Nqform->take_two_site_matrix_diag(step) - Nvalue)
-                          < Ntol);
+        {
+          tensor_t aux = Nqform->take_two_site_matrix_diag(step);
+          projector = which(abs(aux - Nvalue) < Ntol);
+          if (projector.size() == 0) {
+            std::cout << "Unable to satisfy constraint " << Nvalue
+                      << " with tolerance " << Ntol << std::endl;
+            std::cout << "Values:\n" << matrix_form(aux) << std::endl;
+            converged = false;
+            return 0.0;
+          }
+        }
         tensor_t subP12 = P12(range(projector));
         E = linalg::eigs(with_args(apply_qform2_with_projector<tensor_t,qform_t>,
                                    step, P12, &Hqform, projector),
@@ -206,7 +215,9 @@ namespace mps {
       double E = 1e28;
       if (debug) {
         std::cout << "***\n*** Algorithm with " << size() << " sites, "
-                  << "two-sites = " << !single_site() << std::endl;
+                  << "two-sites = " << !single_site()
+                  << (Nqform? ", constrained" : ", unconstrained")
+                  << std::endl;
       }
       for (index failures = 0, i = 0; i < sweeps; i++) {
         double newE = single_site()? single_site_sweep() : two_site_sweep();
