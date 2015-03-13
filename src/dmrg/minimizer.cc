@@ -140,6 +140,19 @@ namespace mps {
 
     double two_site_step() {
       tensor_t E;
+      if (debug > 1) {
+        if (step > 0) {
+          std::cout << "\tsite=" << site << ", dimensions="
+                    << psi[site].dimensions() << ","
+                    << psi[site+1].dimensions()
+                    << std::endl;
+        } else {
+          std::cout << "\tsite=" << site << ", dimensions="
+                    << psi[site-1].dimensions() << ","
+                    << psi[site].dimensions()
+                    << std::endl;
+        }
+      }
       tensor_t P12 =
         (step > 0) ?
         fold(psi[site], -1, psi[site+1], 0) :
@@ -149,6 +162,11 @@ namespace mps {
         {
           tensor_t aux = Nqform->take_two_site_matrix_diag(step);
           projector = which(abs(aux - Nvalue) < Ntol);
+          if (debug > 1) {
+            std::cout << "\tsite=" << site << ", constraints="
+                      << projector.size() << "/" << aux.size()
+                      << std::endl;
+          }
           if (projector.size() == 0) {
             std::cout << "Unable to satisfy constraint " << Nvalue
                       << " with tolerance " << Ntol << std::endl;
@@ -165,7 +183,8 @@ namespace mps {
         P12.fill_with_zeros();
         P12.at(range(projector)) = subP12;
         if (converged) {
-          set_canonical_2_sites(psi, P12, site, step, Dmax, svd_tolerance);
+          set_canonical_2_sites(psi, P12, site, step, Dmax, svd_tolerance,
+                                false);
         }
         Hqform.propagate(psi[site], psi[site], step);
         Nqform->propagate(psi[site], psi[site], step);
@@ -177,7 +196,7 @@ namespace mps {
                          &P12, &converged);
         if (converged) {
           set_canonical_2_sites(psi, reshape(P12, d), site, step, Dmax,
-                                svd_tolerance);
+                                svd_tolerance, false);
         }
         Hqform.propagate(psi[site], psi[site], step);
       }
