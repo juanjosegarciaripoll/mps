@@ -30,6 +30,8 @@ namespace mps {
   const double MPS_TRUNCATE_ZEROS = 0.0;
   const double MPS_DEFAULT_TOLERANCE = -4.0;
 
+  const unsigned MPS_DEBUG_TRUNCATION = FLAGS.create_key(0);
+
   const unsigned MPS_TRUNCATION_TOLERANCE = FLAGS.create_key(DBL_EPSILON);
 
   const unsigned MPS_DEBUG_TROTTER = FLAGS.create_key(0);
