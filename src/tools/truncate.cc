@@ -92,7 +92,6 @@ namespace mps {
     }
     delete[] cumulated;
     if (debug) {
-      std::cout << s*s << std::endl;
       std::cout << "Truncated to tolerance " << limit << ", new size "
                 << max_dim << " vs " << L << std::endl;
     }
