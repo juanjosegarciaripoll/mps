@@ -35,13 +35,15 @@ namespace mps {
 
   template<class Tensor, class QForm>
   const Tensor apply_qform2_with_projector(const Tensor &P, int sense,
-                                           const Tensor &P12, const QForm *qform,
+                                           Tensor *P12, const QForm *qform,
                                            const Indices &projector)
   {
-    Tensor v = Tensor::zeros(P12.dimensions());
-    v.at(range(projector)) = P;
-    v = qform->apply_two_site_matrix(v, sense);
-    return v(range(projector));
+    // This is a bit fishy, because we reuse P12 as a buffer where to
+    // do the computation of H * psi. However, we rely on the fact that
+    // ARPACK is not multithreaded and thus apply_qform2_... is never
+    // concurrent on the same tensor.
+    P12->at(range(projector)) = P;
+    return qform->apply_two_site_matrix(*P12, sense)(range(projector));
   }
 
   template<class Tensor, class QForm>
@@ -176,11 +178,11 @@ namespace mps {
           }
         }
         tensor_t subP12 = P12(range(projector));
+        P12.fill_with_zeros();
         E = linalg::eigs(with_args(apply_qform2_with_projector<tensor_t,qform_t>,
-                                   step, P12, &Hqform, projector),
+                                   step, &P12, &Hqform, projector),
                          subP12.size(), linalg::SmallestAlgebraic, 1,
                          &subP12, &converged);
-        P12.fill_with_zeros();
         P12.at(range(projector)) = subP12;
         if (converged) {
           set_canonical_2_sites(psi, P12, site, step, Dmax, svd_tolerance,
