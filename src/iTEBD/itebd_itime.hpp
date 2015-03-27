@@ -119,7 +119,7 @@ namespace mps {
 		  << std::endl;
 	std::cout << "\tdS=" << dS << ";\tdE=" << dE << std::endl;
 	std::cout << "\tdSdt=" << dSdt << ";\tdEdt=" << dEdt << std::endl;
-        std::cout << "l = " << psi.left_vector(0) << std::endl;
+        std::cout << "l = " << real(psi.left_vector(0)) << std::endl;
       }
     }
     return psi;
