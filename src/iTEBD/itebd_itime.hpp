@@ -97,7 +97,8 @@ namespace mps {
 		  << ";\tl=" << std::max(psi.left_dimension(0),
 					 psi.right_dimension(0))
 		  << std::endl;
-        std::cout << "l = " << matrix_form(psi.left_vector(0)) << std::endl;
+        std::cout << "l = " << matrix_form(real(psi.left_vector(0)))
+                  << std::endl;
       }
     }
     return psimin;

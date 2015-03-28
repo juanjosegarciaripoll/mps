@@ -38,6 +38,8 @@ namespace mps {
   /**Algorithms acting on two sites.*/
   extern const unsigned int MPS_TWO_SITE_ALGORITHM;
 
+  /**Flag key for debugging the simplification routines.*/
+  extern const unsigned int MPS_DEBUG_TRUNCATION;
   /**Flag key for the default relative truncation tolerance.*/
   extern const unsigned int MPS_TRUNCATION_TOLERANCE;
 

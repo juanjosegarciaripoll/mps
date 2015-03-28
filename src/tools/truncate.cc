@@ -19,6 +19,8 @@
 
 #include <float.h>
 #include <mps/tools.h>
+#include <mps/flags.h>
+#include <tensor/io.h>
 
 namespace mps {
 
@@ -31,6 +33,8 @@ namespace mps {
      * is smaller than MAX_DIM.
      */
     size_t L = s.size();
+    bool debug = FLAGS.get(MPS_DEBUG_TRUNCATION);
+
     if (max_dim == 0 || max_dim > L) {
       max_dim = L;
     }
@@ -38,6 +42,9 @@ namespace mps {
       tol = FLAGS.get(MPS_TRUNCATION_TOLERANCE);
     }
     if (tol >= 1.0 /* MPS_DO_NOT_TRUNCATE */ ) {
+      if (debug) {
+        std::cout << "Truncation disabled" << std::endl;
+      }
       return max_dim;
     }
     if (tol == 0 /* MPS_TRUNCATE_ZEROS */) {
@@ -45,8 +52,15 @@ namespace mps {
        * is no need to accumulate values. */
       for (size_t i = L; i--; ) {
         if (s[i]) {
+          if (debug) {
+            std::cout << "Truncated only zeros, new size "
+                      << i << " vs " << L << std::endl;
+          }
           return (i < max_dim)? (i+1) : max_dim;
         }
+      }
+      if (debug) {
+        std::cout << "Not truncated vector of size " << L << std::endl;
       }
       return 0;
     }
@@ -77,6 +91,10 @@ namespace mps {
       }
     }
     delete[] cumulated;
+    if (debug) {
+      std::cout << "Truncated to tolerance " << limit << ", new size "
+                << max_dim << " vs " << L << std::endl;
+    }
     return max_dim;
   }
 
