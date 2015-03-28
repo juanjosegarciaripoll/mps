@@ -55,51 +55,58 @@ namespace mps {
     Tensor Id = Tensor::eye(H12.rows());
     double time = 0;
     double E = energy(psi, H12), S = psi.entropy();
+    if (energies)
+      energies->push_back(E);
+    if (entropies)
+      entropies->push_back(S);
     double Emin = E;
     iTEBD<Tensor> psimin = psi;
  
+    if (!deltan) {
+      deltan = 1;
+    }
     std::cout.precision(5);
-    std::cout << nsteps << ", " << dt << " x " << deltan << " = " << dt * deltan << std::endl;
-
-    for (size_t i = 0; (i < nsteps) && (!stop); i++) {
-      switch (method) {
-      case 0:
-	psi = psi.apply_operator(eH12[0], 0, tolerance, max_dim);
-	psi = psi.apply_operator(eH12[0], 1, tolerance, max_dim);
-	break;
-      case 1:
-	psi = psi.apply_operator(eH12[1], 0, tolerance, max_dim);
-	psi = psi.apply_operator(eH12[0], 1, tolerance, max_dim);
-	psi = psi.apply_operator(eH12[1], 0, tolerance, max_dim);
-	break;
-      default:
-	psi = psi.apply_operator(eH12[0], 0, tolerance, max_dim);
-	psi = psi.apply_operator(eH12[1], 1, tolerance, max_dim);
-	psi = psi.apply_operator(eH12[2], 0, tolerance, max_dim);
-	psi = psi.apply_operator(eH12[3], 1, tolerance, max_dim);
-	psi = psi.apply_operator(eH12[2], 0, tolerance, max_dim);
-	psi = psi.apply_operator(eH12[1], 1, tolerance, max_dim);
-	psi = psi.apply_operator(eH12[0], 0, tolerance, max_dim);
-      }
-      time += dt;
-      if ((deltan && (i % deltan  == 0))) {
-        double newE = energy(psi, H12);
-        double newS = psi.entropy();
-        if (energies)
-          energies.push_back(newE);
-        if (entropies)
-          entropies.push_back(newS);
-        if (newE <= Emin) {
-          Emin = newE;
-          psimin = psi;
+    std::cout << nsteps << ", " << dt << " x " << deltan
+              << " = " << dt * deltan << std::endl;
+    for (size_t phases = (nsteps + deltan - 1) / deltan; phases; phases--) {
+      for (size_t i = 0; (i < deltan); i++) {
+        switch (method) {
+        case 0:
+          psi = psi.apply_operator(eH12[0], 0, tolerance, max_dim);
+          psi = psi.apply_operator(eH12[0], 1, tolerance, max_dim);
+          break;
+        case 1:
+          psi = psi.apply_operator(eH12[1], 0, tolerance, max_dim);
+          psi = psi.apply_operator(eH12[0], 1, tolerance, max_dim);
+          psi = psi.apply_operator(eH12[1], 0, tolerance, max_dim);
+          break;
+        default:
+          psi = psi.apply_operator(eH12[0], 0, tolerance, max_dim);
+          psi = psi.apply_operator(eH12[1], 1, tolerance, max_dim);
+          psi = psi.apply_operator(eH12[2], 0, tolerance, max_dim);
+          psi = psi.apply_operator(eH12[3], 1, tolerance, max_dim);
+          psi = psi.apply_operator(eH12[2], 0, tolerance, max_dim);
+          psi = psi.apply_operator(eH12[1], 1, tolerance, max_dim);
+          psi = psi.apply_operator(eH12[0], 0, tolerance, max_dim);
         }
-	std::cout << "t=" << time << ";\tE=" << E << ";\tS=" << S
-		  << ";\tl=" << std::max(psi.left_dimension(0),
-					 psi.right_dimension(0))
-		  << std::endl;
-        std::cout << "l = " << matrix_form(real(psi.left_vector(0)))
-                  << std::endl;
+        time += dt;
       }
+      double newE = energy(psi, H12);
+      double newS = psi.entropy();
+      if (energies)
+        energies->push_back(newE);
+      if (entropies)
+        entropies->push_back(newS);
+      if (newE <= Emin) {
+        Emin = newE;
+        psimin = psi;
+      }
+      std::cout << "t=" << time << ";\tE=" << E << ";\tS=" << S
+                << ";\tl=" << std::max(psi.left_dimension(0),
+                                       psi.right_dimension(0))
+                << std::endl;
+      std::cout << "l = " << matrix_form(real(psi.left_vector(0)))
+                << std::endl;
     }
     return psimin;
   }
