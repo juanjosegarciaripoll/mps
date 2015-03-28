@@ -20,6 +20,7 @@
 #ifndef MPS_ITEBD_H
 #define MPS_ITEBD_H
 
+#include <vector>
 #include <tensor/tensor.h>
 
 /*!\addtogroup MPS*/
@@ -201,7 +202,6 @@ private:
   /** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
   double energy(const CiTEBD &psi, const CTensor &Op12);
 
-
 /** Evolve an iTEBD in imaginary time, using the local Hamiltonian \a H12 on
  state \a psi. Given a Hamiltonian which is a composition of local Hamiltonians
  acting on pairs of sites, \f$H=\sum_{i} H_{i,i+1}\f$, we evolve the iTEBD state
@@ -212,10 +212,12 @@ private:
 template<class Tensor>
 const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12, double dt,
                                  tensor::index nsteps, double tolerance = -1,
-                                 tensor::index max_dim = 0, tensor::index deltan = 1, int method = 1);
+                                 tensor::index max_dim = 0, tensor::index deltan = 1, int method = 1,
+                                 std::vector<double> *energies = 0,
+                                 std::vector<double> *entropies = 0);
 
 /* @} */
 
-}
+  }
 
 #endif // MPS_QUANTUM_H

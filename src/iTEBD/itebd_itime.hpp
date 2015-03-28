@@ -24,31 +24,14 @@
 
 namespace mps {
 
-  static inline bool
-  stop(double delta, double tol, double value)
-  {
-    return delta < tol * std::max<double>(tensor::abs(value), 1e-3);
-  }
-
-  static inline double
-  avg_change(size_t step, RTensor &cum, double delta)
-  {
-    size_t L = cum.size();
-    size_t i = step % L;
-    cum.at(i) = delta;
-    if (step >= L) {
-      return std::accumulate(cum.begin(), cum.end(), 0.0);
-    } else {
-      return 1.0;
-    }
-  }
-
   template<class Tensor>
   const iTEBD<Tensor>
   evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
 	       double dt, tensor::index nsteps,
 	       double tolerance, tensor::index max_dim,
-	       tensor::index deltan, int method)
+	       tensor::index deltan, int method,
+               std::vector<double> *energies,
+               std::vector<double> *entropies)
   {
     static const double FR_param[5] =
       {0.67560359597983, 1.35120719195966, -0.17560359597983, -1.70241438391932};
@@ -72,13 +55,12 @@ namespace mps {
     Tensor Id = Tensor::eye(H12.rows());
     double time = 0;
     double E = energy(psi, H12), S = psi.entropy();
+    double Emin = E;
+    iTEBD<Tensor> psimin = psi;
+ 
     std::cout.precision(5);
     std::cout << nsteps << ", " << dt << " x " << deltan << " = " << dt * deltan << std::endl;
-    RTensor S_growth(std::max<tensor::index>(deltan, 10));
-    RTensor E_growth(std::max<tensor::index>(deltan, 10));
-    S_growth.fill_with_zeros();
-    E_growth.fill_with_zeros();
-    bool stop = false;
+
     for (size_t i = 0; (i < nsteps) && (!stop); i++) {
       switch (method) {
       case 0:
@@ -99,30 +81,26 @@ namespace mps {
 	psi = psi.apply_operator(eH12[1], 1, tolerance, max_dim);
 	psi = psi.apply_operator(eH12[0], 0, tolerance, max_dim);
       }
-      double newE = energy(psi, H12);
-      double newS = psi.entropy();
-      double dS = S - newS;
-      double dE = E - newE;
-      double dSdt = avg_change(i, S_growth, dS) / dt;
-      double dEdt = avg_change(i, E_growth, dE) / dt;
-      S = newS;
-      E = newE;
       time += dt;
-      if (i > E_growth.size() && ((tensor::abs(dSdt) < 1e-6) && (dEdt <= 1e-6))) {
-	std::cout << "Entropy and energy converged" << std::endl;
-	stop = true;
-      }
-      if ((deltan && (i % deltan  == 0)) || stop) {
+      if ((deltan && (i % deltan  == 0))) {
+        double newE = energy(psi, H12);
+        double newS = psi.entropy();
+        if (energies)
+          energies.push_back(newE);
+        if (entropies)
+          entropies.push_back(newS);
+        if (newE <= Emin) {
+          Emin = newE;
+          psimin = psi;
+        }
 	std::cout << "t=" << time << ";\tE=" << E << ";\tS=" << S
 		  << ";\tl=" << std::max(psi.left_dimension(0),
 					 psi.right_dimension(0))
 		  << std::endl;
-	std::cout << "\tdS=" << dS << ";\tdE=" << dE << std::endl;
-	std::cout << "\tdSdt=" << dSdt << ";\tdEdt=" << dEdt << std::endl;
-        std::cout << "l = " << psi.left_vector(0) << std::endl;
+        std::cout << "l = " << matrix_form(psi.left_vector(0)) << std::endl;
       }
     }
-    return psi;
+    return psimin;
   }
 
 }
