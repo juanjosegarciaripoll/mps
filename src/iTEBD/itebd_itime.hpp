@@ -112,6 +112,7 @@ namespace mps {
       E = newE;
       S = newS;
     }
+    return psi;
     return psimin;
   }
 
