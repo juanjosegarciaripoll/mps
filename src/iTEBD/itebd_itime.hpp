@@ -101,12 +101,16 @@ namespace mps {
         Emin = newE;
         psimin = psi;
       }
-      std::cout << "t=" << time << ";\tE=" << E << ";\tS=" << S
+      std::cout << "t=" << time
+                << ";\tE=" << newE << "; dE=" << newE-E
+                << ";\tS=" << S << "; dS=" << newS-S
                 << ";\tl=" << std::max(psi.left_dimension(0),
                                        psi.right_dimension(0))
+                << std::endl
+                << "l = " << matrix_form(real(psi.left_vector(0)))
                 << std::endl;
-      std::cout << "l = " << matrix_form(real(psi.left_vector(0)))
-                << std::endl;
+      E = newE;
+      S = newS;
     }
     return psimin;
   }
