@@ -38,18 +38,7 @@ namespace mps {
   {
     Tensor v = prop_matrix(Tensor(), +1, A, A);
     v /= norm2(v);
-#if 1
     linalg::eig_power(with_args(p1<Tensor>, &A), v.size(), &v);
-#else
-    for (size_t i = 0; i < 10; i++) {
-      Tensor new_v = prop_matrix(v, +1, A, A);
-      new_v /= norm2(new_v);
-      double err = abs(1.0 - scprod(new_v, v));
-      std::cout << i << "->" << err << std::endl;
-      v = new_v;
-      if (err < tol) break;
-    }
-#endif
     return v;
   }
 
@@ -65,18 +54,7 @@ namespace mps {
   {
     Tensor v =  prop_matrix(prop_matrix(Tensor(), +1, A, A), +1, B, B);
     v /= norm2(v);
-#if 1
     linalg::eig_power(with_args(p2<Tensor>, &A, &B), v.size(), &v);
-#else
-    for (size_t i = 0; i < 10; i++) {
-      Tensor new_v = prop_matrix(prop_matrix(v, +1, A, A), +1, B, B);
-      new_v /= norm2(new_v);
-      double err = abs(1.0 - scprod(new_v, v));
-      std::cout << i << "->" << err << std::endl;
-      v = new_v;
-      if (err < tol) break;
-    }
-#endif
     return v;
   }
 

@@ -84,8 +84,11 @@ namespace mps {
                 reshape(Tensor::eye(a), 1,1,a,a) :
                 reshape(Tensor::eye(a), a,a,1,1)) / (double)a;
     linalg::eig_power(with_args(px<Tensor>, sense, &G), v.size(), &v);
+    // v(a1,a2) is associated index 'a1' with the conjugate tensor
+    // and 'a2' with the tensor itself, (see prop_init) hence we have to
+    // transpose.
     v = reshape(v, a, a);
-    v = (v + adjoint(v)) / 2.0;
+    v = (transpose(v) + conj(v)) / 2.0;
     return v;
   }
 
@@ -170,7 +173,7 @@ namespace mps {
   template<class Tensor>
   iTEBD<Tensor>::iTEBD(const Tensor &AB, const Tensor &lAB,
                        double tolerance, tensor::index max_dim)
-  : canonical_(true)
+  : canonical_(false)
   {
     split_tensor<Tensor>(AB, lAB, &A_, &lA_, &B_, &lB_, tolerance, max_dim);
     AlA_ = scale(A_, -1, lA_);
@@ -190,13 +193,11 @@ namespace mps {
   template<class Tensor>
   static Tensor
   itebd_power_eig(const Tensor &A, const Tensor &lA, const Tensor &B, const Tensor &lB,
-                  int sense, tensor::index iter = 0, double tol = 1e-11)
+                  int sense)
   {
     typedef typename Tensor::elt_t elt_t;
     tensor::index a = lB.size();
-    Tensor v = ((sense > 0)?
-                reshape(Tensor::eye(a), 1,1,a,a) :
-                reshape(Tensor::eye(a), a,a,1,1)) / (double)a;
+    Tensor v = Tensor::eye(a,a) / sqrt((double)a);
     if (sense > 0) {
       Tensor A1 = scale(A, 0, lB);
       Tensor A2 = scale(B, 0, lA);
@@ -206,8 +207,11 @@ namespace mps {
       Tensor A1 = scale(B, -1, lB);
       linalg::eig_power(with_args(px4<Tensor>, sense, &A1, &A2), v.size(), &v);
     }
+    // v(a1,a2) is associated index 'a1' with the conjugate tensor
+    // and 'a2' with the tensor itself, (see prop_init) hence we have to
+    // transpose.
     v = reshape(v, a, a);
-    v = (v + adjoint(v)) / 2.0;
+    v = (transpose(v) + conj(v)) / 2.0;
     return v;
   }
 
@@ -233,9 +237,6 @@ namespace mps {
   const iTEBD<Tensor>
   iTEBD<Tensor>::canonical_form(double tolerance, tensor::index max_dim) const
   {
-#if 0
-    return iTEBD<Tensor>(fold(AlA_, -1, B_, 0), lB_, tolerance, max_dim);
-#else
     Tensor X;		/* X(b,c) */
     Tensor Xinv;	/* Xinv(c,b) */
     ortho_right<Tensor>(A_, lA_, B_, lB_, &X, &Xinv);
@@ -255,14 +256,35 @@ namespace mps {
 
     /* aux(d,c) = U(d,x) l(x) V(x,c) */
     Tensor U, V;
-    Tensor newlB = limited_svd(aux, &U, &V, tolerance, max_dim);
-
+    // There is no need to truncate because U 'aux' already has the
+    // size of the bond dimension
+    Tensor newlB = linalg::svd(aux, &U, &V, SVD_ECONOMIC);
+    
     /* V(x,c) (A'*lA*B')(c,i,d) U(d,x') -> (A''*lA*B'')(x,i,x') */
     newA = fold(V, -1, newA, 0);
     newB = fold(newB, -1, U, 0);
 
-    return iTEBD<Tensor>(newA, lA_, newB, newlB, true);
+#if 0    
+    std::cout << "Testing canonical form\n";
+    {
+      Tensor A2 = scale(newA, -1, lA_);
+      Tensor A1 = scale(newB, -1, newlB);
+      Tensor v = Tensor::eye(A1.dimension(0));
+      Tensor w = px4<Tensor>(v, -1, &A1, &A2);
+      std::cout << "--- scprod(1,(AlABlB)*1) = " << scprod(w, v)/norm2(w)/norm2(v)
+                << std::endl;
+    }
+
+    {
+      Tensor A1 = scale(newA, 0, newlB);
+      Tensor A2 = scale(newB, 0, lA_);
+      Tensor v = Tensor::eye(A1.dimension(0));
+      Tensor w = px4<Tensor>(v, +1, &A1, &A2);
+      std::cout << "+++ scprod(1,1*(lBAlAB)) = " << scprod(w, v)/norm2(w)/norm2(v)
+                << std::endl;
+    }
 #endif
+    return iTEBD<Tensor>(newA, lA_, newB, newlB, true);
   }
 
   template<class Tensor>
@@ -270,14 +292,6 @@ namespace mps {
   iTEBD<Tensor>::apply_operator(const Tensor &U, int site, double tolerance,
                                 tensor::index max_dim) const
   {
-#if 0
-    tensor::index a, i, j, b;
-    Tensor GAB = (site & 1) ? fold(BlB_, -1, A_, 0) : fold(AlA_, -1, B_, 0);
-    const Tensor &lAB = (site & 1) ? lA_ : lB_;
-    GAB.get_dimensions(&a, &i, &j, &b);
-    GAB = reshape(foldin(U, -1, reshape(GAB, a, i*j, b), 1), a, i, j, b);
-    return iTEBD<Tensor>(GAB, lAB, tolerance, max_dim);
-#else
     Tensor A, lA, B, lB;
     if (site & 1) {
       Tensor GBA = fold(BlB_, -1, A_, 0);
@@ -285,16 +299,15 @@ namespace mps {
       GBA.get_dimensions(&a, &i, &j, &b);
       GBA = reshape(foldin(U, -1, reshape(GBA, a, i*j, b), 1), a, i, j, b);
       split_tensor(GBA, lA_, &B, &lB, &A, &lA, tolerance, max_dim);
-      return iTEBD<Tensor>(A, lA, B, lB, true);
+      return iTEBD<Tensor>(A, lA, B, lB, false);
     } else {
       Tensor GAB = fold(AlA_, -1, B_, 0);
       tensor::index a, i, j, b;
       GAB.get_dimensions(&a, &i, &j, &b);
       GAB = reshape(foldin(U, -1, reshape(GAB, a, i*j, b), 1), a, i, j, b);
       split_tensor(GAB, lB_, &A, &lA, &B, &lB, tolerance, max_dim);
-      return iTEBD<Tensor>(A, lA, B, lB, true);
+      return iTEBD<Tensor>(A, lA, B, lB, false);
     }
-#endif
   }
 
 }
