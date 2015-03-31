@@ -59,8 +59,6 @@ namespace mps {
       energies->push_back(E);
     if (entropies)
       entropies->push_back(S);
-    double Emin = E;
-    iTEBD<Tensor> psimin = psi;
  
     if (!deltan) {
       deltan = 1;
@@ -91,16 +89,13 @@ namespace mps {
         }
         time += dt;
       }
+      psi = psi.canonical_form();
       double newE = energy(psi, H12);
       double newS = psi.entropy();
       if (energies)
         energies->push_back(newE);
       if (entropies)
         entropies->push_back(newS);
-      if (newE <= Emin) {
-        Emin = newE;
-        psimin = psi;
-      }
       std::cout << "t=" << time
                 << ";\tE=" << newE << "; dE=" << newE-E
                 << ";\tS=" << S << "; dS=" << newS-S
@@ -113,7 +108,6 @@ namespace mps {
       S = newS;
     }
     return psi;
-    return psimin;
   }
 
 }
