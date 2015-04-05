@@ -139,7 +139,8 @@ namespace mps {
   template<class Tensor>
   static void
   split_tensor(Tensor GAB, Tensor lAB, Tensor *pA, Tensor *plA, Tensor *pB,
-               Tensor *plB, double tolerance, tensor::index max_dim)
+               Tensor *plB, double tolerance, tensor::index max_dim,
+               bool is_canonical = false)
   {
     tensor::index a, i, j, b;
     /*
@@ -148,7 +149,8 @@ namespace mps {
      * so that the left and right basis are orthogonalized.
      */
     GAB.get_dimensions(&a,&i,&j,&b);
-    canonical_form<Tensor>(reshape(GAB, a,i*j,b), lAB, &GAB, &lAB, tolerance, max_dim);
+    if (!is_canonical)
+      canonical_form<Tensor>(reshape(GAB, a,i*j,b), lAB, &GAB, &lAB, tolerance, max_dim);
     a = b = lAB.size();
     /*
      * Now the state is given by
@@ -293,6 +295,22 @@ namespace mps {
                                 tensor::index max_dim) const
   {
     Tensor A, lA, B, lB;
+#if 1
+    if (site & 1) {
+      iTEBD<Tensor> aux(B_, lB_, A_, lA_, false);
+      aux = aux.canonical_form().apply_operator(U, 0, tolerance, max_dim);
+      return iTEBD<Tensor>(aux.B_, aux.lB_, aux.A_, aux.lA_, false);
+    } else if (!is_canonical()) {
+      return canonical_form().apply_operator(U, 0, tolerance, max_dim);
+    } else {
+      Tensor GAB = fold(AlA_, -1, B_, 0);
+      tensor::index a, i, j, b;
+      GAB.get_dimensions(&a, &i, &j, &b);
+      GAB = reshape(foldin(U, -1, reshape(GAB, a, i*j, b), 1), a, i, j, b);
+      split_tensor(GAB, lB_, &A, &lA, &B, &lB, tolerance, max_dim, is_canonical());
+      return iTEBD<Tensor>(A, lA, B, lB, false);      
+    }
+#else
     if (site & 1) {
       Tensor GBA = fold(BlB_, -1, A_, 0);
       tensor::index a, i, j, b;
@@ -308,6 +326,7 @@ namespace mps {
       split_tensor(GAB, lB_, &A, &lA, &B, &lB, tolerance, max_dim);
       return iTEBD<Tensor>(A, lA, B, lB, false);
     }
+#endif
   }
 
 }
