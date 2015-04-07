@@ -68,9 +68,9 @@ namespace mps {
    */
 
   template<class Tensor>
-  const Tensor px(const Tensor &v, int sense, const Tensor *G)
+  const Tensor px(const Tensor &v, int sense, const Tensor *G, tensor::index a)
   {
-    return prop_matrix(v, sense, *G, *G);
+    return reshape(prop_matrix(reshape(v, a, a), sense, *G, *G), a*a);
   }
 
   template<class Tensor>
@@ -80,10 +80,13 @@ namespace mps {
     typedef typename Tensor::elt_t elt_t;
     tensor::index a, i;
     G.get_dimensions(&a, &i, &a);
-    Tensor v = ((sense > 0)?
-                reshape(Tensor::eye(a), 1,1,a,a) :
-                reshape(Tensor::eye(a), a,a,1,1)) / (double)a;
-    linalg::eig_power(with_args(px<Tensor>, sense, &G), v.size(), &v);
+    Tensor v = reshape(Tensor::eye(a), a*a) / (double)a;
+#if 0
+    linalg::eig_power(with_args(px<Tensor>, sense, &G, a), v.size(), &v);
+#else
+    linalg::eigs(with_args(px<Tensor>, sense, &G, a), v.size(),
+                 linalg::LargestMagnitude, 1, &v);
+#endif
     // v(a1,a2) is associated index 'a1' with the conjugate tensor
     // and 'a2' with the tensor itself, (see prop_init) hence we have to
     // transpose.
@@ -187,9 +190,12 @@ namespace mps {
    */
 
   template<class Tensor>
-  const Tensor px4(const Tensor &v, int sense, const Tensor *A, const Tensor *B)
+  const Tensor px4(const Tensor &v, int sense, const Tensor *A, const Tensor *B,
+                   tensor::index a)
   {
-    return prop_matrix(prop_matrix(v, sense, *A, *A), sense, *B, *B);
+    return reshape(prop_matrix(prop_matrix(reshape(v, a, a), sense, *A, *A),
+                               sense, *B, *B),
+                   a*a);
   }
 
   template<class Tensor>
@@ -199,16 +205,31 @@ namespace mps {
   {
     typedef typename Tensor::elt_t elt_t;
     tensor::index a = lB.size();
+#if 0
     Tensor v = Tensor::eye(a,a) / sqrt((double)a);
     if (sense > 0) {
       Tensor A1 = scale(A, 0, lB);
       Tensor A2 = scale(B, 0, lA);
-      linalg::eig_power(with_args(px4<Tensor>, sense, &A1, &A2), v.size(), &v);
+      linalg::eig_power(with_args(px4<Tensor>, sense, &A1, &A2, a), v.size(), &v);
     } else {
       Tensor A2 = scale(A, -1, lA);
       Tensor A1 = scale(B, -1, lB);
-      linalg::eig_power(with_args(px4<Tensor>, sense, &A1, &A2), v.size(), &v);
+      linalg::eig_power(with_args(px4<Tensor>, sense, &A1, &A2, a), v.size(), &v);
     }
+#else
+    Tensor v = reshape(Tensor::eye(a,a) / sqrt((double)a), a*a);
+    if (sense > 0) {
+      Tensor A1 = scale(A, 0, lB);
+      Tensor A2 = scale(B, 0, lA);
+      linalg::eigs(with_args(px4<Tensor>, sense, &A1, &A2, a), v.size(),
+      linalg::LargestMagnitude, 1, &v);
+    } else {
+      Tensor A2 = scale(A, -1, lA);
+      Tensor A1 = scale(B, -1, lB);
+      linalg::eigs(with_args(px4<Tensor>, sense, &A1, &A2, a), v.size(),
+      linalg::LargestMagnitude, 1, &v);
+    }
+#endif
     // v(a1,a2) is associated index 'a1' with the conjugate tensor
     // and 'a2' with the tensor itself, (see prop_init) hence we have to
     // transpose.
@@ -286,6 +307,7 @@ namespace mps {
                 << std::endl;
     }
 #endif
+
     return iTEBD<Tensor>(newA, lA_, newB, newlB, true);
   }
 
