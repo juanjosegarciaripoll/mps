@@ -54,6 +54,7 @@ namespace mps {
     }
     Tensor Id = Tensor::eye(H12.rows());
     double time = 0;
+    psi = psi.canonical_form();
     double E = energy(psi, H12), S = psi.entropy();
     if (energies)
       energies->push_back(E);
@@ -66,6 +67,14 @@ namespace mps {
     std::cout.precision(5);
     std::cout << nsteps << ", " << dt << " x " << deltan
               << " = " << dt * deltan << std::endl;
+    std::cout << "t=" << time
+              << ";\tE=" << E << "; dE=" << 0.0
+              << ";\tS=" << S << "; dS=" << 0.0
+              << ";\tl=" << std::max(psi.left_dimension(0),
+                                     psi.right_dimension(0))
+              << std::endl
+              << "l = " << matrix_form(real(psi.left_vector(0)))
+              << std::endl;
     for (size_t phases = (nsteps + deltan - 1) / deltan; phases; phases--) {
       for (size_t i = 0; (i < deltan); i++) {
         switch (method) {
@@ -98,7 +107,7 @@ namespace mps {
         entropies->push_back(newS);
       std::cout << "t=" << time
                 << ";\tE=" << newE << "; dE=" << newE-E
-                << ";\tS=" << S << "; dS=" << newS-S
+                << ";\tS=" << newS << "; dS=" << newS-S
                 << ";\tl=" << std::max(psi.left_dimension(0),
                                        psi.right_dimension(0))
                 << std::endl
