@@ -21,6 +21,69 @@
 
 namespace mps {
 
+  static const int byte[256] = {
+    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3,
+    3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4,
+    3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2,
+    2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5,
+    3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5,
+    5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 1, 2, 2, 3,
+    2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4,
+    4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 2, 3, 3, 4, 3, 4,
+    4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6,
+    5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5,
+    5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
+  };
+
+  int count(index w)
+  {
+    if (sizeof(w) == 4) {
+      int i = byte[w & 0xff];
+      w >>= 8;
+      i += byte[w & 0xff];
+      w >>= 8;
+      i += byte[w & 0xff];
+      w >>= 8;
+      i += byte[w & 0xff];
+      return i;
+    } else {
+      int i = byte[w & 0xff];
+      w >>= 8;
+      i += byte[w & 0xff];
+      w >>= 8;
+      i += byte[w & 0xff];
+      w >>= 8;
+      i += byte[w & 0xff];
+      w >>= 8;
+      i += byte[w & 0xff];
+      w >>= 8;
+      i += byte[w & 0xff];
+      w >>= 8;
+      i += byte[w & 0xff];
+      w >>= 8;
+      i += byte[w & 0xff];
+      return i;
+    }
+  }
+
+  const Indices
+  Lattice::filtered_states(int sites, int filling)
+  {
+    index n = 0;
+    for (index c = 0, l = (index)1 << sites; c < l; c++) {
+      if (count(c) == filling)
+	n++;
+    }
+    Indices output(n);
+    n = 0;
+    for (index c = 0, l = (index)1 << sites; c < l; c++) {
+      if (count(c) == filling)
+	output.at(n++) = c;
+    }
+    return output;
+  }
+
   Lattice::Lattice(int sites, int N) :
     number_of_sites(sites),
     number_of_particles(N),
@@ -124,5 +187,7 @@ namespace mps {
     }
     return H;
   }
+
+  
   
 }

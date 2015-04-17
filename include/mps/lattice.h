@@ -32,7 +32,7 @@ namespace mps {
     const int number_of_particles;
     const Indices configurations;
 
-    static Indices filtered_states(int sites, int number_of_particles);
+    static const Indices filtered_states(int sites, int number_of_particles);
 
   public:
 
