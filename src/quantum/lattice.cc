@@ -36,7 +36,7 @@ namespace mps {
     5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
   };
 
-  int count(index w)
+  int count(tensor::index w)
   {
     if (sizeof(w) == 4) {
       int i = byte[w & 0xff];
@@ -70,14 +70,14 @@ namespace mps {
   const Indices
   Lattice::filtered_states(int sites, int filling)
   {
-    index n = 0;
-    for (index c = 0, l = (index)1 << sites; c < l; c++) {
+    tensor::index n = 0;
+    for (tensor::index c = 0, l = (tensor::index)1 << sites; c < l; c++) {
       if (count(c) == filling)
 	n++;
     }
     Indices output(n);
     n = 0;
-    for (index c = 0, l = (index)1 << sites; c < l; c++) {
+    for (tensor::index c = 0, l = (tensor::index)1 << sites; c < l; c++) {
       if (count(c) == filling)
 	output.at(n++) = c;
     }
@@ -97,13 +97,13 @@ namespace mps {
     if (to_site == from_site)
       return number(from_site);
 
-    index L = configurations.size();
+    tensor::index L = configurations.size();
     RTensor values(L);
 
-    index from_mask = (index)1 << from_site;
-    index to_mask = (index)1 << to_site;
-    index mask = from_mask | to_mask;
-    index sign_mask;
+    tensor::index from_mask = (tensor::index)1 << from_site;
+    tensor::index to_mask = (tensor::index)1 << to_site;
+    tensor::index mask = from_mask | to_mask;
+    tensor::index sign_mask;
 
     if (from_site < to_site)
       sign_mask = (to_mask-1) & (~(from_mask-1));
@@ -116,14 +116,14 @@ namespace mps {
       for (Indices::iterator it = ndx.begin(), end = ndx.end();
 	   it != end; ++it, ++v)
 	{
-	  index other = (*it ^ mask);
+	  tensor::index other = (*it ^ mask);
 	  *v = (other & mask == to_mask);
 	}
     } else {
       for (Indices::iterator it = ndx.begin(), end = ndx.end();
 	   it != end; ++it, ++v)
 	{
-	  index other = (*it ^ mask);
+	  tensor::index other = (*it ^ mask);
 	  bool sign = count(*it & sign_mask) & 1;
 	  *v = (other & mask == to_mask);
 	  if (sign & 1)
@@ -143,12 +143,12 @@ namespace mps {
   const RSparse
   Lattice::interaction(int site1, int site2)
   {
-    index L = configurations.size();
+    tensor::index L = configurations.size();
     RTensor values(L);
 
-    index mask1 = (index)1 << site1;
-    index mask2 = (index)1 << site2;
-    index target = mask1 | mask2;
+    tensor::index mask1 = (tensor::index)1 << site1;
+    tensor::index mask2 = (tensor::index)1 << site2;
+    tensor::index target = mask1 | mask2;
     RTensor::iterator v = values.begin();
     for (Indices::const_iterator it = configurations.begin(), end = configurations.end();
 	 it != end;
