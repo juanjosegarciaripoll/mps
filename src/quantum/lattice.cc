@@ -103,13 +103,33 @@ namespace mps {
     index from_mask = (index)1 << from_site;
     index to_mask = (index)1 << to_site;
     index mask = from_mask | to_mask;
+    index sign_mask;
+
+    if (from_site < to_site)
+      sign_mask = (to_mask-1) & (~(from_mask-1));
+    else
+      sign_mask = (from_mask-1) & (~(to_mask-1));
+    
     RTensor::iterator v = values.begin();
     Indices ndx = configurations;
-    for (Indices::iterator it = ndx.begin(), end = ndx.end(); it != end; ++it, ++v)
-      {
-	index other = (*it ^ mask);
-	*v = (other & mask == to_mask);
-      }
+    if (fermionic) {
+      for (Indices::iterator it = ndx.begin(), end = ndx.end();
+	   it != end; ++it, ++v)
+	{
+	  index other = (*it ^ mask);
+	  *v = (other & mask == to_mask);
+	}
+    } else {
+      for (Indices::iterator it = ndx.begin(), end = ndx.end();
+	   it != end; ++it, ++v)
+	{
+	  index other = (*it ^ mask);
+	  bool sign = count(*it & sign_mask) & 1;
+	  *v = (other & mask == to_mask);
+	  if (sign & 1)
+	    *v = -*v;
+	}
+    }
     Indices n = iota(0, L-1);
     return RSparse(n,sort_indices(ndx),values,L,L);
   }
