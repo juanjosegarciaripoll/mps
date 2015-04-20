@@ -34,17 +34,17 @@ namespace mps {
     if (to_site == from_site)
       return number(from_site);
 
-    index L = configurations.size();
+    tensor::index L = configurations.size();
     RTensor values(L);
 
-    index from_mask = (index)1 << from_site;
-    index to_mask = (index)1 << to_site;
-    index mask = from_mask | to_mask;
+    tensor::index from_mask = (tensor::index)1 << from_site;
+    tensor::index to_mask = (tensor::index)1 << to_site;
+    tensor::index mask = from_mask | to_mask;
     RTensor::iterator v = values.begin();
     Indices ndx = configurations;
     for (Indices::iterator it = ndx.begin(), end = ndx.end(); it != end; ++it, ++v)
       {
-	index other = (*it ^ mask);
+	tensor::index other = (*it ^ mask);
 	*v = (other & mask == to_mask);
       }
     Indices n = iota(0, L-1);
@@ -60,12 +60,12 @@ namespace mps {
   const RSparse
   Lattice::interaction(int site1, int site2)
   {
-    index L = configurations.size();
+    tensor::index L = configurations.size();
     RTensor values(L);
 
-    index mask1 = (index)1 << site1;
-    index mask2 = (index)1 << site2;
-    index target = mask1 | mask2;
+    tensor::index mask1 = (tensor::index)1 << site1;
+    tensor::index mask2 = (tensor::index)1 << site2;
+    tensor::index target = mask1 | mask2;
     RTensor::iterator v = values.begin();
     for (Indices::const_iterator it = configurations.begin(), end = configurations.end();
 	 it != end;

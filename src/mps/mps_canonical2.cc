@@ -17,6 +17,7 @@
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <cmath>
 #include <algorithm>
 #include <tensor/linalg.h>
 #include <mps/mps.h>
@@ -37,7 +38,7 @@ namespace mps {
     Pij.get_dimensions(&a1, &i1, &j1, &c1);
     Tensor Pi, Pj;
     RTensor s = linalg::block_svd(reshape(Pij, a1*i1,j1*c1), &Pi, &Pj, SVD_ECONOMIC);
-    if (isnan(s(0))) {
+    if (std::isnan(s(0))) {
 #if 0
       sdf::OutDataFile file("aux.dat", sdf::DataFile::SDF_PARANOID);
       file.dump(reshape(Pij, a1*i1, j1*c1), "Pij");

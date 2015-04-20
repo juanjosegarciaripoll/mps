@@ -28,7 +28,7 @@ namespace mps {
 
   class Lattice {
 
-    const index number_of_sites;
+    const tensor::index number_of_sites;
     const int number_of_particles;
     const Indices configurations;
 
