@@ -1,14 +1,10 @@
-# We define the global AM_CPPFLAGS as everything we compile includes from these
-# directories.
-AM_CPPFLAGS = \
-	-I$(top_srcdir) -I$(top_srcdir)/include \
-	-I$(top_builddir)/include
-
 #
 # Main library
 #
 lib_LTLIBRARIES = libmps.la
 
+libmps_la_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/include \
+	-I$(top_builddir)/include $(CPPFLAGS)
 libmps_la_SOURCES = \
 	quantum/spin.cc \
 	quantum/fock.cc \
