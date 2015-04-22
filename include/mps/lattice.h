@@ -43,15 +43,18 @@ namespace mps {
     
     Lattice(int sites, int N);
 
-    const RSparse hopping(int site1, int site2, bool fermionic = false);
-    const RSparse number(int site1);
-    const RSparse interaction(int site1, int site2);
+    const RSparse hopping(int site1, int site2, bool fermionic = false) const;
+    const RSparse number(int site1) const;
+    const RSparse interaction(int site1, int site2) const;
 
     const RSparse Hamiltonian(const RTensor &J, const RTensor &interactions,
-			      double mu, bool fermionic = false);
-    const CSparse Hamiltonian(const CTensor &J, const RTensor &interactions,
-			      double mu, bool fermionic = false);
+			      double mu, bool fermionic = false) const;
+    const CSparse Hamiltonian(const CTensor &J, const CTensor &interactions,
+			      double mu, bool fermionic = false) const;
 
+    int size() const;
+    int particles() const;
+    tensor::index dimension() const;
   };
   
 }

@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <tensor/io.h>
 #include <mps/lattice.h>
 
 namespace mps {
@@ -36,7 +37,7 @@ namespace mps {
     5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
   };
 
-  int count(tensor::index w)
+  static int count(tensor::index w)
   {
     if (sizeof(w) == 4) {
       int i = byte[w & 0xff];
@@ -92,7 +93,7 @@ namespace mps {
   }
 
   const RSparse
-  Lattice::hopping(int to_site, int from_site, bool fermionic)
+  Lattice::hopping(int to_site, int from_site, bool fermionic) const
   {
     if (to_site == from_site)
       return number(from_site);
@@ -102,46 +103,71 @@ namespace mps {
 
     tensor::index from_mask = (tensor::index)1 << from_site;
     tensor::index to_mask = (tensor::index)1 << to_site;
-    tensor::index mask = from_mask | to_mask;
-    tensor::index sign_mask;
+    tensor::index mask11 = from_mask | to_mask;
+    tensor::index mask01 = from_mask;
+    tensor::index mask10 = to_mask;
 
-    if (from_site < to_site)
-      sign_mask = (to_mask-1) & (~(from_mask-1));
-    else
-      sign_mask = (from_mask-1) & (~(to_mask-1));
-    
     RTensor::iterator v = values.begin();
     Indices ndx = configurations;
-    if (fermionic) {
+    if (!fermionic) {
       for (Indices::iterator it = ndx.begin(), end = ndx.end();
 	   it != end; ++it, ++v)
 	{
-	  tensor::index other = (*it ^ mask);
-	  *v = (other & mask == to_mask);
+	  tensor::index other = *it;
+	  tensor::index aux = other & mask11;
+	  if (aux == mask01) {
+	    *v = 1.0;
+	    other ^= mask11;
+	  } else if (aux == mask10) {
+	    *v = 0.0;
+	    other ^= mask11;
+	  } else {
+	    *v = 0.0;
+	  }
+	  *it = other;
 	}
     } else {
+      tensor::index sign_mask, sign_value;
+      if (from_site < to_site) {
+	sign_mask = (to_mask-1) & (~(from_mask-1));
+	sign_value = 0;
+      } else {
+	sign_mask = (from_mask-1) & (~(to_mask-1));
+	sign_value = 1;
+      }
       for (Indices::iterator it = ndx.begin(), end = ndx.end();
 	   it != end; ++it, ++v)
 	{
-	  tensor::index other = (*it ^ mask);
-	  bool sign = count(*it & sign_mask) & 1;
-	  *v = (other & mask == to_mask);
-	  if (sign & 1)
-	    *v = -*v;
+	  tensor::index other = *it;
+	  tensor::index aux = other & mask11;
+	  if (aux == mask01) {
+	    if ((count(other & sign_mask) & 1) == sign_value)
+	      *v = -1.0;
+	    else
+	      *v = 1.0;
+	    other ^= mask11;
+	  } else if (aux == mask10) {
+	    *v = 0.0;
+	    other ^= mask11;
+	  } else {
+	    *v = 0.0;
+	  }
+	  *it = other;
 	}
     }
-    Indices n = iota(0, L-1);
-    return RSparse(n,sort_indices(ndx),values,L,L);
+    Indices cols = iota(0, L-1);
+    Indices rows = sort_indices(ndx);
+    return RSparse(rows,cols,values,L,L);
   }
 
   const RSparse
-  Lattice::number(int site)
+  Lattice::number(int site) const
   {
     return interaction(site, site);
   }
 
   const RSparse
-  Lattice::interaction(int site1, int site2)
+  Lattice::interaction(int site1, int site2) const
   {
     tensor::index L = configurations.size();
     RTensor values(L);
@@ -150,11 +176,12 @@ namespace mps {
     tensor::index mask2 = (tensor::index)1 << site2;
     tensor::index target = mask1 | mask2;
     RTensor::iterator v = values.begin();
-    for (Indices::const_iterator it = configurations.begin(), end = configurations.end();
+    for (Indices::const_iterator it = configurations.begin(),
+	   end = configurations.end();
 	 it != end;
 	 ++it, ++v)
       {
-	*v = (*it & target == target);
+	*v = (*it & target) == target;
       }
     Indices n = iota(0, L-1);
     return RSparse(n,n,values,L,L);
@@ -170,7 +197,8 @@ namespace mps {
   }
 
   const RSparse
-  Lattice::Hamiltonian(const RTensor &J, const RTensor &U, double mu, bool fermionic)
+  Lattice::Hamiltonian(const RTensor &J, const RTensor &U, double mu,
+		       bool fermionic) const
   {
     RSparse H;
     for (int i = 0; i < J.rows(); i++) {
@@ -189,8 +217,8 @@ namespace mps {
   }
   
   const CSparse
-  Lattice::Hamiltonian(const CTensor &J, const RTensor &U, double mu,
-		       bool fermionic)
+  Lattice::Hamiltonian(const CTensor &J, const CTensor &U, double mu,
+		       bool fermionic) const
   {
     CSparse H;
     for (int i = 0; i < J.rows(); i++) {
@@ -199,8 +227,8 @@ namespace mps {
 	if (real(Jij) || imag(Jij)) {
 	  maybe_add<CSparse>(&H, Jij * hopping(i, j, fermionic));
 	}
-	double Uij = U(i,j);
-	if (Uij) {
+	cdouble Uij = U(i,j);
+	if (abs(Uij)) {
 	  maybe_add<CSparse>(&H, Uij * interaction(i, j));
 	}
       }
@@ -208,6 +236,22 @@ namespace mps {
     return H;
   }
 
+  int
+  Lattice::size() const
+  {
+    return number_of_sites;
+  }
   
+  int
+  Lattice::particles() const
+  {
+    return number_of_particles;
+  }
+  
+  tensor::index
+  Lattice::dimension() const
+  {
+    return configurations.size();
+  }
   
 }
