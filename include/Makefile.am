@@ -13,6 +13,7 @@ nobase_include_HEADERS = \
 	mps/mps_algorithms.h \
 	mps/qform.h \
 	mps/quantum.h \
+	mps/lattice.h \
 	mps/rmpo.h \
 	mps/rmps.h \
 	mps/time_evolve.h \
