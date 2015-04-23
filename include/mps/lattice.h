@@ -41,11 +41,11 @@ namespace mps {
 
   public:
 
-    enum {
-      /** The lattice will contain bosonic particles. */
-      BOSONIC = 0,
+    enum particle_kind_t {
+      /** The lattice will contain impenetrable bosonic particles. */
+      HARD_CORE_BOSONS = 0,
       /** The lattice will contain fermions (in Jordan-Wigner representation).*/
-      FERMIONIC = 1
+      FERMIONS = 1
     };
 
     /** Construct the internal representation for a lattice with N particles in
@@ -54,25 +54,25 @@ namespace mps {
 
     /** Hopping operator for a particle between two sites. Returns the
         equivalent of \$a^\dagger_{to}a_{from}\$. */
-    const RSparse hopping_operator(int site1, int site2, bool fermionic = false) const;
+    const RSparse hopping_operator(int site1, int site2, particle_kind_t kind = FERMIONS) const;
     /** Number operator for the given lattice site.*/
     const RSparse number_operator(int site1) const;
     /** Hubbard interaction between different lattice site. It implements
         operator \$ n_{site1} n_{site2} \$.*/
     const RSparse interaction_operator(int site1, int site2) const;
 
-    /** Full Hamiltonian containing hopping of particles and
+    /** Full Hamiltonian containing hopping of kind and
         interactions. Matrix J(i,j) is nonzero when there is hopping between
         sites 'i' and 'j', and interactions U(i,j) among those sites
         too. Entries in these matrices can be zero. */
     const RSparse Hamiltonian(const RTensor &J, const RTensor &interactions,
-			      double mu, bool fermionic = false) const;
-    /** Full Hamiltonian containing hopping of particles and
+			      double mu, particle_kind_t kind = FERMIONS) const;
+    /** Full Hamiltonian containing hopping of kind and
         interactions. Matrix J(i,j) is nonzero when there is hopping between
         sites 'i' and 'j', and interactions U(i,j) among those sites
         too. Entries in these matrices can be zero. */
     const CSparse Hamiltonian(const CTensor &J, const CTensor &interactions,
-			      double mu, bool fermionic = false) const;
+			      double mu, particle_kind_t kind = FERMIONS) const;
 
     /** Number of sites in the lattice. */
     int size() const;

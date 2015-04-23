@@ -48,7 +48,7 @@ namespace mps {
       w >>= 8;
       i += byte[w & 0xff];
       return i;
-    } else {
+    } else if (sizeof(w) == 8) {
       int i = byte[w & 0xff];
       w >>= 8;
       i += byte[w & 0xff];
@@ -65,6 +65,13 @@ namespace mps {
       w >>= 8;
       i += byte[w & 0xff];
       return i;
+    } else {
+      int count = 0;
+      for (int i = sizeof(w); i; --i) {
+        count += byte[w & 0xff];
+        w >>= 8;
+      }
+      return count;
     }
   }
 
@@ -93,10 +100,10 @@ namespace mps {
   }
 
   const RSparse
-  Lattice::hopping(int to_site, int from_site, bool fermionic) const
+  Lattice::hopping_operator(int to_site, int from_site, particle_kind_t kind) const
   {
     if (to_site == from_site)
-      return number(from_site);
+      return number_operator(from_site);
 
     tensor::index L = configurations.size();
     RTensor values(L);
@@ -109,7 +116,7 @@ namespace mps {
 
     RTensor::iterator v = values.begin();
     Indices ndx = configurations;
-    if (!fermionic) {
+    if (kind == HARD_CORE_BOSONS) {
       for (Indices::iterator it = ndx.begin(), end = ndx.end();
 	   it != end; ++it, ++v)
 	{
@@ -161,13 +168,13 @@ namespace mps {
   }
 
   const RSparse
-  Lattice::number(int site) const
+  Lattice::number_operator(int site) const
   {
-    return interaction(site, site);
+    return interaction_operator(site, site);
   }
 
   const RSparse
-  Lattice::interaction(int site1, int site2) const
+  Lattice::interaction_operator(int site1, int site2) const
   {
     tensor::index L = configurations.size();
     RTensor values(L);
@@ -198,18 +205,18 @@ namespace mps {
 
   const RSparse
   Lattice::Hamiltonian(const RTensor &J, const RTensor &U, double mu,
-		       bool fermionic) const
+		       particle_kind_t kind) const
   {
     RSparse H;
     for (int i = 0; i < J.rows(); i++) {
       for (int j = 0; j < J.columns(); j++) {
 	double Jij = J(i,j) - (i == j) * mu;
 	if (Jij) {
-	  maybe_add<RSparse>(&H, Jij * hopping(i, j, fermionic));
+	  maybe_add<RSparse>(&H, Jij * hopping_operator(i, j, kind));
 	}
 	double Uij = U(i,j);
 	if (Uij) {
-	  maybe_add<RSparse>(&H, Uij * interaction(i, j));
+	  maybe_add<RSparse>(&H, Uij * interaction_operator(i, j));
 	}
       }
     }
@@ -218,18 +225,18 @@ namespace mps {
   
   const CSparse
   Lattice::Hamiltonian(const CTensor &J, const CTensor &U, double mu,
-		       bool fermionic) const
+		       particle_kind_t kind) const
   {
     CSparse H;
     for (int i = 0; i < J.rows(); i++) {
       for (int j = 0; j < J.columns(); j++) {
 	cdouble Jij = J(i,j) - (i == j) * mu;
 	if (real(Jij) || imag(Jij)) {
-	  maybe_add<CSparse>(&H, Jij * hopping(i, j, fermionic));
+	  maybe_add<CSparse>(&H, Jij * hopping_operator(i, j, kind));
 	}
 	cdouble Uij = U(i,j);
 	if (abs(Uij)) {
-	  maybe_add<CSparse>(&H, Uij * interaction(i, j));
+	  maybe_add<CSparse>(&H, Uij * interaction_operator(i, j));
 	}
       }
     }
