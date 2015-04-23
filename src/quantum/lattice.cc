@@ -37,55 +37,48 @@ namespace mps {
     5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
   };
 
-  static int count(tensor::index w)
+  typedef tensor::index word;
+
+  static int count(word w)
   {
     if (sizeof(w) == 4) {
-      int i = byte[w & 0xff];
-      w >>= 8;
-      i += byte[w & 0xff];
-      w >>= 8;
-      i += byte[w & 0xff];
-      w >>= 8;
-      i += byte[w & 0xff];
-      return i;
-    } else if (sizeof(w) == 8) {
-      int i = byte[w & 0xff];
-      w >>= 8;
-      i += byte[w & 0xff];
-      w >>= 8;
-      i += byte[w & 0xff];
-      w >>= 8;
-      i += byte[w & 0xff];
-      w >>= 8;
-      i += byte[w & 0xff];
-      w >>= 8;
-      i += byte[w & 0xff];
-      w >>= 8;
-      i += byte[w & 0xff];
-      w >>= 8;
-      i += byte[w & 0xff];
-      return i;
+      return byte[w & 0xff] +
+        byte[(w >> 8) & 0xff] +
+        byte[(w >> 16) & 0xff] +
+        byte[(w >> 24) & 0xff];
     } else {
-      int count = 0;
-      for (int i = sizeof(w); i; --i) {
-        count += byte[w & 0xff];
-        w >>= 8;
-      }
-      return count;
+      return byte[w & 0xff] +
+        byte[(w >> 8) & 0xff] +
+        byte[(w >> 16) & 0xff] +
+        byte[(w >> 24) & 0xff] +
+        byte[(w >> 32) & 0xff];
     }
   }
 
   const Indices
   Lattice::filtered_states(int sites, int filling)
   {
-    tensor::index n = 0;
-    for (tensor::index c = 0, l = (tensor::index)1 << sites; c < l; c++) {
+    if (sizeof(word) == 4) {
+      if (sites >= 32) {
+        std::cerr << "In this architecture with 32-bit words, Lattice can only handle up to 31 sites" << std::endl;
+        abort();
+      }
+    } else {
+      if (sites > 34) {
+        std::cerr << "In this architecture with " << sizeof(word) * 8
+                  << "bit words, Lattice can only handle up to 34 sites"
+                  << std::endl;
+        abort();
+      }
+    }
+    word n = 0;
+    for (word c = 0, l = (word)1 << sites; c < l; c++) {
       if (count(c) == filling)
 	n++;
     }
     Indices output(n);
     n = 0;
-    for (tensor::index c = 0, l = (tensor::index)1 << sites; c < l; c++) {
+    for (word c = 0, l = (word)1 << sites; c < l; c++) {
       if (count(c) == filling)
 	output.at(n++) = c;
     }
@@ -105,14 +98,14 @@ namespace mps {
     if (to_site == from_site)
       return number_operator(from_site);
 
-    tensor::index L = configurations.size();
+    word L = configurations.size();
     RTensor values(L);
 
-    tensor::index from_mask = (tensor::index)1 << from_site;
-    tensor::index to_mask = (tensor::index)1 << to_site;
-    tensor::index mask11 = from_mask | to_mask;
-    tensor::index mask01 = from_mask;
-    tensor::index mask10 = to_mask;
+    word from_mask = (word)1 << from_site;
+    word to_mask = (word)1 << to_site;
+    word mask11 = from_mask | to_mask;
+    word mask01 = from_mask;
+    word mask10 = to_mask;
 
     RTensor::iterator v = values.begin();
     Indices ndx = configurations;
@@ -120,8 +113,8 @@ namespace mps {
       for (Indices::iterator it = ndx.begin(), end = ndx.end();
 	   it != end; ++it, ++v)
 	{
-	  tensor::index other = *it;
-	  tensor::index aux = other & mask11;
+	  word other = *it;
+	  word aux = other & mask11;
 	  if (aux == mask01) {
 	    *v = 1.0;
 	    other ^= mask11;
@@ -134,7 +127,7 @@ namespace mps {
 	  *it = other;
 	}
     } else {
-      tensor::index sign_mask, sign_value;
+      word sign_mask, sign_value;
       if (from_site < to_site) {
 	sign_mask = (to_mask-1) & (~(from_mask-1));
 	sign_value = 0;
@@ -145,8 +138,8 @@ namespace mps {
       for (Indices::iterator it = ndx.begin(), end = ndx.end();
 	   it != end; ++it, ++v)
 	{
-	  tensor::index other = *it;
-	  tensor::index aux = other & mask11;
+	  word other = *it;
+	  word aux = other & mask11;
 	  if (aux == mask01) {
 	    if ((count(other & sign_mask) & 1) == sign_value)
 	      *v = -1.0;
@@ -164,6 +157,10 @@ namespace mps {
     }
     Indices cols = iota(0, L-1);
     Indices rows = sort_indices(ndx);
+    if (0)
+      std::cout << cols << std::endl
+                << configurations << std::endl
+                << ndx << std::endl;
     return RSparse(rows,cols,values,L,L);
   }
 
@@ -176,12 +173,12 @@ namespace mps {
   const RSparse
   Lattice::interaction_operator(int site1, int site2) const
   {
-    tensor::index L = configurations.size();
+    word L = configurations.size();
     RTensor values(L);
 
-    tensor::index mask1 = (tensor::index)1 << site1;
-    tensor::index mask2 = (tensor::index)1 << site2;
-    tensor::index target = mask1 | mask2;
+    word mask1 = (word)1 << site1;
+    word mask2 = (word)1 << site2;
+    word target = mask1 | mask2;
     RTensor::iterator v = values.begin();
     for (Indices::const_iterator it = configurations.begin(),
 	   end = configurations.end();
