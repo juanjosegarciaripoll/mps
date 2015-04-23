@@ -31,6 +31,11 @@ check_PROGRAMS += test_quantum_fock
 test_quantum_fock_SOURCES = test_quantum_fock.cc
 test_quantum_fock_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
+TESTS += test_quantum_lattice
+check_PROGRAMS += test_quantum_lattice
+test_quantum_lattice_SOURCES = test_quantum_lattice.cc
+test_quantum_lattice_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
+
 TESTS += test_mps_mps
 check_PROGRAMS += test_mps_mps
 test_mps_mps_SOURCES = test_mps_mps.cc
