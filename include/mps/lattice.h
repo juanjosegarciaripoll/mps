@@ -54,9 +54,9 @@ namespace mps {
 
     /** Hopping operator for a particle between two sites. Returns the
         equivalent of \$a^\dagger_{to}a_{from}\$. */
-    const RSparse hopping_operator(int site1, int site2, particle_kind_t kind = FERMIONS) const;
+    const RSparse hopping_operator(int to, int from, particle_kind_t kind = FERMIONS) const;
     /** Number operator for the given lattice site.*/
-    const RSparse number_operator(int site1) const;
+    const RSparse number_operator(int site) const;
     /** Hubbard interaction between different lattice site. It implements
         operator \$ n_{site1} n_{site2} \$.*/
     const RSparse interaction_operator(int site1, int site2) const;
