@@ -107,6 +107,46 @@ namespace tensor_test {
     }
   }
 
+  TEST(AnyLatticeTest, AdjointHopping) {
+    for (int size = 1; size < 16; ++size) {
+      for (int N = 1; N <= size; ++N) {
+	Lattice L(size, N);
+	for (int i = 0; i < size; i++) {
+	  for (int j = i; j < size; j++) {
+	    EXPECT_TRUE(all_equal(L.interaction_operator(i,j),
+				  adjoint(L.interaction_operator(j,i))));
+	  }
+	}
+      }
+    }
+  }
+
+  TEST(AnyLatticeTest, OnSiteInteraction) {
+    for (int size = 1; size < 16; ++size) {
+      for (int N = 1; N <= size; ++N) {
+	Lattice L(size, N);
+	for (int i = 0; i < size; i++) {
+	  EXPECT_TRUE(all_equal(L.interaction_operator(i,i),
+				L.number_operator(i)));
+	}
+      }
+    }
+  }
+
+  TEST(AnyLatticeTest, PermutationInvariantInteraction) {
+    for (int size = 1; size < 16; size++) {
+      for (int N = 1; N <= size; ++N) {
+	Lattice L(size, N);
+	for (int i = 0; i < size; i++) {
+	  for (int j = i; j < size; j++) {
+	    EXPECT_TRUE(all_equal(L.interaction_operator(i,j),
+				  L.interaction_operator(j,i)));
+	  }
+	}
+      }
+    }
+  }
+
   //
   // TWO-SITE-LATTICE
   //
