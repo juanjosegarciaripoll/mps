@@ -204,15 +204,6 @@ namespace tensor_test {
         kron2(mps::Pauli_z, kron2(mps::Pauli_z, mps::Pauli_id));
       Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
-      std::cout << "*************\n";
-      std::cout << mps_to_vector(psi) << std::endl;
-      std::cout << Hpsi1 << std::endl;
-      std::cout << Hpsi2 << std::endl;
-      std::cout << mpo[0] << std::endl
-                << mpo[1] << std::endl
-                << mpo[2] << std::endl;
-      std::cout << matrix_form(H) << std::endl;
-
       EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
     }
   }
@@ -288,116 +279,6 @@ namespace tensor_test {
 
   TEST(CMPO, Random) {
     test_over_integers(2, 10, test_random_mpo<CMPO>);
-  }
-
-  ////////////////////////////////////////////////////////////
-  // EXPLICIT CONSTRUCTION OF MPOS
-  //
-
-  //
-  // RMPO
-  //
-
-  TEST(RMPO, LocalMatrix2x2) {
-    RTensor x = real(mps::Pauli_x);
-    RTensor z = real(mps::Pauli_z);
-    RTensor i2 = real(mps::Pauli_id);
-    RMPO mpo(2,2);
-    add_local_term(&mpo, z, 0);
-    add_local_term(&mpo, x, 1);
-    EXPECT_CEQ(mpo_to_matrix(mpo), kron2(z, i2) + kron2(i2, x));
-  }
-
-  TEST(RMPO, LocalMatrix3x2) {
-    RTensor x = real(mps::Pauli_x);
-    RTensor z = real(mps::Pauli_z);
-    RTensor i2 = real(mps::Pauli_id);
-    RMPO mpo(3,2);
-    add_local_term(&mpo, z, 0);
-    add_local_term(&mpo, x, 1);
-    add_local_term(&mpo, x + z, 2);
-    EXPECT_CEQ(mpo_to_matrix(mpo),
-               kron2(z, kron2(i2, i2)) + kron2(i2, kron2(x, i2))+
-               kron2(i2, kron2(i2, x+z)));
-  }
-
-  TEST(RMPO, IntMatrix2x2) {
-    RTensor x = real(mps::Pauli_x);
-    RTensor z = real(mps::Pauli_z);
-    RMPO mpo(2,2);
-    add_interaction(&mpo, z, 0, x);
-    add_interaction(&mpo, x, 0, z + x);
-    EXPECT_CEQ(mpo_to_matrix(mpo), kron2(z, x) + kron2(x, z + x));
-  }
-
-  TEST(RMPO, IntMatrix3x2) {
-    RTensor x = real(mps::Pauli_x);
-    RTensor z = real(mps::Pauli_z);
-    RTensor i2 = real(mps::Pauli_id);
-    {
-      RMPO mpo(3,2);
-      add_interaction(&mpo, z, 0, x);
-      EXPECT_CEQ(mpo_to_matrix(mpo), kron2(z, kron2(x, i2)));
-    }
-    {
-      RMPO mpo(3,2);
-      add_interaction(&mpo, z, 0, x);
-      add_interaction(&mpo, x, 1, z);
-      EXPECT_CEQ(mpo_to_matrix(mpo), kron2(z, kron2(x, i2)) + kron2(i2, kron2(x, z)));
-    }
-  }
-
-  //
-  // CMPO
-  //
-
-  TEST(CMPO, LocalMatrix2x2) {
-    CTensor x = mps::Pauli_x;
-    CTensor z = mps::Pauli_z;
-    CTensor i2 = mps::Pauli_id;
-    CMPO mpo(2,2);
-    add_local_term(&mpo, z, 0);
-    add_local_term(&mpo, x, 1);
-    EXPECT_CEQ(mpo_to_matrix(mpo), kron2(z, i2) + kron2(i2, x));
-  }
-
-  TEST(CMPO, LocalMatrix3x2) {
-    CTensor x = mps::Pauli_x;
-    CTensor z = mps::Pauli_z;
-    CTensor i2 = mps::Pauli_id;
-    CMPO mpo(3,2);
-    add_local_term(&mpo, z, 0);
-    add_local_term(&mpo, x, 1);
-    add_local_term(&mpo, x + z, 2);
-    EXPECT_CEQ(mpo_to_matrix(mpo),
-               kron2(z, kron2(i2, i2)) + kron2(i2, kron2(x, i2))+
-               kron2(i2, kron2(i2, x+z)));
-  }
-
-  TEST(CMPO, IntMatrix2x2) {
-    CTensor x = mps::Pauli_x;
-    CTensor z = mps::Pauli_z;
-    CMPO mpo(2,2);
-    add_interaction(&mpo, z, 0, x);
-    add_interaction(&mpo, x, 0, z + x);
-    EXPECT_CEQ(mpo_to_matrix(mpo), kron2(z, x) + kron2(x, z + x));
-  }
-
-  TEST(CMPO, IntMatrix3x2) {
-    CTensor x = mps::Pauli_x;
-    CTensor z = mps::Pauli_z;
-    CTensor i2 = mps::Pauli_id;
-    {
-      CMPO mpo(3,2);
-      add_interaction(&mpo, z, 0, x);
-      EXPECT_CEQ(mpo_to_matrix(mpo), kron2(z, kron2(x, i2)));
-    }
-    {
-      CMPO mpo(3,2);
-      add_interaction(&mpo, z, 0, x);
-      add_interaction(&mpo, x, 1, z);
-      EXPECT_CEQ(mpo_to_matrix(mpo), kron2(z, kron2(x, i2)) + kron2(i2, kron2(x, z)));
-    }
   }
 
 

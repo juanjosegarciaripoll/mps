@@ -91,6 +91,11 @@ check_PROGRAMS += test_mpo_base
 test_mpo_base_SOURCES = test_mpo_base.cc
 test_mpo_base_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
 
+TESTS += test_mpo_matrix
+check_PROGRAMS += test_mpo_matrix
+test_mpo_matrix_SOURCES = test_mpo_matrix.cc
+test_mpo_matrix_LDADD = libtestmain.a ../src/libmps.la $(GTEST_LDFLAGS) #-lstdc++
+
 TESTS += test_mps_qform
 check_PROGRAMS += test_mps_qform
 test_mps_qform_SOURCES = test_mps_qform.cc
