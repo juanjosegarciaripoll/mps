@@ -75,8 +75,12 @@ namespace mps {
   static void do_add_interaction(MPO &mpo, const Tensor &Hi, index i,
 				 const Tensor &Hj)
   {
-    if (i < 0 || (i+1) >= mpo.size()) {
-      std::cerr << "In add_local_term(), the index " << i << " is outside the lattice.\n";
+    if (i < 0) {
+      std::cerr << "In add_interaction(), the index " << i << " is outside the lattice.\n";
+      abort();
+    }
+    if ((i+1) >= mpo.size()) {
+      std::cerr << "In add_interaction(), the index " << i << "+1 is outside the lattice.\n";
       abort();
     }
     if (Hi.rows() != Hi.columns()) {
