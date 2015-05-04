@@ -124,9 +124,6 @@ namespace mps {
   /**Compute a single-site expected value.*/
   cdouble expected(const CMPS &a, const CTensor &Op1, index k);
 
-  /**Add the expectation values a single-site operator over the lattice.*/
-  cdouble expected(const CMPS &a, const CTensor &Op1);
-
   /**Compute a two-site correlation.*/
   double expected(const RMPS &a, const RTensor &op1, index k1, const RTensor &op2, index k2);
 
