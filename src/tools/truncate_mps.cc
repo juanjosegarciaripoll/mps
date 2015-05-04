@@ -52,6 +52,10 @@ namespace mps {
   bool
   truncate_inner(MPS *Q, const MPS &P, index Dmax, bool periodic, bool increase)
   {
+    if (Dmax == 0) {
+      *Q = P;
+      return false;
+    }
     Indices d = expected_dimensions<MPS>(P, Dmax, periodic);
     bool truncated = 0;
     index L = P.size();
