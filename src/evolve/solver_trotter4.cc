@@ -44,6 +44,12 @@ namespace mps {
   ForestRuthSolver::one_step(CMPS *P, index Dmax)
   {
     int debug = FLAGS.get(MPS_DEBUG_TROTTER);
+    if (!Dmax) {
+      if (strategy != DO_NOT_TRUNCATE) {
+        std::cerr << "In TrotterSolver::one_step(), no maximum dimension provided\n";
+        abort();
+      }
+    }
 
     switch (strategy) {
     case TRUNCATE_EACH_UNITARY: {

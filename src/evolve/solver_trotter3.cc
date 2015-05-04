@@ -36,6 +36,12 @@ namespace mps {
   Trotter3Solver::one_step(CMPS *P, index Dmax)
   {
     int debug = FLAGS.get(MPS_DEBUG_TROTTER);
+    if (!Dmax) {
+      if (strategy != DO_NOT_TRUNCATE) {
+        std::cerr << "In TrotterSolver::one_step(), no maximum dimension provided\n";
+        abort();
+      }
+    }
 
     U1.debug = U2.debug = debug;
     switch (strategy) {
