@@ -109,43 +109,49 @@ namespace mps {
     P2.get_dimensions(&a2, &i2, &a3);
 
     double err = 0.0;
+
+    /* Apply the unitary onto two neighboring sites. This creates a
+     * larger tensor that we have to split into two new tensors, Pout[k1]
+     * and Pout[k2], that represent the sites */
+    P1 = reshape(fold(P1, -1, P2, 0), a1,i1*i2,a3);
     if (!U12.is_empty()) {
-      /* Apply the unitary onto two neighboring sites. This creates a
-       * larger tensor that we have to split into two new tensors, Pout[k1]
-       * and Pout[k2], that represent the sites */
-      P1 = reshape(fold(P1, -1, P2, 0), a1,i1*i2,a3);
       P1 = foldin(U12, -1, P1, 1);
-      RTensor s = linalg::svd(reshape(P1,a1*i1,i2*a3), &P1, &P2, SVD_ECONOMIC);
-      if (dk > 0) {
-	scale_inplace(P2, 0, s);
-      } else {
-	scale_inplace(P1, -1, s);
-      }
-      a2 = s.size();
-      /*
-       * Here we perform a first truncation of the matrix.
-       *   1) If we use Guifre's algorithm, the truncation is based on the
-       *   maximum size that we want to keep and a tolerance.
-       *   2) If we on the other hand use the simplify() routine, we just
-       *   remove the zero elements which appear from the zeros in the
-       *   singular value decomposition above.
-       * Notice that at the end, P is orthonormalized in both cases.
-       */
-      index new_a2 = where_to_truncate(s, tolerance, max_a2? max_a2 : a2);
-      if (new_a2 != a2) {
-        P1 = change_dimension(P1, -1, new_a2);
-        P2 = change_dimension(P2, 0, new_a2);
-        a2 = new_a2;
-        for (index i = a2; i < s.size(); i++)
-          err += square(s[i]);
-      }
     }
+    RTensor s = linalg::svd(reshape(P1,a1*i1,i2*a3), &P1, &P2,
+                            SVD_ECONOMIC);
     if (dk > 0) {
-      P.at(k1) = reshape(P1, a1,i1,a2);
-      set_canonical(P, k2, reshape(P2, a2,i2,a3), dk);
+      scale_inplace(P2, 0, s);
     } else {
+      scale_inplace(P1, -1, s);
+    }
+    a2 = s.size();
+    index new_a2 = where_to_truncate(s, tolerance, max_a2? max_a2 : a2);
+    if (new_a2 != a2) {
+      P1 = change_dimension(P1, -1, new_a2);
+      P2 = change_dimension(P2, 0, new_a2);
+      a2 = new_a2;
+      for (index i = a2; i < s.size(); i++)
+        err += square(s[i]);
+    }
+    if (max_a2) {
+      /* If we impose a truncation at this stage, we are using
+       * Guifre's original TEBD algorithm and we split and
+       * orthogonalize as we move on. */
+      if (dk > 0) {
+        P.at(k1) = reshape(P1, a1,i1,a2);
+        set_canonical(P, k2, reshape(P2, a2,i2,a3), dk);
+      } else {
+        P.at(k2) = reshape(P2, a2,i2,a3);
+        set_canonical(P, k1, reshape(P1, a1,i1,a2), dk);
+      }
+    } else {
+      /*
+       * Otherwise we are not truncating (except for eliminating zero singular
+       * values) and we just keep the result of applying the
+       * unitaries. Truncation will be done at a later stage.
+       */
+      P.at(k1) = reshape(P1, a1,i1,a2);
       P.at(k2) = reshape(P2, a2,i2,a3);
-      set_canonical(P, k1, reshape(P1, a1,i1,a2), dk);
     }
     return err;
   }
@@ -155,11 +161,18 @@ namespace mps {
                                              double tolerance,
                                              index Dmax, bool normalize) const
   {
+    /*
+     * In this version we first apply all unitaries. The state is not
+     * truncated, except for eliminating zero singular values, what does
+     * not introduce errors. After this we simplify the state to a fixed
+     * maximum bond dimension.
+     */
     double err = apply(psi, sense, tolerance, 0, normalize);
     CMPS aux = *psi;
     index sweeps = 12;
     if (truncate(&aux, *psi, Dmax, false)) {
-      err += simplify(&aux, *psi, sense, false, sweeps, normalize);
+      int sense = +1;
+      err += simplify(&aux, *psi, &sense, false, sweeps, normalize);
       if (debug) {
         std::cout << "Unitary: bond dimension after truncating = "
                   << largest_bond_dimension(aux)
