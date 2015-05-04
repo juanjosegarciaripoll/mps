@@ -113,7 +113,7 @@ namespace mps {
      exp(-iH\Delta t) = exp(-iH_{even} \Delta t/2) exp(-iH_{odd} \Delta t/2)\f]
   */
   class Trotter2Solver : public TrotterSolver {
-    Unitary U;
+    Unitary Ueven, Uodd;
     bool optimize;
     int sense;
   public:
