@@ -101,8 +101,8 @@ namespace tensor_test {
 	EXPECT_DOUBLE_EQ(v, expected(ghz, P0, j));
 	EXPECT_DOUBLE_EQ(v, expected(ghz, P1, j));
       }
-      EXPECT_DOUBLE_EQ(v * i, expected(ghz, P0));
-      EXPECT_DOUBLE_EQ(v * i, expected(ghz, P1));
+      EXPECT_CEQ(v * RTensor::ones(igen << i), expected_vector(ghz, P0));
+      EXPECT_CEQ(v * RTensor::ones(igen << i), expected_vector(ghz, P1));
     }
   }
 
