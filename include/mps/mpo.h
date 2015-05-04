@@ -56,6 +56,16 @@ namespace mps {
 
   const RMPO mmult(const RMPO &A, const RMPO &B);
 
+  /** Return the matrix that represents the MPO acting on the full Hilbert
+      space. Use with care with only small tensors, as this may exhaust the
+      memory of your computer. */
+  const RTensor mpo_to_matrix(const RMPO &A);
+
+  /** Return the matrix that represents the MPO acting on the full Hilbert
+      space. Use with care with only small tensors, as this may exhaust the
+      memory of your computer. */
+  const CTensor mpo_to_matrix(const CMPO &A);
+
 }
 
 #endif /* !MPO_MPO_H */

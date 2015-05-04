@@ -121,6 +121,8 @@ libmps_la_SOURCES = \
 	mpo/mpo_adjoint_z.cc \
 	mpo/mpo_mmult_d.cc \
 	mpo/mpo_mmult_z.cc \
+	mpo/mpo_to_matrix_d.cc \
+	mpo/mpo_to_matrix_z.cc \
 	evolve/solver_base.cc \
 	evolve/trotter_unitary.cc \
 	evolve/solver_trotter2.cc \
