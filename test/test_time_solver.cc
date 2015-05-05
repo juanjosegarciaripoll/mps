@@ -52,8 +52,8 @@ namespace tensor_test {
                                H.interaction_right(i, j, 0.0) * 0.0);
         }
       }
-      pHok.set_local_term(i, H.local_term(i, 0.0));
-      pHno.set_local_term(i, H.local_term(i, 0.0) * 0.0);
+      pHok.set_local_term(i, H.local_term(i, 0.0) * 0.5);
+      pHno.set_local_term(i, H.local_term(i, 0.0) * 0.5);
     }
     *ppHeven = pHeven;
     *ppHodd = pHodd;
@@ -61,25 +61,25 @@ namespace tensor_test {
 
   //////////////////////////////////////////////////////////////////////
 
-  void evolve_identity(int size, const CMPS apply_H(const Hamiltonian &H, double dt, const CMPS &psi))
+  void evolve_identity(int size, const CMPS apply_U(const Hamiltonian &H, double dt, const CMPS &psi))
   {
     CMPS psi = ghz_state(size);
     // Id is a zero operator that causes the evolution operator to
     // be the identity
     TIHamiltonian H(size, RTensor(), RTensor::zeros(2,2));
-    CMPS aux = apply_H(H, 0.1, psi);
+    CMPS aux = apply_U(H, 0.1, psi);
     EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
     EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
     EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
   }
 
-  void evolve_global_phase(int size, const CMPS apply_H(const Hamiltonian &H, double dt, const CMPS &psi))
+  void evolve_global_phase(int size, const CMPS apply_U(const Hamiltonian &H, double dt, const CMPS &psi))
   {
     CMPS psi = ghz_state(size);
     // H is a multiple of the identity, causing the evolution
     // operator to be just a global phase
     TIHamiltonian H(size, RTensor(), RTensor::eye(2,2));
-    CMPS aux = apply_H(H, 0.1, psi);
+    CMPS aux = apply_U(H, 0.1, psi);
     EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
     EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
   }
