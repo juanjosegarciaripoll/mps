@@ -30,14 +30,14 @@
 namespace tensor_test {
 
   CTensor
-  apply_trotter2(const Hamiltonian &H, cdouble idt, const CTensor &psi)
+  apply_trotter3(const Hamiltonian &H, cdouble idt, const CTensor &psi)
   {
     Hamiltonian *pHeven, *pHodd;
     split_Hamiltonian(&pHeven, &pHodd, H);
 
-    CTensor U1 = expm(full(sparse_hamiltonian(*pHeven)) * idt);
-    CTensor U2 = expm(full(sparse_hamiltonian(*pHodd)) * idt);
-    CTensor new_psi = mmult(U1, mmult(U2, psi));
+    CTensor U1 = expm(full(sparse_hamiltonian(*pHodd)) * idt);
+    CTensor U2 = expm(full(sparse_hamiltonian(*pHeven)) * (0.5*idt));
+    CTensor new_psi = mmult(U2, mmult(U1, mmult(U2, psi)));
 
     delete pHeven;
     delete pHodd;
@@ -60,7 +60,7 @@ namespace tensor_test {
     double err = solver.one_step(&aux, 0);
     EXPECT_CEQ(err, 0.0);
     EXPECT_CEQ(norm2(aux), 1.0);
-    CTensor aux2 = apply_trotter2(H, to_complex(0.0,-dt), mps_to_vector(psi));
+    CTensor aux2 = apply_trotter3(H, to_complex(0.0,-dt), mps_to_vector(psi));
     EXPECT_CEQ(mps_to_vector(aux), aux2);
   }
 
@@ -72,7 +72,7 @@ namespace tensor_test {
     solver.strategy = Trotter2Solver::TRUNCATE_EACH_LAYER;
     double err = solver.one_step(&truncated_psi_t, Dmax);
     EXPECT_CEQ(norm2(truncated_psi_t), 1.0);
-    CTensor psi_t = apply_trotter2(H, to_complex(0.0,-dt), mps_to_vector(psi));
+    CTensor psi_t = apply_trotter3(H, to_complex(0.0,-dt), mps_to_vector(psi));
     EXPECT_CEQ(mps_to_vector(truncated_psi_t), psi_t);
   }
 
