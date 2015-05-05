@@ -26,53 +26,54 @@
 namespace mps {
 
   TrotterSolver::Unitary::Unitary(const Hamiltonian &H, index k, cdouble dt,
-                                  bool apply_pairwise, bool do_debug) :
-    debug(do_debug), pairwise(apply_pairwise),
-    k0(k), kN(H.size()), U(H.size())
+                                  bool do_debug) :
+    debug(do_debug), k0(k), kN(H.size()), U(H.size())
   {
+    /*
+     * When we do 'Trotter' evolution, the Hamiltonian is split into
+     * 'even' and 'odd' contributions made of mutually commuting terms.
+     * This object splits those contributions:
+     *
+     *     H_even = \sum_n H_{2n,2n+1} + 0.5*Hloc_{L}
+     *     H_odd  = 0.5*Hloc_{0} + \sum_n H_{2n+1,2n+2}
+     *
+     * where the pairwise terms include part of the local operators
+     *
+     *     H_{kk+1} = Hint_{kk+1} + 0.5*Hloc_{k} + 0.5*Hloc_{k+1}
+     *
+     * and where the extra Hloc_{0} and Hloc_{L} ensure that all local
+     * operators appear both in the even and odd splittings.
+     */
     if (k > 1) {
       std::cerr << "In TrotterSolver::Unitary::Unitary(H, k, ...), "
         "the initial site k was neither 0 nor 1";
       abort();
     }
-    if (pairwise) {
-      if ((k & 1) ^ (kN & 1)) {
-	// We look for the nearest site which has the same parity.
-	kN--;
-      }
-      if ((kN - k0) < 2) {
-	// No sites!
-	kN = k0;
-      }
-    } else {
-      kN = kN - 1;
+    if ((k & 1) ^ (kN & 1)) {
+      // We look for the nearest site which has the same parity.
+      kN--;
+    }
+    if ((kN - k0) < 2) {
+      // No sites!
+      kN = k0;
     }
     if (debug) std::cout << "computing: ";
     dt = to_complex(-tensor::abs(imag(dt)), -real(dt));
-    for (int di = 1, i = 0; i < (int)H.size(); i += di) {
+    for (int di, i = 0; i < (int)H.size(); i += di) {
       CTensor Hi;
       if (i < k0 || i >= kN) {
-	if (!pairwise) continue;
 	// Local operator
 	Hi = H.local_term(i,0.0) / 2.0;
 	if (debug) std::cout << "[" << i << "]";
 	di = 1;
       } else {
-	double f1 = 0.5;
-	double f2 = 0.5;
-	if (pairwise) {
-	  di = 2;
-	} else {
-	  if (i == 0) f1 = 1.0;
-	  if (i+2 == (int)H.size()) f2 = 1.0;
-	  di = 1;
-	}
 	CTensor i1 = CTensor::eye(H.dimension(i));
 	CTensor i2 = CTensor::eye(H.dimension(i+1));
 	Hi = H.interaction(i,0.0)
-	  + kron2(H.local_term(i,0.0) * f1, i2)
-	  + kron2(i1, H.local_term(i+1,0.0) * f2);
+	  + kron2(0.5 * H.local_term(i,0.0), i2)
+	  + kron2(i1, 0.5 * H.local_term(i+1,0.0));
 	if (debug) std::cout << "[" << i << "," << i+1 << "]";
+        di = 2;
       }
       U.at(i) = linalg::expm(Hi * dt);
     }
@@ -84,7 +85,7 @@ namespace mps {
 
   void
   TrotterSolver::Unitary::apply_onto_one_site(CMPS &P, const CTensor &Uloc,
-                                              index k, int dk) const
+                                              index k, int dk, index max_a2) const
   {
     CTensor P1 = P[k];
     if (!Uloc.is_empty()) {
@@ -92,7 +93,11 @@ namespace mps {
       P1.get_dimensions(&a1, &i1, &a2);
       P1 = foldin(Uloc, -1, P1, 1);
     }
-    set_canonical(P, k, P1, dk);
+    if (max_a2) {
+      set_canonical(P, k, P1, dk);
+    } else {
+      P.at(k) = P1;
+    }
   }
 
   double
@@ -164,22 +169,20 @@ namespace mps {
     /*
      * In this version we first apply all unitaries. The state is not
      * truncated, except for eliminating zero singular values, what does
-     * not introduce errors. After this we simplify the state to a fixed
-     * maximum bond dimension.
+     * not introduce errors.
      */
-    double err = apply(psi, sense, tolerance, 0, normalize);
-    CMPS aux = *psi;
-    index sweeps = 12;
-    if (truncate(&aux, *psi, Dmax, false)) {
-      int sense = +1;
-      err += simplify(&aux, *psi, &sense, false, sweeps, normalize);
-      if (debug) {
-        std::cout << "Unitary: bond dimension after truncating = "
-                  << largest_bond_dimension(aux)
-                  << std::endl;
-      }
+    *sense = +1;
+    double err = apply(psi, sense, tolerance, 0, false);
+    /*
+     * After this initial phase, we now simplify the state to have the
+     * right bond dimension.
+     */
+    int simplify_sense = -1;
+    *psi = canonical_form(*psi, simplify_sense);
+    if (largest_bond_dimension(*psi) <= Dmax) {
+      index sweeps = 12;
+      err += simplify_obc(psi, *psi, &simplify_sense, sweeps, normalize, Dmax);
     }
-    *psi = aux;
     return err;
   }
 
@@ -188,45 +191,32 @@ namespace mps {
                                 index Dmax, bool normalize) const
   {
     if (*sense == 0) {
-      if (normalize) {
-        *psi = normal_form(*psi);
-      } else {
-        *psi = canonical_form(*psi);
-      }
       *sense = +1;
     }
     tic();
 
     index L = psi->size();
     double err = 0;
-    int dk = pairwise? 2 : 1;
+    int dk = 2;
     if (*sense > 0) {
-      if (pairwise) {
-	for (int k = 0; k < k0; k++) {
-	  apply_onto_one_site(*psi, U[k], k, *sense);
-	}
+      for (int k = 0; k < k0; k++) {
+        apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
       }
       for (int k = k0; k < kN; k += dk) {
 	err += apply_onto_two_sites(*psi, U[k], k, k+1, *sense, tolerance, Dmax);
       }
-      if (pairwise) {
-	for (int k = kN; k < (int)L; k++) {
-	  apply_onto_one_site(*psi, U[k], k, *sense);
-	}
+      for (int k = kN; k < (int)L; k++) {
+        apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
       }
     } else {
-      if (pairwise) {
-	for (int k = L-1; k >= kN; k--) {
-	  apply_onto_one_site(*psi, U[k], k, *sense);
-	}
+      for (int k = L-1; k >= kN; k--) {
+        apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
       }
       for (int k = kN - dk; k >= k0; k -= dk) {
 	err += apply_onto_two_sites(*psi, U[k], k, k+1, *sense, tolerance, Dmax);
       }
-      if (pairwise) {
-	for (int k = k0 - 1; k >= 0; k--) {
-	  apply_onto_one_site(*psi, U[k], k, *sense);
-	}
+      for (int k = k0 - 1; k >= 0; k--) {
+        apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
       }
     }
     if (debug) {
@@ -234,9 +224,7 @@ namespace mps {
                 << "\t[" << toc() << "s]\n";
     }
     if (normalize) {
-      index k = (*sense > 0)? L-1 : 0;
-      CTensor Pk = (*psi)[k];
-      psi->at(k) = Pk / norm2(Pk);
+      *psi = normal_form(*psi, *sense);
     }
 
     *sense = -*sense;

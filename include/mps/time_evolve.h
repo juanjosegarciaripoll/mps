@@ -86,8 +86,7 @@ namespace mps {
       bool debug;
 
       /*Construct the unitary operator.*/
-      Unitary(const Hamiltonian &H, index k, cdouble dt,
-	      bool apply_pairwise = true, bool do_debug = false);
+      Unitary(const Hamiltonian &H, index k, cdouble dt, bool do_debug = false);
 
       /*Apply the unitary on a MPS.*/
       double apply(CMPS *psi, int *dk, double tolerance, index Dmax,
@@ -98,10 +97,10 @@ namespace mps {
 				bool normalize = false) const;
 
     private:
-      bool pairwise;
       int k0, kN;
       std::vector<CTensor> U;
-      void apply_onto_one_site(CMPS &P, const CTensor &Uloc, index k, int dk) const;
+      void apply_onto_one_site(CMPS &P, const CTensor &Uloc, index k, int dk,
+                               index max_a2) const;
       double apply_onto_two_sites(CMPS &P, const CTensor &U12,
 				  index k1, index k2, int dk,
 				  double tolerance, index max_a2) const;
