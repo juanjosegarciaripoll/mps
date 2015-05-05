@@ -69,8 +69,12 @@ namespace mps {
       return err;
     }
     case DO_NOT_TRUNCATE: {
+      if (debug) std::cout << "Trotter3 method: do not truncate:\n"
+                           << "Trotter3 Layer 1/3\n";
       U2.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      if (debug) std::cout << "Trotter3 Layer 2/3\n";
       U1.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      if (debug) std::cout << "Trotter3 Layer 3/3\n";
       U2.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0, normalize);
       return 0.0;
     }
