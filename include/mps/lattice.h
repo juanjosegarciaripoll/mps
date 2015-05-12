@@ -33,13 +33,9 @@ namespace mps {
    */
   class Lattice {
 
-    const tensor::index number_of_sites;
-    const int number_of_particles;
-    const Indices configurations;
-
-    static const Indices filtered_states(int sites, int number_of_particles);
-
   public:
+
+    typedef tensor::index word;
 
     enum particle_kind_t {
       /** The lattice will contain impenetrable bosonic particles. */
@@ -74,12 +70,33 @@ namespace mps {
     const CSparse Hamiltonian(const CTensor &J, const CTensor &interactions,
 			      double mu, particle_kind_t kind = FERMIONS) const;
 
+    /** Bipartition of the lattice. We regard lattice sites 0 to N-1 as one
+        half, and N to size() as the other half. We construct two vectors of all
+        physical configurations that result from splitting particles on each of
+        the sublattices, having respective sizes L1 and L2. In addition to this
+        we also construct a vector of indices, ndx, such that the element psi[i]
+        of a wavefunction is mapped to the ndx[i] entry of a reduced density
+        matrix, of size L1 * L2.
+    */
+    void bipartition(int sites_left, Indices *left_states, Indices *right_states,
+                     Indices *matrix_indices) const;
+
     /** Number of sites in the lattice. */
     int size() const;
     /** Preconfigured number of particles. */
     int particles() const;
     /** Dimensionality of the constrained Hilbert space. */
     tensor::index dimension() const;
+
+  private:
+    const tensor::index number_of_sites;
+    const int number_of_particles;
+    const Indices configurations;
+
+    static int count_bits(Lattice::word w);
+
+    static const Indices states_with_n_particles(int sites, int number_of_particles);
+    static const Indices states_in_particle_range(int sites, int nmin, int nmax);
   };
   
 }

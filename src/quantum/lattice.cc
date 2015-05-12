@@ -37,9 +37,8 @@ namespace mps {
     5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
   };
 
-  typedef tensor::index word;
-
-  static int count(word w)
+  int
+  Lattice::count_bits(Lattice::word w)
   {
     if (sizeof(w) == 4) {
       return byte[w & 0xff] +
@@ -56,7 +55,7 @@ namespace mps {
   }
 
   const Indices
-  Lattice::filtered_states(int sites, int filling)
+  Lattice::states_with_n_particles(int sites, int filling)
   {
     if (sizeof(word) == 4) {
       if (sites >= 32) {
@@ -71,15 +70,21 @@ namespace mps {
         abort();
       }
     }
+    if (filling > sites) {
+      std::cerr << "In Lattice, the number of particles, " << filling
+                << ", exceeds the number of lattice sites, " << sites
+                << std::endl;
+      abort();
+    }
     word n = 0;
     for (word c = 0, l = (word)1 << sites; c < l; c++) {
-      if (count(c) == filling)
+      if (count_bits(c) == filling)
 	n++;
     }
     Indices output(n);
     n = 0;
     for (word c = 0, l = (word)1 << sites; c < l; c++) {
-      if (count(c) == filling)
+      if (count_bits(c) == filling)
 	output.at(n++) = c;
     }
     return output;
@@ -88,7 +93,7 @@ namespace mps {
   Lattice::Lattice(int sites, int N) :
     number_of_sites(sites),
     number_of_particles(N),
-    configurations(filtered_states(number_of_sites, number_of_particles))
+    configurations(states_with_n_particles(number_of_sites, number_of_particles))
   {
   }
 
@@ -141,7 +146,7 @@ namespace mps {
 	  word other = *it;
 	  word aux = other & mask11;
 	  if (aux == mask01) {
-	    if ((count(other & sign_mask) & 1) == sign_value)
+	    if ((count_bits(other & sign_mask) & 1) == sign_value)
 	      *v = -1.0;
 	    else
 	      *v = 1.0;

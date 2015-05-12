@@ -15,6 +15,7 @@ libmps_la_SOURCES = \
 	quantum/sparse_1d_hamiltonian_many_d.cc \
 	quantum/sparse_1d_hamiltonian_many_z.cc \
 	quantum/lattice.cc \
+	quantum/lattice_bipartition.cc \
 	hamiltonian/hamiltonian.cc \
 	hamiltonian/hamiltonian_expected_d.cc \
 	hamiltonian/hamiltonian_expected_z.cc \
