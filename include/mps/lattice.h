@@ -88,6 +88,20 @@ namespace mps {
     /** Dimensionality of the constrained Hilbert space. */
     tensor::index dimension() const;
 
+    const RTensor apply(const RTensor &psi, const RTensor &J, const RTensor &U, particle_kind_t kind = FERMIONS) const;
+    const CTensor apply(const CTensor &psi, const CTensor &J, const CTensor &U, particle_kind_t kind = FERMIONS) const;
+    
+    const RTensor eigs(const RTensor &J, const RTensor &U, int eig_type, size_t neig,
+                       RTensor *vectors = NULL, bool *converged = NULL,
+                       particle_kind_t kind = FERMIONS) const;
+    const CTensor eigs(const CTensor &J, const CTensor &U, int eig_type, size_t neig,
+                       CTensor *vectors = NULL, bool *converged = NULL,
+                       particle_kind_t kind = FERMIONS) const;
+
+    void hopping_inner(RTensor *values, Indices *ndx, int to_site, int from_site,
+                       particle_kind_t kind) const;
+    const RTensor interaction_inner(int site1, int site2) const;
+
   private:
     const tensor::index number_of_sites;
     const int number_of_particles;

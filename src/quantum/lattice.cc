@@ -97,14 +97,12 @@ namespace mps {
   {
   }
 
-  const RSparse
-  Lattice::hopping_operator(int to_site, int from_site, particle_kind_t kind) const
+  void
+  Lattice::hopping_inner(RTensor *values, Indices *ndx, int to_site, int from_site,
+                         particle_kind_t kind) const
   {
-    if (to_site == from_site)
-      return number_operator(from_site);
-
     word L = configurations.size();
-    RTensor values(L);
+    *values = RTensor::zeros(igen<<L);
 
     word from_mask = (word)1 << from_site;
     word to_mask = (word)1 << to_site;
@@ -112,10 +110,10 @@ namespace mps {
     word mask01 = from_mask;
     word mask10 = to_mask;
 
-    RTensor::iterator v = values.begin();
-    Indices ndx = configurations;
+    RTensor::iterator v = values->begin();
+    *ndx = configurations;
     if (kind == HARD_CORE_BOSONS) {
-      for (Indices::iterator it = ndx.begin(), end = ndx.end();
+      for (Indices::iterator it = ndx->begin(), end = ndx->end();
 	   it != end; ++it, ++v)
 	{
 	  word other = *it;
@@ -140,7 +138,7 @@ namespace mps {
 	sign_mask = (from_mask-1) & (~(to_mask-1));
 	sign_value = 1;
       }
-      for (Indices::iterator it = ndx.begin(), end = ndx.end();
+      for (Indices::iterator it = ndx->begin(), end = ndx->end();
 	   it != end; ++it, ++v)
 	{
 	  word other = *it;
@@ -160,13 +158,23 @@ namespace mps {
 	  *it = other;
 	}
     }
-    Indices cols = iota(0, L-1);
-    Indices rows = sort_indices(ndx);
+  }
+  
+  const RSparse
+  Lattice::hopping_operator(int to_site, int from_site, particle_kind_t kind) const
+  {
+    if (to_site == from_site)
+      return number_operator(from_site);
+    Indices rows;
+    RTensor values;
+    hopping_inner(&values, &rows, to_site, from_site, kind);
+    rows = sort_indices(rows);
+    Indices cols = iota(0, rows.size()-1);
     if (0)
       std::cout << cols << std::endl
                 << configurations << std::endl
-                << ndx << std::endl;
-    return RSparse(rows,cols,values,L,L);
+                << rows << std::endl;
+    return RSparse(rows, cols, values, rows.size(), rows.size());
   }
 
   const RSparse
@@ -177,6 +185,15 @@ namespace mps {
 
   const RSparse
   Lattice::interaction_operator(int site1, int site2) const
+  {
+    word L = configurations.size();
+    RTensor values = interaction_inner(site1, site2);
+    Indices n = iota(0, L-1);
+    return RSparse(n,n,values,L,L);
+  }
+
+  const RTensor
+  Lattice::interaction_inner(int site1, int site2) const
   {
     word L = configurations.size();
     RTensor values(L);
@@ -192,8 +209,7 @@ namespace mps {
       {
 	*v = (*it & target) == target;
       }
-    Indices n = iota(0, L-1);
-    return RSparse(n,n,values,L,L);
+    return values;
   }
 
   template<class Sparse>
@@ -262,5 +278,5 @@ namespace mps {
   {
     return configurations.size();
   }
-  
+
 }
