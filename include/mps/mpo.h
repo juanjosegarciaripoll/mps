@@ -29,11 +29,15 @@ namespace mps {
 
   using namespace tensor;
 
+  RMPO local_Hamiltonian_mpo(const std::vector<RTensor> &Hloc);
+
   void add_local_term(RMPO *mpdo, const RTensor &Hloc, index k);
 
   void add_interaction(RMPO *mpdo, const RTensor &Hi, index i, const RTensor &Hj);
 
   void add_interaction(RMPO *mpdo, const std::vector<RTensor> &Hi, index i);
+
+  CMPO local_Hamiltonian_mpo(const std::vector<CTensor> &Hloc);
 
   void add_local_term(CMPO *mpdo, const CTensor &Hloc, index i);
 
