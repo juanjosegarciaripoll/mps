@@ -44,7 +44,6 @@ namespace mps {
       index d = Hloc[i].rows();
       Tensor aux = Tensor::zeros(2, d, d, 2);
       aux.at(range(0), range(), range(), range(1)) = Hloc[i];
-      std::cout << aux.dimensions() << std::endl;
 
       Tensor id = Tensor::eye(d);
       aux.at(range(1), range(), range(), range(1)) = id;
