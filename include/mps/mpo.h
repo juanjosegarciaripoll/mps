@@ -20,6 +20,7 @@
 #ifndef MPO_MPO_H
 #define MPO_MPO_H
 
+#include <vector>
 #include <mps/mps.h>
 #include <mps/rmpo.h>
 #include <mps/cmpo.h>
@@ -32,9 +33,13 @@ namespace mps {
 
   void add_interaction(RMPO *mpdo, const RTensor &Hi, index i, const RTensor &Hj);
 
+  void add_interaction(RMPO *mpdo, const std::vector<RTensor> &Hi, index i);
+
   void add_local_term(CMPO *mpdo, const CTensor &Hloc, index i);
 
   void add_interaction(CMPO *mpdo, const CTensor &Hi, index i, const CTensor &Hj);
+
+  void add_interaction(CMPO *mpdo, const std::vector<CTensor> &Hi, index i);
 
   const RMPS apply(const RMPO &mpdo, const RMPS &state);
 

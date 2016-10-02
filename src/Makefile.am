@@ -114,6 +114,8 @@ libmps_la_SOURCES = \
 	mpo/cmpo_from_hamiltonian.cc \
 	mpo/mpo_add_term_d.cc \
 	mpo/mpo_add_term_z.cc \
+	mpo/mpo_add_long_range_term_d.cc \
+	mpo/mpo_add_long_range_term_z.cc \
 	mpo/mpo_apply_d.cc \
 	mpo/mpo_apply_z.cc \
 	mpo/mpo_expected_d.cc \
