@@ -36,20 +36,12 @@ namespace mps {
    */
 
   template<class MPO, class Tensor>
-  static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H, index i)
+  static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H)
   {
     //
-    // This function add terms \sum_{j,j\neq i} H[i]*H[j] to a Hamiltonian.
-    // The origin of interactions is thus marked by "i"
+    // This function add a term \prod_j H[j] to a Hamiltonian.
     //
-    if (i < 0) {
-      std::cerr << "In add_interaction(), the index " << i << " is outside the lattice.\n";
-      abort();
-    }
-    if (i >= mpo.size()) {
-      std::cerr << "In add_interaction(), the index " << i << " is outside the lattice.\n";
-      abort();
-    }
+    index closing = 0, opening = 0;
     for (int j = 0; j < mpo.size(); ++j) {
       const Tensor &Hj = H[j];
       Tensor Pj = mpo[j];
@@ -63,37 +55,18 @@ namespace mps {
       }
       index dl = Pj.dimension(0);
       index dr = Pj.dimension(3);
-      index closing = 1, opening = 0;
       if (j > 0) {
         Pj = change_dimension(Pj, 0, dl+1);
       }
       if (j+1 < mpo.size()) {
         Pj = change_dimension(Pj, 3, dr+1);
-      } else {
-        closing = 0;
       }
-      if (j == i) {
-        // We are on the origin of the interaction
-        // We close all terms that came from the left
-        if (j > 0) {
-          Pj.at(range(dl),range(),range(),range(closing)) = Hj;
-        }
-        // We open all terms that did not have anything on the left
-        if (j+1 < mpo.size()) {
-          Pj.at(range(opening),range(),range(),range(dr)) = Hj;
-        }
-      } else if (j < i) {
-        // We open new terms
-        Pj.at(range(opening),range(),range(),range(dr)) = Hj;
-        if (j > 0) {
-          Pj.at(range(dl),range(),range(),range(dr)) = Tensor::eye(Hj.rows());
-        }
+      if (j == 0) {
+	Pj.at(range(opening),range(),range(),range(dr)) = Hj;
+      } else if (j+1 < mpo.size()) {
+	Pj.at(range(dl),range(),range(),range(dr)) = Hj;
       } else {
-        // We close terms opened by the qubit
-        Pj.at(range(dl),range(),range(),range(closing)) = Hj;
-        if (j+1 < mpo.size()) {
-          Pj.at(range(dl),range(),range(),range(dr)) = Tensor::eye(Hj.rows());
-        }
+	Pj.at(range(dl),range(),range(),range(closing)) = Hj;
       }
       mpo.at(j) = Pj;
     }
