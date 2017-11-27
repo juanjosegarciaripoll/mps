@@ -17,42 +17,61 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <list>
 #include <tensor/tools.h>
 #include <tensor/io.h>
 #include <tensor/linalg.h>
 #include <mps/minimizer.h>
+#include <mps/lform.h>
 #include <mps/qform.h>
 
 namespace mps {
 
-  template<class Tensor, class QForm>
-  const Tensor apply_qform1(const Tensor &P, const Indices &d, const QForm *qform)
+  template<class Tensor>
+  const Tensor orthogonalize(Tensor Psi, const std::list<Tensor> *ortho)
   {
-    Tensor v = reshape(P, d);
-    v = qform->apply_one_site_matrix(v);
-    return reshape(v, P.size());
+    if (ortho) {
+      for (typename std::list<Tensor>::const_iterator it = ortho->begin();
+           it != ortho->end(); ++it)
+      {
+        Psi = Psi - scprod(*it, Psi) * (*it);
+      }
+    }
+    return Psi;
   }
 
   template<class Tensor, class QForm>
-  const Tensor apply_qform2_with_projector(const Tensor &P, int sense,
-                                           Tensor *P12, const QForm *qform,
-                                           const Indices &projector)
+  const Tensor apply_qform1(const Tensor &P, const Indices &d,
+                            const QForm *qform, const std::list<Tensor> *ortho)
+  {
+    Tensor v = orthogonalize(reshape(P, d), ortho);
+    v = qform->apply_one_site_matrix(v);
+    return reshape(orthogonalize(v, ortho), P.size());
+  }
+
+  template<class Tensor, class QForm>
+  const Tensor apply_qform2_with_subspace(const Tensor &P, int sense,
+                                          Tensor *P12, const QForm *qform,
+                                          const Indices &subspace,
+                                          const std::list<Tensor> *ortho)
   {
     // This is a bit fishy, because we reuse P12 as a buffer where to
     // do the computation of H * psi. However, we rely on the fact that
     // ARPACK is not multithreaded and thus apply_qform2_... is never
     // concurrent on the same tensor.
-    P12->at(range(projector)) = P;
-    return qform->apply_two_site_matrix(*P12, sense)(range(projector));
+    P12->at(range(subspace)) = orthogonalize(P, ortho);
+    return orthogonalize(qform->apply_two_site_matrix(*P12, sense),
+                         ortho)(range(subspace));
   }
 
   template<class Tensor, class QForm>
   const Tensor apply_qform2(const Tensor &P, int sense, const Indices &d,
-                            const QForm *qform)
+                            const QForm *qform,
+                            const std::list<Tensor> *ortho)
   {
-    Tensor v = reshape(P, d);
+    Tensor v = orthogonalize(reshape(P, d), ortho);
     v = qform->apply_two_site_matrix(v, sense);
-    return reshape(v, v.size());
+    return orthogonalize(reshape(v, v.size()), ortho);
   }
 
   template<class MPO>
@@ -62,9 +81,13 @@ namespace mps {
     typedef typename mps_t::elt_t tensor_t;
     typedef typename tensor_t::elt_t number_t;
     typedef QuadraticForm<mpo_t> qform_t;
+    typedef LinearForm<mps_t> lform_t;
+    typedef std::list<tensor_t> tensor_list_t;
 
     mps_t psi;
     qform_t Hqform, *Nqform;
+    std::list<mps_t> OrthoMPS;
+    std::list<lform_t> OrthoLform;
     number_t Nvalue;
     double Ntol;
     index site;
@@ -96,6 +119,44 @@ namespace mps {
       return psi;
     }
 
+    void add_state(const mps_t &psi_orthogonal, const mps_t &psi)
+    {
+      OrthoMPS.push_front(psi_orthogonal);
+      OrthoLform.push_front(lform_t(psi_orthogonal, psi, 0));
+    }
+
+    tensor_list_t orthogonal_projectors(index site, int sense) {
+      tensor_list_t output;
+      for (typename std::list<lform_t>::iterator it = OrthoLform.begin();
+           it != OrthoLform.end(); ++it)
+      {
+        if (site != it->here()) {
+          std::cout << "DMRG algorithm place at " << site
+                    << " while projectors at " << it->here()
+                    << std::endl;
+          abort();
+        }
+        tensor_t other =
+          sense? it->single_site_vector() : it->two_site_vector(sense);
+        output.push_front(other / sqrt(norm2(other)));
+      }
+      return output;
+    }
+
+    void propagate(const tensor_t &P, index site, int step)
+    {
+      // Update Hamiltonian, constraints and linear forms for orthogonal
+      // states with the new tensors that have just been introduced into
+      // 'psi'.
+      Hqform.propagate(psi[site], psi[site], step);
+      Nqform->propagate(psi[site], psi[site], step);
+      for (typename std::list<lform_t>::iterator it = OrthoLform.begin();
+           it != OrthoLform.end(); ++it)
+      {
+        it->propagate(psi[site], step);
+      }
+    }
+
     void add_constraint(const mpo_t &constraint, number_t value)
     {
       if (Nqform) delete Nqform;
@@ -104,15 +165,27 @@ namespace mps {
     }
 
     double single_site_step() {
+      tensor_list_t orthogonal_to = orthogonal_projectors(site, 0);
       tensor_t P = psi[site];
       const Indices d = P.dimensions();
       tensor_t E = linalg::eigs(with_args(apply_qform1<tensor_t,qform_t>,
-                                          d, &Hqform),
+                                          d, &Hqform, &orthogonal_to),
                                 P.size(), linalg::SmallestAlgebraic, 1,
                                 &P, &converged);
+      if (site == psi.size()/2 && compute_gap) {
+        tensor_t newP = P;
+        tensor_t E = linalg::eigs(with_args(apply_qform1<tensor_t,qform_t>,
+                                            d, &Hqform, &orthogonal_to),
+                                  newP.size(), linalg::SmallestAlgebraic, 2,
+                                  &newP, &converged);
+        if (debug) {
+          std::cout << "\thalf-size gap " << E[1] - E[0] << std::endl;
+        }
+        constrained_gap = gap = real(E[1] - E[0]);
+      }
       if (converged) {
         set_canonical(psi, site, reshape(P, d), step, false);
-        Hqform.propagate(psi[site], psi[site], step);
+        propagate(psi[site], site, step);
         if (debug > 1) {
           std::cout << "\tsite=" << site << ", E=" << real(E[0])
                     << ", P.d" << psi[site].dimensions()
@@ -159,17 +232,30 @@ namespace mps {
         (step > 0) ?
         fold(psi[site], -1, psi[site+1], 0) :
         fold(psi[site-1], -1, psi[site], 0);
+      tensor_list_t orthogonal_to = orthogonal_projectors(site, step);
+      if (site == psi.size()/2 && compute_gap) {
+        tensor_t newP12 = P12;
+        tensor_t E = linalg::eigs(with_args(apply_qform2<tensor_t,qform_t>,
+                                            step, newP12.dimensions(), &Hqform,
+                                            &orthogonal_to),
+                                  newP12.size(), linalg::SmallestAlgebraic, 2,
+                                  &newP12);
+        if (debug) {
+          std::cout << "\thalf-size gap " << E[1] - E[0] << std::endl;
+        }
+        constrained_gap = gap = real(E[1]-E[0]);
+      }
       if (Nqform) {
-        Indices projector;
+        Indices subspace;
         {
           tensor_t aux = Nqform->take_two_site_matrix_diag(step);
-          projector = which(abs(aux - Nvalue) < Ntol);
+          subspace = which(abs(aux - Nvalue) < Ntol);
           if (debug > 1) {
             std::cout << "\tsite=" << site << ", constraints="
-                      << projector.size() << "/" << aux.size()
+                      << subspace.size() << "/" << aux.size()
                       << std::endl;
           }
-          if (projector.size() == 0) {
+          if (subspace.size() == 0) {
             std::cout << "Unable to satisfy constraint " << Nvalue
                       << " with tolerance " << Ntol << std::endl;
             std::cout << "Values:\n" << matrix_form(aux) << std::endl;
@@ -177,35 +263,41 @@ namespace mps {
             return 0.0;
           }
         }
-        tensor_t subP12 = P12(range(projector));
+        tensor_t subP12 = P12(range(subspace));
         P12.fill_with_zeros();
-        E = linalg::eigs(with_args(apply_qform2_with_projector<tensor_t,qform_t>,
-                                   step, &P12, &Hqform, projector),
+        E = linalg::eigs(with_args(apply_qform2_with_subspace<tensor_t,qform_t>,
+                                   step, &P12, &Hqform, subspace, &orthogonal_to),
                          subP12.size(), linalg::SmallestAlgebraic, 1,
                          &subP12, &converged);
-        P12.at(range(projector)) = subP12;
-        if (converged) {
-          set_canonical_2_sites(psi, P12, site, step, Dmax, svd_tolerance,
-                                false);
+        if (site == psi.size()/2 && compute_gap) {
+          tensor_t newP12 = subP12;
+          tensor_t E = linalg::eigs(with_args(apply_qform2_with_subspace<tensor_t,qform_t>,
+                                              step, &P12, &Hqform, subspace, &orthogonal_to),
+                                    newP12.size(), linalg::SmallestAlgebraic, 2,
+                                    &newP12, &converged);
+          if (debug) {
+            std::cout << "\tconstrained half-size gap " << (E[1] - E[0]) << std::endl;
+          }
+          constrained_gap = real(E[1] - E[0]);
         }
-        Hqform.propagate(psi[site], psi[site], step);
-        Nqform->propagate(psi[site], psi[site], step);
+        P12.at(range(subspace)) = subP12;
       } else {
         const Indices d = P12.dimensions();
         E = linalg::eigs(with_args(apply_qform2<tensor_t,qform_t>,
-                                   step, d, &Hqform),
+                                   step, d, &Hqform, &orthogonal_to),
                          P12.size(), linalg::SmallestAlgebraic, 1,
                          &P12, &converged);
-        if (converged) {
-          set_canonical_2_sites(psi, reshape(P12, d), site, step, Dmax,
-                                svd_tolerance, false);
-        }
-        Hqform.propagate(psi[site], psi[site], step);
+        P12 = reshape(P12, d);
       }
+      if (converged) {
+        set_canonical_2_sites(psi, P12, site, step, Dmax, svd_tolerance, false);
+      }
+      propagate(psi[site], site, step);
       if (debug > 1) {
         std::cout << "\tsite=" << site << ", E=" << real(E[0])
                   << ", P1.d=" << psi[site].dimensions()
                   << ", P2.d=" << psi[site+step].dimensions()
+                  << ", converged=" << converged
                   << std::endl;
       }
       return real(E[0]);
@@ -234,6 +326,7 @@ namespace mps {
     double full_sweep(mps_t *psi) {
       double E = 1e28;
       if (debug) {
+        tic();
         std::cout << "***\n*** Algorithm with " << size() << " sites, "
                   << "two-sites = " << !single_site()
                   << (Nqform? ", constrained" : ", unconstrained")
@@ -245,6 +338,7 @@ namespace mps {
           std::cout << "iteration=" << i << "; E=" << newE
                     << "; dE=" << newE - E << "; tol=" << tolerance
                     << (converged? "" : "; did not converge!")
+                    << "; t=" << toc() << "s"
                     << std::endl;
         }
         if (!converged) {

@@ -29,7 +29,8 @@ namespace mps {
 
     MinimizerOptions() :
       sweeps(32), display(false), debug(false), tolerance(1e-10),
-      svd_tolerance(1e-11), allow_E_growth(1), Dmax(0)
+      svd_tolerance(1e-11), allow_E_growth(1), Dmax(0),
+      compute_gap(false), gap(0), constrained_gap(0)
     {}
 
     index sweeps;
@@ -39,6 +40,9 @@ namespace mps {
     double svd_tolerance;
     int allow_E_growth;
     index Dmax;
+
+    bool compute_gap;
+    double gap, constrained_gap;
   };
 
   double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt,
