@@ -22,10 +22,14 @@
 namespace mps {
 
   double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt,
-                  const CMPO &constraint, cdouble value)
+                  const CMPO &constraint, cdouble value,
+                  const std::list<CMPS> *other)
   {
     Minimizer<CMPO> min(opt, H, *psi);
     min.add_constraint(constraint, value);
+    if (other) {
+      min.add_states(*other);
+    }
     return min.full_sweep(psi);
   }
 

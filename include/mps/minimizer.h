@@ -20,6 +20,7 @@
 #ifndef MPS_MINIMIZER_H
 #define MPS_MINIMIZER_H
 
+#include <list>
 #include <mps/mps.h>
 #include <mps/mpo.h>
 
@@ -46,9 +47,11 @@ namespace mps {
   };
 
   double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt,
-                  const RMPO &constraint, double value);
+                  const RMPO &constraint, double value,
+                  const std::list<RMPS> *other = NULL);
   double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt,
-                  const CMPO &constraint, cdouble value);
+                  const CMPO &constraint, cdouble value,
+                  const std::list<CMPS> *other = NULL);
 
   double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt);
   double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt);

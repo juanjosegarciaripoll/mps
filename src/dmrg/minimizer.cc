@@ -59,7 +59,8 @@ namespace mps {
     // do the computation of H * psi. However, we rely on the fact that
     // ARPACK is not multithreaded and thus apply_qform2_... is never
     // concurrent on the same tensor.
-    P12->at(range(subspace)) = orthogonalize(P, ortho);
+    P12->at(range(subspace)) = P;
+    *P12 = orthogonalize(*P12, ortho);
     return orthogonalize(qform->apply_two_site_matrix(*P12, sense),
                          ortho)(range(subspace));
   }
@@ -119,10 +120,14 @@ namespace mps {
       return psi;
     }
 
-    void add_state(const mps_t &psi_orthogonal, const mps_t &psi)
+    void add_states(const std::list<mps_t> &psi_orthogonal)
     {
-      OrthoMPS.push_front(psi_orthogonal);
-      OrthoLform.push_front(lform_t(psi_orthogonal, psi, 0));
+      for (typename std::list<mps_t>::const_iterator it = psi_orthogonal.begin();
+           it != psi_orthogonal.end();
+           ++it) {
+        OrthoMPS.push_front(*it);
+        OrthoLform.push_front(lform_t(*it, psi, 0));
+      }
     }
 
     tensor_list_t orthogonal_projectors(index site, int sense) {
@@ -137,7 +142,7 @@ namespace mps {
           abort();
         }
         tensor_t other =
-          sense? it->single_site_vector() : it->two_site_vector(sense);
+          sense? it->two_site_vector(sense) : it->single_site_vector();
         output.push_front(other / sqrt(norm2(other)));
       }
       return output;
