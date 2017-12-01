@@ -53,6 +53,10 @@ namespace mps {
 
   const CMPS apply(const CMPO &mpdo, const CMPS &state);
 
+  const RMPS apply_canonical(const RMPO &mpdo, const RMPS &state, int sense = +1, bool truncate = false);
+
+  const CMPS apply_canonical(const CMPO &mpdo, const CMPS &state, int sense = -1, bool truncate = false);
+
   double expected(const RMPS &bra, const RMPO &op, const RMPS &ket);
 
   double expected(const RMPS &bra, const RMPO &op);

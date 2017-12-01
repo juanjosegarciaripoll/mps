@@ -122,6 +122,8 @@ libmps_la_SOURCES = \
 	mpo/mpo_local_Hamiltonian_z.cc \
 	mpo/mpo_apply_d.cc \
 	mpo/mpo_apply_z.cc \
+	mpo/mpo_apply_canonical_d.cc \
+	mpo/mpo_apply_canonical_z.cc \
 	mpo/mpo_expected_d.cc \
 	mpo/mpo_expected_z.cc \
 	mpo/mpo_dump_d.cc \
