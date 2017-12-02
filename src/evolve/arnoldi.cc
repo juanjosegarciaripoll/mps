@@ -28,6 +28,19 @@ namespace mps {
 
   using namespace linalg;
 
+  static CTensor
+  ground_state(const CTensor &Heff, const CTensor &N)
+  {
+    CTensor U;
+    CTensor E = linalg::eig(solve_with_svd(N, Heff), &U);
+    Indices ndx = sort_indices(real(E));
+    E = E(range(ndx));
+    U = U(range(),range(ndx));
+    std::cout << "Energy = " << E[0] << std::endl;
+    std::cout << E << std::endl;
+    return reshape(U(range(),range(0)), U.rows());
+  }
+
   ArnoldiSolver::ArnoldiSolver(const Hamiltonian &H, cdouble dt, int nvectors) :
     TimeSolver(dt), H_(H, 0.0), max_states_(nvectors), tolerance_(0)
   {
@@ -53,13 +66,13 @@ namespace mps {
   {
     CTensor N = CTensor::zeros(max_states_, max_states_);
     CTensor Heff = N;
-    CMPS current = normal_form(*psi, -1);
-    CMPS Hcurrent = apply(H_, current);
+    CMPS current = *psi;
+    CMPS Hcurrent = apply_canonical(H_, current, -1);
     int debug = mps::FLAGS.get(MPS_DEBUG_ARNOLDI);
 
     std::vector<CMPS> states;
     states.reserve(max_states_);
-    states.push_back(current);
+    states.push_back(normal_form(current, -1));
     N.at(0,0) = to_complex(1.0);
     Heff.at(0,0) = real(scprod(current, Hcurrent));
 
@@ -77,7 +90,7 @@ namespace mps {
       //	v[0] = states[ndx-1]
       //	v[1] = states[ndx-2]
       //
-      current = Hcurrent = canonical_form(Hcurrent, -1);
+      current = Hcurrent;
       {
 	vectors.clear();
 	coeffs.clear();
@@ -130,7 +143,7 @@ namespace mps {
       //    Also compute the matrix elements of the Hamiltonian in this new basis.
       //
       states.push_back(current);
-      Hcurrent = apply(H_, current);
+      Hcurrent = apply_canonical(H_, current, -1);
       for (int n = 0; n < ndx; n++) {
 	cdouble aux;
 	N.at(n, ndx) = aux = scprod(states[n], current);
@@ -147,21 +160,26 @@ namespace mps {
     //    compute the exponential and finally move on to the original basis and build
     //    the approximate vector.
     //
-    CTensor coef = CTensor::zeros(igen << Heff.rows());
-    cdouble idt = to_complex(0, -1) * time_step();
-    coef.at(0) = to_complex(1.0);
-    coef = mmult(expm(idt * solve_with_svd(N, Heff)), coef);
-    if (debug >= 2) {
-      std::cout << "N=" << matrix_form(tensor::abs(N)) << std::endl
-                << "H=" << matrix_form(tensor::abs(Heff)) << std::endl
-                << "U=" << matrix_form(expm(idt * solve_with_svd(N, Heff)))
-                << std::endl
-                << "H/N=" << matrix_form(solve_with_svd(N, Heff))
-                << std::endl
-                << "v=" << matrix_form(coef) << std::endl
-                << "|v|=" << norm2(coef) << std::endl
-                << "|v|=" << scprod(coef, mmult(N, coef)) << std::endl
-                << "idt=" << idt << std::endl;
+    CTensor coef;
+    if (abs(time_step()) == 0) {
+      coef = ground_state(Heff, N);
+    } else {
+      coef = CTensor::zeros(igen << Heff.rows());
+      cdouble idt = to_complex(0, -1) * time_step();
+      coef.at(0) = to_complex(1.0);
+      coef = mmult(expm(idt * solve_with_svd(N, Heff)), coef);
+      if (debug >= 2) {
+        std::cout << "N=" << matrix_form(tensor::abs(N)) << std::endl
+                  << "H=" << matrix_form(tensor::abs(Heff)) << std::endl
+                  << "U=" << matrix_form(expm(idt * solve_with_svd(N, Heff)))
+                  << std::endl
+                  << "H/N=" << matrix_form(solve_with_svd(N, Heff))
+                  << std::endl
+                  << "v=" << matrix_form(coef) << std::endl
+                  << "|v|=" << norm2(coef) << std::endl
+                  << "|v|=" << scprod(coef, mmult(N, coef)) << std::endl
+                  << "idt=" << idt << std::endl;
+      }
     }
 
     //
