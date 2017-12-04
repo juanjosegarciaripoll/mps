@@ -154,7 +154,8 @@ namespace mps {
       // states with the new tensors that have just been introduced into
       // 'psi'.
       Hqform.propagate(psi[site], psi[site], step);
-      Nqform->propagate(psi[site], psi[site], step);
+      if (Nqform)
+        Nqform->propagate(psi[site], psi[site], step);
       for (typename std::list<lform_t>::iterator it = OrthoLform.begin();
            it != OrthoLform.end(); ++it)
       {
