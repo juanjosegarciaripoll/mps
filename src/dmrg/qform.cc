@@ -49,7 +49,7 @@ namespace mps {
   QuadraticForm<MPO>::make_matrix_database(const MPO &mpo)
   {
     // We only support open boundary condition problems
-    assert(mpo[0].dimension(0));
+    assert(mpo[0].dimension(0) == 1);
     index d, L = mpo.size();
     matrix_database_t output(L+1);
     typename MPO::elt_t tensor;
