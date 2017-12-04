@@ -132,6 +132,8 @@ libmps_la_SOURCES = \
 	mpo/mpo_adjoint_z.cc \
 	mpo/mpo_mmult_d.cc \
 	mpo/mpo_mmult_z.cc \
+	mpo/mpo_simplify_d.cc \
+	mpo/mpo_simplify_z.cc \
 	mpo/mpo_to_matrix_d.cc \
 	mpo/mpo_to_matrix_z.cc \
 	evolve/solver_base.cc \

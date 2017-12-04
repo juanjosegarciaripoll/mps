@@ -83,6 +83,10 @@ namespace mps {
       memory of your computer. */
   const CTensor mpo_to_matrix(const CMPO &A);
 
+  const RMPO simplify(const RMPO &old_mpo, int sense=+1, bool debug=false);
+
+  const CMPO simplify(const CMPO &old_mpo, int sense=+1, bool debug=false);
+
 }
 
 #endif /* !MPO_MPO_H */
