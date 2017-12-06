@@ -17,14 +17,21 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "mpo_add_long_range_term.cc"
+#include "mpo_add_hopping_matrix.cc"
 
 namespace mps {
 
-  void add_interaction(CMPO *mpo, const std::vector<CTensor> &Hi, index i,
-                       const CTensor *sign)
+  void add_hopping_matrix(RMPO *mpo, const RTensor &J,
+			  const RTensor &ad, const RTensor &a)
   {
-    do_add_interaction(*mpo, Hi, i, sign);
+    do_add_hopping_matrix(*mpo, J, ad, a, RTensor::eye(a.rows()));
+  }
+
+  void add_jordan_wigner_matrix(RMPO *mpo, const RTensor &J,
+				const RTensor &ad, const RTensor &a,
+				const RTensor &sign)
+  {
+    do_add_hopping_matrix(*mpo, J, ad, a, sign);
   }
 
 } // namespace mps
