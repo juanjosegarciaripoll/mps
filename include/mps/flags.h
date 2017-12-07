@@ -33,6 +33,9 @@ namespace mps {
   /**Default relative tolerance of the singular values dropped.*/
   extern const double MPS_DEFAULT_TOLERANCE;
 
+  /**Decide whether to use block_svd.*/
+  extern const unsigned int MPS_USE_BLOCK_SVD;
+
   /**Algorithms acting on one site.*/
   extern const unsigned int MPS_SINGLE_SITE_ALGORITHM;
   /**Algorithms acting on two sites.*/

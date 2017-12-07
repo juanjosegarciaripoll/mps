@@ -35,9 +35,13 @@ namespace mps {
 
   void add_interaction(RMPO *mpdo, const RTensor &Hi, index i, const RTensor &Hj);
 
-  void add_interaction(RMPO *mpdo, const std::vector<RTensor> &Hi, index i);
+  void add_interaction(RMPO *mpdo, const std::vector<RTensor> &Hi, index i, const RTensor *sign = NULL);
 
   void add_product_term(RMPO *mpdo, const std::vector<RTensor> &Hi);
+
+  void add_hopping_matrix(RMPO *mpdo, const RTensor &J, const RTensor &ad, const RTensor &a);
+
+  void add_jordan_wigner_matrix(RMPO *mpdo, const RTensor &J, const RTensor &ad, const RTensor &a, const RTensor &sign);
 
   CMPO local_Hamiltonian_mpo(const std::vector<CTensor> &Hloc);
 
@@ -45,17 +49,21 @@ namespace mps {
 
   void add_interaction(CMPO *mpdo, const CTensor &Hi, index i, const CTensor &Hj);
 
-  void add_interaction(CMPO *mpdo, const std::vector<CTensor> &Hi, index i);
+  void add_interaction(CMPO *mpdo, const std::vector<CTensor> &Hi, index i, const CTensor *sign = NULL);
 
   void add_product_term(CMPO *mpdo, const std::vector<CTensor> &Hi);
+
+  void add_hopping_matrix(CMPO *mpdo, const CTensor &J, const CTensor &ad, const CTensor &a);
+
+  void add_jordan_wigner_matrix(CMPO *mpdo, const CTensor &J, const CTensor &ad, const CTensor &a, const CTensor &sign);
 
   const RMPS apply(const RMPO &mpdo, const RMPS &state);
 
   const CMPS apply(const CMPO &mpdo, const CMPS &state);
 
-  const RMPS apply_canonical(const RMPO &mpdo, const RMPS &state, int sense = +1, bool truncate = false);
+  const RMPS apply_canonical(const RMPO &mpdo, const RMPS &state, int sense = +1, bool truncate = true);
 
-  const CMPS apply_canonical(const CMPO &mpdo, const CMPS &state, int sense = -1, bool truncate = false);
+  const CMPS apply_canonical(const CMPO &mpdo, const CMPS &state, int sense = -1, bool truncate = true);
 
   double expected(const RMPS &bra, const RMPO &op, const RMPS &ket);
 
