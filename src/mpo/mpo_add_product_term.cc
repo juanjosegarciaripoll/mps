@@ -35,6 +35,15 @@ namespace mps {
     
    */
 
+  template<class Tensor>
+  static bool
+  is_identity(const Tensor &t)
+  {
+    return (t.rank() == 2) &&
+      (t.columns() == t.rows()) &&
+      all_equal(t, Tensor::eye(t.rows()));
+  }
+
   template<class MPO, class Tensor>
   static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H)
   {
@@ -42,32 +51,30 @@ namespace mps {
     // This function add a term \prod_j H[j] to a Hamiltonian.
     //
     index closing = 0, opening = 0;
-    for (int j = 0; j < mpo.size(); ++j) {
+    int start = 0, end = mpo.size();
+    while (start < end && is_identity(H[start])) {
+      ++start;
+    }
+    while (end > 0 && is_identity(H[end-1])) {
+      --end;
+      closing = 1;
+    }
+    for (int j = start; j < end; ++j) {
       const Tensor &Hj = H[j];
       Tensor Pj = mpo[j];
-      if (Hj.rows() != Hj.columns()) {
-        std::cerr << "In add_interaction(MPO, ...), matrices are not square.\n";
-        abort();
-      }
-      if (Hj.rows() != Pj.dimension(1)) {
-        std::cerr << "In add_interaction(MPO, ...), matrices do not match MPO dimensions.\nMPO: " << Pj.dimensions() << ", H[" << j << "]: " << Hj.dimensions() << std::endl;
-        abort();
-      }
       index dl = Pj.dimension(0);
       index dr = Pj.dimension(3);
-      if (j > 0) {
+      if (j > start) {
         Pj = change_dimension(Pj, 0, dl+1);
-      }
-      if (j+1 < mpo.size()) {
-        Pj = change_dimension(Pj, 3, dr+1);
-      }
-      if (j == 0) {
-	Pj.at(range(opening),range(),range(),range(dr)) = Hj;
-      } else if (j+1 < mpo.size()) {
-	Pj.at(range(dl),range(),range(),range(dr)) = Hj;
       } else {
-	Pj.at(range(dl),range(),range(),range(closing)) = Hj;
+        dl = opening;
       }
+      if (j+1 < end) {
+        Pj = change_dimension(Pj, 3, dr+1);
+      } else {
+        dr = closing;
+      }
+      Pj.at(range(dl),range(),range(),range(dr)) = Hj;
       mpo.at(j) = Pj;
     }
   }
