@@ -128,6 +128,8 @@ libmps_la_SOURCES = \
 	mpo/mpo_apply_canonical_z.cc \
 	mpo/mpo_expected_d.cc \
 	mpo/mpo_expected_z.cc \
+	mpo/mpo_fidelity_d.cc \
+	mpo/mpo_fidelity_z.cc \
 	mpo/mpo_dump_d.cc \
 	mpo/mpo_dump_z.cc \
 	mpo/mpo_adjoint_d.cc \
@@ -138,6 +140,8 @@ libmps_la_SOURCES = \
 	mpo/mpo_simplify_z.cc \
 	mpo/mpo_to_matrix_d.cc \
 	mpo/mpo_to_matrix_z.cc \
+	mpo/mpo_to_mps_d.cc \
+	mpo/mpo_to_mps_z.cc \
 	evolve/solver_base.cc \
 	evolve/trotter_unitary.cc \
 	evolve/solver_trotter2.cc \

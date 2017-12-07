@@ -57,28 +57,40 @@ namespace mps {
 
   void add_jordan_wigner_matrix(CMPO *mpdo, const CTensor &J, const CTensor &ad, const CTensor &a, const CTensor &sign);
 
+  /** Apply a Matrix Product Operator onto a state. */
   const RMPS apply(const RMPO &mpdo, const RMPS &state);
 
+  /** Apply a Matrix Product Operator onto a state. */
   const CMPS apply(const CMPO &mpdo, const CMPS &state);
 
+  /** Apply a Matrix Product Operator onto a state, obtaining a canonical form. */
   const RMPS apply_canonical(const RMPO &mpdo, const RMPS &state, int sense = +1, bool truncate = true);
 
+  /** Apply a Matrix Product Operator onto a state, obtaining a canonical form. */
   const CMPS apply_canonical(const CMPO &mpdo, const CMPS &state, int sense = -1, bool truncate = true);
 
+  /** Expectation value of an MPO between two MPS. */
   double expected(const RMPS &bra, const RMPO &op, const RMPS &ket);
 
+  /** Expectation value of an MPO between two MPS. */
   double expected(const RMPS &bra, const RMPO &op);
 
+  /** Expectation value of an MPO between two MPS. */
   cdouble expected(const CMPS &bra, const CMPO &op, const CMPS &ket);
 
+  /** Expectation value of an MPO between two MPS. */
   cdouble expected(const CMPS &bra, const CMPO &op);
 
+  /** Adjoint of a Matrix Product Operator. */
   const CMPO adjoint(const CMPO &mpo);
 
+  /** Adjoint (Transpose) of a Matrix Product Operator. */
   const RMPO adjoint(const RMPO &mpo);
 
+  /** Combine two Matrix Product Operators, multiplying them A*B. */
   const CMPO mmult(const CMPO &A, const CMPO &B);
 
+  /** Combine two Matrix Product Operators, multiplying them A*B. */
   const RMPO mmult(const RMPO &A, const RMPO &B);
 
   /** Return the matrix that represents the MPO acting on the full Hilbert
@@ -95,6 +107,15 @@ namespace mps {
 
   const CMPO simplify(const CMPO &old_mpo, int sense=+1, bool debug=false);
 
+  /** Compute a fidelity between two operators. Fidelity is defined as $\mathrm{tr}(Ua^\dagger Ub)/\sqrt{\mathrm{tr}(Ua^\dagger Ua)\mathrm{tr}(Ub^\dagger Ub)}\$ */
+  double fidelity(const RMPO &Ua, const RMPO &Ub);
+
+  /** Compute a fidelity between two operators. Fidelity is defined as $\mathrm{tr}(Ua^\dagger Ub)/\sqrt{\mathrm{tr}(Ua^\dagger Ua)\mathrm{tr}(Ub^\dagger Ub)}\$ */
+  double fidelity(const CMPO &Ua, const CMPO &Ub);
+
+  const RMPS mpo_to_mps(const RMPO &A);
+
+  const CMPS mpo_to_mps(const CMPO &A);
 }
 
 #endif /* !MPO_MPO_H */

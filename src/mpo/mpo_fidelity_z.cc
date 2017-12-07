@@ -17,31 +17,17 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <tensor/io.h>
 #include <mps/mpo.h>
 
 namespace mps {
 
-  template<class MPO, class MPS, class Tensor> MPO
-  do_simplify(const MPO &old_mpo, int sense, bool debug)
+  double fidelity(const CMPO &Ua, const CMPO &Ub)
   {
-    MPS psi = canonical_form(mpo_to_mps(old_mpo), sense);
-    MPO mpo = old_mpo;
-
-    for (int i = 0; i < mpo.size(); i++) {
-      const Tensor &m1 = mpo[i];
-      const Tensor &m2 = psi[i];
-      mpo.at(i) = reshape(m2,
-			  m2.dimension(0),
-			  m1.dimension(1),
-			  m1.dimension(2),
-			  m2.dimension(2));
-      if (debug) {
-	std::cout << old_mpo[i].dimensions() << " -> "
-		  << mpo[i].dimensions() << std::endl;
-      }
-    }
-    return mpo;
+    CMPS psi1 = canonical_form(mpo_to_mps(Ua), -1);
+    CMPS psi2 = canonical_form(mpo_to_mps(Ub), -1);
+    double n1 = norm2(psi1);
+    double n2 = norm2(psi2);
+    return abs(scprod(psi1,psi2)/(n1*n2));    
   }
 
 } // namespace mps
