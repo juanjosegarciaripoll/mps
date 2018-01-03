@@ -59,6 +59,7 @@ namespace mps {
     // do the computation of H * psi. However, we rely on the fact that
     // ARPACK is not multithreaded and thus apply_qform2_... is never
     // concurrent on the same tensor.
+    P12->fill_with_zeros();
     P12->at(range(subspace)) = P;
     *P12 = orthogonalize(*P12, ortho);
     return orthogonalize(qform->apply_two_site_matrix(*P12, sense),
@@ -265,6 +266,8 @@ namespace mps {
             std::cout << "Unable to satisfy constraint " << Nvalue
                       << " with tolerance " << Ntol << std::endl;
             std::cout << "Values:\n" << matrix_form(aux) << std::endl;
+            std::cout << abs(aux - Nvalue) << std::endl;
+            std::cout << (abs(aux - Nvalue) < Ntol) << std::endl;
             converged = false;
             return 0.0;
           }
@@ -286,6 +289,7 @@ namespace mps {
           }
           constrained_gap = real(E[1] - E[0]);
         }
+        P12.fill_with_zeros();
         P12.at(range(subspace)) = subP12;
       } else {
         const Indices d = P12.dimensions();
