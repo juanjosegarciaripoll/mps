@@ -48,7 +48,7 @@ namespace mps {
   static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H)
   {
     //
-    // This function add a term \prod_j H[j] to a Hamiltonian.
+    // This function adds a term \prod_j H[j] to a Hamiltonian.
     //
     index closing = 0, opening = 0;
     int start = 0, end = mpo.size();
@@ -58,7 +58,7 @@ namespace mps {
     while (end > 0 && is_identity(H[end-1])) {
       --end;
       closing = 1;
-    }
+    } 
     for (int j = start; j < end; ++j) {
       const Tensor &Hj = H[j];
       Tensor Pj = mpo[j];
@@ -74,7 +74,12 @@ namespace mps {
       } else {
         dr = closing;
       }
-      Pj.at(range(dl),range(),range(),range(dr)) = Hj;
+      if (dl == opening && dr == closing) {
+        Pj.at(range(dl),range(),range(),range(dr)) = Hj +
+          Pj(range(dl),range(),range(),range(dr));
+      } else {
+        Pj.at(range(dl),range(),range(),range(dr)) = Hj;
+      }
       mpo.at(j) = Pj;
     }
   }
