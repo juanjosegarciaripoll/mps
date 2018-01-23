@@ -81,6 +81,9 @@ namespace mps {
     std::vector<double> errors;
     double err, n;
     int sense;
+    if (debug) {
+      std::cout << "Arnoldi step\n";
+    }
     for (int ndx = 1; ndx < max_states_; ndx++) {
       const CMPS &last = states[ndx-1];
       //
@@ -107,32 +110,36 @@ namespace mps {
           //coeffs.push_back(-scprod(current, states[ndx-2]));
           coeffs.push_back(-Heff(ndx-1,ndx-2));
 	}
-        int sense = +1;
-	err = simplify_obc(&current, coeffs, vectors, &sense, 2, true,
+        int sense = -1;
+	err = simplify_obc(&current, coeffs, vectors, &sense, 4, true,
                            2*Dmax, -1, &n);
-        if (sense < 0) {
+        /* We ensure that the states are normalized and with a canonical
+         * form opposite to the sense of the simplification above. This
+         * improves stability and speed in the SVDs. */
+        if (sense > 0) {
+          if (debug) {
+            std::cout << "\tspurious canonical form\n";
+          }
           current = canonical_form(current, -1);
         }
-        if (debug >= 2) {
-          std::cout << "ndx=" << ndx << ", err=" << err
-                    << ", n=" << norm2(current) << "=" << n << ", tol="
-                    << tolerance_ << ", sense=" << sense << std::endl;
+        if (debug) {
+          std::cout << "\tndx=" << ndx << ", err=" << err
+                    << ", tol="
+                    << tolerance_ << ", sense=" << sense
+                    << ", n=" << n;
+          if (debug >= 2)
+            std::cout << "=" << norm2(current);
+          std::cout << std::endl;
         }
         if (n < 1e-15 ||
             (tolerance_ && (n < tolerance_*std::max(norm2(Hcurrent), 1.0))))
         {
-          if (debug >= 2) {
+          if (debug) {
             std::cout << "Arnoldi method converged before tolerance\n";
           }
           N = N(range(0,ndx-1),range(0,ndx-1));
           Heff = Heff(range(0,ndx-1),range(0,ndx-1));
           break;
-        }
-        /* We ensure that the states are normalized and with a canonical
-         * form opposite to the sense of the simplification above. This
-         * improves stability and speed in the SVDs. */
-        if (sense > 0) {
-          current = normal_form(current, -1);
         }
         errors.push_back(err / n);
       }
@@ -185,8 +192,14 @@ namespace mps {
     //
     // 4) Here is where we perform the truncation from our basis to a single MPS.
     //
-    sense = +1;
+    sense = -1;
     err = simplify_obc(psi, coef, states, &sense, 12, true, Dmax, -1);
+    if (sense > 0) {
+      if (debug) {
+        std::cout << "\tspurious canonical form\n";
+      }
+      current = canonical_form(current, -1);
+    }
     err += scprod(RTensor(errors), square(abs(coef)));
     if (debug) {
       std::cout << "Arnoldi final truncation error " << err << std::endl;

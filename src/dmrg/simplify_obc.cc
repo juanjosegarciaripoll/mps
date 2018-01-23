@@ -57,7 +57,8 @@ namespace mps {
     if (debug) {
       std::cout << "simplify_obc: "
                 << (single_site? "single_site" : "two-sites")
-                << ", dmax=" << Dmax << ", tol=" << tol
+                << ", dmax=" << Dmax << ", truncate_tol=" << tol
+                << ", stop_tol=" << tolerance
                 << std::endl
                 << "\tweights=" << w << std::endl;
     }
