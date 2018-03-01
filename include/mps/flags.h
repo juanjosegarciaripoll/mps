@@ -48,8 +48,13 @@ namespace mps {
 
   /**Flag key for debugging the time evolution routines.*/
   extern const unsigned int MPS_DEBUG_TROTTER;
+
   /**Flag key for debugging the Arnoldi method.*/
   extern const unsigned int MPS_DEBUG_ARNOLDI;
+  /**Flag key for number of Arnoldi simplification sweeps.*/
+  extern const unsigned int MPS_ARNOLDI_SIMPLIFY_INTERNAL_SWEEPS;
+  /**Flag key for number of Arnoldi final simplification sweeps.*/
+  extern const unsigned int MPS_ARNOLDI_SIMPLIFY_FINAL_SWEEPS;
 
   /**Flag key for debugging the simplification routines.*/
   extern const unsigned int MPS_DEBUG_SIMPLIFY;

@@ -69,6 +69,10 @@ namespace mps {
     CMPS current = *psi;
     CMPS Hcurrent = apply_canonical(H_, current, -1);
     int debug = mps::FLAGS.get(MPS_DEBUG_ARNOLDI);
+    // Number of passes in simplify_obc when building the Arnoldi matrix
+    int simplify_internal_sweeps = mps::FLAGS.get(MPS_ARNOLDI_SIMPLIFY_INTERNAL_SWEEPS);
+    // Number of passes in simplify_obc when computing the final state
+    int simplify_final_sweeps = mps::FLAGS.get(MPS_ARNOLDI_SIMPLIFY_FINAL_SWEEPS);
 
     std::vector<CMPS> states;
     states.reserve(max_states_);
@@ -111,8 +115,9 @@ namespace mps {
           coeffs.push_back(-Heff(ndx-1,ndx-2));
 	}
         int sense = -1;
-	err = simplify_obc(&current, coeffs, vectors, &sense, 4, true,
-                           2*Dmax, -1, &n);
+	err = simplify_obc(&current, coeffs, vectors, &sense,
+                           simplify_internal_sweeps, true,
+                           2*Dmax, MPS_DEFAULT_TOLERANCE, &n);
         /* We ensure that the states are normalized and with a canonical
          * form opposite to the sense of the simplification above. This
          * improves stability and speed in the SVDs. */
@@ -193,7 +198,9 @@ namespace mps {
     // 4) Here is where we perform the truncation from our basis to a single MPS.
     //
     sense = -1;
-    err = simplify_obc(psi, coef, states, &sense, 12, true, Dmax, -1);
+    err = simplify_obc(psi, coef, states, &sense,
+                       simplify_final_sweeps, true, Dmax,
+                       MPS_DEFAULT_TOLERANCE);
     if (sense > 0) {
       if (debug) {
         std::cout << "\tspurious canonical form\n";

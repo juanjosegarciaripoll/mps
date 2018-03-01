@@ -39,6 +39,8 @@ namespace mps {
   const unsigned MPS_DEBUG_TROTTER = FLAGS.create_key(0);
 
   const unsigned MPS_DEBUG_ARNOLDI = FLAGS.create_key(0);
+  const unsigned MPS_ARNOLDI_SIMPLIFY_INTERNAL_SWEEPS = FLAGS.create_key(2);
+  const unsigned MPS_ARNOLDI_SIMPLIFY_FINAL_SWEEPS = FLAGS.create_key(4);
 
   const unsigned MPS_DEBUG_SIMPLIFY = FLAGS.create_key(0);
 
