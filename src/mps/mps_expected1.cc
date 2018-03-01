@@ -59,12 +59,19 @@ namespace mps {
   /* STATE NORM */
 
   template <class MPS>
-  static typename MPS::number_t scalar_product(const MPS &a, const MPS &b)
+  static typename MPS::number_t scalar_product(const MPS &a, const MPS &b,
+                                               int sense)
   {
     typename MPS::elt_t M;
     assert(a.size() == b.size());
-    for (index k = 0; k < a.size(); k++) {
-      M = prop_matrix(M, +1, a[k], b[k], NULL);
+    if (sense >= 0) {
+      for (index k = 0; k < a.size(); k++) {
+        M = prop_matrix(M, +1, a[k], b[k], NULL);
+      }
+    } else {
+      for (index k = a.size(); k--; ) {
+        M = prop_matrix(M, -1, a[k], b[k], NULL);
+      }
     }
     return prop_matrix_close(M)[0];
   }

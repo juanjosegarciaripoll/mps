@@ -64,21 +64,27 @@ namespace mps {
   double
   ArnoldiSolver::one_step(CMPS *psi, index Dmax)
   {
+    // Number of passes in simplify_obc when building the Arnoldi matrix
+    const int simplify_internal_sweeps = mps::FLAGS.get(MPS_ARNOLDI_SIMPLIFY_INTERNAL_SWEEPS);
+    // Number of passes in simplify_obc when computing the final state
+    const int simplify_final_sweeps = mps::FLAGS.get(MPS_ARNOLDI_SIMPLIFY_FINAL_SWEEPS);
+    // When computing H * psi, truncate small singular values
+    const bool truncate_mpo_on_mps = true;
+    // We keep all states in canonical form w.r.t. this sense
+    const int mps_sense = -1;
+
     CTensor N = CTensor::zeros(max_states_, max_states_);
     CTensor Heff = N;
     CMPS current = *psi;
-    CMPS Hcurrent = apply_canonical(H_, current, -1);
+    CMPS Hcurrent = apply_canonical(H_, current, mps_sense,
+                                    truncate_mpo_on_mps);
     int debug = mps::FLAGS.get(MPS_DEBUG_ARNOLDI);
-    // Number of passes in simplify_obc when building the Arnoldi matrix
-    int simplify_internal_sweeps = mps::FLAGS.get(MPS_ARNOLDI_SIMPLIFY_INTERNAL_SWEEPS);
-    // Number of passes in simplify_obc when computing the final state
-    int simplify_final_sweeps = mps::FLAGS.get(MPS_ARNOLDI_SIMPLIFY_FINAL_SWEEPS);
 
     std::vector<CMPS> states;
     states.reserve(max_states_);
     states.push_back(normal_form(current, -1));
     N.at(0,0) = to_complex(1.0);
-    Heff.at(0,0) = real(scprod(current, Hcurrent));
+    Heff.at(0,0) = real(scprod(current, Hcurrent, mps_sense));
 
     std::vector<CMPS> vectors(3);
     std::vector<cdouble> coeffs(3);
@@ -106,26 +112,26 @@ namespace mps {
 	coeffs.push_back(number_one<cdouble>());
 
 	vectors.push_back(states[ndx-1]);
-	//coeffs.push_back(-scprod(current, states[ndx-1]));
+	//coeffs.push_back(-scprod(current, states[ndx-1], mps_sense));
         coeffs.push_back(-Heff(ndx-1,ndx-1));
 
 	if (ndx > 1) {
 	  vectors.push_back(states[ndx-2]);
-          //coeffs.push_back(-scprod(current, states[ndx-2]));
+          //coeffs.push_back(-scprod(current, states[ndx-2], mps_sense));
           coeffs.push_back(-Heff(ndx-1,ndx-2));
 	}
-        int sense = -1;
+        int sense = mps_sense;
 	err = simplify_obc(&current, coeffs, vectors, &sense,
                            simplify_internal_sweeps, true,
                            2*Dmax, MPS_DEFAULT_TOLERANCE, &n);
         /* We ensure that the states are normalized and with a canonical
          * form opposite to the sense of the simplification above. This
          * improves stability and speed in the SVDs. */
-        if (sense > 0) {
+        if (sense*mps_sense < 0) {
           if (debug) {
             std::cout << "\tspurious canonical form\n";
           }
-          current = canonical_form(current, -1);
+          current = canonical_form(current, mps_sense);
         }
         if (debug) {
           std::cout << "\tndx=" << ndx << ", err=" << err
@@ -155,16 +161,16 @@ namespace mps {
       //    Also compute the matrix elements of the Hamiltonian in this new basis.
       //
       states.push_back(current);
-      Hcurrent = apply_canonical(H_, current, -1);
+      Hcurrent = apply_canonical(H_, current, mps_sense, truncate_mpo_on_mps);
       for (int n = 0; n < ndx; n++) {
 	cdouble aux;
-	N.at(n, ndx) = aux = scprod(states[n], current);
+	N.at(n, ndx) = aux = scprod(states[n], current, mps_sense);
 	N.at(ndx, n) = tensor::conj(aux);
-	Heff.at(n, ndx) = aux = scprod(states[n], Hcurrent);
+	Heff.at(n, ndx) = aux = scprod(states[n], Hcurrent, mps_sense);
 	Heff.at(ndx, n) = tensor::conj(aux);
       }
       N.at(ndx, ndx) = 1.0;
-      Heff.at(ndx, ndx) = real(scprod(current, Hcurrent));
+      Heff.at(ndx, ndx) = real(scprod(current, Hcurrent, mps_sense));
     }
     //
     // 2) Once we have the basis, we compute the exponential on it. Notice that, since
@@ -197,15 +203,15 @@ namespace mps {
     //
     // 4) Here is where we perform the truncation from our basis to a single MPS.
     //
-    sense = -1;
+    sense = mps_sense;
     err = simplify_obc(psi, coef, states, &sense,
                        simplify_final_sweeps, true, Dmax,
                        MPS_DEFAULT_TOLERANCE);
-    if (sense > 0) {
+    if (sense*mps_sense < 0) {
       if (debug) {
         std::cout << "\tspurious canonical form\n";
       }
-      current = canonical_form(current, -1);
+      current = canonical_form(current, mps_sense);
     }
     err += scprod(RTensor(errors), square(abs(coef)));
     if (debug) {
