@@ -179,7 +179,7 @@ namespace mps {
      */
     int simplify_sense = -1;
     *psi = canonical_form(*psi, simplify_sense);
-    if (largest_bond_dimension(*psi) <= Dmax) {
+    if (largest_bond_dimension(*psi) > Dmax) {
       index sweeps = 12;
       err += simplify_obc(psi, *psi, &simplify_sense, sweeps, normalize, Dmax);
     }
