@@ -48,17 +48,18 @@ namespace mps {
       std::cerr << "In expected(MPS, std::vector<Tensor>, std::vector<Tensor>, MPS), the 2n argument differs from the MPS size.";
       abort();
     }
-    Tensor *auxRight = new Tensor[L];
-    Tensor *auxLeft = new Tensor[L];
+    std::vector<Tensor> auxRight(L);
+    std::vector<Tensor> auxLeft(L);
     {
       Tensor aux;
       for (size_t i = 1; i < L; i++) {
         auxLeft[i] = aux = prop_matrix(aux, +1, a[i-1], b[i-1], 0);
       }
-      aux = Tensor();
-      for (size_t i = 2; i < L; i++) {
-        size_t ndx = L - i;
-        auxRight[ndx] = aux = prop_matrix(aux, -1, a[ndx+1], b[ndx+1], 0);
+    }
+    {
+      Tensor aux;
+      for (size_t i = L-1; i; --i) {
+        auxRight[i-1] = aux = prop_matrix(aux, -1, a[i], b[i], 0);
       }
     }
     Tensor output = Tensor::zeros(L, L);
@@ -74,20 +75,22 @@ namespace mps {
           Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op2[j]);
           output.at(i,j) = prop_matrix_close(aux2, auxRight[j])[0];
           aux = prop_matrix(aux, +1, a[j], b[j], jordan_wigner_op);
+          std::cout << "(" << i << "," << j << ")," << std::flush;
           output.at(j,i) = tensor::conj(output.at(i,j));
         }
       }
-      if (!symmetric) {
+    }
+    if (!symmetric) {
+      for (size_t i = 0; i < L; i++) {
         Tensor aux = prop_matrix(auxLeft[i], +1, a[i], b[i], &op2[i]);
-        for (size_t j = 0; j < i; j++) {
+        for (size_t j = i+1; j < L; j++) {
           Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op1[j]);
-          output.at(i,j) = prop_matrix_close(aux2, auxRight[j])[0];
-          aux = prop_matrix(aux, +1, a[j], b[j], 0);
+          std::cout << "(" << j << "," << i << ")," << std::flush;
+          output.at(j,i) = prop_matrix_close(aux2, auxRight[j])[0];
+          aux = prop_matrix(aux, +1, a[j], b[j], jordan_wigner_op);
         }
       }
     }
-    delete[] auxRight;
-    delete[] auxLeft;
     return output;
   }
 
