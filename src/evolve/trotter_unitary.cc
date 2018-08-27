@@ -26,7 +26,7 @@
 namespace mps {
 
   TrotterSolver::Unitary::Unitary(const Hamiltonian &H, index k, cdouble dt,
-                                  bool do_debug) :
+                                  int do_debug) :
     debug(do_debug), k0(k), kN(H.size()), U(H.size())
   {
     /*
@@ -115,6 +115,14 @@ namespace mps {
 
     double err = 0.0;
 
+    if (debug > 1) {
+      std::cout << "Applying two-site unitary on (" << k1 << "," << k2 << ")"
+                << ", max bond dimension " << max_a2 << ", tolerance " << tolerance
+                << std::endl
+                << "From dimensions "
+                << P1.dimensions() << "," << P2.dimensions();
+    }
+
     /* Apply the unitary onto two neighboring sites. This creates a
      * larger tensor that we have to split into two new tensors, Pout[k1]
      * and Pout[k2], that represent the sites */
@@ -158,6 +166,13 @@ namespace mps {
       P.at(k1) = reshape(P1, a1,i1,a2);
       P.at(k2) = reshape(P2, a2,i2,a3);
     }
+    if (debug > 1) {
+      std::cout << " to "
+                << P1.dimensions() << "," << P2.dimensions()
+                << " error " << err
+                << std::endl;
+    }
+
     return err;
   }
 

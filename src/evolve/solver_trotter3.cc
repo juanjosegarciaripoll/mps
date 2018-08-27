@@ -60,33 +60,33 @@ namespace mps {
       double err = 0.0;
       if (debug) std::cout << "Trotter3 method: truncate layers:\n"
                            << "Trotter3 Layer 1/3\n";
-      err = U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_ZEROS, Dmax);
+      err = U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax);
       if (debug) std::cout << "Trotter3 Layer 2/3\n";
-      err += U1.apply_and_simplify(P, &sense, MPS_TRUNCATE_ZEROS, Dmax);
+      err += U1.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax);
       if (debug) std::cout << "Trotter3 Layer 3/3\n";
-      err += U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_ZEROS, Dmax,
+      err += U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax,
                                    normalize);
       return err;
     }
     case DO_NOT_TRUNCATE: {
       if (debug) std::cout << "Trotter3 method: do not truncate:\n"
                            << "Trotter3 Layer 1/3\n";
-      U2.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      U2.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
       if (debug) std::cout << "Trotter3 Layer 2/3\n";
-      U1.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      U1.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
       if (debug) std::cout << "Trotter3 Layer 3/3\n";
-      U2.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0, normalize);
+      U2.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0, normalize);
       return 0.0;
     }
     default: {
       CMPS Pfull = *P;
       if (debug) std::cout << "Trotter3 method: truncate group:\n"
                            << "Trotter3 Layer 1/3\n";
-      U2.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      U2.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
       if (debug) std::cout << "Trotter3 Layer 2/3\n";
-      U1.apply(P, &sense, MPS_TRUNCATE_ZEROS, 0);
+      U1.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
       if (debug) std::cout << "Trotter3 Layer 3/3\n";
-      return U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_ZEROS, Dmax,
+      return U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax,
                                    normalize);
     }
     }

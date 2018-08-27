@@ -83,10 +83,10 @@ namespace mps {
       use.
     */
     struct Unitary {
-      bool debug;
+      int debug;
 
       /*Construct the unitary operator.*/
-      Unitary(const Hamiltonian &H, index k, cdouble dt, bool do_debug = false);
+      Unitary(const Hamiltonian &H, index k, cdouble dt, int do_debug = 0);
 
       /*Apply the unitary on a MPS.*/
       double apply(CMPS *psi, int *dk, double tolerance, index Dmax,
