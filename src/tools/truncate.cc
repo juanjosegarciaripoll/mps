@@ -32,13 +32,13 @@ namespace mps {
      * is smaller than the relative tolerance (TOL) or the length of the output
      * is smaller than MAX_DIM.
      */
-    size_t L = s.size();
+    const size_t L = s.size();
     bool debug = FLAGS.get(MPS_DEBUG_TRUNCATION);
 
     if (max_dim == 0 || max_dim > L) {
       max_dim = L;
     }
-    if (tol == MPS_DEFAULT_TOLERANCE) {
+    if (tol < 0 /* MPS_DEFAULT_TOLERANCE is negative */) {
       tol = FLAGS.get(MPS_TRUNCATION_TOLERANCE);
     }
     if (tol >= 1.0 /* MPS_DO_NOT_TRUNCATE */ ) {
@@ -72,24 +72,22 @@ namespace mps {
     double *cumulated = new double[L];
     double total = 0;
     for (size_t i = L; i--; ) {
-      cumulated[i] = total;
       total += square(s[i]);
+      cumulated[i] = total;
     }
     /* Due to the precision limits in current processors, we automatically
      * relax the tolerance to DBL_EPSILON, which is a floating point number
      * such that added to 1.0 gives 1.0. In other words, a tolerance <=
      * DBL_EPSILON is irrelevant for all purposes.
      */
-    if (tol < DBL_EPSILON) {
-      tol = DBL_EPSILON;
-    }
-    double limit = tol * total;
+    double limit = std::max(tol, DBL_EPSILON) * total;
     for (size_t i = 0; i < max_dim; i++) {
       if (cumulated[i] <= limit) {
         max_dim = i+1;
         break;
       }
     }
+
     delete[] cumulated;
     if (debug) {
       std::cout << "Truncated to tolerance " << limit << ", new size "

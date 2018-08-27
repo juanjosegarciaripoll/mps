@@ -30,6 +30,8 @@ namespace mps {
   extern const double MPS_DO_NOT_TRUNCATE;
   /**Truncate tensors eliminating zero values from the SVD.*/
   extern const double MPS_TRUNCATE_ZEROS;
+  /**Truncate tensors eliminating values that round up to zero.*/
+  extern const double MPS_TRUNCATE_EPSILON;
   /**Default relative tolerance of the singular values dropped.*/
   extern const double MPS_DEFAULT_TOLERANCE;
 

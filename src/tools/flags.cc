@@ -1,3 +1,4 @@
+
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2012 Juan Jose Garcia Ripoll
@@ -28,6 +29,7 @@ namespace mps {
 
   const double MPS_DO_NOT_TRUNCATE = 2.0;
   const double MPS_TRUNCATE_ZEROS = 0.0;
+  const double MPS_TRUNCATE_EPSILON = DBL_EPSILON;
   const double MPS_DEFAULT_TOLERANCE = -4.0;
 
   const unsigned MPS_USE_BLOCK_SVD = FLAGS.create_key(1);
