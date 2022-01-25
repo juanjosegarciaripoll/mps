@@ -24,13 +24,14 @@
 
 #include "lattice_apply.cc"
 
-namespace mps {
-
+namespace mps
+{
   const RTensor
   Lattice::eigs(const RTensor &J, const RTensor &U, int eig_type, size_t neig,
-		RTensor *vectors, bool *converged, particle_kind_t kind) const
+                RTensor *vectors, bool *converged, particle_kind_t kind) const
   {
-    return linalg::eigs(tensor::with_args(apply_lattice<RTensor>, *this, J, U, kind),
+    return linalg::eigs([&](const RTensor &psi)
+                        { return apply_lattice<RTensor>(psi, *this, J, U, kind); },
                         dimension(), eig_type, neig, vectors, converged);
   }
 }

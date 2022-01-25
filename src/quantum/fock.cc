@@ -21,7 +21,8 @@
 #include <mps/quantum.h>
 #include <tensor/io.h>
 
-namespace mps {
+namespace mps
+{
 
   using tensor::index;
 
@@ -30,9 +31,9 @@ namespace mps {
   */
   RSparse number_operator(int nmax)
   {
-    index d = nmax+1; // Matrix size
+    index d = nmax + 1; // Matrix size
     Indices ndx = iota(0, nmax);
-    RTensor n = linspace(0, nmax, nmax+1);
+    RTensor n = linspace(0, nmax, nmax + 1);
     return RSparse(ndx, ndx, n, d, d);
   }
 
@@ -41,8 +42,8 @@ namespace mps {
   */
   RSparse destruction_operator(int nmax)
   {
-    index d = nmax+1; // Matrix size
-    Indices row = iota(0, nmax-1);
+    index d = nmax + 1; // Matrix size
+    Indices row = iota(0, nmax - 1);
     Indices col = iota(1, nmax);
     RTensor n = sqrt(linspace(1.0, nmax, nmax));
     return RSparse(row, col, n, d, d);
@@ -53,9 +54,9 @@ namespace mps {
   */
   RSparse creation_operator(int nmax)
   {
-    index d = nmax+1; // Matrix size
+    index d = nmax + 1; // Matrix size
     Indices row = iota(1, nmax);
-    Indices col = iota(0, nmax-1);
+    Indices col = iota(0, nmax - 1);
     RTensor n = sqrt(linspace(1.0, nmax, nmax));
     return RSparse(row, col, n, d, d);
   }
@@ -65,9 +66,10 @@ namespace mps {
   */
   RTensor coherent_state(double alpha, int nmax)
   {
-    RTensor output(nmax+1);
-    double c = exp(-alpha*alpha/2.0);
-    for (int i = 0; i <= nmax; ) {
+    auto output = RTensor::empty(nmax + 1);
+    double c = exp(-alpha * alpha / 2.0);
+    for (int i = 0; i <= nmax;)
+    {
       output.at(i) = c;
       c = c * alpha / sqrt((double)(++i));
     }
@@ -79,10 +81,11 @@ namespace mps {
   */
   CTensor coherent_state(cdouble alpha, int nmax)
   {
-    CTensor output(nmax+1);
+    auto output = CTensor::empty(nmax + 1);
     double a2 = abs(alpha);
-    cdouble c = exp(-a2*a2/2.0);
-    for (int i = 0; i <= nmax; ) {
+    cdouble c = exp(-a2 * a2 / 2.0);
+    for (int i = 0; i <= nmax;)
+    {
       output.at(i) = c;
       c = c * alpha / sqrt((double)(++i));
     }

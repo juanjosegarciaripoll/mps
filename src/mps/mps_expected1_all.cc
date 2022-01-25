@@ -20,7 +20,8 @@
 #include <mps/mps.h>
 #include <mps/mps_algorithms.h>
 
-namespace mps {
+namespace mps
+{
 
   using namespace tensor;
 
@@ -33,28 +34,31 @@ namespace mps {
                            const MPS &b)
   {
     size_t L = a.size();
-    if (b.size() != L) {
+    if (b.size() != L)
+    {
       std::cerr << "In expected_vector(), two MPS of different size were passed";
       abort();
     }
-    if (op.size() != L) {
+    if (op.size() != L)
+    {
       std::cerr << "In expected_vector(), there are less operators than the state size.";
       abort();
     }
     std::vector<Tensor> auxLeft(L);
     Tensor left;
-    for (size_t i = 1; i < L; i++) {
-      auxLeft[i] = left = prop_matrix(left, +1, a[i-1], b[i-1], 0);
+    for (size_t i = 1; i < L; i++)
+    {
+      auxLeft[i] = left = prop_matrix(left, +1, a[i - 1], b[i - 1], 0);
     }
     Tensor right;
-    Tensor output(L);
-    for (size_t i = L; i--;) {
+    auto output = Tensor::empty(L);
+    for (size_t i = L; i--;)
+    {
       left = prop_matrix(auxLeft[i], +1, a[i], b[i], &op[i]);
       output.at(i) = prop_matrix_close(left, right)[0];
       right = prop_matrix(right, -1, a[i], b[i], 0);
     }
     return output;
   }
-
 
 } // namespace mps

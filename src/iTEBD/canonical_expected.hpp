@@ -20,15 +20,19 @@
 #include <mps/tools.h>
 #include <mps/itebd.h>
 
-namespace mps {
+namespace mps
+{
 
-  template<class Tensor>
+  template <class Tensor>
   static inline const typename Tensor::elt_t
   do_expected12(const iTEBD<Tensor> &psi, const Tensor &Op12, int site)
   {
-    if (!psi.is_canonical()) {
+    if (!psi.is_canonical())
+    {
       return do_expected12(psi.canonical_form(), Op12, site);
-    } else {
+    }
+    else
+    {
       tensor::index a, i, b, j;
       const Tensor &AlA = psi.combined_matrix(0);
       const Tensor &BlB = psi.combined_matrix(1);
@@ -36,16 +40,19 @@ namespace mps {
       BlB.get_dimensions(&b, &j, &a);
       Tensor v1 = psi.left_boundary(0);
       Tensor v2 = v1;
-      if (site & 1) {
+      if (site & 1)
+      {
         v1 = propagate_right(v1, AlA);
         v2 = v1;
-        const Tensor BlBAlA = reshape(fold(BlB, -1, AlA, 0), b, j*i, b);
+        const Tensor BlBAlA = reshape(fold(BlB, -1, AlA, 0), b, j * i, b);
         v1 = propagate_right(v1, BlBAlA, Op12);
         v2 = propagate_right(v2, BlBAlA);
         v1 = propagate_right(v1, BlB);
         v2 = propagate_right(v2, BlB);
-      } else {
-        const Tensor AlABlB = reshape(fold(AlA, -1, BlB, 0), a, i*j, a);
+      }
+      else
+      {
+        const Tensor AlABlB = reshape(fold(AlA, -1, BlB, 0), a, i * j, a);
         v1 = propagate_right(v1, AlABlB, Op12);
         v2 = propagate_right(v2, AlABlB);
       }
@@ -53,19 +60,26 @@ namespace mps {
     }
   }
 
-  template<class Tensor>
+  template <class Tensor>
   static inline const typename Tensor::elt_t
   do_string_order(const iTEBD<Tensor> &psi,
-		  const Tensor &Opi, int i, const Tensor &Opmiddle,
-		  const Tensor &Opj, int j)
+                  const Tensor &Opi, int i, const Tensor &Opmiddle,
+                  const Tensor &Opj, int j)
   {
-    if (i == j) {
+    if (i == j)
+    {
       return expected(psi, mmult(Opi, Opj), i);
-    } else if (i > j) {
+    }
+    else if (i > j)
+    {
       return do_string_order(psi, Opj, j, Opmiddle, Opi, i);
-    } else if (!psi.is_canonical()) {
+    }
+    else if (!psi.is_canonical())
+    {
       return do_string_order(psi.canonical_form(), Opi, i, Opmiddle, Opj, j);
-    } else {
+    }
+    else
+    {
       j = j - i;
       i = i & 1;
       j = j + i;
@@ -73,7 +87,8 @@ namespace mps {
       Tensor v2 = v1;
       const Tensor none;
       const Tensor *op;
-      for (int site = 0; (site <= j) || !(site & 1); ++site) {
+      for (int site = 0; (site <= j) || !(site & 1); ++site)
+      {
         if (site == i)
           op = &Opi;
         else if (site == j)
@@ -89,39 +104,52 @@ namespace mps {
     }
   }
 
-  template<class Tensor>
+  template <class Tensor>
   static inline const Tensor
   do_string_order_many(const iTEBD<Tensor> &psi,
                        const Tensor &Opi, const Tensor &Opmiddle,
                        const Tensor &Opj, int N)
   {
-    if (!psi.is_canonical()) {
+    if (!psi.is_canonical())
+    {
       return do_string_order_many(psi.canonical_form(), Opi, Opmiddle, Opj, N);
-    } else {
+    }
+    else
+    {
       Tensor v1 = psi.left_boundary(0);
       Tensor v2 = v1;
-      Tensor output(N);
+      Tensor output = Tensor::empty(N);
       Tensor nextv2;
-      for (int site = 0; (site < N); ++site) {
+      for (int site = 0; (site < N); ++site)
+      {
         const Tensor &aux = psi.combined_matrix(site);
-        Tensor v = propagate_right(v1, aux, site? Opj : mmult(Opi,Opj));
-        if (nextv2.size()) {
+        Tensor v = propagate_right(v1, aux, site ? Opj : mmult(Opi, Opj));
+        if (nextv2.size())
+        {
           v2 = nextv2;
-        } else {
+        }
+        else
+        {
           v2 = propagate_right(v2, aux);
         }
-        if (!(site & 1)) {
-          const Tensor &aux = psi.combined_matrix(site+1);
+        if (!(site & 1))
+        {
+          const Tensor &aux = psi.combined_matrix(site + 1);
           nextv2 = propagate_right(v2, aux);
           v = propagate_right(v, aux);
           output.at(site) = trace(v) / trace(nextv2);
-        } else {
+        }
+        else
+        {
           nextv2 = Tensor();
           output.at(site) = trace(v) / trace(v2);
         }
-        if (site) {
+        if (site)
+        {
           v1 = propagate_right(v1, aux, Opmiddle);
-        } else {
+        }
+        else
+        {
           v1 = propagate_right(v1, aux, Opi);
         }
       }

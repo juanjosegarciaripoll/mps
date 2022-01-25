@@ -25,7 +25,8 @@
 #include <mps/mpo.h>
 #include <mps/hamiltonian.h>
 
-namespace mps {
+namespace mps
+{
 
   /** Internal representation of a MPO as a quadratic form.
       This object works with a scalar product $$\langle\psi|O|\phi\rangle$$,
@@ -35,8 +36,9 @@ namespace mps {
       are the elements of the tensors $\psi$[k] and $\phi$[k] of the MPS
       on that given site.
   */
-  template<class MPO>
-  class QuadraticForm {
+  template <class MPO>
+  class QuadraticForm
+  {
   public:
     typedef MPO mpo_t;
     typedef typename MPO::MPS mps_t;
@@ -63,34 +65,34 @@ namespace mps {
     /** Number of sites in the lattice. */
     index size() const { return size_; }
     /** Last site in the lattice. */
-    index last_site() const { return size_-1; }
+    index last_site() const { return size_ - 1; }
 
     /** Matrix representation of the quadratic form with respect to site here().*/
-    const elt_t single_site_matrix() const;
-    /** Matrix representation of the quadratic form with respect to
-	sites here() and here()+1.*/
-    const elt_t two_site_matrix(int sense = +1) const;
+    elt_t single_site_matrix() const;
+    /** Matrix representation of the quadratic form with respect to 
+     * sites here() and here()+1.*/
+    elt_t two_site_matrix(int sense = +1) const;
     /** Apply the two_site_matrix() onto a tensor representing one site. */
-    const elt_t apply_one_site_matrix(const elt_t &P) const;
+    elt_t apply_one_site_matrix(const elt_t &P) const;
     /** Apply the two_site_matrix() onto a tensor representing two sites. */
-    const elt_t apply_two_site_matrix(const elt_t &P12, int sense = +1) const;
+    elt_t apply_two_site_matrix(const elt_t &P12, int sense = +1) const;
     /** Efficiently take the diagonal part of the single_site_matrix(). */
-    const elt_t take_single_site_matrix_diag() const;
+    elt_t take_single_site_matrix_diag() const;
     /** Efficiently take the diagonal part of the two_site_matrix(). */
-    const elt_t take_two_site_matrix_diag(int sense = +1) const;
+    elt_t take_two_site_matrix_diag(int sense = +1) const;
 
   private:
-
-    struct Pair {
+    struct Pair
+    {
       int left_ndx, right_ndx; // inner dimensions in the MPO
-      elt_t op; // operator
+      elt_t op;                // operator
 
-      Pair(int i, int j, const elt_t &tensor) :
-	left_ndx(i),
-	right_ndx(j),
-	op(reshape(tensor(range(i), range(),range(), range(j)),
-		   tensor.dimension(1), tensor.dimension(2)))
-      {}
+      Pair(int i, int j, const elt_t &tensor) : left_ndx(i),
+                                                right_ndx(j),
+                                                op(reshape(tensor(range(i), range(), range(), range(j)),
+                                                           tensor.dimension(1), tensor.dimension(2)))
+      {
+      }
 
       bool is_empty() const { return norm2(op) == 0; }
     };
@@ -105,23 +107,29 @@ namespace mps {
     matrix_database_t matrix_;
     pair_tree_t pairs_;
 
-    elt_t &left_matrix(index site, int n) {
+    elt_t &left_matrix(index site, int n)
+    {
       return matrix_[site][n];
     }
-    elt_t &right_matrix(index site, int n) {
-      return matrix_[site+1][n];
+    elt_t &right_matrix(index site, int n)
+    {
+      return matrix_[site + 1][n];
     }
-    const elt_t &left_matrix(index site, int n) const {
+    const elt_t &left_matrix(index site, int n) const
+    {
       return matrix_[site][n];
     }
-    const elt_t &right_matrix(index site, int n) const {
-      return matrix_[site+1][n];
+    const elt_t &right_matrix(index site, int n) const
+    {
+      return matrix_[site + 1][n];
     }
-    matrix_array_t &left_matrices(index site) {
+    matrix_array_t &left_matrices(index site)
+    {
       return matrix_[site];
     }
-    matrix_array_t &right_matrices(index site) {
-      return matrix_[site+1];
+    matrix_array_t &right_matrices(index site)
+    {
+      return matrix_[site + 1];
     }
     void dump_matrices();
 

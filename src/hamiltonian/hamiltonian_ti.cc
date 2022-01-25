@@ -25,83 +25,59 @@
 
 namespace mps {
 
-  /**Create a translationally invariant Hamiltonian. 'N' is the number of lattice
+/**Create a translationally invariant Hamiltonian. 'N' is the number of lattice
    * sites, 'H12' is the nearest neighbor interaction between every two sites,
    * 'H1' is the local term and 'periodic' determines whether there is also
    * interaction between sites 1 and N. */
-  TIHamiltonian::TIHamiltonian(index N, const CTensor &H12, const CTensor &H1,
-			       bool periodic) :
-    size_(N), H12_(H12), H1_(H1), periodic_(periodic)
-  {
-    if (H1.is_empty()) {
-      if (H12.is_empty()) {
-        std::cerr << "In TIHamiltonian(). You have to provide at least a local term or an interaction.\n";
-        abort();
-      } else {
-        index d = round(sqrt(H12.rows()));
-        H1_ = RTensor::zeros(d,d);
-      }
-    }
+TIHamiltonian::TIHamiltonian(index N, const CTensor &H12, const CTensor &H1,
+                             bool periodic)
+    : size_(N), H12_(H12), H1_(H1), periodic_(periodic) {
+  if (H1.is_empty()) {
     if (H12.is_empty()) {
-      index d = H1_.rows();
-      H12_ = RTensor::zeros(d*d, d*d);
-    } else if (norm2(H12)) {
-      split_interaction(H12_, &H12_left_, &H12_right_);
+      std::cerr << "In TIHamiltonian(). You have to provide at least a local "
+                   "term or an interaction.\n";
+      abort();
+    } else {
+      index d = static_cast<index>(round(sqrt(H12.rows())));
+      H1_ = RTensor::zeros(d, d);
     }
   }
-
-  const Hamiltonian *
-  TIHamiltonian::duplicate() const
-  {
-    return new TIHamiltonian(*this);
+  if (H12.is_empty()) {
+    index d = H1_.rows();
+    H12_ = RTensor::zeros(d * d, d * d);
+  } else if (norm2(H12)) {
+    split_interaction(H12_, &H12_left_, &H12_right_);
   }
+}
 
-  index
-  TIHamiltonian::size() const
-  {
-    return size_;
-  }
+const Hamiltonian *TIHamiltonian::duplicate() const {
+  return new TIHamiltonian(*this);
+}
 
-  bool
-  TIHamiltonian::is_constant() const
-  {
-    return 1;
-  }
+index TIHamiltonian::size() const { return size_; }
 
-  bool
-  TIHamiltonian::is_periodic() const
-  {
-    return periodic_;
-  }
+bool TIHamiltonian::is_constant() const { return 1; }
 
-  const CTensor
-  TIHamiltonian::interaction(index k, double t) const
-  {
-    return H12_;
-  }
+bool TIHamiltonian::is_periodic() const { return periodic_; }
 
-  const CTensor
-  TIHamiltonian::interaction_left(index k, index ndx, double t) const
-  {
-    return H12_left_[ndx];
-  }
+const CTensor TIHamiltonian::interaction(index k, double t) const {
+  return H12_;
+}
 
-  const CTensor
-  TIHamiltonian::interaction_right(index k, index ndx, double t) const
-  {
-    return H12_right_[ndx];
-  }
+const CTensor TIHamiltonian::interaction_left(index k, index ndx,
+                                              double t) const {
+  return H12_left_[ndx];
+}
 
-  index
-  TIHamiltonian::interaction_depth(index k, double t) const
-  {
-    return H12_left_.size();
-  }
+const CTensor TIHamiltonian::interaction_right(index k, index ndx,
+                                               double t) const {
+  return H12_right_[ndx];
+}
 
-  const CTensor
-  TIHamiltonian::local_term(index k, double t) const
-  {
-    return H1_;
-  }
+index TIHamiltonian::interaction_depth(index k, double t) const {
+  return H12_left_.size();
+}
 
-} // namespace mps
+const CTensor TIHamiltonian::local_term(index k, double t) const { return H1_; }
+
+}  // namespace mps

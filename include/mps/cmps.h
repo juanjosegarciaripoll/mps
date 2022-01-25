@@ -25,17 +25,19 @@
 /*!\addtogroup TheMPS*/
 /* @{ */
 
-namespace mps {
+namespace mps
+{
 
   /**Real matrix product structure.*/
-  class CMPS : public MP<tensor::CTensor> {
+  class CMPS : public MP<tensor::CTensor>
+  {
   public:
     CMPS(const RMPS &real_mps);
     CMPS(index size, index physical_dimension = 0, index bond_dimension = 1,
          bool periodic = false);
     CMPS(const tensor::Indices &physical_dimension, index bond_dimension = 1,
          bool periodic = false);
-    CMPS(const std::vector<elt_t> &data) : parent(data) {};
+    CMPS(const std::vector<elt_t> &data) : parent(data){};
     CMPS();
 
     index normal_index(index i) const;
@@ -44,12 +46,12 @@ namespace mps {
     bool is_periodic() const;
 
     /**Create a random MPS. */
-    static const CMPS random(index length, index physical_dimension,
-                             index bond_dimension, bool periodic = false);
+    static CMPS random(index length, index physical_dimension,
+                       index bond_dimension, bool periodic = false);
 
     /**Create a random MPS. */
-    static const CMPS random(const tensor::Indices &physical_dimensions,
-                             index bond_dimension, bool periodic = false);
+    static CMPS random(const tensor::Indices &physical_dimensions,
+                       index bond_dimension, bool periodic = false);
 
   private:
     typedef MP<elt_t> parent;

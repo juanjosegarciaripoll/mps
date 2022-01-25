@@ -24,13 +24,14 @@
 
 #include "lattice_apply.cc"
 
-namespace mps {
-
+namespace mps
+{
   const CTensor
   Lattice::eigs(const CTensor &J, const CTensor &U, int eig_type, size_t neig,
-		CTensor *vectors, bool *converged, particle_kind_t kind) const
+                CTensor *vectors, bool *converged, particle_kind_t kind) const
   {
-    return linalg::eigs(tensor::with_args(apply_lattice<CTensor>, *this, J, U, kind),
-			dimension(), eig_type, neig, vectors, converged);
+    return linalg::eigs([&](const CTensor &psi)
+                        { return apply_lattice<CTensor>(psi, *this, J, U, kind); },
+                        dimension(), eig_type, neig, vectors, converged);
   }
 }

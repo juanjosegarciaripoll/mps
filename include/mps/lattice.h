@@ -22,7 +22,8 @@
 
 #include <tensor/sparse.h>
 
-namespace mps {
+namespace mps
+{
 
   using namespace tensor;
 
@@ -31,13 +32,14 @@ namespace mps {
    * particles, their density, their interactions, assuming that there is a
    * fixed (beforehand) number of particles at all times.
    */
-  class Lattice {
+  class Lattice
+  {
 
   public:
-
     typedef tensor::index word;
 
-    enum particle_kind_t {
+    enum particle_kind_t
+    {
       /** The lattice will contain impenetrable bosonic particles. */
       HARD_CORE_BOSONS = 0,
       /** The lattice will contain fermions (in Jordan-Wigner representation).*/
@@ -62,13 +64,13 @@ namespace mps {
         sites 'i' and 'j', and interactions U(i,j) among those sites
         too. Entries in these matrices can be zero. */
     const RSparse Hamiltonian(const RTensor &J, const RTensor &interactions,
-			      double mu, particle_kind_t kind = FERMIONS) const;
+                              double mu, particle_kind_t kind = FERMIONS) const;
     /** Full Hamiltonian containing hopping of kind and
         interactions. Matrix J(i,j) is nonzero when there is hopping between
         sites 'i' and 'j', and interactions U(i,j) among those sites
         too. Entries in these matrices can be zero. */
     const CSparse Hamiltonian(const CTensor &J, const CTensor &interactions,
-			      double mu, particle_kind_t kind = FERMIONS) const;
+                              double mu, particle_kind_t kind = FERMIONS) const;
 
     /** Bipartition of the lattice. We regard lattice sites 0 to N-1 as one
         half, and N to size() as the other half. We construct two vectors of all
@@ -88,9 +90,9 @@ namespace mps {
     /** Dimensionality of the constrained Hilbert space. */
     tensor::index dimension() const;
 
-    const RTensor apply(const RTensor &psi, const RTensor &J, const RTensor &U, particle_kind_t kind = FERMIONS) const;
-    const CTensor apply(const CTensor &psi, const CTensor &J, const CTensor &U, particle_kind_t kind = FERMIONS) const;
-    
+    RTensor apply(const RTensor &psi, const RTensor &J, const RTensor &U, particle_kind_t kind = FERMIONS) const;
+    CTensor apply(const CTensor &psi, const CTensor &J, const CTensor &U, particle_kind_t kind = FERMIONS) const;
+
     const RTensor eigs(const RTensor &J, const RTensor &U, int eig_type, size_t neig,
                        RTensor *vectors = NULL, bool *converged = NULL,
                        particle_kind_t kind = FERMIONS) const;
@@ -112,7 +114,7 @@ namespace mps {
     static const Indices states_with_n_particles(int sites, int number_of_particles);
     static const Indices states_in_particle_range(int sites, int nmin, int nmax);
   };
-  
+
 }
 
 #endif /* !MPS_LATTICE_H */

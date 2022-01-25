@@ -20,24 +20,24 @@
 #include <algorithm>
 #include <mps/cmps.h>
 
-namespace mps {
-
+namespace mps
+{
   static void randomize(CMPS &mps)
   {
     for (CMPS::iterator it = mps.begin(); it != mps.end(); it++)
       it->randomize();
   }
 
-  const CMPS CMPS::random(index length, index physical_dimension,
-			  index bond_dimension, bool periodic)
+  CMPS CMPS::random(index length, index physical_dimension,
+                    index bond_dimension, bool periodic)
   {
     CMPS output(length, physical_dimension, bond_dimension, periodic);
     randomize(output);
     return output;
   }
 
-  const CMPS CMPS::random(const tensor::Indices &physical_dimensions,
-			  index bond_dimension, bool periodic)
+  CMPS CMPS::random(const tensor::Indices &physical_dimensions,
+                    index bond_dimension, bool periodic)
   {
     CMPS output(physical_dimensions.size(), bond_dimension, periodic);
     randomize(output);
