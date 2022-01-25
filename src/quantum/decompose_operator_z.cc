@@ -22,13 +22,11 @@
 
 namespace mps {
 
-  /**Schmidt decomposition of a complex operator.
+/**Schmidt decomposition of a complex operator.
      \ingroup QM
   */
-  void
-  decompose_operator(const CTensor &U, CTensor *O1, CTensor *O2) {
-    do_decompose_operator(U, O1, O2);
-  }
+void decompose_operator(const CTensor &U, CTensor *O1, CTensor *O2) {
+  do_decompose_operator(U, O1, O2);
+}
 
-
-} // namespace mps
+}  // namespace mps

@@ -24,73 +24,70 @@
 
 namespace tensor_test {
 
-  using namespace mps;
+using namespace mps;
 
-  //
-  // Canonical form of a state that does not require simplification.
-  //
-  template<class MPS>
-  void test_canonical_form(int size)
+//
+// Canonical form of a state that does not require simplification.
+//
+template <class MPS>
+void test_canonical_form(int size) {
+  MPS psi = cluster_state(size);
   {
-    MPS psi = cluster_state(size);
-    {
-      MPS aux = canonical_form(psi, -1);
-      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
-    }
-    {
-      MPS aux = canonical_form(psi, +1);
-      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
-    }
+    MPS aux = canonical_form(psi, -1);
+    EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+    EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+    EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
   }
-
-  //
-  // Normal form of a state that does not require simplification.
-  //
-  template<class MPS>
-  void test_normal_form(int size)
   {
-    MPS psi = cluster_state(size);
-    {
-      MPS aux = normal_form(psi, -1);
-      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
-    }
-    {
-      MPS aux = normal_form(psi, +1);
-      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
-    }
+    MPS aux = canonical_form(psi, +1);
+    EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+    EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+    EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
   }
+}
 
-  ////////////////////////////////////////////////////////////
-  // SIMPLIFY RMPS
-  //
-
-  TEST(RMPSCanonical, SimpleStates) {
-    test_over_integers(2, 10, test_canonical_form<RMPS>);
+//
+// Normal form of a state that does not require simplification.
+//
+template <class MPS>
+void test_normal_form(int size) {
+  MPS psi = cluster_state(size);
+  {
+    MPS aux = normal_form(psi, -1);
+    EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+    EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+    EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
   }
-
-  TEST(RMPSNormal, SimpleStates) {
-    test_over_integers(2, 10, test_normal_form<RMPS>);
+  {
+    MPS aux = normal_form(psi, +1);
+    EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+    EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+    EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
   }
+}
 
-  ////////////////////////////////////////////////////////////
-  // SIMPLIFY CMPS
-  //
+////////////////////////////////////////////////////////////
+// SIMPLIFY RMPS
+//
 
-  TEST(CMPSCanonical, SimpleStates) {
-    test_over_integers(2, 10, test_canonical_form<CMPS>);
-  }
+TEST(RMPSCanonical, SimpleStates) {
+  test_over_integers(2, 10, test_canonical_form<RMPS>);
+}
 
-  TEST(CMPSNormal, SimpleStates) {
-    test_over_integers(2, 10, test_normal_form<CMPS>);
-  }
+TEST(RMPSNormal, SimpleStates) {
+  test_over_integers(2, 10, test_normal_form<RMPS>);
+}
 
+////////////////////////////////////////////////////////////
+// SIMPLIFY CMPS
+//
 
-} // namespace tensor_test
+TEST(CMPSCanonical, SimpleStates) {
+  test_over_integers(2, 10, test_canonical_form<CMPS>);
+}
+
+TEST(CMPSNormal, SimpleStates) {
+  test_over_integers(2, 10, test_normal_form<CMPS>);
+}
+
+}  // namespace tensor_test

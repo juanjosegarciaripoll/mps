@@ -21,17 +21,14 @@
 
 namespace mps {
 
-  void add_hopping_matrix(RMPO *mpo, const RTensor &J,
-			  const RTensor &ad, const RTensor &a)
-  {
-    do_add_hopping_matrix(*mpo, J, ad, a, RTensor::eye(a.rows()));
-  }
+void add_hopping_matrix(RMPO *mpo, const RTensor &J, const RTensor &ad,
+                        const RTensor &a) {
+  do_add_hopping_matrix(*mpo, J, ad, a, RTensor::eye(a.rows()));
+}
 
-  void add_jordan_wigner_matrix(RMPO *mpo, const RTensor &J,
-				const RTensor &ad, const RTensor &a,
-				const RTensor &sign)
-  {
-    do_add_hopping_matrix(*mpo, J, ad, a, sign);
-  }
+void add_jordan_wigner_matrix(RMPO *mpo, const RTensor &J, const RTensor &ad,
+                              const RTensor &a, const RTensor &sign) {
+  do_add_hopping_matrix(*mpo, J, ad, a, sign);
+}
 
-} // namespace mps
+}  // namespace mps

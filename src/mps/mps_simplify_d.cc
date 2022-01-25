@@ -22,10 +22,9 @@
 
 namespace mps {
 
-  double simplify(RMPS *P, const RMPS &Q, int *sense, bool periodicbc,
-		  index sweeps, bool normalize)
-  {
-    return do_simplify(P, Q, sense, periodicbc, sweeps, normalize);
-  }
+double simplify(RMPS *P, const RMPS &Q, int *sense, bool periodicbc,
+                index sweeps, bool normalize) {
+  return do_simplify(P, Q, sense, periodicbc, sweeps, normalize);
+}
 
-} // namespace mps
+}  // namespace mps

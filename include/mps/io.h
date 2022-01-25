@@ -27,16 +27,15 @@
 
 namespace mps {
 
-  std::ostream &operator<<(std::ostream &s, const RMPO &mpo);
+std::ostream &operator<<(std::ostream &s, const RMPO &mpo);
 
-  std::ostream &operator<<(std::ostream &s, const CMPO &mpo);
+std::ostream &operator<<(std::ostream &s, const CMPO &mpo);
 
-  void dump(sdf::OutDataFile &d, const RMPS &mps, const std::string &name);
-  void dump(sdf::OutDataFile &d, const CMPS &mps, const std::string &name);
-  const RMPS load_rmps(sdf::InDataFile &d, const std::string &name);
-  const CMPS load_cmps(sdf::InDataFile &d, const std::string &name);
+void dump(sdf::OutDataFile &d, const RMPS &mps, const std::string &name);
+void dump(sdf::OutDataFile &d, const CMPS &mps, const std::string &name);
+const RMPS load_rmps(sdf::InDataFile &d, const std::string &name);
+const CMPS load_cmps(sdf::InDataFile &d, const std::string &name);
 
-} // namespace mps
+}  // namespace mps
 
 #endif /* MPS_IO_H */
-

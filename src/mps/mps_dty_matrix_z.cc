@@ -23,9 +23,8 @@
 
 namespace mps {
 
-  const CTensor density_matrix(const CMPS &psi, index site)
-  {
-    return do_density_matrix<CMPS,CTensor>(psi, site);
-  }
-
+const CTensor density_matrix(const CMPS &psi, index site) {
+  return do_density_matrix<CMPS, CTensor>(psi, site);
 }
+
+}  // namespace mps

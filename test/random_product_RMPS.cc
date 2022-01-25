@@ -23,16 +23,15 @@
 
 namespace tensor_test {
 
-  using namespace mps;
+using namespace mps;
 
-  RMPS random_product_RMPS(int n, int dimension)
-  {
-    RMPS output(n);
-    for (int i = 0; i < n; i++) {
-      RTensor v = RTensor::random(1, dimension, 1);
-      output.at(i) = v / norm2(v);
-    }
-    return output;
+RMPS random_product_RMPS(int n, int dimension) {
+  RMPS output(n);
+  for (int i = 0; i < n; i++) {
+    RTensor v = RTensor::random(1, dimension, 1);
+    output.at(i) = v / norm2(v);
   }
+  return output;
+}
 
-} // namespace tensor_test
+}  // namespace tensor_test

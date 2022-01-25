@@ -23,16 +23,14 @@
 
 namespace mps {
 
-  CMPS::CMPS(const RMPS &other) :
-    parent(other.size())
-  {
-    CMPS::iterator a = begin();
-    RMPS::const_iterator b = other.begin();
-    while (a != end()) {
-      *a = tensor::CTensor(*b);
-      ++a;
-      ++b;
-    }
+CMPS::CMPS(const RMPS &other) : parent(other.size()) {
+  CMPS::iterator a = begin();
+  RMPS::const_iterator b = other.begin();
+  while (a != end()) {
+    *a = tensor::CTensor(*b);
+    ++a;
+    ++b;
   }
+}
 
-} // namespace mps
+}  // namespace mps

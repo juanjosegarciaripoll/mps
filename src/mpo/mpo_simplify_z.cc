@@ -21,9 +21,8 @@
 
 namespace mps {
 
-  const CMPO simplify(const CMPO &mpo, int sense, bool debug)
-  {
-    return do_simplify<CMPO,CMPS,CTensor>(mpo, sense, debug);
-  }
+const CMPO simplify(const CMPO &mpo, int sense, bool debug) {
+  return do_simplify<CMPO, CMPS, CTensor>(mpo, sense, debug);
+}
 
-} // namespace mps
+}  // namespace mps

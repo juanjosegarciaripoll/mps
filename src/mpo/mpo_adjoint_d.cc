@@ -21,10 +21,6 @@
 
 namespace mps {
 
-  const RMPO
-  adjoint(const RMPO &mpo)
-  {
-    return mpo;
-  }
+const RMPO adjoint(const RMPO &mpo) { return mpo; }
 
-} // namespace mps
+}  // namespace mps

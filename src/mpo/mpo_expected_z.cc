@@ -21,14 +21,12 @@
 
 namespace mps {
 
-  cdouble expected(const CMPS &bra, const CMPO &op, const CMPS &ket)
-  {
-    return scprod(bra, apply(op, ket));
-  }
+cdouble expected(const CMPS &bra, const CMPO &op, const CMPS &ket) {
+  return scprod(bra, apply(op, ket));
+}
 
-  cdouble expected(const CMPS &psi, const CMPO &op)
-  {
-    return expected(psi, op, psi);
-  }
+cdouble expected(const CMPS &psi, const CMPO &op) {
+  return expected(psi, op, psi);
+}
 
-} // namespace mps
+}  // namespace mps

@@ -21,28 +21,26 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
-  template<class MPO, class Tensor>
-  static const Tensor
-  to_matrix(const MPO &A)
-  {
-    Tensor B = Tensor::ones(1,1,1);
-    tensor::index D = 1;
-    tensor::index a = 1;
+template <class MPO, class Tensor>
+static const Tensor to_matrix(const MPO &A) {
+  Tensor B = Tensor::ones(1, 1, 1);
+  tensor::index D = 1;
+  tensor::index a = 1;
 
-    for (int i = 0; i < A.size(); ++i) {
-      Tensor Ai = A[i];
-      tensor::index d = Ai.dimension(1);
-      tensor::index b = Ai.dimension(3);
-      /* B(D,D',a)*A(a,d,d',b) -> B(D,D',d,d',b) */
-      B = fold(B, 2, Ai, 0);
-      /* B(D,D',a)*A(a,d,d',b) -> B(D,d,D',d',,b) */
-      B = reshape(permute(B, 1,2), D*d, D*d, b);
-      a = b;
-      D = D*d;
-    }
-    return reshape(B, D, D);
+  for (int i = 0; i < A.size(); ++i) {
+    Tensor Ai = A[i];
+    tensor::index d = Ai.dimension(1);
+    tensor::index b = Ai.dimension(3);
+    /* B(D,D',a)*A(a,d,d',b) -> B(D,D',d,d',b) */
+    B = fold(B, 2, Ai, 0);
+    /* B(D,D',a)*A(a,d,d',b) -> B(D,d,D',d',,b) */
+    B = reshape(permute(B, 1, 2), D * d, D * d, b);
+    a = b;
+    D = D * d;
   }
+  return reshape(B, D, D);
+}
 
-} // namespace mps
+}  // namespace mps

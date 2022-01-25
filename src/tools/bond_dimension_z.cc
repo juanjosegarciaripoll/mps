@@ -21,12 +21,10 @@
 
 namespace mps {
 
-  int largest_bond_dimension(const MP<tensor::CTensor> &mp)
-  {
-    int i = 0;
-    for (int j = 0; j < mp.size(); j++)
-      i = std::max<int>(i, mp[j].dimension(0));
-    return i;
-  }
-
+int largest_bond_dimension(const MP<tensor::CTensor> &mp) {
+  int i = 0;
+  for (int j = 0; j < mp.size(); j++) i = std::max<int>(i, mp[j].dimension(0));
+  return i;
 }
+
+}  // namespace mps

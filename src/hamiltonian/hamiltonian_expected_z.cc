@@ -22,10 +22,8 @@
 
 namespace mps {
 
-  double expected(const CMPS &psi, const Hamiltonian &H, double t)
-  {
-    return do_expected(psi, H, t);
-  }
+double expected(const CMPS &psi, const Hamiltonian &H, double t) {
+  return do_expected(psi, H, t);
+}
 
-} // namespace mps
-
+}  // namespace mps

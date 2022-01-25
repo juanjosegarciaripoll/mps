@@ -22,30 +22,28 @@
 
 namespace mps {
 
-  template<class MPO, class Tensor>
-  static void do_add_hopping_matrix(MPO &mpo, const Tensor &J,
-				    const Tensor &ad, const Tensor &a,
-				    const Tensor &sign)
-  {
-    //
-    // This function add terms
-    // \sum_{j,j\neq i} J(i,j) a[i]*sign[i+1]*...*sign[j-1]*ad[j] to a Hamiltonian.
-    //
-    assert(J.rank() == 2);
-    assert(J.rows() == J.columns());
-    assert(J.rows() == mpo.size());
+template <class MPO, class Tensor>
+static void do_add_hopping_matrix(MPO &mpo, const Tensor &J, const Tensor &ad,
+                                  const Tensor &a, const Tensor &sign) {
+  //
+  // This function add terms
+  // \sum_{j,j\neq i} J(i,j) a[i]*sign[i+1]*...*sign[j-1]*ad[j] to a Hamiltonian.
+  //
+  assert(J.rank() == 2);
+  assert(J.rows() == J.columns());
+  assert(J.rows() == mpo.size());
 
-    int L = mpo.size();
-    for (int j = 0; j < L; ++j) {
-      std::vector<Tensor> ops(L);
-      for (int i = 0; i < L; ++i) {
-	if (i == j)
-          ops.at(j) = ad;
-        else
-	  ops.at(i) = a * J(j, i);
-      }
-      add_interaction(&mpo, ops, j, &sign);
+  int L = mpo.size();
+  for (int j = 0; j < L; ++j) {
+    std::vector<Tensor> ops(L);
+    for (int i = 0; i < L; ++i) {
+      if (i == j)
+        ops.at(j) = ad;
+      else
+        ops.at(i) = a * J(j, i);
     }
+    add_interaction(&mpo, ops, j, &sign);
   }
+}
 
-} // namespace mps
+}  // namespace mps

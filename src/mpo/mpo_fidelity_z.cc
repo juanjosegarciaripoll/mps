@@ -21,13 +21,12 @@
 
 namespace mps {
 
-  double fidelity(const CMPO &Ua, const CMPO &Ub)
-  {
-    CMPS psi1 = canonical_form(mpo_to_mps(Ua), -1);
-    CMPS psi2 = canonical_form(mpo_to_mps(Ub), -1);
-    double n1 = norm2(psi1);
-    double n2 = norm2(psi2);
-    return abs(scprod(psi1,psi2)/(n1*n2));    
-  }
+double fidelity(const CMPO &Ua, const CMPO &Ub) {
+  CMPS psi1 = canonical_form(mpo_to_mps(Ua), -1);
+  CMPS psi2 = canonical_form(mpo_to_mps(Ub), -1);
+  double n1 = norm2(psi1);
+  double n2 = norm2(psi2);
+  return abs(scprod(psi1, psi2) / (n1 * n2));
+}
 
-} // namespace mps
+}  // namespace mps

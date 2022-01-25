@@ -24,128 +24,125 @@
 
 namespace tensor_test {
 
-  using namespace tensor;
-  using namespace mps;
-  using tensor::index;
+using namespace tensor;
+using namespace mps;
+using tensor::index;
 
-  template<class MPS>
-  const MPS add_errors(const MPS &psi) {
-    MPS output = psi;
-    for (index i = 0; i < output.size(); i++) {
-      typename MPS::elt_t x = output[i];
-      output.at(i) = x + 0.01 * x.random(x.dimensions());
-    }
-    return output;
+template <class MPS>
+const MPS add_errors(const MPS &psi) {
+  MPS output = psi;
+  for (index i = 0; i < output.size(); i++) {
+    typename MPS::elt_t x = output[i];
+    output.at(i) = x + 0.01 * x.random(x.dimensions());
   }
+  return output;
+}
 
-  //
-  // Simplifying a state that does not require simplification.
-  //
-  template<class MPS, bool two_sites>
-  void trivial_simplify(int size)
-  {
-    MPS psi = cluster_state(size);
-    MPS aux = psi;
-    int sense;
+//
+// Simplifying a state that does not require simplification.
+//
+template <class MPS, bool two_sites>
+void trivial_simplify(int size) {
+  MPS psi = cluster_state(size);
+  MPS aux = psi;
+  int sense;
 
-    if (two_sites)
-      mps::FLAGS.set(MPS_SIMPLIFY_ALGORITHM, MPS_TWO_SITE_ALGORITHM);
-    else
-      mps::FLAGS.set(MPS_SIMPLIFY_ALGORITHM, MPS_SINGLE_SITE_ALGORITHM);
+  if (two_sites)
+    mps::FLAGS.set(MPS_SIMPLIFY_ALGORITHM, MPS_TWO_SITE_ALGORITHM);
+  else
+    mps::FLAGS.set(MPS_SIMPLIFY_ALGORITHM, MPS_SINGLE_SITE_ALGORITHM);
 
-    for (int sweeps = 1; sweeps < 3; sweeps++) {
-      sense = +1;
-      aux = canonical_form(psi, sense);
-      simplify_obc(&aux, psi, &sense, sweeps, true);
+  for (int sweeps = 1; sweeps < 3; sweeps++) {
+    sense = +1;
+    aux = canonical_form(psi, sense);
+    simplify_obc(&aux, psi, &sense, sweeps, true);
 
-      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
+    EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+    EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+    EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
 
-      sense = -1;
-      aux = canonical_form(psi, sense);
-      simplify_obc(&aux, psi, &sense, 1, true);
+    sense = -1;
+    aux = canonical_form(psi, sense);
+    simplify_obc(&aux, psi, &sense, 1, true);
 
-      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
-    }
+    EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+    EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+    EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
   }
+}
 
-  //
-  // Simplifying a state that does not require simplification,
-  // but adding some errors.
-  //
-  template<class MPS, bool two_sites>
-  void trivial_simplify_with_errors(int size)
-  {
-    MPS psi = cluster_state(size);
-    MPS aux = psi;
-    int sense;
+//
+// Simplifying a state that does not require simplification,
+// but adding some errors.
+//
+template <class MPS, bool two_sites>
+void trivial_simplify_with_errors(int size) {
+  MPS psi = cluster_state(size);
+  MPS aux = psi;
+  int sense;
 
-    if (two_sites)
-      mps::FLAGS.set(MPS_SIMPLIFY_ALGORITHM, MPS_TWO_SITE_ALGORITHM);
-    else
-      mps::FLAGS.set(MPS_SIMPLIFY_ALGORITHM, MPS_SINGLE_SITE_ALGORITHM);
+  if (two_sites)
+    mps::FLAGS.set(MPS_SIMPLIFY_ALGORITHM, MPS_TWO_SITE_ALGORITHM);
+  else
+    mps::FLAGS.set(MPS_SIMPLIFY_ALGORITHM, MPS_SINGLE_SITE_ALGORITHM);
 
-    for (int sweeps = 1; sweeps < 3; sweeps++) {
-      aux = add_errors(psi);
-      sense = +1;
-      simplify_obc(&aux, psi, &sense, sweeps, true);
+  for (int sweeps = 1; sweeps < 3; sweeps++) {
+    aux = add_errors(psi);
+    sense = +1;
+    simplify_obc(&aux, psi, &sense, sweeps, true);
 
-      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
+    EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+    EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+    EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
 
-      aux = add_errors(psi);
-      sense = -1;
-      simplify_obc(&aux, psi, &sense, 1, true);
+    aux = add_errors(psi);
+    sense = -1;
+    simplify_obc(&aux, psi, &sense, 1, true);
 
-      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
-    }
+    EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+    EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+    EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
   }
+}
 
-  ////////////////////////////////////////////////////////////
-  // SIMPLIFY RMPS
-  //
+////////////////////////////////////////////////////////////
+// SIMPLIFY RMPS
+//
 
-  TEST(RMPSSimplify, Identity) {
-    test_over_integers(2, 10, trivial_simplify<RMPS,false>);
-  }
+TEST(RMPSSimplify, Identity) {
+  test_over_integers(2, 10, trivial_simplify<RMPS, false>);
+}
 
-  TEST(RMPSSimplify, IdentityWithErrors) {
-    test_over_integers(2, 10, trivial_simplify_with_errors<RMPS,false>);
-  }
+TEST(RMPSSimplify, IdentityWithErrors) {
+  test_over_integers(2, 10, trivial_simplify_with_errors<RMPS, false>);
+}
 
-  TEST(RMPSSimplify, Identity2sites) {
-    test_over_integers(2, 10, trivial_simplify<RMPS,true>);
-  }
+TEST(RMPSSimplify, Identity2sites) {
+  test_over_integers(2, 10, trivial_simplify<RMPS, true>);
+}
 
-  TEST(RMPSSimplify, IdentityWithErrors2sites) {
-    test_over_integers(2, 10, trivial_simplify_with_errors<RMPS,true>);
-  }
+TEST(RMPSSimplify, IdentityWithErrors2sites) {
+  test_over_integers(2, 10, trivial_simplify_with_errors<RMPS, true>);
+}
 
-  ////////////////////////////////////////////////////////////
-  // SIMPLIFY CMPS
-  //
+////////////////////////////////////////////////////////////
+// SIMPLIFY CMPS
+//
 
-  TEST(CMPSSimplify, Identity) {
-    test_over_integers(2, 10, trivial_simplify<CMPS,false>);
-  }
+TEST(CMPSSimplify, Identity) {
+  test_over_integers(2, 10, trivial_simplify<CMPS, false>);
+}
 
-  TEST(CMPSSimplify, IdentityWithErrors) {
-    test_over_integers(2, 10, trivial_simplify_with_errors<CMPS,false>);
-  }
+TEST(CMPSSimplify, IdentityWithErrors) {
+  test_over_integers(2, 10, trivial_simplify_with_errors<CMPS, false>);
+}
 
-  TEST(CMPSSimplify, Identity2sites) {
-    test_over_integers(2, 10, trivial_simplify<CMPS,true>);
-  }
+TEST(CMPSSimplify, Identity2sites) {
+  test_over_integers(2, 10, trivial_simplify<CMPS, true>);
+}
 
-  TEST(CMPSSimplify, IdentityWithErrors2sites) {
-    test_over_integers(2, 10, trivial_simplify_with_errors<CMPS,true>);
-  }
+TEST(CMPSSimplify, IdentityWithErrors2sites) {
+  test_over_integers(2, 10, trivial_simplify_with_errors<CMPS, true>);
+}
 
-
-} // namespace tensor_test
+}  // namespace tensor_test

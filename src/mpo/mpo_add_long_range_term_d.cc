@@ -21,10 +21,9 @@
 
 namespace mps {
 
-  void add_interaction(RMPO *mpo, const std::vector<RTensor> &Hi, index i,
-                       const RTensor *sign)
-  {
-    do_add_interaction(*mpo, Hi, i, sign);
-  }
+void add_interaction(RMPO *mpo, const std::vector<RTensor> &Hi, index i,
+                     const RTensor *sign) {
+  do_add_interaction(*mpo, Hi, i, sign);
+}
 
-} // namespace mps
+}  // namespace mps

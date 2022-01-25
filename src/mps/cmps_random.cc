@@ -20,28 +20,23 @@
 #include <algorithm>
 #include <mps/cmps.h>
 
-namespace mps
-{
-  static void randomize(CMPS &mps)
-  {
-    for (CMPS::iterator it = mps.begin(); it != mps.end(); it++)
-      it->randomize();
-  }
+namespace mps {
+static void randomize(CMPS &mps) {
+  for (CMPS::iterator it = mps.begin(); it != mps.end(); it++) it->randomize();
+}
 
-  CMPS CMPS::random(index length, index physical_dimension,
-                    index bond_dimension, bool periodic)
-  {
-    CMPS output(length, physical_dimension, bond_dimension, periodic);
-    randomize(output);
-    return output;
-  }
+CMPS CMPS::random(index length, index physical_dimension, index bond_dimension,
+                  bool periodic) {
+  CMPS output(length, physical_dimension, bond_dimension, periodic);
+  randomize(output);
+  return output;
+}
 
-  CMPS CMPS::random(const tensor::Indices &physical_dimensions,
-                    index bond_dimension, bool periodic)
-  {
-    CMPS output(physical_dimensions.size(), bond_dimension, periodic);
-    randomize(output);
-    return output;
-  }
+CMPS CMPS::random(const tensor::Indices &physical_dimensions,
+                  index bond_dimension, bool periodic) {
+  CMPS output(physical_dimensions.size(), bond_dimension, periodic);
+  randomize(output);
+  return output;
+}
 
-} // namespace mps
+}  // namespace mps

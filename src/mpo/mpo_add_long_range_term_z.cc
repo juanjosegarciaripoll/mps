@@ -21,10 +21,9 @@
 
 namespace mps {
 
-  void add_interaction(CMPO *mpo, const std::vector<CTensor> &Hi, index i,
-                       const CTensor *sign)
-  {
-    do_add_interaction(*mpo, Hi, i, sign);
-  }
+void add_interaction(CMPO *mpo, const std::vector<CTensor> &Hi, index i,
+                     const CTensor *sign) {
+  do_add_interaction(*mpo, Hi, i, sign);
+}
 
-} // namespace mps
+}  // namespace mps

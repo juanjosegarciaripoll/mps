@@ -21,9 +21,8 @@
 
 namespace mps {
 
-  const RMPO simplify(const RMPO &mpo, int sense, bool debug)
-  {
-    return do_simplify<RMPO,RMPS,RTensor>(mpo, sense, debug);
-  }
+const RMPO simplify(const RMPO &mpo, int sense, bool debug) {
+  return do_simplify<RMPO, RMPS, RTensor>(mpo, sense, debug);
+}
 
-} // namespace mps
+}  // namespace mps

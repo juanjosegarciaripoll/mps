@@ -21,9 +21,8 @@
 
 namespace mps {
 
-  const RMPS apply(const RMPO &mpdo, const RMPS &psi)
-  {
-    return do_apply(mpdo, psi);
-  }
+const RMPS apply(const RMPO &mpdo, const RMPS &psi) {
+  return do_apply(mpdo, psi);
+}
 
-} // namespace mps
+}  // namespace mps

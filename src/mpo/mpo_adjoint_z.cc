@@ -21,14 +21,12 @@
 
 namespace mps {
 
-  const CMPO
-  adjoint(const CMPO &mpo)
-  {
-    CMPO output = mpo;
-    for (index i = 0; i < mpo.size(); i++) {
-      output.at(i) = conj(permute(mpo[i], 1,2));
-    }
-    return output;
+const CMPO adjoint(const CMPO &mpo) {
+  CMPO output = mpo;
+  for (index i = 0; i < mpo.size(); i++) {
+    output.at(i) = conj(permute(mpo[i], 1, 2));
   }
+  return output;
+}
 
-} // namespace mps
+}  // namespace mps

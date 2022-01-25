@@ -24,114 +24,111 @@
 
 namespace tensor_test {
 
-  using namespace tensor;
-  using namespace mps;
-  using tensor::index;
+using namespace tensor;
+using namespace mps;
+using tensor::index;
 
-  template<class MPS>
-  const MPS add_errors(const MPS &psi) {
-    MPS output = psi;
-    for (index i = 0; i < output.size(); i++) {
-      typename MPS::elt_t x = output[i];
-      output.at(i) = x + 0.01 * x.random(x.dimensions());
-    }
-    return output;
+template <class MPS>
+const MPS add_errors(const MPS &psi) {
+  MPS output = psi;
+  for (index i = 0; i < output.size(); i++) {
+    typename MPS::elt_t x = output[i];
+    output.at(i) = x + 0.01 * x.random(x.dimensions());
   }
+  return output;
+}
 
-  //
-  // Simplifying a state that does not require simplification.
-  //
-  template<class MPS>
-  void trivial_simplify(int size)
-  {
-    MPS psi = ghz_state(size, false);
-    index Dmax = 2;
-    double tol = -1;
-    for (int L = 1; L < 4; L++) {
-      std::vector<MPS> states(L, psi);
-      typename MPS::elt_t weights = tensor::abs(RTensor::random(L));
-      int sense;
+//
+// Simplifying a state that does not require simplification.
+//
+template <class MPS>
+void trivial_simplify(int size) {
+  MPS psi = ghz_state(size, false);
+  index Dmax = 2;
+  double tol = -1;
+  for (int L = 1; L < 4; L++) {
+    std::vector<MPS> states(L, psi);
+    typename MPS::elt_t weights = tensor::abs(RTensor::random(L));
+    int sense;
 
-      for (int sweeps = 1; sweeps < 3; sweeps++) {
-        MPS aux = psi;
-        sense = +1;
+    for (int sweeps = 1; sweeps < 3; sweeps++) {
+      MPS aux = psi;
+      sense = +1;
 
-        simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
+      simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
 
-        EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-        EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-        EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
+      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
 
-        aux = psi;
-        sense = -1;
-        simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
+      aux = psi;
+      sense = -1;
+      simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
 
-        EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-        EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-        EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
-      }
+      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
     }
   }
+}
 
-  //
-  // Simplifying a state that does not require simplification,
-  // but adding some errors.
-  //
-  template<class MPS>
-  void trivial_simplify_with_errors(int size)
-  {
-    MPS psi = ghz_state(size, false);
-    index Dmax = 2;
-    double tol = -1;
+//
+// Simplifying a state that does not require simplification,
+// but adding some errors.
+//
+template <class MPS>
+void trivial_simplify_with_errors(int size) {
+  MPS psi = ghz_state(size, false);
+  index Dmax = 2;
+  double tol = -1;
 
-    for (int L = 1; L < 4; L++) {
-      std::vector<MPS> states(L, psi);
-      typename MPS::elt_t weights = tensor::abs(RTensor::random(L));
-      int sense;
+  for (int L = 1; L < 4; L++) {
+    std::vector<MPS> states(L, psi);
+    typename MPS::elt_t weights = tensor::abs(RTensor::random(L));
+    int sense;
 
-      for (int sweeps = 1; sweeps < 3; sweeps++) {
-        MPS aux = add_errors(psi);
-        sense = +1;
-        simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
+    for (int sweeps = 1; sweeps < 3; sweeps++) {
+      MPS aux = add_errors(psi);
+      sense = +1;
+      simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
 
-        EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-        EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-        EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
+      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
 
-        aux = add_errors(psi);
-        sense = -1;
-        simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
+      aux = add_errors(psi);
+      sense = -1;
+      simplify(&aux, states, weights, Dmax, tol, &sense, sweeps, true);
 
-        EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-        EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-        EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
-      }
+      EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+      EXPECT_CEQ3(tensor::abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+      EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
     }
   }
+}
 
-  ////////////////////////////////////////////////////////////
-  // SIMPLIFY RMPS
-  //
+////////////////////////////////////////////////////////////
+// SIMPLIFY RMPS
+//
 
-  TEST(RMPSSimplify, Identity) {
-    test_over_integers(2, 10, trivial_simplify<RMPS>);
-  }
+TEST(RMPSSimplify, Identity) {
+  test_over_integers(2, 10, trivial_simplify<RMPS>);
+}
 
-  TEST(RMPSSimplify, IdentityWithErrors) {
-    test_over_integers(2, 10, trivial_simplify_with_errors<RMPS>);
-  }
+TEST(RMPSSimplify, IdentityWithErrors) {
+  test_over_integers(2, 10, trivial_simplify_with_errors<RMPS>);
+}
 
-  ////////////////////////////////////////////////////////////
-  // SIMPLIFY CMPS
-  //
+////////////////////////////////////////////////////////////
+// SIMPLIFY CMPS
+//
 
-  TEST(CMPSSimplify, Identity) {
-    test_over_integers(2, 10, trivial_simplify<CMPS>);
-  }
+TEST(CMPSSimplify, Identity) {
+  test_over_integers(2, 10, trivial_simplify<CMPS>);
+}
 
-  TEST(CMPSSimplify, IdentityWithErrors) {
-    test_over_integers(2, 10, trivial_simplify_with_errors<CMPS>);
-  }
+TEST(CMPSSimplify, IdentityWithErrors) {
+  test_over_integers(2, 10, trivial_simplify_with_errors<CMPS>);
+}
 
-
-} // namespace tensor_test
+}  // namespace tensor_test

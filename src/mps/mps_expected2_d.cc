@@ -22,12 +22,11 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
-  double expected(const RMPS &a, const RTensor &op1, index k1,
-		  const RTensor &op2, index k2)
-  {
-    return two_sites_expected(a, op1, k1, op2, k2);
-  }
+double expected(const RMPS &a, const RTensor &op1, index k1, const RTensor &op2,
+                index k2) {
+  return two_sites_expected(a, op1, k1, op2, k2);
+}
 
-} // namespace mps
+}  // namespace mps

@@ -21,14 +21,13 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
-  const CMPS apply_local_operator(const CMPS &psi, const CTensor &op, index site)
-  {
-    CMPS output = psi;
-    output.at(site) = foldin(op, -1, psi[site], 1);
-    return output;
-  }
+const CMPS apply_local_operator(const CMPS &psi, const CTensor &op,
+                                index site) {
+  CMPS output = psi;
+  output.at(site) = foldin(op, -1, psi[site], 1);
+  return output;
+}
 
-} // namespace mps
-
+}  // namespace mps

@@ -21,14 +21,12 @@
 
 namespace mps {
 
-  double expected(const RMPS &bra, const RMPO &op, const RMPS &ket)
-  {
-    return scprod(bra, apply(op, ket));
-  }
+double expected(const RMPS &bra, const RMPO &op, const RMPS &ket) {
+  return scprod(bra, apply(op, ket));
+}
 
-  double expected(const RMPS &psi, const RMPO &op)
-  {
-    return expected(psi, op, psi);
-  }
+double expected(const RMPS &psi, const RMPO &op) {
+  return expected(psi, op, psi);
+}
 
-} // namespace mps
+}  // namespace mps

@@ -27,34 +27,34 @@
 
 namespace mps {
 
-  /**Real matrix product structure.*/
-  class RMPS : public MP<tensor::RTensor> {
-  public:
-    RMPS(index size, index physical_dimension = 0, index bond_dimension = 1,
-         bool periodic = false);
-    RMPS(const tensor::Indices &physical_dimension, index bond_dimension = 1,
-         bool periodic = false);
-    RMPS(const std::vector<elt_t> &data) : parent(data) {};
-    RMPS();
+/**Real matrix product structure.*/
+class RMPS : public MP<tensor::RTensor> {
+ public:
+  RMPS(index size, index physical_dimension = 0, index bond_dimension = 1,
+       bool periodic = false);
+  RMPS(const tensor::Indices &physical_dimension, index bond_dimension = 1,
+       bool periodic = false);
+  RMPS(const std::vector<elt_t> &data) : parent(data){};
+  RMPS();
 
-    index normal_index(index i) const;
+  index normal_index(index i) const;
 
-    /**Can the RMP be used for a periodic boundary condition problem?*/
-    bool is_periodic() const;
+  /**Can the RMP be used for a periodic boundary condition problem?*/
+  bool is_periodic() const;
 
-    /**Create a random MPS. */
-    static const RMPS random(index length, index physical_dimension,
-                             index bond_dimension, bool periodic = false);
+  /**Create a random MPS. */
+  static const RMPS random(index length, index physical_dimension,
+                           index bond_dimension, bool periodic = false);
 
-    /**Create a random MPS. */
-    static const RMPS random(const tensor::Indices &physical_dimensions,
-                             index bond_dimension, bool periodic = false);
+  /**Create a random MPS. */
+  static const RMPS random(const tensor::Indices &physical_dimensions,
+                           index bond_dimension, bool periodic = false);
 
-  private:
-    typedef MP<elt_t> parent;
-  };
+ private:
+  typedef MP<elt_t> parent;
+};
 
-}
+}  // namespace mps
 
 /* @} */
 

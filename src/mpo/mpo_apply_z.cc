@@ -21,9 +21,8 @@
 
 namespace mps {
 
-  const CMPS apply(const CMPO &mpdo, const CMPS &psi)
-  {
-    return do_apply(mpdo, psi);
-  }
+const CMPS apply(const CMPO &mpdo, const CMPS &psi) {
+  return do_apply(mpdo, psi);
+}
 
-} // namespace mps
+}  // namespace mps

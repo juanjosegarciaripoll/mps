@@ -23,48 +23,50 @@
 
 namespace mps {
 
-  tensor::Flags FLAGS;
+tensor::Flags FLAGS;
 
-  const double MPS_DEFAULT = 12345678912345e78;
+const double MPS_DEFAULT = 12345678912345e78;
 
-  const double MPS_DO_NOT_TRUNCATE = 2.0;
-  const double MPS_TRUNCATE_ZEROS = 0.0;
-  const double MPS_TRUNCATE_EPSILON = DBL_EPSILON;
-  const double MPS_DEFAULT_TOLERANCE = -4.0;
+const double MPS_DO_NOT_TRUNCATE = 2.0;
+const double MPS_TRUNCATE_ZEROS = 0.0;
+const double MPS_TRUNCATE_EPSILON = DBL_EPSILON;
+const double MPS_DEFAULT_TOLERANCE = -4.0;
 
-  const unsigned MPS_USE_BLOCK_SVD = FLAGS.create_key(1);
+const unsigned MPS_USE_BLOCK_SVD = FLAGS.create_key(1);
 
-  const unsigned MPS_DEBUG_TRUNCATION = FLAGS.create_key(0);
+const unsigned MPS_DEBUG_TRUNCATION = FLAGS.create_key(0);
 
-  const unsigned MPS_TRUNCATION_TOLERANCE = FLAGS.create_key(DBL_EPSILON);
+const unsigned MPS_TRUNCATION_TOLERANCE = FLAGS.create_key(DBL_EPSILON);
 
-  const unsigned MPS_DEBUG_TROTTER = FLAGS.create_key(0);
+const unsigned MPS_DEBUG_TROTTER = FLAGS.create_key(0);
 
-  const unsigned MPS_DEBUG_ARNOLDI = FLAGS.create_key(0);
-  const unsigned MPS_ARNOLDI_SIMPLIFY_INTERNAL_SWEEPS = FLAGS.create_key(2);
-  const unsigned MPS_ARNOLDI_SIMPLIFY_FINAL_SWEEPS = FLAGS.create_key(4);
+const unsigned MPS_DEBUG_ARNOLDI = FLAGS.create_key(0);
+const unsigned MPS_ARNOLDI_SIMPLIFY_INTERNAL_SWEEPS = FLAGS.create_key(2);
+const unsigned MPS_ARNOLDI_SIMPLIFY_FINAL_SWEEPS = FLAGS.create_key(4);
 
-  const unsigned MPS_DEBUG_SIMPLIFY = FLAGS.create_key(0);
+const unsigned MPS_DEBUG_SIMPLIFY = FLAGS.create_key(0);
 
-  const unsigned MPS_SIMPLIFY_MAX_SWEEPS = FLAGS.create_key(12);
+const unsigned MPS_SIMPLIFY_MAX_SWEEPS = FLAGS.create_key(12);
 
-  const unsigned MPS_SIMPLIFY_TOLERANCE = FLAGS.create_key(1e-14);
+const unsigned MPS_SIMPLIFY_TOLERANCE = FLAGS.create_key(1e-14);
 
-  const unsigned MPS_SINGLE_SITE_ALGORITHM = 1;
-  const unsigned MPS_TWO_SITE_ALGORITHM = 2;
+const unsigned MPS_SINGLE_SITE_ALGORITHM = 1;
+const unsigned MPS_TWO_SITE_ALGORITHM = 2;
 
-  const unsigned MPS_SIMPLIFY_ALGORITHM = FLAGS.create_key(MPS_SINGLE_SITE_ALGORITHM);
+const unsigned MPS_SIMPLIFY_ALGORITHM =
+    FLAGS.create_key(MPS_SINGLE_SITE_ALGORITHM);
 
-  const unsigned MPS_DEBUG_SOLVE = FLAGS.create_key(0);
+const unsigned MPS_DEBUG_SOLVE = FLAGS.create_key(0);
 
-  const unsigned MPS_SOLVE_ALGORITHM = FLAGS.create_key(MPS_SINGLE_SITE_ALGORITHM);
+const unsigned MPS_SOLVE_ALGORITHM =
+    FLAGS.create_key(MPS_SINGLE_SITE_ALGORITHM);
 
-  const unsigned MPS_SOLVE_TOLERANCE = FLAGS.create_key(1e-10);
+const unsigned MPS_SOLVE_TOLERANCE = FLAGS.create_key(1e-10);
 
-  const unsigned MPS_ITEBD_CANONICAL_EXPECTED = 1;
-  const unsigned MPS_ITEBD_SLOW_EXPECTED = 2;
-  const unsigned MPS_ITEBD_BDRY_EXPECTED = 3;
-  const unsigned MPS_ITEBD_EXPECTED_METHOD = FLAGS.create_key(MPS_ITEBD_CANONICAL_EXPECTED);
+const unsigned MPS_ITEBD_CANONICAL_EXPECTED = 1;
+const unsigned MPS_ITEBD_SLOW_EXPECTED = 2;
+const unsigned MPS_ITEBD_BDRY_EXPECTED = 3;
+const unsigned MPS_ITEBD_EXPECTED_METHOD =
+    FLAGS.create_key(MPS_ITEBD_CANONICAL_EXPECTED);
 
-}
-
+}  // namespace mps

@@ -21,11 +21,10 @@
 
 namespace mps {
 
-  const CMPS load_cmps(sdf::InDataFile &d, const std::string &name)
-  {
-    std::vector<CTensor> aux;
-    d.load(&aux, name);
-    return CMPS(aux);
-  }
+const CMPS load_cmps(sdf::InDataFile &d, const std::string &name) {
+  std::vector<CTensor> aux;
+  d.load(&aux, name);
+  return CMPS(aux);
+}
 
-} // namespace mps
+}  // namespace mps

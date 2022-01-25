@@ -21,9 +21,9 @@
 
 namespace mps {
 
-  const CTensor split(CTensor *A, const CTensor &origA, int sense, bool truncate)
-  {
-    return do_split<CTensor>(A, origA, sense, truncate);
-  }
+const CTensor split(CTensor *A, const CTensor &origA, int sense,
+                    bool truncate) {
+  return do_split<CTensor>(A, origA, sense, truncate);
+}
 
-} // namespace mps
+}  // namespace mps

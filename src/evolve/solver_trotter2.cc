@@ -22,34 +22,32 @@
 
 namespace mps {
 
-  /**********************************************************************
+/**********************************************************************
    * Trotter's method with only two passes.
    *
    *	exp(-iHdt) = \prod_k={N-1}^1 exp(-iH_{kk+1} dt)
    *                 \prod_k=1^{N-1} exp(-iH_{kk+1} dt)
    */
 
-  Trotter2Solver::Trotter2Solver(const Hamiltonian &H, cdouble dt) :
-    TrotterSolver(dt), Ueven(H, 0, dt), Uodd(H, 1, dt), sense(0)
-  {
+Trotter2Solver::Trotter2Solver(const Hamiltonian &H, cdouble dt)
+    : TrotterSolver(dt), Ueven(H, 0, dt), Uodd(H, 1, dt), sense(0) {}
+
+double Trotter2Solver::one_step(CMPS *P, index Dmax) {
+  int debug = FLAGS.get(MPS_DEBUG_TROTTER);
+  if (!Dmax) {
+    if (strategy != DO_NOT_TRUNCATE) {
+      std::cerr
+          << "In TrotterSolver::one_step(), no maximum dimension provided\n";
+      abort();
+    }
   }
 
-  double
-  Trotter2Solver::one_step(CMPS *P, index Dmax)
-  {
-    int debug = FLAGS.get(MPS_DEBUG_TROTTER);
-    if (!Dmax) {
-      if (strategy != DO_NOT_TRUNCATE) {
-        std::cerr << "In TrotterSolver::one_step(), no maximum dimension provided\n";
-        abort();
-      }
-    }
-
-    switch (strategy) {
+  switch (strategy) {
     case TRUNCATE_EACH_UNITARY: {
       double err;
-      if (debug) std::cout << "Trotter2 method: truncate unitaries\n"
-                           << "Trotter2 Layer 1/2\n";
+      if (debug)
+        std::cout << "Trotter2 method: truncate unitaries\n"
+                  << "Trotter2 Layer 1/2\n";
       err = Ueven.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
       if (debug) std::cout << "Trotter2 Layer 2/2\n";
       err += Uodd.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax, normalize);
@@ -57,8 +55,9 @@ namespace mps {
     }
     case TRUNCATE_EACH_LAYER: {
       double err;
-      if (debug) std::cout << "Trotter2 method: truncate layers\n"
-                           << "Trotter2 Layer 1/2\n";
+      if (debug)
+        std::cout << "Trotter2 method: truncate layers\n"
+                  << "Trotter2 Layer 1/2\n";
       err = Ueven.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax);
       if (debug) std::cout << "Trotter2 Layer 2/2\n";
       err += Uodd.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax,
@@ -66,22 +65,24 @@ namespace mps {
       return err;
     }
     case DO_NOT_TRUNCATE: {
-      if (debug) std::cout << "Trotter2 method: no truncation\n"
-                           << "Trotter2 Layer 1/2\n";
+      if (debug)
+        std::cout << "Trotter2 method: no truncation\n"
+                  << "Trotter2 Layer 1/2\n";
       Ueven.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
       if (debug) std::cout << "Trotter2 Layer 2/2\n";
       Uodd.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
       return 0.0;
     }
     default: {
-      if (debug) std::cout << "Trotter2 method: truncate group:\n"
-                           << "Trotter2 Layer 1/2\n";
+      if (debug)
+        std::cout << "Trotter2 method: truncate group:\n"
+                  << "Trotter2 Layer 1/2\n";
       Ueven.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
       if (debug) std::cout << "Trotter2 Layer 2/2\n";
       return Uodd.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax,
                                      normalize);
     }
-    }
   }
+}
 
-} // namespace mps
+}  // namespace mps

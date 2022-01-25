@@ -22,17 +22,13 @@
 
 namespace mps {
 
-  cdouble
-  expected(const CiTEBD &psi, const CTensor &Op1, const CTensor &Op2)
-  {
-    return expected(psi, Op1, 0, Op2, 1);
-  }
-
-  cdouble
-  expected(const CiTEBD &psi, const CTensor &Op1, int i,
-	   const CTensor &Op2, int j)
-  {
-    return string_order(psi, Op1, i, CTensor(), Op2, j);
-  }
-
+cdouble expected(const CiTEBD &psi, const CTensor &Op1, const CTensor &Op2) {
+  return expected(psi, Op1, 0, Op2, 1);
 }
+
+cdouble expected(const CiTEBD &psi, const CTensor &Op1, int i,
+                 const CTensor &Op2, int j) {
+  return string_order(psi, Op1, i, CTensor(), Op2, j);
+}
+
+}  // namespace mps

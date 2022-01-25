@@ -22,40 +22,38 @@
 
 namespace mps {
 
-  /**********************************************************************
+/**********************************************************************
    * Trotter's method of fourth order.
    */
 
-  static const double inv_theta = 0.74007895010513;
-  static const double FR_param[5] = {0.67560359597983, 1.35120719195966,
-                                     -0.17560359597983, -1.70241438391932};
+static const double inv_theta = 0.74007895010513;
+static const double FR_param[5] = {0.67560359597983, 1.35120719195966,
+                                   -0.17560359597983, -1.70241438391932};
 
-  ForestRuthSolver::ForestRuthSolver(const Hamiltonian &H, cdouble dt) :
-    TrotterSolver(dt),
-    U1(H, 0, dt*FR_param[0]),
-    U2(H, 1, dt*FR_param[1]),
-    U3(H, 0, dt*FR_param[2]),
-    U4(H, 1, dt*FR_param[3]),
-    sense(0)
-  {
+ForestRuthSolver::ForestRuthSolver(const Hamiltonian &H, cdouble dt)
+    : TrotterSolver(dt),
+      U1(H, 0, dt * FR_param[0]),
+      U2(H, 1, dt * FR_param[1]),
+      U3(H, 0, dt * FR_param[2]),
+      U4(H, 1, dt * FR_param[3]),
+      sense(0) {}
+
+double ForestRuthSolver::one_step(CMPS *P, index Dmax) {
+  int debug = FLAGS.get(MPS_DEBUG_TROTTER);
+  if (!Dmax) {
+    if (strategy != DO_NOT_TRUNCATE) {
+      std::cerr
+          << "In TrotterSolver::one_step(), no maximum dimension provided\n";
+      abort();
+    }
   }
 
-  double
-  ForestRuthSolver::one_step(CMPS *P, index Dmax)
-  {
-    int debug = FLAGS.get(MPS_DEBUG_TROTTER);
-    if (!Dmax) {
-      if (strategy != DO_NOT_TRUNCATE) {
-        std::cerr << "In TrotterSolver::one_step(), no maximum dimension provided\n";
-        abort();
-      }
-    }
-
-    switch (strategy) {
+  switch (strategy) {
     case TRUNCATE_EACH_UNITARY: {
       double err = 0.0;
-      if (debug) std::cout << "Trotter4 method: truncate unitaries:\n"
-                           << "Trotter4 Layer 1/7\n";
+      if (debug)
+        std::cout << "Trotter4 method: truncate unitaries:\n"
+                  << "Trotter4 Layer 1/7\n";
       err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
       if (debug) std::cout << "Trotter3 Layer 2/7\n";
       err += U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
@@ -84,8 +82,9 @@ namespace mps {
     }
     case TRUNCATE_EACH_LAYER: {
       double err = 0.0;
-      if (debug) std::cout << "Trotter4 method: truncate layers:\n"
-                           << "Trotter4 Layer 1/7\n";
+      if (debug)
+        std::cout << "Trotter4 method: truncate layers:\n"
+                  << "Trotter4 Layer 1/7\n";
       err += U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
       if (debug) std::cout << "Trotter3 Layer 2/7\n";
       err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
@@ -98,14 +97,15 @@ namespace mps {
       if (debug) std::cout << "Trotter3 Layer 6/7\n";
       err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
       if (debug) std::cout << "Trotter3 Layer 7/7\n";
-      err += U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0,
-                                   normalize);
+      err +=
+          U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0, normalize);
       return err;
     }
     default: {
       double err = 0.0;
-      if (debug) std::cout << "Trotter4 method: truncate groups:\n"
-                           << "Trotter4 Layer 1/7\n";
+      if (debug)
+        std::cout << "Trotter4 method: truncate groups:\n"
+                  << "Trotter4 Layer 1/7\n";
       err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
       if (debug) std::cout << "Trotter3 Layer 2/7\n";
       err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
@@ -122,7 +122,7 @@ namespace mps {
                                    normalize);
       return err;
     }
-    }
   }
+}
 
-} // namespace mps
+}  // namespace mps

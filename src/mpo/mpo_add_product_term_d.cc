@@ -21,9 +21,8 @@
 
 namespace mps {
 
-  void add_product_term(RMPO *mpo, const std::vector<RTensor> &Hi)
-  {
-    do_add_interaction(*mpo, Hi);
-  }
+void add_product_term(RMPO *mpo, const std::vector<RTensor> &Hi) {
+  do_add_interaction(*mpo, Hi);
+}
 
-} // namespace mps
+}  // namespace mps

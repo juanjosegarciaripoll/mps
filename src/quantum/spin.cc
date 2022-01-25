@@ -21,49 +21,44 @@
 #include <tensor/gen.h>
 #include <mps/quantum.h>
 
-namespace mps
-{
+namespace mps {
 
-  /*!\defgroup QM Quantum Mechanics
+/*!\defgroup QM Quantum Mechanics
    */
 
-  /**\f$\sigma_x\f$ Pauli matrix*/
-  extern const RTensor Pauli_id(igen << 2 << 2, rgen << 1.0 << 0.0 << 0.0 << 1.0);
-  extern const RTensor Pauli_x(igen << 2 << 2, rgen << 0.0 << 1.0 << 1.0 << 0.0);
-  extern const RTensor Pauli_z(igen << 2 << 2, rgen << 1.0 << 0.0 << 0.0 << -1.0);
-  extern const CTensor Pauli_y(igen << 2 << 2,
-                               cgen << 0.0 << to_complex(0.0, 1.0)
-                                    << to_complex(0.0, -1.0) << 0.0);
+/**\f$\sigma_x\f$ Pauli matrix*/
+extern const RTensor Pauli_id(igen << 2 << 2, rgen << 1.0 << 0.0 << 0.0 << 1.0);
+extern const RTensor Pauli_x(igen << 2 << 2, rgen << 0.0 << 1.0 << 1.0 << 0.0);
+extern const RTensor Pauli_z(igen << 2 << 2, rgen << 1.0 << 0.0 << 0.0 << -1.0);
+extern const CTensor Pauli_y(igen << 2 << 2, cgen << 0.0 << to_complex(0.0, 1.0)
+                                                  << to_complex(0.0, -1.0)
+                                                  << 0.0);
 
-  /**Compute the angular momentum operators for a given total spin.
+/**Compute the angular momentum operators for a given total spin.
      \ingroup QM
   */
 
-  void spin_operators(double s, CTensor *sx, CTensor *sy, CTensor *sz)
-  {
-    if (s < 0.5 || s > 3.0)
-    {
-      std::cerr << "spin_operators(): the spin value " << s << " is not valid\n";
-      abort();
-    }
-    tensor::index d = (tensor::index)floor(2 * s + 1);
-
-    auto aux1 = RTensor::empty(d);
-    for (tensor::index i = 0; i < d; i++)
-    {
-      double m = s - i;
-      aux1.at(i) = m;
-    }
-    auto aux2 = RTensor::empty(d - 1);
-    for (tensor::index i = 0; i < (d - 1); i++)
-    {
-      double m = s - i;
-      aux2.at(i) = sqrt(s * (s + 1) - (m - 1) * m);
-    }
-    RTensor sp = diag(aux2, +1);
-    RTensor sm = diag(aux2, -1);
-    *sx = to_complex(0.5 * (sp + sm));
-    *sy = to_complex(0.0, 0.5) * (sm - sp);
-    *sz = to_complex(diag(aux1));
+void spin_operators(double s, CTensor *sx, CTensor *sy, CTensor *sz) {
+  if (s < 0.5 || s > 3.0) {
+    std::cerr << "spin_operators(): the spin value " << s << " is not valid\n";
+    abort();
   }
+  tensor::index d = (tensor::index)floor(2 * s + 1);
+
+  auto aux1 = RTensor::empty(d);
+  for (tensor::index i = 0; i < d; i++) {
+    double m = s - i;
+    aux1.at(i) = m;
+  }
+  auto aux2 = RTensor::empty(d - 1);
+  for (tensor::index i = 0; i < (d - 1); i++) {
+    double m = s - i;
+    aux2.at(i) = sqrt(s * (s + 1) - (m - 1) * m);
+  }
+  RTensor sp = diag(aux2, +1);
+  RTensor sm = diag(aux2, -1);
+  *sx = to_complex(0.5 * (sp + sm));
+  *sy = to_complex(0.0, 0.5) * (sm - sp);
+  *sz = to_complex(diag(aux1));
 }
+}  // namespace mps

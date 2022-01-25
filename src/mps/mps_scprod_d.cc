@@ -22,9 +22,8 @@
 
 namespace mps {
 
-  double scprod(const RMPS &psi1, const RMPS &psi2, int sense)
-  {
-    return scalar_product(psi1, psi2, sense);
-  }
+double scprod(const RMPS &psi1, const RMPS &psi2, int sense) {
+  return scalar_product(psi1, psi2, sense);
+}
 
-} // namespace mps
+}  // namespace mps

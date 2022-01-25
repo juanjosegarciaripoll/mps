@@ -22,9 +22,6 @@
 
 namespace mps {
 
-  double norm2(const CMPS &psi)
-  {
-    return state_norm(psi);
-  }
+double norm2(const CMPS &psi) { return state_norm(psi); }
 
-} // namespace mps
+}  // namespace mps

@@ -21,9 +21,8 @@
 
 namespace mps {
 
-  double energy(const RiTEBD &psi, const RTensor &Op12)
-  {
-    return expected12(psi, Op12, 0) + expected12(psi, Op12, 1);
-  }
-
+double energy(const RiTEBD &psi, const RTensor &Op12) {
+  return expected12(psi, Op12, 0) + expected12(psi, Op12, 1);
 }
+
+}  // namespace mps

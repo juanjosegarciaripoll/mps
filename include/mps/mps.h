@@ -26,7 +26,7 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
 /*!\defgroup TheMPS Matrix product states
 
@@ -61,143 +61,151 @@ namespace mps {
    obtain a vector that represents the same state with to_basis().
 */
 
-  /**Physical dimensions of the state. */
-  const Indices dimensions(const RMPS &psi);
+/**Physical dimensions of the state. */
+const Indices dimensions(const RMPS &psi);
 
-  /**Physical dimensions of the state. */
-  const Indices dimensions(const CMPS &psi);
+/**Physical dimensions of the state. */
+const Indices dimensions(const CMPS &psi);
 
-  /**Create a product state. */
-  const RMPS product_state(index length, const tensor::RTensor &local_state);
+/**Create a product state. */
+const RMPS product_state(index length, const tensor::RTensor &local_state);
 
-  /**Create a product state. */
-  const CMPS product_state(index length, const tensor::CTensor &local_state);
+/**Create a product state. */
+const CMPS product_state(index length, const tensor::CTensor &local_state);
 
-  /**Create a GHZ state.*/
-  const RMPS ghz_state(index length, bool periodic = false);
+/**Create a GHZ state.*/
+const RMPS ghz_state(index length, bool periodic = false);
 
-  /**Create a cluster state.*/
-  const RMPS cluster_state(index length);
+/**Create a cluster state.*/
+const RMPS cluster_state(index length);
 
-  /** Apply a local operator on the given site. */
-  const RMPS apply_local_operator(const RMPS &psi, const RTensor &op, index site);
+/** Apply a local operator on the given site. */
+const RMPS apply_local_operator(const RMPS &psi, const RTensor &op, index site);
 
-  /** Apply a local operator on the given site. */
-  const CMPS apply_local_operator(const CMPS &psi, const CTensor &op, index site);
+/** Apply a local operator on the given site. */
+const CMPS apply_local_operator(const CMPS &psi, const CTensor &op, index site);
 
-  /**Convert a RMPS to a complex vector, contracting all tensors.*/
-  const RTensor mps_to_vector(const RMPS &mps);
+/**Convert a RMPS to a complex vector, contracting all tensors.*/
+const RTensor mps_to_vector(const RMPS &mps);
 
-  /**Convert a CMPS to a complex vector, contracting all tensors.*/
-  const CTensor mps_to_vector(const CMPS &mps);
+/**Convert a CMPS to a complex vector, contracting all tensors.*/
+const CTensor mps_to_vector(const CMPS &mps);
 
-  /**Norm of a RMPS.*/
-  double norm2(const RMPS &psi);
+/**Norm of a RMPS.*/
+double norm2(const RMPS &psi);
 
-  /**Norm of a CMPS.*/
-  double norm2(const CMPS &psi);
+/**Norm of a CMPS.*/
+double norm2(const CMPS &psi);
 
-  /**Scalar product between MPS.*/
-  double scprod(const RMPS &psi1, const RMPS &psi2, int sense=+1);
+/**Scalar product between MPS.*/
+double scprod(const RMPS &psi1, const RMPS &psi2, int sense = +1);
 
-  /**Scalar product between MPS.*/
-  cdouble scprod(const CMPS &psi1, const CMPS &psi2, int sense=+1);
+/**Scalar product between MPS.*/
+cdouble scprod(const CMPS &psi1, const CMPS &psi2, int sense = +1);
 
-  /**Compute a single-site expected value.*/
-  double expected(const RMPS &a, const RTensor &Op1, index k);
+/**Compute a single-site expected value.*/
+double expected(const RMPS &a, const RTensor &Op1, index k);
 
-  /**Compute all expected values of a single operator over the chain.*/
-  RTensor expected_vector(const RMPS &a, const RTensor &Op1);
+/**Compute all expected values of a single operator over the chain.*/
+RTensor expected_vector(const RMPS &a, const RTensor &Op1);
 
-  /**Compute all expected values, with a different operator over each site of the chain.*/
-  RTensor expected_vector(const RMPS &a, const std::vector<RTensor> &Op1);
+/**Compute all expected values, with a different operator over each site of the chain.*/
+RTensor expected_vector(const RMPS &a, const std::vector<RTensor> &Op1);
 
-  /**Compute a single-site expected value.*/
-  cdouble expected(const RMPS &a, const CTensor &Op1, index k);
+/**Compute a single-site expected value.*/
+cdouble expected(const RMPS &a, const CTensor &Op1, index k);
 
-  /**Compute all expected values of a single operator over the chain.*/
-  CTensor expected_vector(const CMPS &a, const CTensor &Op1);
+/**Compute all expected values of a single operator over the chain.*/
+CTensor expected_vector(const CMPS &a, const CTensor &Op1);
 
-  /**Compute all expected values, with a different operator over each site of the chain.*/
-  CTensor expected_vector(const CMPS &a, const std::vector<CTensor> &Op1);
+/**Compute all expected values, with a different operator over each site of the chain.*/
+CTensor expected_vector(const CMPS &a, const std::vector<CTensor> &Op1);
 
-  /**Compute a single-site expected value.*/
-  cdouble expected(const CMPS &a, const CTensor &Op1, index k);
+/**Compute a single-site expected value.*/
+cdouble expected(const CMPS &a, const CTensor &Op1, index k);
 
-  /**Compute a two-site correlation.*/
-  double expected(const RMPS &a, const RTensor &op1, index k1, const RTensor &op2, index k2);
+/**Compute a two-site correlation.*/
+double expected(const RMPS &a, const RTensor &op1, index k1, const RTensor &op2,
+                index k2);
 
-  /**Compute a two-site correlation.*/
-  cdouble expected(const RMPS &a, const CTensor &op1, index k1, const CTensor &op2, index k2);
+/**Compute a two-site correlation.*/
+cdouble expected(const RMPS &a, const CTensor &op1, index k1,
+                 const CTensor &op2, index k2);
 
-  /**Compute a two-site correlation.*/
-  cdouble expected(const CMPS &a, const CTensor &op1, index k1, const CTensor &op2, index k2);
+/**Compute a two-site correlation.*/
+cdouble expected(const CMPS &a, const CTensor &op1, index k1,
+                 const CTensor &op2, index k2);
 
-  /**Compute all two-site correlations.*/
-  RTensor expected(const RMPS &a, const RTensor &op1, const RTensor &op2);
+/**Compute all two-site correlations.*/
+RTensor expected(const RMPS &a, const RTensor &op1, const RTensor &op2);
 
-  /**Compute all two-site correlations.*/
-  CTensor expected(const CMPS &a, const CTensor &op1, const CTensor &op2);
+/**Compute all two-site correlations.*/
+CTensor expected(const CMPS &a, const CTensor &op1, const CTensor &op2);
 
-  /**Compute all two-site correlations.*/
-  RTensor expected(const RMPS &a, const std::vector<RTensor> &op1, const std::vector<RTensor> &op2);
+/**Compute all two-site correlations.*/
+RTensor expected(const RMPS &a, const std::vector<RTensor> &op1,
+                 const std::vector<RTensor> &op2);
 
-  /**Compute all two-site correlations.*/
-  CTensor expected(const CMPS &a, const std::vector<CTensor> &op1, const std::vector<CTensor> &op2);
+/**Compute all two-site correlations.*/
+CTensor expected(const CMPS &a, const std::vector<CTensor> &op1,
+                 const std::vector<CTensor> &op2);
 
-  /**Store a tensor in a matrix product state in the canonical form.*/
-  void set_canonical(RMPS &psi, index site, const RTensor &A, int sense, bool truncate = true);
+/**Store a tensor in a matrix product state in the canonical form.*/
+void set_canonical(RMPS &psi, index site, const RTensor &A, int sense,
+                   bool truncate = true);
 
-  /**Store a tensor in a matrix product state in the canonical form.*/
-  void set_canonical(CMPS &psi, index site, const CTensor &A, int sense, bool truncate = true);
+/**Store a tensor in a matrix product state in the canonical form.*/
+void set_canonical(CMPS &psi, index site, const CTensor &A, int sense,
+                   bool truncate = true);
 
-  /**Rewrite a RMPS in canonical form. A value of 'sense' -1 or +1 determines
+/**Rewrite a RMPS in canonical form. A value of 'sense' -1 or +1 determines
      the right-to-left or left-to-right direction in this form. */
-  const RMPS canonical_form(const RMPS &psi, int sense = -1);
+const RMPS canonical_form(const RMPS &psi, int sense = -1);
 
-  /**Rewrite a CMPS in canonical form. A value of 'sense' -1 or +1 determines
+/**Rewrite a CMPS in canonical form. A value of 'sense' -1 or +1 determines
      the right-to-left or left-to-right direction in this form.*/
-  const CMPS canonical_form(const CMPS &psi, int sense = -1);
+const CMPS canonical_form(const CMPS &psi, int sense = -1);
 
-  /**Rewrite a RMPS in canonical form, normalizing. A value of 'sense' -1 or +1 determines
+/**Rewrite a RMPS in canonical form, normalizing. A value of 'sense' -1 or +1 determines
      the right-to-left or left-to-right direction in this form.*/
-  const RMPS normal_form(const RMPS &psi, int sense = -1);
+const RMPS normal_form(const RMPS &psi, int sense = -1);
 
-  /**Rewrite a CMPS in canonical form, normalizing. A value of 'sense' -1 or +1 determines
+/**Rewrite a CMPS in canonical form, normalizing. A value of 'sense' -1 or +1 determines
      the right-to-left or left-to-right direction in this form.*/
-  const CMPS normal_form(const CMPS &psi, int sense = -1);
+const CMPS normal_form(const CMPS &psi, int sense = -1);
 
-  /**Rewrite a RMPS in canonical form on both sides of 'site'. */
-  const RMPS canonical_form_at(const RMPS &psi, index site);
+/**Rewrite a RMPS in canonical form on both sides of 'site'. */
+const RMPS canonical_form_at(const RMPS &psi, index site);
 
-  /**Rewrite a CMPS in canonical form on both sides of 'site'. */
-  const CMPS canonical_form_at(const CMPS &psi, index site);
+/**Rewrite a CMPS in canonical form on both sides of 'site'. */
+const CMPS canonical_form_at(const CMPS &psi, index site);
 
-  /**Rewrite a RMPS in canonical form, normalizing. */
-  const RMPS normal_form_at(const RMPS &psi, index site);
+/**Rewrite a RMPS in canonical form, normalizing. */
+const RMPS normal_form_at(const RMPS &psi, index site);
 
-  /**Rewrite a CMPS in canonical form, normalizing. */
-  const CMPS normal_form_at(const CMPS &psi, index site);
+/**Rewrite a CMPS in canonical form, normalizing. */
+const CMPS normal_form_at(const CMPS &psi, index site);
 
-
-  /** Update an MPS with a tensor that spans two sites, (site,site+1). Dmax is
+/** Update an MPS with a tensor that spans two sites, (site,site+1). Dmax is
    * the maximum bond dimension that is used. Actually, tol and Dmax are the
    * arguments to where_to_truncate. */
-  void set_canonical_2_sites(RMPS &P, const RTensor &Pij, index site, int sense,
-                             index Dmax = 0, double tol = -1, bool canonicalize_both = true);
+void set_canonical_2_sites(RMPS &P, const RTensor &Pij, index site, int sense,
+                           index Dmax = 0, double tol = -1,
+                           bool canonicalize_both = true);
 
-  /** Update an MPS with a tensor that spans two sites, (site,site+1). Dmax is
+/** Update an MPS with a tensor that spans two sites, (site,site+1). Dmax is
    * the maximum bond dimension that is used. Actually, tol and Dmax are the
    * arguments to where_to_truncate. */
-  void set_canonical_2_sites(CMPS &P, const CTensor &Pij, index site, int sense,
-                             index Dmax = 0, double tol = -1, bool canonicalize_both = true);
+void set_canonical_2_sites(CMPS &P, const CTensor &Pij, index site, int sense,
+                           index Dmax = 0, double tol = -1,
+                           bool canonicalize_both = true);
 
-  /* Return a single-site density matrix out of an MPS. */
-  const RTensor density_matrix(const RMPS &psi, index site);
+/* Return a single-site density matrix out of an MPS. */
+const RTensor density_matrix(const RMPS &psi, index site);
 
-  /* Return a single-site density matrix out of an MPS. */
-  const CTensor density_matrix(const CMPS &psi, index site);
+/* Return a single-site density matrix out of an MPS. */
+const CTensor density_matrix(const CMPS &psi, index site);
 
-}
+}  // namespace mps
 
 #endif /* !TENSOR_MPS_H */

@@ -21,11 +21,10 @@
 
 namespace mps {
 
-  double energy(const CiTEBD &psi, const CTensor &Op12)
-  {
-    cdouble E = expected12(psi, Op12, 0) + expected12(psi, Op12, 1);
-    assert(tensor::abs(imag(E)) < 1e-10);
-    return real(E);
-  }
-
+double energy(const CiTEBD &psi, const CTensor &Op12) {
+  cdouble E = expected12(psi, Op12, 0) + expected12(psi, Op12, 1);
+  assert(tensor::abs(imag(E)) < 1e-10);
+  return real(E);
 }
+
+}  // namespace mps

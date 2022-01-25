@@ -27,109 +27,111 @@
 
 namespace tensor_test {
 
-  using namespace mps;
-  using namespace linalg;
-  using tensor::index;
+using namespace mps;
+using namespace linalg;
+using tensor::index;
 
-  //////////////////////////////////////////////////////////////////////
-  // EXACT SOLVERS
-  //
+//////////////////////////////////////////////////////////////////////
+// EXACT SOLVERS
+//
 
-  void
-  split_Hamiltonian(Hamiltonian **ppHeven, Hamiltonian **ppHodd,
-                    const Hamiltonian &H)
-  {
-    ConstantHamiltonian *pHeven = new ConstantHamiltonian(H.size());
-    ConstantHamiltonian *pHodd = new ConstantHamiltonian(H.size());
-    for (int i = 0; i < H.size(); i++) {
-      ConstantHamiltonian &pHok = (i & 1)? (*pHodd) : (*pHeven);
-      ConstantHamiltonian &pHno = (i & 1)? (*pHeven) : (*pHodd);
-      if (i+1 < H.size()) {
-        for (int j = 0; j < H.interaction_depth(i); j++) {
-          pHok.add_interaction(i, H.interaction_left(i, j, 0.0),
-                               H.interaction_right(i, j, 0.0));
-          pHno.add_interaction(i, H.interaction_left(i, j, 0.0) * 0.0,
-                               H.interaction_right(i, j, 0.0) * 0.0);
-        }
+void split_Hamiltonian(Hamiltonian **ppHeven, Hamiltonian **ppHodd,
+                       const Hamiltonian &H) {
+  ConstantHamiltonian *pHeven = new ConstantHamiltonian(H.size());
+  ConstantHamiltonian *pHodd = new ConstantHamiltonian(H.size());
+  for (int i = 0; i < H.size(); i++) {
+    ConstantHamiltonian &pHok = (i & 1) ? (*pHodd) : (*pHeven);
+    ConstantHamiltonian &pHno = (i & 1) ? (*pHeven) : (*pHodd);
+    if (i + 1 < H.size()) {
+      for (int j = 0; j < H.interaction_depth(i); j++) {
+        pHok.add_interaction(i, H.interaction_left(i, j, 0.0),
+                             H.interaction_right(i, j, 0.0));
+        pHno.add_interaction(i, H.interaction_left(i, j, 0.0) * 0.0,
+                             H.interaction_right(i, j, 0.0) * 0.0);
       }
-      pHok.set_local_term(i, H.local_term(i, 0.0) * 0.5);
-      pHno.set_local_term(i, H.local_term(i, 0.0) * 0.5);
     }
-    *ppHeven = pHeven;
-    *ppHodd = pHodd;
+    pHok.set_local_term(i, H.local_term(i, 0.0) * 0.5);
+    pHno.set_local_term(i, H.local_term(i, 0.0) * 0.5);
   }
+  *ppHeven = pHeven;
+  *ppHodd = pHodd;
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-  void evolve_identity(int size, const CMPS apply_U(const Hamiltonian &H, double dt, const CMPS &psi))
-  {
-    CMPS psi = ghz_state(size);
-    // Id is a zero operator that causes the evolution operator to
-    // be the identity
-    TIHamiltonian H(size, RTensor(), RTensor::zeros(2,2));
-    CMPS aux = apply_U(H, 0.1, psi);
-    EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-    EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
-    EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
+void evolve_identity(int size, const CMPS apply_U(const Hamiltonian &H,
+                                                  double dt, const CMPS &psi)) {
+  CMPS psi = ghz_state(size);
+  // Id is a zero operator that causes the evolution operator to
+  // be the identity
+  TIHamiltonian H(size, RTensor(), RTensor::zeros(2, 2));
+  CMPS aux = apply_U(H, 0.1, psi);
+  EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+  EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+  EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
+}
+
+void evolve_global_phase(int size,
+                         const CMPS apply_U(const Hamiltonian &H, double dt,
+                                            const CMPS &psi)) {
+  CMPS psi = ghz_state(size);
+  // H is a multiple of the identity, causing the evolution
+  // operator to be just a global phase
+  TIHamiltonian H(size, RTensor(), RTensor::eye(2, 2));
+  CMPS aux = apply_U(H, 0.1, psi);
+  EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
+  EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+}
+
+void evolve_local_operator_sz(int size,
+                              void do_test(const Hamiltonian &H, double dt,
+                                           const CMPS &psi)) {
+  double dphi = 1.3 / size;
+  ConstantHamiltonian H(size);
+  for (int i = 0; i < size; i++) {
+    H.set_local_term(i, mps::Pauli_z * (dphi * i));
   }
+  do_test(H, 0.1, ghz_state(size));
+  do_test(H, 0.1, cluster_state(size));
+}
 
-  void evolve_global_phase(int size, const CMPS apply_U(const Hamiltonian &H, double dt, const CMPS &psi))
-  {
-    CMPS psi = ghz_state(size);
-    // H is a multiple of the identity, causing the evolution
-    // operator to be just a global phase
-    TIHamiltonian H(size, RTensor(), RTensor::eye(2,2));
-    CMPS aux = apply_U(H, 0.1, psi);
-    EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
-    EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
+void evolve_local_operator_sx(int size,
+                              void do_test(const Hamiltonian &H, double dt,
+                                           const CMPS &psi)) {
+  double dphi = 0.3;
+  ConstantHamiltonian H(size);
+  for (int i = 0; i < size; i++) {
+    H.set_local_term(i, mps::Pauli_x * dphi);
+    dphi = -dphi;
+    if (i > 0)
+      H.add_interaction(i - 1, CTensor::zeros(2, 2), CTensor::zeros(2, 2));
   }
+  do_test(H, 0.1, ghz_state(size));
+  do_test(H, 0.1, cluster_state(size));
+}
 
-  void evolve_local_operator_sz(int size, void do_test(const Hamiltonian &H, double dt, const CMPS &psi))
-  {
-    double dphi = 1.3 / size;
-    ConstantHamiltonian H(size);
-    for (int i = 0; i < size; i++) {
-      H.set_local_term(i, mps::Pauli_z * (dphi * i));
-    }
-    do_test(H, 0.1, ghz_state(size));
-    do_test(H, 0.1, cluster_state(size));
+void evolve_interaction_zz(int size, void do_test(const Hamiltonian &H,
+                                                  double dt, const CMPS &psi)) {
+  double dphi = 1.3 / size;
+  ConstantHamiltonian H(size);
+  for (int i = 0; i < size; i++) {
+    H.set_local_term(i, mps::Pauli_id * 0.0);
+    if (i > 0) H.add_interaction(i - 1, mps::Pauli_z, mps::Pauli_z);
   }
+  do_test(H, 0.1, ghz_state(size));
+  do_test(H, 0.1, cluster_state(size));
+}
 
-  void evolve_local_operator_sx(int size, void do_test(const Hamiltonian &H, double dt, const CMPS &psi))
-  {
-    double dphi = 0.3;
-    ConstantHamiltonian H(size);
-    for (int i = 0; i < size; i++) {
-      H.set_local_term(i, mps::Pauli_x * dphi);
-      dphi = - dphi;
-      if (i > 0) H.add_interaction(i-1, CTensor::zeros(2,2), CTensor::zeros(2,2));
-    }
-    do_test(H, 0.1, ghz_state(size));
-    do_test(H, 0.1, cluster_state(size));
+void evolve_interaction_xx(int size, void do_test(const Hamiltonian &H,
+                                                  double dt, const CMPS &psi)) {
+  double dphi = 1.3 / size;
+  ConstantHamiltonian H(size);
+  for (int i = 0; i < size; i++) {
+    H.set_local_term(i, mps::Pauli_id * 0.0);
+    if (i > 0) H.add_interaction(i - 1, mps::Pauli_x, mps::Pauli_x);
   }
+  do_test(H, 0.1, ghz_state(size));
+  do_test(H, 0.1, cluster_state(size));
+}
 
-  void evolve_interaction_zz(int size, void do_test(const Hamiltonian &H, double dt, const CMPS &psi))
-  {
-    double dphi = 1.3 / size;
-    ConstantHamiltonian H(size);
-    for (int i = 0; i < size; i++) {
-      H.set_local_term(i, mps::Pauli_id * 0.0);
-      if (i > 0) H.add_interaction(i-1, mps::Pauli_z, mps::Pauli_z);
-    }
-    do_test(H, 0.1, ghz_state(size));
-    do_test(H, 0.1, cluster_state(size));
-  }
-
-  void evolve_interaction_xx(int size, void do_test(const Hamiltonian &H, double dt, const CMPS &psi))
-  {
-    double dphi = 1.3 / size;
-    ConstantHamiltonian H(size);
-    for (int i = 0; i < size; i++) {
-      H.set_local_term(i, mps::Pauli_id * 0.0);
-      if (i > 0) H.add_interaction(i - 1, mps::Pauli_x, mps::Pauli_x);
-    }
-    do_test(H, 0.1, ghz_state(size));
-    do_test(H, 0.1, cluster_state(size));
-  }
-
-} // namespace tensor_test
+}  // namespace tensor_test

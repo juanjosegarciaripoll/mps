@@ -22,11 +22,10 @@
 
 namespace mps {
 
-  const RSparse sparse_1d_hamiltonian(const std::vector<RSparse> &H12,
-				      const std::vector<RSparse> &H1,
-				      bool periodic)
-  {
-    return do_sparse_1d_hamiltonian<RSparse,RTensor>(H12, H1, periodic);
-  }
+const RSparse sparse_1d_hamiltonian(const std::vector<RSparse> &H12,
+                                    const std::vector<RSparse> &H1,
+                                    bool periodic) {
+  return do_sparse_1d_hamiltonian<RSparse, RTensor>(H12, H1, periodic);
+}
 
-} // namespace mps
+}  // namespace mps

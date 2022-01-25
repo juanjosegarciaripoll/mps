@@ -21,11 +21,10 @@
 
 namespace mps {
 
-  const RMPS load_rmps(sdf::InDataFile &d, const std::string &name)
-  {
-    std::vector<RTensor> aux;
-    d.load(&aux, name);
-    return RMPS(aux);
-  }
+const RMPS load_rmps(sdf::InDataFile &d, const std::string &name) {
+  std::vector<RTensor> aux;
+  d.load(&aux, name);
+  return RMPS(aux);
+}
 
-} // namespace mps
+}  // namespace mps

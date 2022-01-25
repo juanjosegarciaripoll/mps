@@ -23,30 +23,27 @@
 
 namespace mps {
 
-  template<class Tensor>
-  const Tensor
-  apply_lattice(const Tensor &psi, const Lattice &L, const Tensor &J, const Tensor &U,
-                Lattice::particle_kind_t kind)
+template <class Tensor>
+const Tensor apply_lattice(const Tensor &psi, const Lattice &L, const Tensor &J,
+                           const Tensor &U, Lattice::particle_kind_t kind) {
+  Tensor output = Tensor::zeros(psi.dimensions());
   {
-    Tensor output = Tensor::zeros(psi.dimensions());
-    {
-      RTensor values;
-      Indices ndx;
-      for (int i = 0; i < J.rows(); i++) {
-	for (int j = 0; j < J.rows(); j++) {
-	  if (abs(J(i,j))) {
-	    L.hopping_inner(&values, &ndx, i, j, kind);
-	    output += J(i,j) * values * psi(range(sort_indices(ndx)));
-	  }
-	  if (j >= i && abs(U(i,j))) {
-	    values = L.interaction_inner(i,j);
-	    output += (U(i,j) + U(j,i)) * values * psi;
-	  }
-	}
+    RTensor values;
+    Indices ndx;
+    for (int i = 0; i < J.rows(); i++) {
+      for (int j = 0; j < J.rows(); j++) {
+        if (abs(J(i, j))) {
+          L.hopping_inner(&values, &ndx, i, j, kind);
+          output += J(i, j) * values * psi(range(sort_indices(ndx)));
+        }
+        if (j >= i && abs(U(i, j))) {
+          values = L.interaction_inner(i, j);
+          output += (U(i, j) + U(j, i)) * values * psi;
+        }
       }
     }
-    return output;
   }
-
-
+  return output;
 }
+
+}  // namespace mps

@@ -22,35 +22,32 @@
 
 namespace mps {
 
-  Sweeper::Sweeper(index L, index sense)
-  {
-    assert(L>0);
-    if (sense > 0) {
-      k_ = k0_ = 0;
-      kN_ = L-1;
-      dk_ = +1;
-    } else {
-      k_ = k0_ = L-1;
-      kN_ = 0;
-      dk_ = -1;
-    }
+Sweeper::Sweeper(index L, index sense) {
+  assert(L > 0);
+  if (sense > 0) {
+    k_ = k0_ = 0;
+    kN_ = L - 1;
+    dk_ = +1;
+  } else {
+    k_ = k0_ = L - 1;
+    kN_ = 0;
+    dk_ = -1;
   }
-
-  bool Sweeper::operator--()
-  {
-    if (k_ == kN_) {
-      return false;
-    } else {
-      k_ += dk_;
-      return true;
-    }
-  }
-
-  void Sweeper::flip()
-  {
-    std::swap(k0_,kN_);
-    dk_ = -dk_;
-    k_ = k0_;
-  }
-
 }
+
+bool Sweeper::operator--() {
+  if (k_ == kN_) {
+    return false;
+  } else {
+    k_ += dk_;
+    return true;
+  }
+}
+
+void Sweeper::flip() {
+  std::swap(k0_, kN_);
+  dk_ = -dk_;
+  k_ = k0_;
+}
+
+}  // namespace mps

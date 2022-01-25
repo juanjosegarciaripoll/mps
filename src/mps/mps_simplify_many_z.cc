@@ -22,11 +22,10 @@
 
 namespace mps {
 
-  double simplify(CMPS *P, const std::vector<CMPS> &Q, const CTensor &weights,
-                  int *sense, index sweeps, bool normalize)
-  {
-    MPSManySimplifier<CMPS> aux(Q, weights);
-    return aux.simplify(*P, sense, sweeps, normalize);
-  }
+double simplify(CMPS *P, const std::vector<CMPS> &Q, const CTensor &weights,
+                int *sense, index sweeps, bool normalize) {
+  MPSManySimplifier<CMPS> aux(Q, weights);
+  return aux.simplify(*P, sense, sweeps, normalize);
+}
 
-} // namespace mps
+}  // namespace mps

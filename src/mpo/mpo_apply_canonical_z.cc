@@ -21,10 +21,9 @@
 
 namespace mps {
 
-  const CMPS apply_canonical(const CMPO &mpdo, const CMPS &psi,
-			     int sense, bool truncate)
-  {
-    return do_apply(mpdo, psi, sense, truncate);
-  }
+const CMPS apply_canonical(const CMPO &mpdo, const CMPS &psi, int sense,
+                           bool truncate) {
+  return do_apply(mpdo, psi, sense, truncate);
+}
 
-} // namespace mps
+}  // namespace mps

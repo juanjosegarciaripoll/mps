@@ -37,9 +37,9 @@ using namespace tensor;
    and G. Vidal in <a href='http://arxiv.org/abs/0711.3960'>
    Phys. Rev. B 78, 155117 (2008)</a>
 */
-template<class Tensor>
+template <class Tensor>
 class iTEBD {
-public:
+ public:
   typedef typename Tensor::elt_t elt_t;
   typedef Tensor t;
 
@@ -53,21 +53,24 @@ public:
   iTEBD(const Tensor &newA, const Tensor &newB);
 
   /** Create an iTEBD with \f$\Gamma\f$ and \f$\lambda\f$ matrices. */
-  iTEBD(const Tensor &newA, const Tensor &newlA,
-        const Tensor &newB, const Tensor &newlB,
-        bool canonical = false);
+  iTEBD(const Tensor &newA, const Tensor &newlA, const Tensor &newB,
+        const Tensor &newlB, bool canonical = false);
 
   /* Given a two-site wavefunction, split it. */
-  iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance, tensor::index max_dim);
+  iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance,
+        tensor::index max_dim);
 
   /** Is this iTEBD state in canonical form? */
   bool is_canonical() const { return canonical_; }
 
   /** Construct a new state after acting on 'odd' or 'even' pair of sites with the two-site operator U. */
-  const iTEBD<Tensor> apply_operator(const Tensor &U, int odd = 0, double tolerance = -1, tensor::index max_dim = 0) const;
+  const iTEBD<Tensor> apply_operator(const Tensor &U, int odd = 0,
+                                     double tolerance = -1,
+                                     tensor::index max_dim = 0) const;
 
   /** Return a new state which is in canonical form. */
-  const iTEBD<Tensor> canonical_form(double tolerance = -1, tensor::index max_dim = 0) const;
+  const iTEBD<Tensor> canonical_form(double tolerance = -1,
+                                     tensor::index max_dim = 0) const;
 
   /** Estimate the entanglement entropy associated to splitting the state around 'site' */
   double entropy(int site) const;
@@ -79,30 +82,24 @@ public:
   double entropy() const { return entropy(0) + entropy(1); }
 
   /* Implicit coercion to other types */
-  template<class tensor>
+  template <class tensor>
   operator const iTEBD<tensor>() const {
     return iTEBD<tensor>(A_, lA_, B_, lB_, canonical_);
   }
 
   /** Return the \f$\Gamma\f$ matrix for the lattice 'site'. */
-  const Tensor &matrix(int site) const {
-    return (site & 1)? B_ : A_;
-  }
+  const Tensor &matrix(int site) const { return (site & 1) ? B_ : A_; }
 
   /** Fold a \f$\Gamma\f$ matrix with its neighboring vector \f$\lambda\f$ . */
   const Tensor &combined_matrix(int site) const {
-    return (site & 1)? BlB_ : AlA_;
+    return (site & 1) ? BlB_ : AlA_;
   }
 
   /** Return the vector \f$\lambda\f$ to the left of this site. */
-  const Tensor &left_vector(int site) const {
-    return (site & 1)? lA_ : lB_;
-  }
+  const Tensor &left_vector(int site) const { return (site & 1) ? lA_ : lB_; }
 
   /** Return the vector \f$\lambda\f$ to the right of this site. */
-  const Tensor &right_vector(int site) const {
-    return (site & 1)? lB_ : lA_;
-  }
+  const Tensor &right_vector(int site) const { return (site & 1) ? lB_ : lA_; }
 
   /** Physical dimension of the given site. */
   tensor::index site_dimension(int site) const {
@@ -127,7 +124,7 @@ public:
     return diag(right_vector(site) * right_vector(site));
   }
 
-private:
+ private:
   /* Avoid initializing empty iTEBD states. */
   iTEBD();
 
@@ -137,70 +134,65 @@ private:
   bool canonical_;
 };
 
-  typedef iTEBD<RTensor> RiTEBD;
-  typedef iTEBD<CTensor> CiTEBD;
+typedef iTEBD<RTensor> RiTEBD;
+typedef iTEBD<CTensor> CiTEBD;
 
-  /** Infinite long, one-dimensional GHZ state. */
-  const RiTEBD infinite_ghz_state();
+/** Infinite long, one-dimensional GHZ state. */
+const RiTEBD infinite_ghz_state();
 
-  /** Infinitely long, one-dimensional cluster state. */
-  const RiTEBD infinite_cluster_state();
+/** Infinitely long, one-dimensional cluster state. */
+const RiTEBD infinite_cluster_state();
 
-  /** Infinitely long, one-dimensional AKLT state. */
-  const RiTEBD infinite_aklt_state();
+/** Infinitely long, one-dimensional AKLT state. */
+const RiTEBD infinite_aklt_state();
 
-  /** Expected value of an operator acting on 'site'. */
-  double expected(const RiTEBD &psi, const RTensor &Op, int site = 0);
+/** Expected value of an operator acting on 'site'. */
+double expected(const RiTEBD &psi, const RTensor &Op, int site = 0);
 
-  /** Expected value of two operators, acting on sites '0' and '1'. */
-  double expected(const RiTEBD &psi, const RTensor &Op1, const RTensor &Op2);
+/** Expected value of two operators, acting on sites '0' and '1'. */
+double expected(const RiTEBD &psi, const RTensor &Op1, const RTensor &Op2);
 
-  //** Expected value of two operators, acting on sites 'i' and 'j'. */
-  double expected(const RiTEBD &psi, const RTensor &Op1, int i,
-                  const RTensor &Op2, int j);
+//** Expected value of two operators, acting on sites 'i' and 'j'. */
+double expected(const RiTEBD &psi, const RTensor &Op1, int i,
+                const RTensor &Op2, int j);
 
-  /** String order parameter between sites 'i' and 'j', both included. */
-  double string_order(const RiTEBD &psi, const RTensor &Opi, int i,
-                      const RTensor &Opmiddle,
-                      const RTensor &Opj, int j);
+/** String order parameter between sites 'i' and 'j', both included. */
+double string_order(const RiTEBD &psi, const RTensor &Opi, int i,
+                    const RTensor &Opmiddle, const RTensor &Opj, int j);
 
-  /** String order parameter between sites '0' and up to 'N-1', both included. */
-  RTensor string_order(const RiTEBD &psi, const RTensor &Opi,
-                       const RTensor &Opmiddle,
-                       const RTensor &Opj, int N);
+/** String order parameter between sites '0' and up to 'N-1', both included. */
+RTensor string_order(const RiTEBD &psi, const RTensor &Opi,
+                     const RTensor &Opmiddle, const RTensor &Opj, int N);
 
-  /** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
-  double expected12(const RiTEBD &psi, const RTensor &Op12, int site = 0);
+/** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
+double expected12(const RiTEBD &psi, const RTensor &Op12, int site = 0);
 
-  /** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
-  double energy(const RiTEBD &psi, const RTensor &Op12);
+/** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
+double energy(const RiTEBD &psi, const RTensor &Op12);
 
+/** Expected value of an operator acting on 'site'. */
+cdouble expected(const CiTEBD &psi, const CTensor &Op, int site = 0);
 
-  /** Expected value of an operator acting on 'site'. */
-  cdouble expected(const CiTEBD &psi, const CTensor &Op, int site = 0);
+/** Expected value of two operators, acting on sites '0' and '1'. */
+cdouble expected(const CiTEBD &psi, const CTensor &Op1, const CTensor &Op2);
 
-  /** Expected value of two operators, acting on sites '0' and '1'. */
-  cdouble expected(const CiTEBD &psi, const CTensor &Op1, const CTensor &Op2);
+//** Expected value of two operators, acting on sites 'i' and 'j'. */
+cdouble expected(const CiTEBD &psi, const CTensor &Op1, int i,
+                 const CTensor &Op2, int j);
 
-  //** Expected value of two operators, acting on sites 'i' and 'j'. */
-  cdouble expected(const CiTEBD &psi, const CTensor &Op1, int i,
-                   const CTensor &Op2, int j);
+/** String order parameter between sites 'i' and 'j', both included. */
+cdouble string_order(const CiTEBD &psi, const CTensor &Opi, int i,
+                     const CTensor &Opmiddle, const CTensor &Opj, int j);
 
-  /** String order parameter between sites 'i' and 'j', both included. */
-  cdouble string_order(const CiTEBD &psi, const CTensor &Opi, int i,
-                       const CTensor &Opmiddle,
-                       const CTensor &Opj, int j);
+/** String order parameter between sites '0' and up to 'N-1', both included. */
+CTensor string_order(const CiTEBD &psi, const CTensor &Opi,
+                     const CTensor &Opmiddle, const CTensor &Opj, int N);
 
-  /** String order parameter between sites '0' and up to 'N-1', both included. */
-  CTensor string_order(const CiTEBD &psi, const CTensor &Opi,
-                       const CTensor &Opmiddle,
-                       const CTensor &Opj, int N);
+/** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
+cdouble expected12(const CiTEBD &psi, const CTensor &Op12, int site = 0);
 
-  /** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
-  cdouble expected12(const CiTEBD &psi, const CTensor &Op12, int site = 0);
-
-  /** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
-  double energy(const CiTEBD &psi, const CTensor &Op12);
+/** Expected value of the two-site operator Op12 acting on 'site' and 'site+1'. */
+double energy(const CiTEBD &psi, const CTensor &Op12);
 
 /** Evolve an iTEBD in imaginary time, using the local Hamiltonian \a H12 on
  state \a psi. Given a Hamiltonian which is a composition of local Hamiltonians
@@ -209,15 +201,17 @@ private:
  tolerance and \a max_dim determine the truncation strategy of the state, while
  \a deltan (if nonzero) instructs the program to report the properties of the
  state on the standard text output. */
-template<class Tensor>
-const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12, double dt,
-                                 tensor::index nsteps, double tolerance = -1,
-                                 tensor::index max_dim = 0, tensor::index deltan = 1, int method = 1,
+template <class Tensor>
+const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
+                                 double dt, tensor::index nsteps,
+                                 double tolerance = -1,
+                                 tensor::index max_dim = 0,
+                                 tensor::index deltan = 1, int method = 1,
                                  std::vector<double> *energies = 0,
                                  std::vector<double> *entropies = 0);
 
 /* @} */
 
-  }
+}  // namespace mps
 
-#endif // MPS_QUANTUM_H
+#endif  // MPS_QUANTUM_H

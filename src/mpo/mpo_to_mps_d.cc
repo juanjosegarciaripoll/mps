@@ -21,17 +21,15 @@
 
 namespace mps {
 
-  const RMPS mpo_to_mps(const RMPO &mpo)
-  {
-    RMPS psi(mpo.size());
+const RMPS mpo_to_mps(const RMPO &mpo) {
+  RMPS psi(mpo.size());
 
-    for (int i = 0; i < mpo.size(); i++) {
-      const RTensor &m = mpo[i];
-      psi.at(i) = reshape(m, m.dimension(0),
-			  m.dimension(1)*m.dimension(2),
-			  m.dimension(3));
-    }
-    return psi;
+  for (int i = 0; i < mpo.size(); i++) {
+    const RTensor &m = mpo[i];
+    psi.at(i) = reshape(m, m.dimension(0), m.dimension(1) * m.dimension(2),
+                        m.dimension(3));
   }
+  return psi;
+}
 
-} // namespace mps
+}  // namespace mps

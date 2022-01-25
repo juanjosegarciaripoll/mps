@@ -22,17 +22,15 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
-  CTensor expected_vector(const CMPS &a, const std::vector<CTensor> &op)
-  {
-    return all_expected_vector_fast(a, op, a);
-  }
+CTensor expected_vector(const CMPS &a, const std::vector<CTensor> &op) {
+  return all_expected_vector_fast(a, op, a);
+}
 
-  CTensor expected_vector(const CMPS &a, const CTensor &op)
-  {
-    std::vector<CTensor> vec(a.size(), op);
-    return all_expected_vector_fast(a, vec, a);
-  }
+CTensor expected_vector(const CMPS &a, const CTensor &op) {
+  std::vector<CTensor> vec(a.size(), op);
+  return all_expected_vector_fast(a, vec, a);
+}
 
-} // namespace mps
+}  // namespace mps

@@ -22,7 +22,7 @@
 
 namespace mps {
 
-  /**Schmidt decomposition of a real operator. This function assumes that the
+/**Schmidt decomposition of a real operator. This function assumes that the
      operator \c U acts on two physical systems of the same dimension \c D, and
      finds out the decomposition
      \f[U = \sum_{k=1}^n O^{(1)}_k \otimes O^{(2)}_k\f]
@@ -36,10 +36,8 @@ namespace mps {
 
      \ingroup QM
   */
-  void
-  decompose_operator(const RTensor &U, RTensor *O1, RTensor *O2) {
-    do_decompose_operator(U, O1, O2);
-  }
+void decompose_operator(const RTensor &U, RTensor *O1, RTensor *O2) {
+  do_decompose_operator(U, O1, O2);
+}
 
-
-} // namespace mps
+}  // namespace mps

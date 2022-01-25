@@ -21,27 +21,26 @@
 
 namespace mps {
 
-  template<class MPS, class MPO>
-  static const MPS do_apply(const MPO &mpdo, const MPS &psi)
-  {
-    typedef typename MPS::elt_t Tensor;
-    assert(mpdo.size() == psi.size());
+template <class MPS, class MPO>
+static const MPS do_apply(const MPO &mpdo, const MPS &psi) {
+  typedef typename MPS::elt_t Tensor;
+  assert(mpdo.size() == psi.size());
 
-    index a1, c1, j, c2, a2;
-    index L = mpdo.size();
-    MPS chi(psi.size());
+  index a1, c1, j, c2, a2;
+  index L = mpdo.size();
+  MPS chi(psi.size());
 
-    for (index i = 0; i < L; i++) {
-      const Tensor &A = psi[i]; /* A(a1,i,a2) */
-      const Tensor &O = mpdo[i]; /* O(c1,j,i,c2) */
-      
-      /* B(a1,c1,j,c2,a2) = O(c1,j,i,c2) A(a1,i,a2) */
-      Tensor B = foldin(O, 2, A, 1);
-      B.get_dimensions(&a1, &c1, &j, &c2, &a2);
+  for (index i = 0; i < L; i++) {
+    const Tensor &A = psi[i];  /* A(a1,i,a2) */
+    const Tensor &O = mpdo[i]; /* O(c1,j,i,c2) */
 
-      chi.at(i) = reshape(permute(B, 0,1), c1*a1, j, a2*c2);
-    }
-    return chi;
+    /* B(a1,c1,j,c2,a2) = O(c1,j,i,c2) A(a1,i,a2) */
+    Tensor B = foldin(O, 2, A, 1);
+    B.get_dimensions(&a1, &c1, &j, &c2, &a2);
+
+    chi.at(i) = reshape(permute(B, 0, 1), c1 * a1, j, a2 * c2);
   }
+  return chi;
+}
 
-} // namespace mps
+}  // namespace mps

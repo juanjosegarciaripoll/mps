@@ -22,40 +22,39 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
-  const RMPS ghz_state(index length, bool periodic)
-  {
-    RMPS output(length, 2, 2, periodic);
-    if (length == 1) {
-      double v = 1.0/sqrt(2.0);
-      RTensor &aux = output.at(0);
-      aux.fill_with_zeros();
-      if (periodic) {
-	aux.at(0,1,0) = v;
-	aux.at(1,1,1) = v;
-      } else {
-	aux.at(0,0,0) = v;
-	aux.at(0,1,0) = v;
-      }
+const RMPS ghz_state(index length, bool periodic) {
+  RMPS output(length, 2, 2, periodic);
+  if (length == 1) {
+    double v = 1.0 / sqrt(2.0);
+    RTensor &aux = output.at(0);
+    aux.fill_with_zeros();
+    if (periodic) {
+      aux.at(0, 1, 0) = v;
+      aux.at(1, 1, 1) = v;
     } else {
-      double v = 1.0/sqrt(sqrt(2.0));
-      for (size_t i = 0; i < length; i++) {
-	RTensor &aux = output.at(i);
-	aux.fill_with_zeros();
-	if (i == 0) {
-	  aux.at(0,0,0) = v;
-	  aux.at((periodic?1:0),1,1) = v;
-	} else if (i == (length-1)) {
-	  aux.at(0,0,0) = v;
-	  aux.at(1,1,(periodic?1:0)) = v;
-	} else {
-	  aux.at(0,0,0) = 1.0;
-	  aux.at(1,1,1) = 1.0;
-	}
+      aux.at(0, 0, 0) = v;
+      aux.at(0, 1, 0) = v;
+    }
+  } else {
+    double v = 1.0 / sqrt(sqrt(2.0));
+    for (size_t i = 0; i < length; i++) {
+      RTensor &aux = output.at(i);
+      aux.fill_with_zeros();
+      if (i == 0) {
+        aux.at(0, 0, 0) = v;
+        aux.at((periodic ? 1 : 0), 1, 1) = v;
+      } else if (i == (length - 1)) {
+        aux.at(0, 0, 0) = v;
+        aux.at(1, 1, (periodic ? 1 : 0)) = v;
+      } else {
+        aux.at(0, 0, 0) = 1.0;
+        aux.at(1, 1, 1) = 1.0;
       }
     }
-    return output;
   }
+  return output;
+}
 
-} // namespace mps
+}  // namespace mps

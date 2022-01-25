@@ -21,9 +21,8 @@
 
 namespace mps {
 
-  void add_product_term(CMPO *mpo, const std::vector<CTensor> &Hi)
-  {
-    do_add_interaction(*mpo, Hi);
-  }
+void add_product_term(CMPO *mpo, const std::vector<CTensor> &Hi) {
+  do_add_interaction(*mpo, Hi);
+}
 
-} // namespace mps
+}  // namespace mps

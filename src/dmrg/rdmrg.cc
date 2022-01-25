@@ -21,6 +21,6 @@
 
 namespace mps {
 
-  template class DMRG<RMPS>;
+template class DMRG<RMPS>;
 
-} // namespace mps
+}  // namespace mps

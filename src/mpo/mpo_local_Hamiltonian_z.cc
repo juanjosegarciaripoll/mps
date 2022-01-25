@@ -21,9 +21,8 @@
 
 namespace mps {
 
-  CMPO local_Hamiltonian_mpo(const std::vector<CTensor> &Hloc)
-  {
-    return do_local_Hamiltonian_mpo<CMPO,CTensor>(Hloc);
-  }
+CMPO local_Hamiltonian_mpo(const std::vector<CTensor> &Hloc) {
+  return do_local_Hamiltonian_mpo<CMPO, CTensor>(Hloc);
+}
 
-} // namespace mps
+}  // namespace mps

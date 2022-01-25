@@ -23,51 +23,45 @@
 
 namespace mps {
 
-  template class MP<tensor::RTensor>;
+template class MP<tensor::RTensor>;
 
-  bool RMPS::is_periodic() const {
-    index l = size();
-    if (l) {
-      index d0 = (*this)[0].dimension(0);
-      index dl = (*this)[l-1].dimension(2);
-      if (d0 == dl && d0 > 1)
-	return true;
-    }
-    return false;
+bool RMPS::is_periodic() const {
+  index l = size();
+  if (l) {
+    index d0 = (*this)[0].dimension(0);
+    index dl = (*this)[l - 1].dimension(2);
+    if (d0 == dl && d0 > 1) return true;
   }
+  return false;
+}
 
-  index RMPS::normal_index(index mps_index) const {
-    index mps_size = size();
-    if (mps_index < 0) {
-      assert(mps_index >= -mps_size);
-      return mps_index + mps_size;
-    } else {
-      assert(mps_index < mps_size);
-      return mps_index;
-    }
+index RMPS::normal_index(index mps_index) const {
+  index mps_size = size();
+  if (mps_index < 0) {
+    assert(mps_index >= -mps_size);
+    return mps_index + mps_size;
+  } else {
+    assert(mps_index < mps_size);
+    return mps_index;
   }
+}
 
-  RMPS::RMPS() :
-    parent()
-  {
+RMPS::RMPS() : parent() {}
+
+RMPS::RMPS(index length, index physical_dimension, index bond_dimension,
+           bool periodic)
+    : parent(length) {
+  if (physical_dimension) {
+    tensor::Indices d(length);
+    std::fill(d.begin(), d.end(), physical_dimension);
+    presize_mps(*this, d, bond_dimension, periodic);
   }
+}
 
-  RMPS::RMPS(index length, index physical_dimension, index bond_dimension,
-	     bool periodic) :
-    parent(length)
-  {
-    if (physical_dimension) {
-      tensor::Indices d(length);
-      std::fill(d.begin(), d.end(), physical_dimension);
-      presize_mps(*this, d, bond_dimension, periodic);
-    }
-  }
+RMPS::RMPS(const tensor::Indices &physical_dimensions, index bond_dimension,
+           bool periodic)
+    : parent(physical_dimensions.size()) {
+  presize_mps(*this, physical_dimensions, bond_dimension, periodic);
+}
 
-  RMPS::RMPS(const tensor::Indices &physical_dimensions, index bond_dimension,
-	     bool periodic) :
-    parent(physical_dimensions.size())
-  {
-    presize_mps(*this, physical_dimensions, bond_dimension, periodic);
-  }
-
-} // namespace mps
+}  // namespace mps

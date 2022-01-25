@@ -24,16 +24,14 @@
 
 namespace mps {
 
-  cdouble expected12(const CiTEBD &psi, const CTensor &Op12, int site)
-  {
-    if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_CANONICAL_EXPECTED) {
-      return do_expected12(psi, Op12, site);
-    } else if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_SLOW_EXPECTED){
-      return slow_expected12(psi, Op12, site);
-    } else {
-      return bdry_expected12(psi, Op12, site);
-    }
+cdouble expected12(const CiTEBD &psi, const CTensor &Op12, int site) {
+  if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_CANONICAL_EXPECTED) {
+    return do_expected12(psi, Op12, site);
+  } else if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_SLOW_EXPECTED) {
+    return slow_expected12(psi, Op12, site);
+  } else {
+    return bdry_expected12(psi, Op12, site);
   }
+}
 
-} // namespace mps
-
+}  // namespace mps

@@ -21,6 +21,6 @@
 
 namespace mps {
 
-  template class LinearForm<CMPS>;
+template class LinearForm<CMPS>;
 
-} // namespace mps
+}  // namespace mps

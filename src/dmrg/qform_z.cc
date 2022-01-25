@@ -21,6 +21,6 @@
 
 namespace mps {
 
-  template class QuadraticForm<CMPO>;
+template class QuadraticForm<CMPO>;
 
-} // namespace mps
+}  // namespace mps

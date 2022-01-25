@@ -22,61 +22,58 @@
 
 namespace mps {
 
-  template<class MPS>
-  static const Indices
-  expected_dimensions(const MPS &P, index Dmax, bool periodic)
-  {
-    index l = P.size();
-    Indices d(l+1);
-    if (periodic) {
-      for (index i = 0; i <= l; i++)
-	d.at(i) = Dmax;
-    } else {
-      d.at(0) = 1;
-      d.at(l) = 1;
-      for (index i = 1, c = 1; i < l; i++) {
-	c *= P[i-1].dimension(1);
-	if (c > Dmax) c = Dmax;
-	d.at(i) = c;
-      }
-      for (index i = l, c = 1; i--;) {
-	c *= P[i].dimension(1);
-	if (c > Dmax) c = Dmax;
-	if (c < d[i]) d.at(i) = c;
-      }
+template <class MPS>
+static const Indices expected_dimensions(const MPS &P, index Dmax,
+                                         bool periodic) {
+  index l = P.size();
+  Indices d(l + 1);
+  if (periodic) {
+    for (index i = 0; i <= l; i++) d.at(i) = Dmax;
+  } else {
+    d.at(0) = 1;
+    d.at(l) = 1;
+    for (index i = 1, c = 1; i < l; i++) {
+      c *= P[i - 1].dimension(1);
+      if (c > Dmax) c = Dmax;
+      d.at(i) = c;
     }
-    return d;
+    for (index i = l, c = 1; i--;) {
+      c *= P[i].dimension(1);
+      if (c > Dmax) c = Dmax;
+      if (c < d[i]) d.at(i) = c;
+    }
   }
-
-  template<class MPS>
-  bool
-  truncate_inner(MPS *Q, const MPS &P, index Dmax, bool periodic, bool increase)
-  {
-    if (Dmax == 0) {
-      *Q = P;
-      return false;
-    }
-    Indices d = expected_dimensions<MPS>(P, Dmax, periodic);
-    bool truncated = 0;
-    index L = P.size();
-    *Q = MPS(L);
-    for (index k = 0; k < L; k++) {
-      typename MPS::elt_t Qk = P[k];
-      if (Qk.dimension(0) > d[k]) {
-	truncated = 1;
-	Qk = change_dimension(Qk, 0, d[k]);
-      } else if (increase && (Qk.dimension(0) < d[k])) {
-	Qk = change_dimension(Qk, 0, d[k]);
-      }
-      if (Qk.dimension(2) > d[k+1]) {
-	truncated = 1;
-	Qk = change_dimension(Qk, 2, d[k+1]);
-      } else if (increase && (Qk.dimension(2) < d[k+1])) {
-	Qk = change_dimension(Qk, 2, d[k+1]);
-      }
-      Q->at(k) = Qk;
-    }
-    return truncated;
-  }
-
+  return d;
 }
+
+template <class MPS>
+bool truncate_inner(MPS *Q, const MPS &P, index Dmax, bool periodic,
+                    bool increase) {
+  if (Dmax == 0) {
+    *Q = P;
+    return false;
+  }
+  Indices d = expected_dimensions<MPS>(P, Dmax, periodic);
+  bool truncated = 0;
+  index L = P.size();
+  *Q = MPS(L);
+  for (index k = 0; k < L; k++) {
+    typename MPS::elt_t Qk = P[k];
+    if (Qk.dimension(0) > d[k]) {
+      truncated = 1;
+      Qk = change_dimension(Qk, 0, d[k]);
+    } else if (increase && (Qk.dimension(0) < d[k])) {
+      Qk = change_dimension(Qk, 0, d[k]);
+    }
+    if (Qk.dimension(2) > d[k + 1]) {
+      truncated = 1;
+      Qk = change_dimension(Qk, 2, d[k + 1]);
+    } else if (increase && (Qk.dimension(2) < d[k + 1])) {
+      Qk = change_dimension(Qk, 2, d[k + 1]);
+    }
+    Q->at(k) = Qk;
+  }
+  return truncated;
+}
+
+}  // namespace mps

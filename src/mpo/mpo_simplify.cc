@@ -22,26 +22,22 @@
 
 namespace mps {
 
-  template<class MPO, class MPS, class Tensor> MPO
-  do_simplify(const MPO &old_mpo, int sense, bool debug)
-  {
-    MPS psi = canonical_form(mpo_to_mps(old_mpo), sense);
-    MPO mpo = old_mpo;
+template <class MPO, class MPS, class Tensor>
+MPO do_simplify(const MPO &old_mpo, int sense, bool debug) {
+  MPS psi = canonical_form(mpo_to_mps(old_mpo), sense);
+  MPO mpo = old_mpo;
 
-    for (int i = 0; i < mpo.size(); i++) {
-      const Tensor &m1 = mpo[i];
-      const Tensor &m2 = psi[i];
-      mpo.at(i) = reshape(m2,
-			  m2.dimension(0),
-			  m1.dimension(1),
-			  m1.dimension(2),
-			  m2.dimension(2));
-      if (debug) {
-	std::cout << old_mpo[i].dimensions() << " -> "
-		  << mpo[i].dimensions() << std::endl;
-      }
+  for (int i = 0; i < mpo.size(); i++) {
+    const Tensor &m1 = mpo[i];
+    const Tensor &m2 = psi[i];
+    mpo.at(i) = reshape(m2, m2.dimension(0), m1.dimension(1), m1.dimension(2),
+                        m2.dimension(2));
+    if (debug) {
+      std::cout << old_mpo[i].dimensions() << " -> " << mpo[i].dimensions()
+                << std::endl;
     }
-    return mpo;
   }
+  return mpo;
+}
 
-} // namespace mps
+}  // namespace mps

@@ -25,63 +25,65 @@
 
 namespace mps {
 
-  using tensor::index;
+using tensor::index;
 
-  class Sweeper {
-  public:
-    Sweeper(index L, index sense);
-    index operator*() const { return k_; };
-    bool operator--();
-    bool is_last() const { return k_ == kN_; };
-    index sense() const { return dk_; };
-    index site() const { return k_; };
-    void flip();
-  private:
-    index k_, k0_, kN_, dk_;
-  };
+class Sweeper {
+ public:
+  Sweeper(index L, index sense);
+  index operator*() const { return k_; };
+  bool operator--();
+  bool is_last() const { return k_ == kN_; };
+  index sense() const { return dk_; };
+  index site() const { return k_; };
+  void flip();
 
-  template<class Tensor>
-  class MP {
-    typedef typename std::vector<Tensor> data_type;
-  public:
-    typedef Tensor elt_t;
-    typedef typename Tensor::elt_t number_t;
-    typedef typename data_type::iterator iterator;
-    typedef typename data_type::const_iterator const_iterator;
+ private:
+  index k_, k0_, kN_, dk_;
+};
 
-    MP() : data_() {}
-    MP(size_t size) : data_(size) {}
-    MP(const std::vector<Tensor> &other) : data_(other) {}
-    MP(const MP<Tensor> &other) : data_(other.data_) {}
+template <class Tensor>
+class MP {
+  typedef typename std::vector<Tensor> data_type;
 
-    index size() const { return data_.size(); }
-    index last() const { return size() - 1; }
-    void resize(index new_size) { data_.resize(new_size); }
+ public:
+  typedef Tensor elt_t;
+  typedef typename Tensor::elt_t number_t;
+  typedef typename data_type::iterator iterator;
+  typedef typename data_type::const_iterator const_iterator;
 
-    const Tensor &operator[](index n) const {
-      assert((n>=0) && (n<size()));
-      return data_[n];
-    }
-    Tensor &at(index n) {
-      assert((n>=0) && (n<size()));
-      return data_.at(n);
-    }
+  MP() : data_() {}
+  MP(size_t size) : data_(size) {}
+  MP(const std::vector<Tensor> &other) : data_(other) {}
+  MP(const MP<Tensor> &other) : data_(other.data_) {}
 
-    iterator begin() { return data_.begin(); }
-    const_iterator begin() const { return data_.begin(); }
-    const_iterator end() const { return data_.end(); }
-    iterator end() { return data_.end(); }
-    const std::vector<Tensor> to_vector() const { return data_; }
+  index size() const { return data_.size(); }
+  index last() const { return size() - 1; }
+  void resize(index new_size) { data_.resize(new_size); }
 
-    Sweeper sweeper(index sense) const { return Sweeper(size(), sense); }
+  const Tensor &operator[](index n) const {
+    assert((n >= 0) && (n < size()));
+    return data_[n];
+  }
+  Tensor &at(index n) {
+    assert((n >= 0) && (n < size()));
+    return data_.at(n);
+  }
 
-  private:
-    data_type data_;
-  };
+  iterator begin() { return data_.begin(); }
+  const_iterator begin() const { return data_.begin(); }
+  const_iterator end() const { return data_.end(); }
+  iterator end() { return data_.end(); }
+  const std::vector<Tensor> to_vector() const { return data_; }
 
-  int largest_bond_dimension(const MP<tensor::RTensor> &mp);
-  int largest_bond_dimension(const MP<tensor::CTensor> &mp);
+  Sweeper sweeper(index sense) const { return Sweeper(size(), sense); }
 
-} // namespace mps
+ private:
+  data_type data_;
+};
 
-#endif //!MPS_MP_BASE_H
+int largest_bond_dimension(const MP<tensor::RTensor> &mp);
+int largest_bond_dimension(const MP<tensor::CTensor> &mp);
+
+}  // namespace mps
+
+#endif  //!MPS_MP_BASE_H

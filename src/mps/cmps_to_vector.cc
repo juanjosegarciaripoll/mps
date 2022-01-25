@@ -22,20 +22,20 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
-  const CTensor mps_to_vector(const CMPS &mps)
-  {
-    assert(mps.size() > 0);
+const CTensor mps_to_vector(const CMPS &mps) {
+  assert(mps.size() > 0);
 
-    CTensor output = mps[0];
-    index d0 = output.dimension(0);
-    index d = output.dimension(1);
-    for (index i = 1; i < mps.size(); i++) {
-      output = fold(output, -1, mps[i], 0);
-      output = reshape(output, d0, output.dimension(1)*output.dimension(2), output.dimension(3));
-    }
-    return trace(output, 0, -1);
+  CTensor output = mps[0];
+  index d0 = output.dimension(0);
+  index d = output.dimension(1);
+  for (index i = 1; i < mps.size(); i++) {
+    output = fold(output, -1, mps[i], 0);
+    output = reshape(output, d0, output.dimension(1) * output.dimension(2),
+                     output.dimension(3));
   }
+  return trace(output, 0, -1);
+}
 
-} // namespace mps
+}  // namespace mps

@@ -22,7 +22,7 @@
 
 namespace mps {
 
-  /* This is how we encode MPO:
+/* This is how we encode MPO:
 
      - An operator is a collection of tensors A(a,i,j,b), where
        for fixed "a" and "b", the matrix A(a,i,j,b) is an operator
@@ -35,27 +35,24 @@ namespace mps {
     
    */
 
-  template<class MPO, class Tensor>
-  static MPO do_local_Hamiltonian_mpo(const std::vector<Tensor> &Hloc)
-  {
-    MPO output(Hloc.size(), 1);
-    
-    for (index i = 0; i < Hloc.size(); ++i) {
-      index d = Hloc[i].rows();
-      Tensor aux = Tensor::zeros(2, d, d, 2);
-      aux.at(range(0), range(), range(), range(1)) = Hloc[i];
+template <class MPO, class Tensor>
+static MPO do_local_Hamiltonian_mpo(const std::vector<Tensor> &Hloc) {
+  MPO output(Hloc.size(), 1);
 
-      Tensor id = Tensor::eye(d);
-      aux.at(range(1), range(), range(), range(1)) = id;
-      aux.at(range(0), range(), range(), range(0)) = id;
+  for (index i = 0; i < Hloc.size(); ++i) {
+    index d = Hloc[i].rows();
+    Tensor aux = Tensor::zeros(2, d, d, 2);
+    aux.at(range(0), range(), range(), range(1)) = Hloc[i];
 
-      if (i == 0)
-	aux = aux(range(0),range(),range(),range());
-      if (i+1 == Hloc.size())
-	aux = aux(range(),range(),range(),range(1));
-      output.at(i) = aux;
-    }
-    return output;
+    Tensor id = Tensor::eye(d);
+    aux.at(range(1), range(), range(), range(1)) = id;
+    aux.at(range(0), range(), range(), range(0)) = id;
+
+    if (i == 0) aux = aux(range(0), range(), range(), range());
+    if (i + 1 == Hloc.size()) aux = aux(range(), range(), range(), range(1));
+    output.at(i) = aux;
   }
+  return output;
+}
 
-} // namespace mps
+}  // namespace mps

@@ -21,20 +21,19 @@
 #include <tensor/tensor.h>
 #include <tensor/io.h>
 
-template<class MP>
-static void
-presize_mps(MP &mp, const tensor::Indices &physical_dimensions,
-	    tensor::index bond_dimension, bool periodic)
-{
+template <class MP>
+static void presize_mps(MP &mp, const tensor::Indices &physical_dimensions,
+                        tensor::index bond_dimension, bool periodic) {
   assert(bond_dimension > 0);
   tensor::index l = physical_dimensions.size();
   mp.resize(l);
-  tensor::Indices dimensions = tensor::igen << bond_dimension << 0 << bond_dimension;
+  tensor::Indices dimensions = tensor::igen << bond_dimension << 0
+                                            << bond_dimension;
   for (tensor::index i = 0; i < l; i++) {
     assert(physical_dimensions[i] > 0);
     dimensions.at(1) = physical_dimensions[i];
-    dimensions.at(0) = (periodic || (i > 0))? bond_dimension : 1;
-    dimensions.at(2) = (periodic || (i < (l-1)))? bond_dimension : 1;
+    dimensions.at(0) = (periodic || (i > 0)) ? bond_dimension : 1;
+    dimensions.at(2) = (periodic || (i < (l - 1))) ? bond_dimension : 1;
     mp.at(i) = MP::elt_t::zeros(dimensions);
   }
 }

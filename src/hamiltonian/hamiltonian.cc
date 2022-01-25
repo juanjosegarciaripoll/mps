@@ -22,49 +22,39 @@
 
 namespace mps {
 
-  Hamiltonian::~Hamiltonian()
-  {
-  }
+Hamiltonian::~Hamiltonian() {}
 
-  index
-  Hamiltonian::dimension(index k) const
-  {
-    return local_term(k,0).dimension(1);
-  }
+index Hamiltonian::dimension(index k) const {
+  return local_term(k, 0).dimension(1);
+}
 
-  const Indices
-  Hamiltonian::dimensions() const
-  {
-    index l = size();
-    Indices output(l);
-    for (index i = 0; i < l; i++) {
-      output.at(i) = dimension(i);
-    }
-    return output;
+const Indices Hamiltonian::dimensions() const {
+  index l = size();
+  Indices output(l);
+  for (index i = 0; i < l; i++) {
+    output.at(i) = dimension(i);
   }
+  return output;
+}
 
-  const CTensor
-  Hamiltonian::interaction_left(index k, index ndx, double t) const
-  {
-    CTensor O1, O2;
-    decompose_operator(interaction(k, t), &O1, &O2);
-    return squeeze(O1(range(), range(), range(ndx)));
-  }
+const CTensor Hamiltonian::interaction_left(index k, index ndx,
+                                            double t) const {
+  CTensor O1, O2;
+  decompose_operator(interaction(k, t), &O1, &O2);
+  return squeeze(O1(range(), range(), range(ndx)));
+}
 
-  const CTensor
-  Hamiltonian::interaction_right(index k, index ndx, double t) const
-  {
-    CTensor O1, O2;
-    decompose_operator(interaction(k, t), &O1, &O2);
-    return squeeze(O2(range(), range(), range(ndx)));
-  }
+const CTensor Hamiltonian::interaction_right(index k, index ndx,
+                                             double t) const {
+  CTensor O1, O2;
+  decompose_operator(interaction(k, t), &O1, &O2);
+  return squeeze(O2(range(), range(), range(ndx)));
+}
 
-  index
-  Hamiltonian::interaction_depth(index k, double t) const
-  {
-    CTensor O1, O2;
-    decompose_operator(interaction(k, t), &O1, &O2);
-    return O1.dimension(3);
-  }
+index Hamiltonian::interaction_depth(index k, double t) const {
+  CTensor O1, O2;
+  decompose_operator(interaction(k, t), &O1, &O2);
+  return O1.dimension(3);
+}
 
-} // namespace mps
+}  // namespace mps

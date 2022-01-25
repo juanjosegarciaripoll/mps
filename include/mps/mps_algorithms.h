@@ -25,66 +25,72 @@
 
 namespace mps {
 
-  const RTensor prop_matrix_close(const RTensor &N);
+const RTensor prop_matrix_close(const RTensor &N);
 
-  const RTensor prop_matrix_close(const RTensor &L, const RTensor &R);
+const RTensor prop_matrix_close(const RTensor &L, const RTensor &R);
 
-  const RTensor prop_matrix(const RTensor &M0, int sense, const RTensor &Q,
-			    const RTensor &P, const RTensor *op = NULL);
+const RTensor prop_matrix(const RTensor &M0, int sense, const RTensor &Q,
+                          const RTensor &P, const RTensor *op = NULL);
 
-  const CTensor prop_matrix_close(const CTensor &N);
+const CTensor prop_matrix_close(const CTensor &N);
 
-  const CTensor prop_matrix_close(const CTensor &L, const CTensor &R);
+const CTensor prop_matrix_close(const CTensor &L, const CTensor &R);
 
-  const CTensor prop_matrix(const CTensor &M0, int sense, const CTensor &Q,
-			    const CTensor &P, const CTensor *op = NULL);
+const CTensor prop_matrix(const CTensor &M0, int sense, const CTensor &Q,
+                          const CTensor &P, const CTensor *op = NULL);
 
-  /** Given an MPS, produce another with bond dimension <= Dmax, by truncating it. */
-  bool truncate(RMPS *P, const RMPS &Q, index Dmax, bool periodicbc, bool increase = false);
+/** Given an MPS, produce another with bond dimension <= Dmax, by truncating it. */
+bool truncate(RMPS *P, const RMPS &Q, index Dmax, bool periodicbc,
+              bool increase = false);
 
-  /** Given an MPS, produce another with bond dimension <= Dmax, by truncating it. */
-  bool truncate(CMPS *P, const CMPS &Q, index Dmax, bool periodicbc, bool increase = false);
+/** Given an MPS, produce another with bond dimension <= Dmax, by truncating it. */
+bool truncate(CMPS *P, const CMPS &Q, index Dmax, bool periodicbc,
+              bool increase = false);
 
-  double simplify(RMPS *P, const RMPS &Q, int *sense, bool periodicbc,
-		  index sweeps, bool normalize);
+double simplify(RMPS *P, const RMPS &Q, int *sense, bool periodicbc,
+                index sweeps, bool normalize);
 
-  double simplify(CMPS *P, const CMPS &Q, int *sense, bool periodicbc,
-		  index sweeps, bool normalize);
+double simplify(CMPS *P, const CMPS &Q, int *sense, bool periodicbc,
+                index sweeps, bool normalize);
 
-  double simplify(RMPS *P, const std::vector<RMPS> &Q, const RTensor &weights,
-                  int *sense, index sweeps, bool normalize);
+double simplify(RMPS *P, const std::vector<RMPS> &Q, const RTensor &weights,
+                int *sense, index sweeps, bool normalize);
 
-  double simplify(CMPS *P, const std::vector<CMPS> &Q, const CTensor &weights,
-                  int *sense, index sweeps, bool normalize);
+double simplify(CMPS *P, const std::vector<CMPS> &Q, const CTensor &weights,
+                int *sense, index sweeps, bool normalize);
 
-  double simplify(RMPS *P, const std::vector<RMPS> &Q, const RTensor &weights,
-                  index Dmax, double tol, int *sense, index sweeps, bool normalize);
+double simplify(RMPS *P, const std::vector<RMPS> &Q, const RTensor &weights,
+                index Dmax, double tol, int *sense, index sweeps,
+                bool normalize);
 
-  double simplify(CMPS *P, const std::vector<CMPS> &Q, const CTensor &weights,
-                  index Dmax, double tol, int *sense, index sweeps, bool normalize);
+double simplify(CMPS *P, const std::vector<CMPS> &Q, const CTensor &weights,
+                index Dmax, double tol, int *sense, index sweeps,
+                bool normalize);
 
-  /* Open boundary condition algorithms that simplify a state, optimizing over one site */
+/* Open boundary condition algorithms that simplify a state, optimizing over one site */
 
-  double simplify_obc(RMPS *P, const RMPS &Q, int *sense, index sweeps, bool normalize,
-                      index Dmax = 0, double tol = -1, double *norm = 0);
+double simplify_obc(RMPS *P, const RMPS &Q, int *sense, index sweeps,
+                    bool normalize, index Dmax = 0, double tol = -1,
+                    double *norm = 0);
 
-  double simplify_obc(CMPS *P, const CMPS &Q, int *sense, index sweeps, bool normalize,
-                      index Dmax = 0, double tol = -1, double *norm = 0);
+double simplify_obc(CMPS *P, const CMPS &Q, int *sense, index sweeps,
+                    bool normalize, index Dmax = 0, double tol = -1,
+                    double *norm = 0);
 
-  double simplify_obc(RMPS *P, const RTensor &weights, const std::vector<RMPS> &Q,
-                      int *sense, index sweeps, bool normalize,
-                      index Dmax = 0, double tol = -1, double *norm = 0);
+double simplify_obc(RMPS *P, const RTensor &weights, const std::vector<RMPS> &Q,
+                    int *sense, index sweeps, bool normalize, index Dmax = 0,
+                    double tol = -1, double *norm = 0);
 
-  double simplify_obc(CMPS *P, const CTensor &weights, const std::vector<CMPS> &Q,
-                      int *sense, index sweeps, bool normalize,
-                      index Dmax = 0, double tol = -1, double *norm = 0);
+double simplify_obc(CMPS *P, const CTensor &weights, const std::vector<CMPS> &Q,
+                    int *sense, index sweeps, bool normalize, index Dmax = 0,
+                    double tol = -1, double *norm = 0);
 
-  double solve(const RMPO &H, RMPS *ptrP, const RMPS &Q, int *sense, index sweeps,
-               bool normalize = false, index Dmax = 0, double tol = -1);
+double solve(const RMPO &H, RMPS *ptrP, const RMPS &Q, int *sense, index sweeps,
+             bool normalize = false, index Dmax = 0, double tol = -1);
 
-  double solve(const CMPO &H, CMPS *ptrP, const CMPS &Q, int *sense, index sweeps,
-               bool normalize = false, index Dmax = 0, double tol = -1);
+double solve(const CMPO &H, CMPS *ptrP, const CMPS &Q, int *sense, index sweeps,
+             bool normalize = false, index Dmax = 0, double tol = -1);
 
-} // namespace mps
+}  // namespace mps
 
-#endif // !MPS_MPS_ALGORITHM_H
+#endif  // !MPS_MPS_ALGORITHM_H

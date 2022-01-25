@@ -22,9 +22,6 @@
 
 namespace mps {
 
-  const CMPO mmult(const CMPO &A, const CMPO &B)
-  {
-    return do_mmult(A, B);
-  }
+const CMPO mmult(const CMPO &A, const CMPO &B) { return do_mmult(A, B); }
 
-} // namespace mps
+}  // namespace mps

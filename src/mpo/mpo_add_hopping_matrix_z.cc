@@ -21,17 +21,14 @@
 
 namespace mps {
 
-  void add_hopping_matrix(CMPO *mpo, const CTensor &J,
-			  const CTensor &ad, const CTensor &a)
-  {
-    do_add_hopping_matrix(*mpo, J, ad, a, CTensor::eye(a.rows()));
-  }
+void add_hopping_matrix(CMPO *mpo, const CTensor &J, const CTensor &ad,
+                        const CTensor &a) {
+  do_add_hopping_matrix(*mpo, J, ad, a, CTensor::eye(a.rows()));
+}
 
-  void add_jordan_wigner_matrix(CMPO *mpo, const CTensor &J,
-				const CTensor &ad, const CTensor &a,
-				const CTensor &sign)
-  {
-    do_add_hopping_matrix(*mpo, J, ad, a, sign);
-  }
+void add_jordan_wigner_matrix(CMPO *mpo, const CTensor &J, const CTensor &ad,
+                              const CTensor &a, const CTensor &sign) {
+  do_add_hopping_matrix(*mpo, J, ad, a, sign);
+}
 
-} // namespace mps
+}  // namespace mps

@@ -25,11 +25,11 @@ using namespace tensor;
 
 /**\cond IGNORED */
 
-const RTensor propagate_right(const RTensor &v, const RTensor &A, const RTensor &op)
-{
+const RTensor propagate_right(const RTensor &v, const RTensor &A,
+                              const RTensor &op) {
   return do_propagate_right(v, A, op);
 }
 
 /**\endcond */
 
-}
+}  // namespace mps

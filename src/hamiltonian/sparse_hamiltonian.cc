@@ -22,20 +22,17 @@
 
 namespace mps {
 
-  const CSparse
-  sparse_hamiltonian(const Hamiltonian &H, const double t)
-  {
-    index N = H.size();
-    bool periodic = H.is_periodic();
-    std::vector<CSparse> H12(N);
-    std::vector<CSparse> H1(N);
-    for (index k = 0; k < N; k++) {
-      H1.at(k) = CSparse(H.local_term(k, t));
-      if ((k < (N-1)) || periodic)
-        if (H.interaction_depth(k))
-          H12.at(k) = CSparse(H.interaction(k, t));
-    }
-    return sparse_1d_hamiltonian(H12, H1, periodic);
+const CSparse sparse_hamiltonian(const Hamiltonian &H, const double t) {
+  index N = H.size();
+  bool periodic = H.is_periodic();
+  std::vector<CSparse> H12(N);
+  std::vector<CSparse> H1(N);
+  for (index k = 0; k < N; k++) {
+    H1.at(k) = CSparse(H.local_term(k, t));
+    if ((k < (N - 1)) || periodic)
+      if (H.interaction_depth(k)) H12.at(k) = CSparse(H.interaction(k, t));
   }
+  return sparse_1d_hamiltonian(H12, H1, periodic);
+}
 
-} // namespace mps
+}  // namespace mps

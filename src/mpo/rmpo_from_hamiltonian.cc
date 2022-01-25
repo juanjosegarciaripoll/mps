@@ -22,30 +22,27 @@
 
 namespace mps {
 
-  static const RTensor safe_real(const CTensor &R)
-  {
-    if (!all_equal(imag(R), 0.0)) {
-      std::cerr << "In RMPO, tried to initialize the tensor from a complex Hamiltonian.\n";
-      abort();
-    }
-    return real(R);
+static const RTensor safe_real(const CTensor &R) {
+  if (!all_equal(imag(R), 0.0)) {
+    std::cerr << "In RMPO, tried to initialize the tensor from a complex "
+                 "Hamiltonian.\n";
+    abort();
   }
+  return real(R);
+}
 
-  RMPO::RMPO(const Hamiltonian &H, double t) :
-    parent(H.size())
-  {
-    clear(H.dimensions());
-    for (index i = 0; i < size(); i++) {
-      add_local_term(this, safe_real(H.local_term(i,t)), i);
-    }
-    for (index i = 0; i < size(); i++) {
-      for (index j = 0; j < H.interaction_depth(i, t); j++) {
-        RTensor Hi = safe_real(H.interaction_left(i, j, t));
-        RTensor Hj = safe_real(H.interaction_right(i, j, t));
-        if (!Hi.is_empty())
-          add_interaction(this, Hi, i, Hj);
-      }
+RMPO::RMPO(const Hamiltonian &H, double t) : parent(H.size()) {
+  clear(H.dimensions());
+  for (index i = 0; i < size(); i++) {
+    add_local_term(this, safe_real(H.local_term(i, t)), i);
+  }
+  for (index i = 0; i < size(); i++) {
+    for (index j = 0; j < H.interaction_depth(i, t); j++) {
+      RTensor Hi = safe_real(H.interaction_left(i, j, t));
+      RTensor Hj = safe_real(H.interaction_right(i, j, t));
+      if (!Hi.is_empty()) add_interaction(this, Hi, i, Hj);
     }
   }
+}
 
-} // namespace mps
+}  // namespace mps

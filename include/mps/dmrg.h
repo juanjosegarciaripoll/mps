@@ -25,94 +25,94 @@
 
 namespace mps {
 
-  template<class MPS>
-  class DMRG {
-  public:
-    typedef typename MPS::elt_t elt_t;
-    typedef typename std::vector<elt_t> elt_vector_t;
-    typedef typename std::vector<MPS> mps_vector_t;
-    typedef typename tensor::Sparse<typename elt_t::elt_t> sparse_t;
+template <class MPS>
+class DMRG {
+ public:
+  typedef typename MPS::elt_t elt_t;
+  typedef typename std::vector<elt_t> elt_vector_t;
+  typedef typename std::vector<MPS> mps_vector_t;
+  typedef typename tensor::Sparse<typename elt_t::elt_t> sparse_t;
 
-    bool error;
-    index sweeps;
-    bool display;
-    index debug;
-    double tolerance;
-    double svd_tolerance;
-    int allow_E_growth;
-    index neigenvalues;
+  bool error;
+  index sweeps;
+  bool display;
+  index debug;
+  double tolerance;
+  double svd_tolerance;
+  int allow_E_growth;
+  index neigenvalues;
 
-    RTensor eigenvalues;
+  RTensor eigenvalues;
 
-    RTensor Q_values;
-    elt_vector_t Q_operators;
+  RTensor Q_values;
+  elt_vector_t Q_operators;
 
-    DMRG(const Hamiltonian &H);
-    virtual ~DMRG();
+  DMRG(const Hamiltonian &H);
+  virtual ~DMRG();
 
-    void clear_orthogonality();
-    void orthogonal_to(const MPS &P);
-    void clear_conserved_quantities();
-    void commutes_with(const elt_t &Q);
+  void clear_orthogonality();
+  void orthogonal_to(const MPS &P);
+  void clear_conserved_quantities();
+  void commutes_with(const elt_t &Q);
 
-    double minimize(MPS *P, index Dmax = 0, double E = 0.0);
+  double minimize(MPS *P, index Dmax = 0, double E = 0.0);
 
-    index size() const { return H_->size(); }
-    bool is_periodic() const { return H_->is_periodic(); }
+  index size() const { return H_->size(); }
+  bool is_periodic() const { return H_->is_periodic(); }
 
-  private:
-    const Hamiltonian *H_;
+ private:
+  const Hamiltonian *H_;
 
-    elt_vector_t Hl_;
-    elt_vector_t &Hr_;
+  elt_vector_t Hl_;
+  elt_vector_t &Hr_;
 
-    mps_vector_t P0_, Proj_;
+  mps_vector_t P0_, Proj_;
 
-    mps_vector_t Ql_, Qr_;
-    index full_size_;
-    Indices valid_cells_;
+  mps_vector_t Ql_, Qr_;
+  index full_size_;
+  Indices valid_cells_;
 
-    const elt_t interaction(index k) const;
-    const elt_t interaction_left(index k, index m) const;
-    const elt_t interaction_right(index k, index m) const;
-    const elt_t local_term(index k) const;
-    index interaction_depth(index k) const;
+  const elt_t interaction(index k) const;
+  const elt_t interaction_left(index k, index m) const;
+  const elt_t interaction_right(index k, index m) const;
+  const elt_t local_term(index k) const;
+  index interaction_depth(index k) const;
 
-    void init_matrices(const MPS &P, index k0, bool also_Q);
-    void update_matrices_right(const MPS &P, index k0);
-    void update_matrices_left(const MPS &P, index k0);
+  void init_matrices(const MPS &P, index k0, bool also_Q);
+  void update_matrices_right(const MPS &P, index k0);
+  void update_matrices_left(const MPS &P, index k0);
 
-    const elt_vector_t compute_interactions_right(const MPS &Pk, index k) const;
-    const elt_vector_t compute_interactions_left(const MPS &Pk, index k) const;
-    const elt_t block_site_interaction_right(const MPS &P, index k);
-    const elt_t block_site_interaction_left(const MPS &P, index k);
+  const elt_vector_t compute_interactions_right(const MPS &Pk, index k) const;
+  const elt_vector_t compute_interactions_left(const MPS &Pk, index k) const;
+  const elt_t block_site_interaction_right(const MPS &P, index k);
+  const elt_t block_site_interaction_left(const MPS &P, index k);
 
-    index n_orth_states() const;
-    const elt_t projector(const elt_t &Pk, index k);
-    const elt_t projector_twosites(const elt_t &Pk, index k);
+  index n_orth_states() const;
+  const elt_t projector(const elt_t &Pk, index k);
+  const elt_t projector_twosites(const elt_t &Pk, index k);
 
-    index n_constants() const;
+  index n_constants() const;
 
-    double minimize_single_site(MPS &P, index k, int dk);
-    double minimize_two_sites(MPS &P, index k, int dk, index Dmax);
+  double minimize_single_site(MPS &P, index k, int dk);
+  double minimize_two_sites(MPS &P, index k, int dk, index Dmax);
 
-    void prepare_simplifier(index k, const elt_t &Pk);
-    const elt_t simplify_state(const elt_t &Pk);
-    const elt_t simplify_operator(const elt_t &H);
-    const elt_t reconstruct_state(const elt_t &Psimple);
+  void prepare_simplifier(index k, const elt_t &Pk);
+  const elt_t simplify_state(const elt_t &Pk);
+  const elt_t simplify_operator(const elt_t &H);
+  const elt_t reconstruct_state(const elt_t &Psimple);
 
-    virtual void show_state_info(const MPS &Pk, index iter, index k, double newE);
+  virtual void show_state_info(const MPS &Pk, index iter, index k, double newE);
 
-  private:
-    DMRG(const DMRG &c); // Hidden, not allowed
-  };
+ private:
+  DMRG(const DMRG &c);  // Hidden, not allowed
+};
 
-  extern template class DMRG<RMPS>;
-  typedef DMRG<RMPS> RDMRG;
+extern template class DMRG<RMPS>;
+typedef DMRG<RMPS> RDMRG;
 
-  extern template class DMRG<CMPS>;
-  typedef DMRG<CMPS> CDMRG;
+extern template class DMRG<CMPS>;
+typedef DMRG<CMPS> CDMRG;
 
-} // namespace dmrg
+}  // namespace mps
 
 #endif /* !MPS_DMRG_H */

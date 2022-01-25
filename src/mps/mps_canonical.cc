@@ -23,37 +23,33 @@
 
 namespace mps {
 
-  template<class MPS, class Tensor>
-  static void set_canonical_inner(MPS &psi, index ndx, const Tensor &t,
-				  int sense, bool truncate)
-  {
-    if (sense > 0) {
-      if (ndx+1 == psi.size()) {
-	psi.at(ndx) = t;
-      } else {
-        Tensor V = split(&psi.at(ndx), t, +1, truncate);
-	psi.at(ndx+1) = fold(V, -1, psi[ndx+1], 0);
-      }
+template <class MPS, class Tensor>
+static void set_canonical_inner(MPS &psi, index ndx, const Tensor &t, int sense,
+                                bool truncate) {
+  if (sense > 0) {
+    if (ndx + 1 == psi.size()) {
+      psi.at(ndx) = t;
     } else {
-      if (ndx == 0) {
-	psi.at(ndx) = t;
-      } else {
-        Tensor V = split(&psi.at(ndx), t, -1, truncate);
-	psi.at(ndx-1) = fold(psi[ndx-1], -1, V, 0);
-      }
+      Tensor V = split(&psi.at(ndx), t, +1, truncate);
+      psi.at(ndx + 1) = fold(V, -1, psi[ndx + 1], 0);
+    }
+  } else {
+    if (ndx == 0) {
+      psi.at(ndx) = t;
+    } else {
+      Tensor V = split(&psi.at(ndx), t, -1, truncate);
+      psi.at(ndx - 1) = fold(psi[ndx - 1], -1, V, 0);
     }
   }
+}
 
-  template<class MPS>
-  static const MPS either_form_inner(MPS psi, index site, bool normalize)
-  {
-    index i;
-    for (i = psi.last(); i > site; i--)
-      set_canonical(psi, i, psi[i], -1);
-    for (i = 0; i < site; i++)
-      set_canonical(psi, i, psi[i], +1);
-    if (normalize) psi.at(i) /= norm2(psi[i]);
-    return psi;
-  }
+template <class MPS>
+static const MPS either_form_inner(MPS psi, index site, bool normalize) {
+  index i;
+  for (i = psi.last(); i > site; i--) set_canonical(psi, i, psi[i], -1);
+  for (i = 0; i < site; i++) set_canonical(psi, i, psi[i], +1);
+  if (normalize) psi.at(i) /= norm2(psi[i]);
+  return psi;
+}
 
-} // namespace mps
+}  // namespace mps

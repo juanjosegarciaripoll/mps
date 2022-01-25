@@ -21,14 +21,12 @@
 
 namespace mps {
 
-  const Indices
-  dimensions(const RMPS &psi)
-  {
-    Indices d(psi.size());
-    for (index i = 0; i < psi.size(); i++) {
-      d.at(i) = psi[i].dimension(1);
-    }
-    return d;
+const Indices dimensions(const RMPS &psi) {
+  Indices d(psi.size());
+  for (index i = 0; i < psi.size(); i++) {
+    d.at(i) = psi[i].dimension(1);
   }
+  return d;
+}
 
-} // namespace mps
+}  // namespace mps

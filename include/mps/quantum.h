@@ -25,66 +25,66 @@
 
 namespace mps {
 
-  using namespace tensor;
-  using tensor::index;
+using namespace tensor;
+using tensor::index;
 
-  /*
+/*
    * Angular momentum operators.
    */
 
-  void spin_operators(double s, CTensor *sx, CTensor *sy, CTensor *sz);
+void spin_operators(double s, CTensor *sx, CTensor *sy, CTensor *sz);
 
-  double entropy(const RTensor &lambdas);
+double entropy(const RTensor &lambdas);
 
-  /** Two by two identity matrix. */
-  extern const RTensor Pauli_id;
-  /** \f$\sigma_x\f$ Pauli matrix. */
-  extern const RTensor Pauli_x;
-  /** \f$\sigma_z\f$ Pauli matrix. */
-  extern const RTensor Pauli_z;
-  /** \f$\sigma_y\f$ Pauli matrix. */
-  extern const CTensor Pauli_y;
+/** Two by two identity matrix. */
+extern const RTensor Pauli_id;
+/** \f$\sigma_x\f$ Pauli matrix. */
+extern const RTensor Pauli_x;
+/** \f$\sigma_z\f$ Pauli matrix. */
+extern const RTensor Pauli_z;
+/** \f$\sigma_y\f$ Pauli matrix. */
+extern const CTensor Pauli_y;
 
-  /*
+/*
    * Fock space operators.
    */
 
-  /** Fock number operator truncated to a maximum of 'nmax' bosons. */
-  RSparse number_operator(int nmax);
-  /** Fock destruction operator truncated to a maximum of 'nmax' bosons. */
-  RSparse destruction_operator(int nmax);
-  /** Fock creation operator truncated to a maximum of 'nmax' bosons. */
-  RSparse creation_operator(int nmax);
-  /** Real coherent state truncated to a maximum of 'nmax' bosons. */
-  RTensor coherent_state(double alpha, int nmax);
-  /** Complex coherent state truncated to a maximum of 'nmax' bosons. */
-  CTensor coherent_state(cdouble alpha, int nmax);
+/** Fock number operator truncated to a maximum of 'nmax' bosons. */
+RSparse number_operator(int nmax);
+/** Fock destruction operator truncated to a maximum of 'nmax' bosons. */
+RSparse destruction_operator(int nmax);
+/** Fock creation operator truncated to a maximum of 'nmax' bosons. */
+RSparse creation_operator(int nmax);
+/** Real coherent state truncated to a maximum of 'nmax' bosons. */
+RTensor coherent_state(double alpha, int nmax);
+/** Complex coherent state truncated to a maximum of 'nmax' bosons. */
+CTensor coherent_state(cdouble alpha, int nmax);
 
-  /* Create a sparse Hamiltonian with given local interaction and nearest
+/* Create a sparse Hamiltonian with given local interaction and nearest
    * neighbor interaction. */
-  const CSparse sparse_1d_hamiltonian(const CSparse &H12, const CSparse &Hlocal,
-                                      index size, bool periodic = false);
+const CSparse sparse_1d_hamiltonian(const CSparse &H12, const CSparse &Hlocal,
+                                    index size, bool periodic = false);
 
-  /* Create a sparse Hamiltonian with given local interaction and nearest
+/* Create a sparse Hamiltonian with given local interaction and nearest
    * neighbor interaction. */
-  const RSparse sparse_1d_hamiltonian(const RSparse &H12, const RSparse &Hlocal,
-                                      index size, bool periodic = false);
+const RSparse sparse_1d_hamiltonian(const RSparse &H12, const RSparse &Hlocal,
+                                    index size, bool periodic = false);
 
-  /* Create a sparse Hamiltonian with given local interaction and nearest
+/* Create a sparse Hamiltonian with given local interaction and nearest
    * neighbor interaction. */
-  const CSparse sparse_1d_hamiltonian(const std::vector<CSparse> &H12,
-                                      const std::vector<CSparse> &Hlocal,
-                                      bool periodic = false);
+const CSparse sparse_1d_hamiltonian(const std::vector<CSparse> &H12,
+                                    const std::vector<CSparse> &Hlocal,
+                                    bool periodic = false);
 
-  /* Create a sparse Hamiltonian with given local interaction and nearest
+/* Create a sparse Hamiltonian with given local interaction and nearest
    * neighbor interaction. */
-  const RSparse sparse_1d_hamiltonian(const std::vector<RSparse> &H12,
-                                      const std::vector<RSparse> &Hlocal,
-                                      bool periodic = false);
+const RSparse sparse_1d_hamiltonian(const std::vector<RSparse> &H12,
+                                    const std::vector<RSparse> &Hlocal,
+                                    bool periodic = false);
 
-  void decompose_operator(const RTensor &H12, RTensor *H1, RTensor *H2);
-  void decompose_operator(const CTensor &H12, CTensor *H1, CTensor *H2);
+void decompose_operator(const RTensor &H12, RTensor *H1, RTensor *H2);
+void decompose_operator(const CTensor &H12, CTensor *H1, CTensor *H2);
 
-}
+}  // namespace mps
 
-#endif // MPS_QUANTUM_H
+#endif  // MPS_QUANTUM_H

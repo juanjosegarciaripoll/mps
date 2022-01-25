@@ -21,12 +21,8 @@
 
 namespace mps {
 
-  TimeSolver::~TimeSolver()
-  {
-  }
+TimeSolver::~TimeSolver() {}
 
-  TrotterSolver::~TrotterSolver()
-  {
-  }
+TrotterSolver::~TrotterSolver() {}
 
-} // namespace mps
+}  // namespace mps

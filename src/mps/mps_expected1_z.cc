@@ -22,18 +22,16 @@
 
 namespace mps {
 
-  cdouble expected(const CMPS &a, const CTensor &op, index k)
-  {
-    return single_site_expected(a, op, k);
-  }
+cdouble expected(const CMPS &a, const CTensor &op, index k) {
+  return single_site_expected(a, op, k);
+}
 
-  cdouble expected(const CMPS &a, const CTensor &op)
-  {
-    cdouble output = 0.0;
-    for (index i = 0; i < a.size(); i++) {
-      output += expected(a, op, i);
-    }
-    return output;
+cdouble expected(const CMPS &a, const CTensor &op) {
+  cdouble output = 0.0;
+  for (index i = 0; i < a.size(); i++) {
+    output += expected(a, op, i);
   }
+  return output;
+}
 
-} // namespace mps
+}  // namespace mps

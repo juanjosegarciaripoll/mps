@@ -21,6 +21,6 @@
 
 namespace mps {
 
-  int debug_flags = 0;
+int debug_flags = 0;
 
-} // namespace mps
+}  // namespace mps

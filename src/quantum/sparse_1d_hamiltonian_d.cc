@@ -22,7 +22,7 @@
 
 namespace mps {
 
-  /**Create the Hamiltonian of a translationary invariant model. Given a nearest
+/**Create the Hamiltonian of a translationary invariant model. Given a nearest
      neighbor interaction \c H12, and a local term \c H1, this function
      constructs a sparse matrix representing the Hamiltonian
      \f[ H = \sum_{i=1}^{n} \left[H^{(12)}_{i,i+1} + H^{(1)}_i\right]\f]
@@ -34,11 +34,10 @@ namespace mps {
      
      \ingroup QM
   */
-  const RSparse sparse_1d_hamiltonian(const RSparse &H12, const RSparse &H1,
-				      index N, bool periodic)
-  {
-    assert(N > 0);
-    return do_pair_Hamiltonian<RSparse,RTensor>(H12, H1, N, periodic);
-  }
+const RSparse sparse_1d_hamiltonian(const RSparse &H12, const RSparse &H1,
+                                    index N, bool periodic) {
+  assert(N > 0);
+  return do_pair_Hamiltonian<RSparse, RTensor>(H12, H1, N, periodic);
+}
 
-} // namespace mps
+}  // namespace mps

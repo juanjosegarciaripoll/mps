@@ -22,16 +22,15 @@
 
 namespace mps {
 
-  const CMPS product_state(index length, const tensor::CTensor &local_state)
-  {
-    assert(local_state.rank() == 1);
-    assert(local_state.size());
-    assert(length > 0);
+const CMPS product_state(index length, const tensor::CTensor &local_state) {
+  assert(local_state.rank() == 1);
+  assert(local_state.size());
+  assert(length > 0);
 
-    index d = local_state.size();
-    CMPS output(length);
-    std::fill(output.begin(), output.end(), reshape(local_state, 1, d, 1));
-    return output;
-  }
+  index d = local_state.size();
+  CMPS output(length);
+  std::fill(output.begin(), output.end(), reshape(local_state, 1, d, 1));
+  return output;
+}
 
-} // namespace mps
+}  // namespace mps

@@ -22,7 +22,7 @@
 
 namespace mps {
 
-  /* This is how we encode MPO:
+/* This is how we encode MPO:
 
      - An operator is a collection of tensors A(a,i,j,b), where
        for fixed "a" and "b", the matrix A(a,i,j,b) is an operator
@@ -35,53 +35,49 @@ namespace mps {
     
    */
 
-  template<class Tensor>
-  static bool
-  is_identity(const Tensor &t)
-  {
-    return (t.rank() == 2) &&
-      (t.columns() == t.rows()) &&
-      all_equal(t, Tensor::eye(t.rows()));
-  }
+template <class Tensor>
+static bool is_identity(const Tensor &t) {
+  return (t.rank() == 2) && (t.columns() == t.rows()) &&
+         all_equal(t, Tensor::eye(t.rows()));
+}
 
-  template<class MPO, class Tensor>
-  static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H)
-  {
-    //
-    // This function adds a term \prod_j H[j] to a Hamiltonian.
-    //
-    index closing = 0, opening = 0;
-    int start = 0, end = mpo.size();
-    while (start < end && is_identity(H[start])) {
-      ++start;
-    }
-    while (end > 0 && is_identity(H[end-1])) {
-      --end;
-      closing = 1;
-    } 
-    for (int j = start; j < end; ++j) {
-      const Tensor &Hj = H[j];
-      Tensor Pj = mpo[j];
-      index dl = Pj.dimension(0);
-      index dr = Pj.dimension(3);
-      if (j > start) {
-        Pj = change_dimension(Pj, 0, dl+1);
-      } else {
-        dl = opening;
-      }
-      if (j+1 < end) {
-        Pj = change_dimension(Pj, 3, dr+1);
-      } else {
-        dr = closing;
-      }
-      if (dl == opening && dr == closing) {
-        Pj.at(range(dl),range(),range(),range(dr)) = Hj +
-          Pj(range(dl),range(),range(),range(dr));
-      } else {
-        Pj.at(range(dl),range(),range(),range(dr)) = Hj;
-      }
-      mpo.at(j) = Pj;
-    }
+template <class MPO, class Tensor>
+static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H) {
+  //
+  // This function adds a term \prod_j H[j] to a Hamiltonian.
+  //
+  index closing = 0, opening = 0;
+  int start = 0, end = mpo.size();
+  while (start < end && is_identity(H[start])) {
+    ++start;
   }
+  while (end > 0 && is_identity(H[end - 1])) {
+    --end;
+    closing = 1;
+  }
+  for (int j = start; j < end; ++j) {
+    const Tensor &Hj = H[j];
+    Tensor Pj = mpo[j];
+    index dl = Pj.dimension(0);
+    index dr = Pj.dimension(3);
+    if (j > start) {
+      Pj = change_dimension(Pj, 0, dl + 1);
+    } else {
+      dl = opening;
+    }
+    if (j + 1 < end) {
+      Pj = change_dimension(Pj, 3, dr + 1);
+    } else {
+      dr = closing;
+    }
+    if (dl == opening && dr == closing) {
+      Pj.at(range(dl), range(), range(), range(dr)) =
+          Hj + Pj(range(dl), range(), range(), range(dr));
+    } else {
+      Pj.at(range(dl), range(), range(), range(dr)) = Hj;
+    }
+    mpo.at(j) = Pj;
+  }
+}
 
-} // namespace mps
+}  // namespace mps

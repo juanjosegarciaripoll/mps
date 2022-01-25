@@ -21,14 +21,12 @@
 
 namespace mps {
 
-  void add_local_term(CMPO *mpo, const CTensor &Hloc, index i)
-  {
-    do_add_local_term(*mpo, Hloc, i);
-  }
+void add_local_term(CMPO *mpo, const CTensor &Hloc, index i) {
+  do_add_local_term(*mpo, Hloc, i);
+}
 
-  void add_interaction(CMPO *mpo, const CTensor &Hi, index i, const CTensor &Hj)
-  {
-    do_add_interaction(*mpo, Hi, i, Hj);
-  }
+void add_interaction(CMPO *mpo, const CTensor &Hi, index i, const CTensor &Hj) {
+  do_add_interaction(*mpo, Hi, i, Hj);
+}
 
-} // namespace mps
+}  // namespace mps

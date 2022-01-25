@@ -21,10 +21,8 @@
 
 namespace mps {
 
-  const CTensor
-  mpo_to_matrix(const CMPO &A)
-  {
-    return to_matrix<CMPO,CTensor>(A);
-  }
+const CTensor mpo_to_matrix(const CMPO &A) {
+  return to_matrix<CMPO, CTensor>(A);
+}
 
-} // namespace mps
+}  // namespace mps

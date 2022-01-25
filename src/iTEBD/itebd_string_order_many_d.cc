@@ -21,11 +21,9 @@
 
 namespace mps {
 
-  RTensor
-  string_order(const iTEBD<RTensor> &psi,
-	       const RTensor &Opi, const RTensor &Opmiddle, const RTensor &Opj, int N)
-  {
-    return do_string_order_many(psi, Opi, Opmiddle, Opj, N);
-  }
-
+RTensor string_order(const iTEBD<RTensor> &psi, const RTensor &Opi,
+                     const RTensor &Opmiddle, const RTensor &Opj, int N) {
+  return do_string_order_many(psi, Opi, Opmiddle, Opj, N);
 }
+
+}  // namespace mps

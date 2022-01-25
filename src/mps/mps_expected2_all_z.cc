@@ -22,19 +22,18 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
-  CTensor expected(const CMPS &a, const std::vector<CTensor> &op1, const std::vector<CTensor> &op2)
-  {
-    return all_correlations_fast(a, op1, op2, a);
-  }
+CTensor expected(const CMPS &a, const std::vector<CTensor> &op1,
+                 const std::vector<CTensor> &op2) {
+  return all_correlations_fast(a, op1, op2, a);
+}
 
-  CTensor expected(const CMPS &a, const CTensor &op1, const CTensor &op2)
-  {
-    index L = a.size();
-    std::vector<CTensor> vec1(L, op1);
-    std::vector<CTensor> vec2(L, op2);
-    return all_correlations_fast(a, vec1, vec2, a);
-  }
+CTensor expected(const CMPS &a, const CTensor &op1, const CTensor &op2) {
+  index L = a.size();
+  std::vector<CTensor> vec1(L, op1);
+  std::vector<CTensor> vec2(L, op2);
+  return all_correlations_fast(a, vec1, vec2, a);
+}
 
-} // namespace mps
+}  // namespace mps

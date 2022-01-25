@@ -21,11 +21,9 @@
 
 namespace mps {
 
-  CTensor
-  string_order(const iTEBD<CTensor> &psi,
-	       const CTensor &Opi, const CTensor &Opmiddle, const CTensor &Opj, int N)
-  {
-    return do_string_order_many(psi, Opi, Opmiddle, Opj, N);
-  }
-
+CTensor string_order(const iTEBD<CTensor> &psi, const CTensor &Opi,
+                     const CTensor &Opmiddle, const CTensor &Opj, int N) {
+  return do_string_order_many(psi, Opi, Opmiddle, Opj, N);
 }
+
+}  // namespace mps

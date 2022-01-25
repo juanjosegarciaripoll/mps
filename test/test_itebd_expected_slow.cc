@@ -24,94 +24,91 @@
 
 namespace tensor_test {
 
-  using namespace mps;
-  using namespace tensor;
+using namespace mps;
+using namespace tensor;
 
-  template<class t>
-  const iTEBD<t> test_state(t *H12)
-  {
-    t A = RTensor(igen << 2 << 3 << 2,
-                  rgen << -0.95912 << -0.29373 << -0.32075 << 0.82915
-                  << -0.053633 << 0.29376 << -0.29375 << -0.070285
-                  << 0.82919 << 0.42038 << 0.29377 << -1.2573);
-    t lA = RTensor(igen << 2, rgen << 0.91919 << 0.39382);
-    t B = RTensor(igen << 2 << 3 << 2,
-                  rgen << -0.05363 << 0.29376 << 0.32074 << -0.82919
-                  << -0.95913 << -0.29374 << 0.29375 << -1.2573
-                  << -0.82915 << -0.42036 << -0.29373 << -0.070279);
-    t lB = RTensor(igen << 2, rgen << 0.91923 << 0.39373);
+template <class t>
+const iTEBD<t> test_state(t *H12) {
+  t A = RTensor(igen << 2 << 3 << 2, rgen << -0.95912 << -0.29373 << -0.32075
+                                          << 0.82915 << -0.053633 << 0.29376
+                                          << -0.29375 << -0.070285 << 0.82919
+                                          << 0.42038 << 0.29377 << -1.2573);
+  t lA = RTensor(igen << 2, rgen << 0.91919 << 0.39382);
+  t B = RTensor(igen << 2 << 3 << 2, rgen << -0.05363 << 0.29376 << 0.32074
+                                          << -0.82919 << -0.95913 << -0.29374
+                                          << 0.29375 << -1.2573 << -0.82915
+                                          << -0.42036 << -0.29373 << -0.070279);
+  t lB = RTensor(igen << 2, rgen << 0.91923 << 0.39373);
 
-    if (H12) {
-      *H12 = RTensor(igen << 9 << 9,
-		     rgen << 1 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0
-		     << 0 << 0 << 0 << 1 << 0 << 0 << 0 << 0 << 0
-		     << 0 << 0 << -1 << 0 << 1 << 0 << 0 << 0 << 0
-		     << 0 << 1 << 0 << 0 << 0 << 0 << 0 << 0 << 0
-		     << 0 << 0 << 1 << 0 << 0 << 0 << 1 << 0 << 0
-		     << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1 << 0
-		     << 0 << 0 << 0 << 0 << 1 << 0 << -1 << 0 << 0
-		     << 0 << 0 << 0 << 0 << 0 << 1 << 0 << 0 << 0
-		     << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1);
-    }
-
-    return iTEBD<t>(A, lA, B, lB);
+  if (H12) {
+    *H12 =
+        RTensor(igen << 9 << 9,
+                rgen << 1 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0
+                     << 1 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << -1 << 0 << 1
+                     << 0 << 0 << 0 << 0 << 0 << 1 << 0 << 0 << 0 << 0 << 0 << 0
+                     << 0 << 0 << 0 << 1 << 0 << 0 << 0 << 1 << 0 << 0 << 0 << 0
+                     << 0 << 0 << 0 << 0 << 0 << 1 << 0 << 0 << 0 << 0 << 0 << 1
+                     << 0 << -1 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1 << 0
+                     << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1);
   }
 
-  template<class t>
-  void test_small_canonical_iTEBD()
-  {
-    t H12;
-    iTEBD<t> psi = test_state(&H12);
-    iTEBD<t> psic = psi.canonical_form();
+  return iTEBD<t>(A, lA, B, lB);
+}
 
-    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_SLOW_EXPECTED);
-    typename t::elt_t slow_exp = expected12(psi, H12);
+template <class t>
+void test_small_canonical_iTEBD() {
+  t H12;
+  iTEBD<t> psi = test_state(&H12);
+  iTEBD<t> psic = psi.canonical_form();
 
-    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_BDRY_EXPECTED);
-    typename t::elt_t bdry_exp = expected12(psi, H12);
+  mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_SLOW_EXPECTED);
+  typename t::elt_t slow_exp = expected12(psi, H12);
 
-    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
-    EXPECT_TRUE(simeq(expected12(psi, H12), expected12(psic, H12), 2e-6));
-    EXPECT_TRUE(simeq(expected12(psi, H12), slow_exp, 2e-6));
-    EXPECT_TRUE(simeq(expected12(psic, H12), slow_exp, 2e-6));
-    EXPECT_TRUE(simeq(expected12(psi, H12), bdry_exp, 2e-6));
-    EXPECT_TRUE(simeq(expected12(psic, H12), bdry_exp, 2e-6));
+  mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_BDRY_EXPECTED);
+  typename t::elt_t bdry_exp = expected12(psi, H12);
 
-    /*
+  mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
+  EXPECT_TRUE(simeq(expected12(psi, H12), expected12(psic, H12), 2e-6));
+  EXPECT_TRUE(simeq(expected12(psi, H12), slow_exp, 2e-6));
+  EXPECT_TRUE(simeq(expected12(psic, H12), slow_exp, 2e-6));
+  EXPECT_TRUE(simeq(expected12(psi, H12), bdry_exp, 2e-6));
+  EXPECT_TRUE(simeq(expected12(psic, H12), bdry_exp, 2e-6));
+
+  /*
     std::cout << expected12(psi, H12) << std::endl
 	      << expected12(psic, H12) << std::endl
 	      << slow_expected12(psic, H12) << std::endl
 	      << slow_expected12(psi, H12) << std::endl;
     */
 
-    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_SLOW_EXPECTED);
-    typename t::elt_t slow_E = energy(psi, H12);
+  mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_SLOW_EXPECTED);
+  typename t::elt_t slow_E = energy(psi, H12);
 
-    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_BDRY_EXPECTED);
-    typename t::elt_t bdry_E = energy(psi, H12);
+  mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_BDRY_EXPECTED);
+  typename t::elt_t bdry_E = energy(psi, H12);
 
-    mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
-    EXPECT_TRUE(simeq(energy(psi, H12), energy(psic, H12), 2e-6));
-    EXPECT_TRUE(simeq(energy(psi, H12), slow_E, 2e-6));
-    EXPECT_TRUE(simeq(energy(psic, H12), slow_E, 2e-6));
-    EXPECT_TRUE(simeq(energy(psi, H12), bdry_E, 2e-6));
-    EXPECT_TRUE(simeq(energy(psic, H12), bdry_E, 2e-6));
-  }
-
-  ////////////////////////////////////////////////////////////
-  /// ITEBD WITH REAL TENSORS
-  ///
-
-  TEST(RiTEBDTest, ExpectedCanonicalForm) {
-    test_small_canonical_iTEBD<RTensor>();
-  }
-
-  ////////////////////////////////////////////////////////////
-  /// ITEBD WITH COMPLEX TENSORS
-  ///
-
-  TEST(CiTEBDTest, ExpectedCanonicalForm) {
-    test_small_canonical_iTEBD<CTensor>();
-  }
-
+  mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
+  EXPECT_TRUE(simeq(energy(psi, H12), energy(psic, H12), 2e-6));
+  EXPECT_TRUE(simeq(energy(psi, H12), slow_E, 2e-6));
+  EXPECT_TRUE(simeq(energy(psic, H12), slow_E, 2e-6));
+  EXPECT_TRUE(simeq(energy(psi, H12), bdry_E, 2e-6));
+  EXPECT_TRUE(simeq(energy(psic, H12), bdry_E, 2e-6));
 }
+
+////////////////////////////////////////////////////////////
+/// ITEBD WITH REAL TENSORS
+///
+
+TEST(RiTEBDTest, ExpectedCanonicalForm) {
+  test_small_canonical_iTEBD<RTensor>();
+}
+
+////////////////////////////////////////////////////////////
+/// ITEBD WITH COMPLEX TENSORS
+///
+
+TEST(CiTEBDTest, ExpectedCanonicalForm) {
+  test_small_canonical_iTEBD<CTensor>();
+}
+
+}  // namespace tensor_test

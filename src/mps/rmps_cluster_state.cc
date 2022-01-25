@@ -22,37 +22,36 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
-  const RMPS cluster_state(index length)
-  {
-    if (length < 3) {
-      return ghz_state(length);
-    } else {
-      RMPS output(length, 2, 2);
-      double v0 = 1.0/sqrt(sqrt(2.0));
-      double v = 1.0/sqrt(2.0);
+const RMPS cluster_state(index length) {
+  if (length < 3) {
+    return ghz_state(length);
+  } else {
+    RMPS output(length, 2, 2);
+    double v0 = 1.0 / sqrt(sqrt(2.0));
+    double v = 1.0 / sqrt(2.0);
 
-      RTensor &P0 = output.at(0);
-      P0.fill_with_zeros();
-      P0.at(0,0,0) = P0.at(0,1,1) = v;
+    RTensor &P0 = output.at(0);
+    P0.fill_with_zeros();
+    P0.at(0, 0, 0) = P0.at(0, 1, 1) = v;
 
-      RTensor &PL = output.at(length-1);
-      PL.at(0,0,0) = v;
-      PL.at(0,1,0) = v;
-      PL.at(1,0,0) = v;
-      PL.at(1,1,0) = -v;
+    RTensor &PL = output.at(length - 1);
+    PL.at(0, 0, 0) = v;
+    PL.at(0, 1, 0) = v;
+    PL.at(1, 0, 0) = v;
+    PL.at(1, 1, 0) = -v;
 
-      for (index i = 1; i < (length - 1); i++) {
-	RTensor &P = output.at(i);
-	P.fill_with_zeros();
-	P.at(0,0,0) = v;
-        P.at(1,0,0) = v;
-        P.at(0,1,1) = v;
-        P.at(1,1,1) = -(v);
-      }
-      return output;
+    for (index i = 1; i < (length - 1); i++) {
+      RTensor &P = output.at(i);
+      P.fill_with_zeros();
+      P.at(0, 0, 0) = v;
+      P.at(1, 0, 0) = v;
+      P.at(0, 1, 1) = v;
+      P.at(1, 1, 1) = -(v);
     }
+    return output;
+  }
 }
 
-} // namespace mps
+}  // namespace mps

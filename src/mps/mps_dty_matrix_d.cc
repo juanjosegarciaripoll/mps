@@ -23,9 +23,8 @@
 
 namespace mps {
 
-  const RTensor density_matrix(const RMPS &psi, index site)
-  {
-    return do_density_matrix<RMPS,RTensor>(psi, site);
-  }
-
+const RTensor density_matrix(const RMPS &psi, index site) {
+  return do_density_matrix<RMPS, RTensor>(psi, site);
 }
+
+}  // namespace mps

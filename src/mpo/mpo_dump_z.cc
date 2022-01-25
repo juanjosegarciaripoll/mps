@@ -21,9 +21,8 @@
 
 namespace mps {
 
-  std::ostream &operator<<(std::ostream &s, const CMPO &mpo)
-  {
-    return do_dump_mpo(s, mpo, "CMPO");
-  }
+std::ostream &operator<<(std::ostream &s, const CMPO &mpo) {
+  return do_dump_mpo(s, mpo, "CMPO");
+}
 
-} // namespace mps
+}  // namespace mps

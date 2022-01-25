@@ -27,23 +27,23 @@
 
 namespace mps {
 
-  /**Real matrix product structure.*/
-  class RMPO : public MP<tensor::RTensor> {
-  public:
-    typedef RMPS MPS;
+/**Real matrix product structure.*/
+class RMPO : public MP<tensor::RTensor> {
+ public:
+  typedef RMPS MPS;
 
-    RMPO(index size, index physical_dimension);
-    RMPO(const tensor::Indices &physical_dimension);
-    RMPO(const Hamiltonian &H, double t = 0.0);
-    RMPO();
+  RMPO(index size, index physical_dimension);
+  RMPO(const tensor::Indices &physical_dimension);
+  RMPO(const Hamiltonian &H, double t = 0.0);
+  RMPO();
 
-  private:
-    typedef MP<elt_t> parent;
+ private:
+  typedef MP<elt_t> parent;
 
-    void clear(const tensor::Indices &dimensions);
-  };
+  void clear(const tensor::Indices &dimensions);
+};
 
-}
+}  // namespace mps
 
 /* @} */
 

@@ -23,110 +23,96 @@
 
 namespace tensor_test {
 
-  using namespace mps;
-  using tensor::index;
+using namespace mps;
+using tensor::index;
 
-  TestHamiltonian::TestHamiltonian(index amodel, double spin,
-				   index size, bool ti, bool pbc) :
-    ConstantHamiltonian(size, pbc), model(amodel), coefs(),
-    periodic(pbc), translational_invariance(ti)
-  {
-    double data[][4] = {
-      {1, 0, 0, 0},	// Magnetic field
-      {0, 0, 0, 1},	// Ising
-      {1, 0, 0, 1},	// Ising long. field
-      {1, 1, 0, 0},	// Ising transv. field
-      {1, 1, 1, 0},	// XX
-      {1, 1, 1, 2},	// XXY
-      {1, 1, 1, 1},	// Heisenberg
-      {0, 0, 0, 0}};	// Random
+TestHamiltonian::TestHamiltonian(index amodel, double spin, index size, bool ti,
+                                 bool pbc)
+    : ConstantHamiltonian(size, pbc),
+      model(amodel),
+      coefs(),
+      periodic(pbc),
+      translational_invariance(ti) {
+  double data[][4] = {{1, 0, 0, 0},   // Magnetic field
+                      {0, 0, 0, 1},   // Ising
+                      {1, 0, 0, 1},   // Ising long. field
+                      {1, 1, 0, 0},   // Ising transv. field
+                      {1, 1, 1, 0},   // XX
+                      {1, 1, 1, 2},   // XXY
+                      {1, 1, 1, 1},   // Heisenberg
+                      {0, 0, 0, 0}};  // Random
 
-    RTensor aux;
-    if (model < last_model()) {
-      aux = Vector<double>(4, data[model]);
-      aux.at(0) = aux(0) * rand<double>(1.0);
-    } else {
-      aux = RTensor::random(4);
+  RTensor aux;
+  if (model < last_model()) {
+    aux = Vector<double>(4, data[model]);
+    aux.at(0) = aux(0) * rand<double>(1.0);
+  } else {
+    aux = RTensor::random(4);
+  }
+  coefs = RTensor::zeros(4, size);
+  if (ti) {
+    for (index j = 0; j < size; j++) {
+      coefs.at(range(), range(j)) = aux;
     }
-    coefs = RTensor::zeros(4,size);
-    if (ti) {
-      for (index j = 0; j < size; j++) {
-	coefs.at(range(), range(j)) = aux;
-      }
-    } else {
-      coefs.randomize();
-      for (index j = 0; j < size; j++) {
-	coefs.at(range(), range(j)) = aux * coefs(0,j);
-      }
+  } else {
+    coefs.randomize();
+    for (index j = 0; j < size; j++) {
+      coefs.at(range(), range(j)) = aux * coefs(0, j);
     }
-    if (!is_periodic())
-      coefs.at(range(1,-1), range(-1)) = 0.0;
+  }
+  if (!is_periodic()) coefs.at(range(1, -1), range(-1)) = 0.0;
 
-    spin_operators(spin, &sx, &sy, &sz);
-    CTensor op[4] = {sz, sx, imag(sy), sz};
-    double sgn[4] = {1,  1,  -1,  1};
+  spin_operators(spin, &sx, &sy, &sz);
+  CTensor op[4] = {sz, sx, imag(sy), sz};
+  double sgn[4] = {1, 1, -1, 1};
 
-    for (tensor::index i = 0; i < size; i++) {
-      set_local_term(i, coefs(0,i) * op[0]);
-    }
-    for (tensor::index i = 1; i < size; i++) {
-      for (int n = 1; n < 4; n++) {
-	if (coefs(n,i)) {
-	  add_interaction(i-1, sgn[n] * coefs(n,i) * op[n], op[n]);
-	}
+  for (tensor::index i = 0; i < size; i++) {
+    set_local_term(i, coefs(0, i) * op[0]);
+  }
+  for (tensor::index i = 1; i < size; i++) {
+    for (int n = 1; n < 4; n++) {
+      if (coefs(n, i)) {
+        add_interaction(i - 1, sgn[n] * coefs(n, i) * op[n], op[n]);
       }
     }
   }
+}
 
-  const char *
-  TestHamiltonian::model_name(index model)
-  {
-    const char *name[] = {
-      "Mag. field", "Ising", "Ising long.", "Ising perp.",
-      "XX", "XXY", "Heisenberg", "Random"};
-    return name[model];
-  }
+const char *TestHamiltonian::model_name(index model) {
+  const char *name[] = {"Mag. field", "Ising", "Ising long.", "Ising perp.",
+                        "XX",         "XXY",   "Heisenberg",  "Random"};
+  return name[model];
+}
 
-  index
-  TestHamiltonian::last_model()
-  {
-    return 6;
-  }
+index TestHamiltonian::last_model() { return 6; }
 
-  void
-  test_over_H(bool test(const mps::Hamiltonian &H, double &err),
-	      int max_spins, bool pbc)
-  {
-    for (int periodic = 0; periodic < (pbc? 2 : 1); periodic++) {
-      for (unsigned model = 0;
-	   model <= TestHamiltonian::last_model();
-	   model++)
-      {
-        for (int ti = 1; ti >= 0; ti--) {
-          double err = 0.0;
-          std::cout << TestHamiltonian::model_name(model)
-                    << (periodic? ",pbc" : ",obc")
-                    << (ti? ",t.i " : ",inh ");
-          tic();
-          for (unsigned nspins = 2; nspins < max_spins; nspins++) {
-            for (int times = 1; times < 5; times++) {
-              TestHamiltonian H(model, 0.5, nspins, ti, periodic);
-              double e = 0.0;
-              if (test(H, e)) {
-                std::cout << '.';
-              } else {
-                std::cout << '!';
-              }
-              std::cout.flush();
-              err = std::max(e,err);
+void test_over_H(bool test(const mps::Hamiltonian &H, double &err),
+                 int max_spins, bool pbc) {
+  for (int periodic = 0; periodic < (pbc ? 2 : 1); periodic++) {
+    for (unsigned model = 0; model <= TestHamiltonian::last_model(); model++) {
+      for (int ti = 1; ti >= 0; ti--) {
+        double err = 0.0;
+        std::cout << TestHamiltonian::model_name(model)
+                  << (periodic ? ",pbc" : ",obc") << (ti ? ",t.i " : ",inh ");
+        tic();
+        for (unsigned nspins = 2; nspins < max_spins; nspins++) {
+          for (int times = 1; times < 5; times++) {
+            TestHamiltonian H(model, 0.5, nspins, ti, periodic);
+            double e = 0.0;
+            if (test(H, e)) {
+              std::cout << '.';
+            } else {
+              std::cout << '!';
             }
+            std::cout.flush();
+            err = std::max(e, err);
           }
-          std::cout << "\n\t\tMax. Err: " << err << ", Time: " << toc() << '\n';
         }
+        std::cout << "\n\t\tMax. Err: " << err << ", Time: " << toc() << '\n';
       }
     }
-    std::cout << std::endl;
   }
+  std::cout << std::endl;
+}
 
-
-} // namespace tensor_test
+}  // namespace tensor_test

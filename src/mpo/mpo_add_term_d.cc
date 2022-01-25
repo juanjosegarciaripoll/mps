@@ -21,14 +21,12 @@
 
 namespace mps {
 
-  void add_local_term(RMPO *mpo, const RTensor &Hloc, index i)
-  {
-    do_add_local_term(*mpo, Hloc, i);
-  }
+void add_local_term(RMPO *mpo, const RTensor &Hloc, index i) {
+  do_add_local_term(*mpo, Hloc, i);
+}
 
-  void add_interaction(RMPO *mpo, const RTensor &Hi, index i, const RTensor &Hj)
-  {
-    do_add_interaction(*mpo, Hi, i, Hj);
-  }
+void add_interaction(RMPO *mpo, const RTensor &Hi, index i, const RTensor &Hj) {
+  do_add_interaction(*mpo, Hi, i, Hj);
+}
 
-} // namespace mps
+}  // namespace mps

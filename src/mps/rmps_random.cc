@@ -22,26 +22,22 @@
 
 namespace mps {
 
-  static void randomize(RMPS &mps)
-  {
-    for (RMPS::iterator it = mps.begin(); it != mps.end(); it++)
-      it->randomize();
-  }
+static void randomize(RMPS &mps) {
+  for (RMPS::iterator it = mps.begin(); it != mps.end(); it++) it->randomize();
+}
 
-  const RMPS RMPS::random(index length, index physical_dimension,
-			  index bond_dimension, bool periodic)
-  {
-    RMPS output(length, physical_dimension, bond_dimension, periodic);
-    randomize(output);
-    return output;
-  }
+const RMPS RMPS::random(index length, index physical_dimension,
+                        index bond_dimension, bool periodic) {
+  RMPS output(length, physical_dimension, bond_dimension, periodic);
+  randomize(output);
+  return output;
+}
 
-  const RMPS RMPS::random(const tensor::Indices &physical_dimensions,
-			  index bond_dimension, bool periodic)
-  {
-    RMPS output(physical_dimensions.size(), bond_dimension, periodic);
-    randomize(output);
-    return output;
-  }
+const RMPS RMPS::random(const tensor::Indices &physical_dimensions,
+                        index bond_dimension, bool periodic) {
+  RMPS output(physical_dimensions.size(), bond_dimension, periodic);
+  randomize(output);
+  return output;
+}
 
-} // namespace mps
+}  // namespace mps

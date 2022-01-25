@@ -23,16 +23,15 @@
 
 namespace tensor_test {
 
-  using namespace mps;
+using namespace mps;
 
-  CMPS random_product_CMPS(int n, int dimension)
-  {
-    CMPS output(n);
-    for (int i = 0; i < n; i++) {
-      CTensor v = CTensor::random(1, dimension, 1);
-      output.at(i) = v / norm2(v);
-    }
-    return output;
+CMPS random_product_CMPS(int n, int dimension) {
+  CMPS output(n);
+  for (int i = 0; i < n; i++) {
+    CTensor v = CTensor::random(1, dimension, 1);
+    output.at(i) = v / norm2(v);
   }
+  return output;
+}
 
-} // namespace tensor_test
+}  // namespace tensor_test

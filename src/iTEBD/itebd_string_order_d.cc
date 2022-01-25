@@ -24,22 +24,19 @@
 
 namespace mps {
 
-  double
-  string_order(const iTEBD<RTensor> &psi,
-	       const RTensor &Opi, int i, const RTensor &Opmiddle,
-	       const RTensor &Opj, int j)
-  {
-    if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_CANONICAL_EXPECTED) {
-      return do_string_order(psi, Opi, i, Opmiddle, Opj, j);
-    } else if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_SLOW_EXPECTED){
-      return slow_string_order(Opi, i, Opmiddle, Opj, j,
-                               psi.matrix(0), psi.right_vector(0),
-                               psi.matrix(1), psi.right_vector(1));
-    } else {
-      return bdry_string_order(Opi, i, Opmiddle, Opj, j,
-                               psi.matrix(0), psi.right_vector(0),
-                               psi.matrix(1), psi.right_vector(1));
-    }
+double string_order(const iTEBD<RTensor> &psi, const RTensor &Opi, int i,
+                    const RTensor &Opmiddle, const RTensor &Opj, int j) {
+  if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_CANONICAL_EXPECTED) {
+    return do_string_order(psi, Opi, i, Opmiddle, Opj, j);
+  } else if (FLAGS.get(MPS_ITEBD_EXPECTED_METHOD) == MPS_ITEBD_SLOW_EXPECTED) {
+    return slow_string_order(Opi, i, Opmiddle, Opj, j, psi.matrix(0),
+                             psi.right_vector(0), psi.matrix(1),
+                             psi.right_vector(1));
+  } else {
+    return bdry_string_order(Opi, i, Opmiddle, Opj, j, psi.matrix(0),
+                             psi.right_vector(0), psi.matrix(1),
+                             psi.right_vector(1));
   }
-
 }
+
+}  // namespace mps

@@ -21,30 +21,29 @@
 
 namespace mps {
 
-  template<class MPS>
-  static inline double do_expected(const MPS &P, const Hamiltonian &theH, double t)
-  {
-    CTensor O1, O2, H;
-    cdouble E = number_zero<cdouble>();
-    index N = theH.size();
-    for (index k = 0, k2 = 1; k < N; k++, k2++) {
-	H = theH.local_term(k, t);
-	if (!H.is_empty()) {
-	    E = E + expected(P, H, k);
-	}
-	if (k2 == N) {
-	    if (k == 0 || !theH.is_periodic())
-		break;
-	    k2 = 0;
-	}
-	if (N > 0) {
-	    index depth = theH.interaction_depth(k, t);
-	    for (index i = 0; i < depth; i++) {
-		E += expected(P, theH.interaction_left(k, i, t), k,
-			      theH.interaction_right(k, i, t), k2);
-	    }
-	}
+template <class MPS>
+static inline double do_expected(const MPS &P, const Hamiltonian &theH,
+                                 double t) {
+  CTensor O1, O2, H;
+  cdouble E = number_zero<cdouble>();
+  index N = theH.size();
+  for (index k = 0, k2 = 1; k < N; k++, k2++) {
+    H = theH.local_term(k, t);
+    if (!H.is_empty()) {
+      E = E + expected(P, H, k);
     }
+    if (k2 == N) {
+      if (k == 0 || !theH.is_periodic()) break;
+      k2 = 0;
+    }
+    if (N > 0) {
+      index depth = theH.interaction_depth(k, t);
+      for (index i = 0; i < depth; i++) {
+        E += expected(P, theH.interaction_left(k, i, t), k,
+                      theH.interaction_right(k, i, t), k2);
+      }
+    }
+  }
 #if 0
     if (abs(im_part(E))/max(abs(E),1.0) > 1e-10) {
 	std::cerr << "In Hamiltonian::expected_value(), got complex results when computing\n"
@@ -52,8 +51,7 @@ namespace mps {
 	//myabort();
     }
 #endif
-    return real(E);
-  }
+  return real(E);
+}
 
-} // namespace mps
-
+}  // namespace mps

@@ -27,7 +27,7 @@
 
 namespace mps {
 
-  /*----------------------------------------------------------------------
+/*----------------------------------------------------------------------
    * THE MATHEMATICS OF THE SIMPLIFICATION
    *
    * We have a matrix product state
@@ -60,77 +60,71 @@ namespace mps {
    *	A{k+2} = Mr{k+1}
    * For the first round we only need to compute the Mr{2}..Mr{N}.
    */
-  template<class Tensor>
-  static void
-  normalize_this(Tensor &Pk, int sense)
-  {
-    index a1,i1,a2;
-    Tensor U;
-    if (sense > 0) {
-      Pk.get_dimensions(&a1,&i1,&a2);
-      linalg::block_svd(reshape(Pk, a1*i1,a2), &U, NULL, SVD_ECONOMIC);
-      a2 = std::min(a1*i1, a2);
-    } else {
-      Pk.get_dimensions(&a1,&i1,&a2);
-      linalg::block_svd(reshape(Pk, a1,i1*a2), NULL, &U, SVD_ECONOMIC);
-      a1 = std::min(a1, i1*a2);
+template <class Tensor>
+static void normalize_this(Tensor &Pk, int sense) {
+  index a1, i1, a2;
+  Tensor U;
+  if (sense > 0) {
+    Pk.get_dimensions(&a1, &i1, &a2);
+    linalg::block_svd(reshape(Pk, a1 * i1, a2), &U, NULL, SVD_ECONOMIC);
+    a2 = std::min(a1 * i1, a2);
+  } else {
+    Pk.get_dimensions(&a1, &i1, &a2);
+    linalg::block_svd(reshape(Pk, a1, i1 * a2), NULL, &U, SVD_ECONOMIC);
+    a1 = std::min(a1, i1 * a2);
+  }
+  Pk = reshape(U, a1, i1, a2);
+}
+
+template <class MPS>
+struct MPSManySimplifier {
+  typedef typename MPS::elt_t Tensor;
+  typedef typename Tensor::elt_t number;
+  typedef std::vector<Tensor> tensor_vector_t;
+  typedef std::vector<tensor_vector_t> matrices_t;
+  typedef std::vector<MPS> mps_vector_t;
+
+  index L;
+  const index nvectors;
+  const mps_vector_t &Q;
+  const Tensor &weights;
+  matrices_t A;
+  double normQ2;
+
+  MPSManySimplifier(const mps_vector_t &aQ, const Tensor &aweights)
+      : nvectors(aQ.size()), Q(aQ), weights(aweights) {
+    if (nvectors == 0) {
+      std::cerr << "In mps::simplify(), at least one vector has to be provided."
+                << std::endl;
+      abort();
     }
-    Pk = reshape(U, a1,i1,a2);
+    L = Q[0].size();
+    if (L == 1) {
+      std::cerr << "The mps::simplify() function is designed to "
+                   "work with states that have more than one site."
+                << std::endl;
+      abort();
+    }
+
+    A = matrices_t(L + 2, tensor_vector_t(nvectors));
+    dump_matrices("Const");
+
+    number x = number_zero<number>();
+    for (int i = 0; i < nvectors; i++) {
+      for (int j = i; j < nvectors; j++) {
+        number y = scprod(Q[i], Q[j]) * tensor::conj(weights[i]) * weights[j];
+        if (i == j)
+          x = x + y;
+        else
+          x = x + 2 * real(y);
+      }
+    }
+    normQ2 = real(x);
   }
 
-  template<class MPS>
-  struct MPSManySimplifier {
-    typedef typename MPS::elt_t Tensor;
-    typedef typename Tensor::elt_t number;
-    typedef std::vector<Tensor> tensor_vector_t;
-    typedef std::vector<tensor_vector_t> matrices_t;
-    typedef std::vector<MPS> mps_vector_t;
+  Tensor &matrix(index site, index vector) { return A[site + 1].at(vector); }
 
-    index L;
-    const index nvectors;
-    const mps_vector_t &Q;
-    const Tensor &weights;
-    matrices_t A;
-    double normQ2;
-
-    MPSManySimplifier(const mps_vector_t &aQ, const Tensor &aweights) :
-      nvectors(aQ.size()), Q(aQ), weights(aweights)
-    {
-      if (nvectors == 0) {
-        std::cerr << "In mps::simplify(), at least one vector has to be provided."
-                  << std::endl;
-        abort();
-      }
-      L = Q[0].size();
-      if (L == 1) {
-        std::cerr << "The mps::simplify() function is designed to "
-          "work with states that have more than one site."
-                  << std::endl;
-        abort();
-      }
-
-      A = matrices_t(L+2, tensor_vector_t(nvectors));
-      dump_matrices("Const");
-
-      number x = number_zero<number>();
-      for (int i = 0; i < nvectors; i++) {
-        for (int j = i; j < nvectors; j++) {
-          number y = scprod(Q[i], Q[j]) * tensor::conj(weights[i]) * weights[j];
-          if (i == j)
-            x = x + y;
-          else
-            x = x + 2 * real(y);
-        }
-      }
-      normQ2 = real(x);
-    }
-
-    Tensor &matrix(index site, index vector) {
-      return A[site+1].at(vector);
-    }
-
-    void
-    dump_matrices(const char *context = "foo") {
+  void dump_matrices(const char *context = "foo") {
 #if 0
       std::cout << context << std::endl;
       for (int j = 0; j < A.size(); j++) {
@@ -140,126 +134,113 @@ namespace mps {
         }
       }
 #endif
-    }
+  }
 
-    void
-    update_matrices(index site, const Tensor &Pk, int sense)
-    {
-      if (sense > 0) {
-        for (int i = 0; i < nvectors; i++) {
-          matrix(site, i) = prop_matrix(matrix(site - 1, i), +1, Pk, Q[i][site]);
-        }
-      } else {
-        for (int i = 0; i < nvectors; i++) {
-          matrix(site, i) = prop_matrix(matrix(site + 1, i), -1, Pk, Q[i][site]);
-        }
-      }
-    }
-
-    number
-    true_scprod(const MPS &P)
-    {
-      number x = number_zero<number>();
+  void update_matrices(index site, const Tensor &Pk, int sense) {
+    if (sense > 0) {
       for (int i = 0; i < nvectors; i++) {
-        x = x + scprod(P, Q[i]) * weights[i];
+        matrix(site, i) = prop_matrix(matrix(site - 1, i), +1, Pk, Q[i][site]);
       }
-      return x;
-    }
-
-    void
-    initialize_matrices(const MPS &P, int sense)
-    {
-      if (sense > 0) {
-        for (index k = L; k--; ) {
-          update_matrices(k, P[k], -1);
-        }
-      } else if (sense < 0) {
-        for (index k = 0; k < L; k++) {
-          update_matrices(k, P[k], +1);
-        }
-      } else {
-        std::cerr << "In simplify(MPS &,...): sense=0 is not a valid direction";
-        abort();
-      }
-      dump_matrices("initialization");
-    }
-
-    number
-    scalar_product(index site)
-    {
-      number M = number_zero<number>();
-      dump_matrices("scprod");
+    } else {
       for (int i = 0; i < nvectors; i++) {
-        M += prop_matrix_close(matrix(site, i))[0] * weights[i];
+        matrix(site, i) = prop_matrix(matrix(site + 1, i), -1, Pk, Q[i][site]);
       }
-      return M;
     }
+  }
 
-    const Tensor
-    next_projector(Tensor Ml, Tensor Mr, const Tensor &Qk)
-    {
-      index a1,a2,b1,i1,b2,a3,b3;
+  number true_scprod(const MPS &P) {
+    number x = number_zero<number>();
+    for (int i = 0; i < nvectors; i++) {
+      x = x + scprod(P, Q[i]) * weights[i];
+    }
+    return x;
+  }
 
-      if (Mr.is_empty()) {
-        if (Ml.is_empty()) {
-          return Qk;
-        } else {
-          Ml.get_dimensions(&a1,&b1,&a2,&b2);
-          Qk.get_dimensions(&b2,&i1,&b1);
-          // Ml(a1,b1,a2,b2) -> Ml([b2,b1],a2,a1)
-          Ml = reshape(permute(Ml, 0, 3), b2*b1,a2,a1);
-          // Qk(b2,i1,b1) -> Pk([b2,b1],i1)
-          Tensor Pk = reshape(permute(Qk, 1, 2), b2*b1,i1);
-          // Pk(a2,i1,a1) = Ml([b2,b1],a2,a1) Pk([b2,b1],i1)
-          return permute(reshape(fold(Ml, 0, Pk, 0), a2,a1,i1), 1,2);
-        }
-      } else if (Ml.is_empty()) {
-        Mr.get_dimensions(&a1,&b1,&a2,&b2);
-        Qk.get_dimensions(&b2,&i1,&b1);
-        // Mr(a1,b1,a2,b2) -> Mr([b2,b1],a2,a1)
-        Mr = reshape(permute(Mr, 0, 3), b2*b1,a2,a1);
+  void initialize_matrices(const MPS &P, int sense) {
+    if (sense > 0) {
+      for (index k = L; k--;) {
+        update_matrices(k, P[k], -1);
+      }
+    } else if (sense < 0) {
+      for (index k = 0; k < L; k++) {
+        update_matrices(k, P[k], +1);
+      }
+    } else {
+      std::cerr << "In simplify(MPS &,...): sense=0 is not a valid direction";
+      abort();
+    }
+    dump_matrices("initialization");
+  }
+
+  number scalar_product(index site) {
+    number M = number_zero<number>();
+    dump_matrices("scprod");
+    for (int i = 0; i < nvectors; i++) {
+      M += prop_matrix_close(matrix(site, i))[0] * weights[i];
+    }
+    return M;
+  }
+
+  const Tensor next_projector(Tensor Ml, Tensor Mr, const Tensor &Qk) {
+    index a1, a2, b1, i1, b2, a3, b3;
+
+    if (Mr.is_empty()) {
+      if (Ml.is_empty()) {
+        return Qk;
+      } else {
+        Ml.get_dimensions(&a1, &b1, &a2, &b2);
+        Qk.get_dimensions(&b2, &i1, &b1);
+        // Ml(a1,b1,a2,b2) -> Ml([b2,b1],a2,a1)
+        Ml = reshape(permute(Ml, 0, 3), b2 * b1, a2, a1);
         // Qk(b2,i1,b1) -> Pk([b2,b1],i1)
-        Tensor Pk = reshape(permute(Qk, 1, 2), b2*b1,i1);
-        // Pk(a2,i1,a1) = Mr([b2,b1],a2,a1) Pk([b2,b1],i1)
-        return permute(reshape(fold(Mr, 0, Pk, 0), a2,a1,i1), 1,2);
-      } else {
-        Ml.get_dimensions(&a1,&b1,&a2,&b2);
-        Qk.get_dimensions(&b2,&i1,&b3);
-        Mr.get_dimensions(&a3,&b3,&a1,&b1);
-        // Qk(b2,i1,b3) Ml(a1,b1,a2,b2) -> Pk(i1,[b3,a1,b1],a2)
-        Tensor Pk = reshape(fold(Qk, 0, Ml, 3), i1,b3*a1*b1,a2);
-        // Mr(a1,b1,a3,b3) -> Mr([a1,b1,b3],a3)
-        Mr = reshape(permute(permute(Mr, 2, 3), 0, 2), b3*a1*b1,a3);
-        // Pk(i1,[b3,a1,b1],a2) Mr([a1,b1,b3],a3) -> Pk(a2,i1,a3)
-        return permute(reshape(fold(Pk, 1, Mr, 0), i1,a2,a3), 0,1);
+        Tensor Pk = reshape(permute(Qk, 1, 2), b2 * b1, i1);
+        // Pk(a2,i1,a1) = Ml([b2,b1],a2,a1) Pk([b2,b1],i1)
+        return permute(reshape(fold(Ml, 0, Pk, 0), a2, a1, i1), 1, 2);
       }
+    } else if (Ml.is_empty()) {
+      Mr.get_dimensions(&a1, &b1, &a2, &b2);
+      Qk.get_dimensions(&b2, &i1, &b1);
+      // Mr(a1,b1,a2,b2) -> Mr([b2,b1],a2,a1)
+      Mr = reshape(permute(Mr, 0, 3), b2 * b1, a2, a1);
+      // Qk(b2,i1,b1) -> Pk([b2,b1],i1)
+      Tensor Pk = reshape(permute(Qk, 1, 2), b2 * b1, i1);
+      // Pk(a2,i1,a1) = Mr([b2,b1],a2,a1) Pk([b2,b1],i1)
+      return permute(reshape(fold(Mr, 0, Pk, 0), a2, a1, i1), 1, 2);
+    } else {
+      Ml.get_dimensions(&a1, &b1, &a2, &b2);
+      Qk.get_dimensions(&b2, &i1, &b3);
+      Mr.get_dimensions(&a3, &b3, &a1, &b1);
+      // Qk(b2,i1,b3) Ml(a1,b1,a2,b2) -> Pk(i1,[b3,a1,b1],a2)
+      Tensor Pk = reshape(fold(Qk, 0, Ml, 3), i1, b3 * a1 * b1, a2);
+      // Mr(a1,b1,a3,b3) -> Mr([a1,b1,b3],a3)
+      Mr = reshape(permute(permute(Mr, 2, 3), 0, 2), b3 * a1 * b1, a3);
+      // Pk(i1,[b3,a1,b1],a2) Mr([a1,b1,b3],a3) -> Pk(a2,i1,a3)
+      return permute(reshape(fold(Pk, 1, Mr, 0), i1, a2, a3), 0, 1);
     }
+  }
 
-    void
-    dump_state(const MPS &P)
-    {
+  void dump_state(const MPS &P) {
 #if 0
       for (int i = 0; i < P.size(); i++)
         std::cout << "dP[" << i << "]=" << P[i].dimensions() << std::endl;
 #endif
-    }
+  }
 
-    const Tensor
-    next_projector(index site)
-    {
-      Tensor output;
-      for (int i = 0; i < nvectors; i++) {
-        Tensor new_Pk =
-          weights[i] * next_projector(matrix(site-1, i), matrix(site+1, i), Q[i][site]);
-        if (i)
-          output = output + new_Pk;
-        else
-          output = new_Pk;
-      }
-      return output;
+  const Tensor next_projector(index site) {
+    Tensor output;
+    for (int i = 0; i < nvectors; i++) {
+      Tensor new_Pk =
+          weights[i] *
+          next_projector(matrix(site - 1, i), matrix(site + 1, i), Q[i][site]);
+      if (i)
+        output = output + new_Pk;
+      else
+        output = new_Pk;
     }
+    return output;
+  }
 
-    /*
+  /*
      * This routine takes a state Q with large dimensionality and obtains another
      * matrix product state P which is smaller.
      *
@@ -279,90 +260,82 @@ namespace mps {
      *
      * 3) The value of SENSE can be passed further to apply_unitary(), simplify(), etc.
      */
-    double
-    simplify(MPS &P, int *sense, index sweeps, bool normalize)
-    {
-      bool debug = mps::FLAGS.get(MPS_DEBUG_SIMPLIFY);
-      double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
+  double simplify(MPS &P, int *sense, index sweeps, bool normalize) {
+    bool debug = mps::FLAGS.get(MPS_DEBUG_SIMPLIFY);
+    double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
 
-      int aux_sense = 1;
-      if (!sense) {
-        sense = &aux_sense;
+    int aux_sense = 1;
+    if (!sense) {
+      sense = &aux_sense;
+    }
+    if (sweeps < 1) sweeps = 1;
+
+    initialize_matrices(P, *sense);
+
+    if (debug) {
+      std::cout << "----------\nSimplifying " << Q.size()
+                << " states with norm " << normQ2 << std::endl;
+    }
+    double err = normQ2 * 10, scp, normP2;
+    for (index sweep = 0; sweep < sweeps; sweep++) {
+      Tensor Pk;
+      if (*sense > 0) {
+        for (index k = 0; k < L; k++) {
+          Pk = next_projector(k);
+          set_canonical(P, k, Pk, +1, false);
+          Pk = P.at(k);
+          update_matrices(k, Pk, +1);
+        }
+        scp = real(scalar_product(L - 1));
+        normP2 = real(scprod(Pk, Pk));
+      } else {
+        for (index k = L; k--;) {
+          Pk = next_projector(k);
+          set_canonical(P, k, Pk, -1, false);
+          Pk = P.at(k);
+          update_matrices(k, Pk, -1);
+        }
+        scp = real(scalar_product(0));
+        normP2 = real(scprod(Pk, Pk));
       }
-      if (sweeps < 1)
-        sweeps = 1;
-
-      initialize_matrices(P, *sense);
-
+      double olderr = err;
+      err = tensor::abs(normQ2 + normP2 - 2 * scp);
       if (debug) {
-        std::cout << "----------\nSimplifying " << Q.size()
-                  <<" states with norm " << normQ2 << std::endl;
+        std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
       }
-      double err = normQ2 * 10, scp, normP2;
-      for (index sweep = 0; sweep < sweeps; sweep++) {
-        Tensor Pk;
-        if (*sense > 0) {
-          for (index k = 0; k < L; k++) {
-            Pk = next_projector(k);
-            set_canonical(P, k, Pk, +1, false);
-            Pk = P.at(k);
-            update_matrices(k, Pk, +1);
-          }
-          scp = real(scalar_product(L-1));
-          normP2 = real(scprod(Pk, Pk));
-        } else {
-          for (index k = L; k--; ) {
-            Pk = next_projector(k);
-            set_canonical(P, k, Pk, -1, false);
-            Pk = P.at(k);
-            update_matrices(k, Pk, -1);
-          }
-          scp = real(scalar_product(0));
-          normP2 = real(scprod(Pk, Pk));
+      if (tensor::abs(olderr - err) < 1e-5 * tensor::abs(normQ2) ||
+          (err < tolerance * normQ2) || (err < 1e-14)) {
+        if (normalize) {
+          index ndx = (*sense > 0) ? L - 1 : 0;
+          P.at(ndx) = Pk / sqrt(normP2);
+          *sense = -*sense;
         }
-        double olderr = err;
-        err = tensor::abs(normQ2 + normP2 - 2 * scp);
-        if (debug) {
-          std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
-        }
-        if (tensor::abs(olderr-err) < 1e-5*tensor::abs(normQ2) ||
-            (err < tolerance * normQ2) ||
-            (err < 1e-14))
-          {
-            if (normalize) {
-              index ndx = (*sense>0) ? L-1 : 0;
-              P.at(ndx) = Pk/sqrt(normP2);
-              *sense = -*sense;
-            }
-            break;
-          }
-        *sense = -*sense;
+        break;
       }
-      return err;
+      *sense = -*sense;
     }
+    return err;
+  }
 
+  const Tensor next_projector_2_sites(index site) {
+    Tensor output;
+    index a1, i1, i2, a2;
+    for (int i = 0; i < nvectors; i++) {
+      Tensor P = fold(Q[i][site], -1, Q[i][site + 1], 0);
+      P.get_dimensions(&a1, &i1, &i2, &a2);
 
-    const Tensor
-    next_projector_2_sites(index site)
-    {
-      Tensor output;
-      index a1, i1, i2, a2;
-      for (int i = 0; i < nvectors; i++) {
-        Tensor P = fold(Q[i][site], -1, Q[i][site+1], 0);
-        P.get_dimensions(&a1, &i1, &i2, &a2);
-
-        Tensor new_Pk =
-          weights[i] * next_projector(matrix(site-1, i), matrix(site+2, i),
-                                      reshape(P, a1, i1*i2, a2));
-        if (i)
-          output = output + new_Pk;
-        else
-          output = new_Pk;
-      }
-      return reshape(output, output.dimension(0), i1, i2, output.dimension(2));
+      Tensor new_Pk =
+          weights[i] * next_projector(matrix(site - 1, i), matrix(site + 2, i),
+                                      reshape(P, a1, i1 * i2, a2));
+      if (i)
+        output = output + new_Pk;
+      else
+        output = new_Pk;
     }
+    return reshape(output, output.dimension(0), i1, i2, output.dimension(2));
+  }
 
-    /*
+  /*
      * This routine takes a state Q with large dimensionality and obtains another
      * matrix product state P which is smaller.
      *
@@ -382,69 +355,64 @@ namespace mps {
      *
      * 3) The value of SENSE can be passed further to apply_unitary(), simplify(), etc.
      */
-    double
-    simplify_2_sites(MPS &P, index Dmax, double tol, int *sense,
-                     index sweeps, bool normalize)
-    {
-      bool debug = mps::FLAGS.get(MPS_DEBUG_SIMPLIFY);
-      double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
+  double simplify_2_sites(MPS &P, index Dmax, double tol, int *sense,
+                          index sweeps, bool normalize) {
+    bool debug = mps::FLAGS.get(MPS_DEBUG_SIMPLIFY);
+    double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
 
-      int aux_sense = 1;
-      if (!sense) {
-        sense = &aux_sense;
-      }
-      if (sweeps < 1)
-        sweeps = 1;
-
-      initialize_matrices(P, *sense);
-
-      if (debug) {
-        std::cout << "----------\nSimplifying " << Q.size()
-                  <<" states with norm " << normQ2 << std::endl;
-      }
-
-      double err = normQ2 * 10, scp, normP2;
-      for (index sweep = 0; sweep < sweeps; sweep++) {
-        Tensor Pk;
-        if (*sense > 0) {
-          for (index k = 0; k < (L-1); k++) {
-            Pk = next_projector_2_sites(k);
-            set_canonical_2_sites(P, Pk, k, +1, Dmax, tol);
-            update_matrices(k, P[k], +1);
-          }
-          update_matrices(L-1, Pk = P[L-1], +1);
-          scp = real(scalar_product(L-1));
-          normP2 = real(scprod(Pk, Pk));
-        } else {
-          for (index k = L-1; k > 0; k--) {
-            Pk = next_projector_2_sites(k-1);
-            set_canonical_2_sites(P, Pk, k, -1, Dmax, tol);
-            update_matrices(k, P[k], -1);
-          }
-          update_matrices(0, Pk = P[0], -1);
-          scp = real(scalar_product(0));
-          normP2 = real(scprod(Pk, Pk));
-        }
-        double olderr = err;
-        err = tensor::abs(normQ2 + normP2 - 2 * scp);
-        if (debug) {
-          std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
-        }
-        if (tensor::abs(olderr-err) < 1e-5*tensor::abs(normQ2) ||
-            (err < tolerance * normQ2) ||
-            (err < 1e-14))
-          {
-            if (normalize) {
-              index ndx = (*sense>0) ? L-1 : 0;
-              P.at(ndx) = Pk/sqrt(normP2);
-              *sense = -*sense;
-            }
-            break;
-          }
-        *sense = -*sense;
-      }
-      return err;
+    int aux_sense = 1;
+    if (!sense) {
+      sense = &aux_sense;
     }
-  };
+    if (sweeps < 1) sweeps = 1;
 
-} // namespace mps
+    initialize_matrices(P, *sense);
+
+    if (debug) {
+      std::cout << "----------\nSimplifying " << Q.size()
+                << " states with norm " << normQ2 << std::endl;
+    }
+
+    double err = normQ2 * 10, scp, normP2;
+    for (index sweep = 0; sweep < sweeps; sweep++) {
+      Tensor Pk;
+      if (*sense > 0) {
+        for (index k = 0; k < (L - 1); k++) {
+          Pk = next_projector_2_sites(k);
+          set_canonical_2_sites(P, Pk, k, +1, Dmax, tol);
+          update_matrices(k, P[k], +1);
+        }
+        update_matrices(L - 1, Pk = P[L - 1], +1);
+        scp = real(scalar_product(L - 1));
+        normP2 = real(scprod(Pk, Pk));
+      } else {
+        for (index k = L - 1; k > 0; k--) {
+          Pk = next_projector_2_sites(k - 1);
+          set_canonical_2_sites(P, Pk, k, -1, Dmax, tol);
+          update_matrices(k, P[k], -1);
+        }
+        update_matrices(0, Pk = P[0], -1);
+        scp = real(scalar_product(0));
+        normP2 = real(scprod(Pk, Pk));
+      }
+      double olderr = err;
+      err = tensor::abs(normQ2 + normP2 - 2 * scp);
+      if (debug) {
+        std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
+      }
+      if (tensor::abs(olderr - err) < 1e-5 * tensor::abs(normQ2) ||
+          (err < tolerance * normQ2) || (err < 1e-14)) {
+        if (normalize) {
+          index ndx = (*sense > 0) ? L - 1 : 0;
+          P.at(ndx) = Pk / sqrt(normP2);
+          *sense = -*sense;
+        }
+        break;
+      }
+      *sense = -*sense;
+    }
+    return err;
+  }
+};
+
+}  // namespace mps

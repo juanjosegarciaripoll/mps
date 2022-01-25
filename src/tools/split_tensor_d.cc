@@ -21,9 +21,9 @@
 
 namespace mps {
 
-  const RTensor split(RTensor *A, const RTensor &origA, int sense, bool truncate)
-  {
-    return do_split<RTensor>(A, origA, sense, truncate);
-  }
+const RTensor split(RTensor *A, const RTensor &origA, int sense,
+                    bool truncate) {
+  return do_split<RTensor>(A, origA, sense, truncate);
+}
 
-} // namespace mps
+}  // namespace mps

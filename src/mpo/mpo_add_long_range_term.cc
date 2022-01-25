@@ -22,7 +22,7 @@
 
 namespace mps {
 
-  /* This is how we encode MPO:
+/* This is how we encode MPO:
 
      - An operator is a collection of tensors A(a,i,j,b), where
        for fixed "a" and "b", the matrix A(a,i,j,b) is an operator
@@ -35,92 +35,92 @@ namespace mps {
     
    */
 
-  template<class MPO, class Tensor>
-  static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H, index i,
-                                 const Tensor *sign)
-  {
-    //
-    // This function add terms \sum_{j,j\neq i} H[i]*H[j] to a Hamiltonian.
-    // The origin of interactions is thus marked by "i"
-    //
-    int start = 0, end = mpo.size();
-    if (i < 0 || i >= end) {
-      std::cerr << "In add_interaction(), the index " << i << " is outside the lattice.\n";
-      abort();
-    }
-    if (norm2(H[i]) == 0) {
-      return;
-    }
-    int last_closing = 0;
-    while (start < end && norm2(H[start]) == 0) {
-      ++start;
-    }
-    while (end && (sum(abs(H[end-1])) == 0)) {
-      --end;
-      last_closing = 1;
-    }
-    for (int j = start; j < end; ++j) {
-      const Tensor &Hj = H[j];
-      Tensor Pj = mpo[j];
-      index dl = Pj.dimension(0);
-      index dr = Pj.dimension(3);
-      int opening = 0, closing = 1;
-#if 1
-      if (j+1 < end){
-        Pj = change_dimension(Pj, 3, dr+1);
-        if (j <= i) {
-          Pj.at(range(opening),range(),range(),range(dr)) = Hj;
-        }
-      } else {
-        closing = last_closing;
-      }
-      if (j > start) {
-        Pj = change_dimension(Pj, 0, dl+1);
-        if (i <= j) {
-          Pj.at(range(dl),range(),range(),range(closing)) = Hj;
-        }
-        if (i != j && j+1 < end) {
-          Pj.at(range(dl),range(),range(),range(dr)) =
-            sign? *sign : Tensor::eye(Hj.rows());
-        }
-      }
-#else
-      if (j > start) {
-        Pj = change_dimension(Pj, 0, dl+1);
-      }
-      if (j+1 < end){
-        Pj = change_dimension(Pj, 3, dr+1);
-      } else {
-        closing = last_closing;
-      }
-      if (j == i) {
-        // We are on the origin of the interaction
-        // We close all terms that came from the left
-        if (j > start) {
-          Pj.at(range(dl),range(),range(),range(closing)) = Hj;
-        }
-        // We open all terms that did not have anything on the left
-        if (j+1 < end) {
-          Pj.at(range(opening),range(),range(),range(dr)) = Hj;
-        }
-      } else if (j < i) {
-        // We open new terms
-        Pj.at(range(opening),range(),range(),range(dr)) = Hj;
-        if (j > start) {
-          Pj.at(range(dl),range(),range(),range(dr)) =
-            sign? *sign : Tensor::eye(Hj.rows());
-        }
-      } else {
-        // We close terms opened by the qubit
-        Pj.at(range(dl),range(),range(),range(closing)) = Hj;
-        if (j+1 < end) {
-          Pj.at(range(dl),range(),range(),range(dr)) =
-            sign? *sign : Tensor::eye(Hj.rows());
-        }
-      }
-#endif
-      mpo.at(j) = Pj;
-    }
+template <class MPO, class Tensor>
+static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H, index i,
+                               const Tensor *sign) {
+  //
+  // This function add terms \sum_{j,j\neq i} H[i]*H[j] to a Hamiltonian.
+  // The origin of interactions is thus marked by "i"
+  //
+  int start = 0, end = mpo.size();
+  if (i < 0 || i >= end) {
+    std::cerr << "In add_interaction(), the index " << i
+              << " is outside the lattice.\n";
+    abort();
   }
+  if (norm2(H[i]) == 0) {
+    return;
+  }
+  int last_closing = 0;
+  while (start < end && norm2(H[start]) == 0) {
+    ++start;
+  }
+  while (end && (sum(abs(H[end - 1])) == 0)) {
+    --end;
+    last_closing = 1;
+  }
+  for (int j = start; j < end; ++j) {
+    const Tensor &Hj = H[j];
+    Tensor Pj = mpo[j];
+    index dl = Pj.dimension(0);
+    index dr = Pj.dimension(3);
+    int opening = 0, closing = 1;
+#if 1
+    if (j + 1 < end) {
+      Pj = change_dimension(Pj, 3, dr + 1);
+      if (j <= i) {
+        Pj.at(range(opening), range(), range(), range(dr)) = Hj;
+      }
+    } else {
+      closing = last_closing;
+    }
+    if (j > start) {
+      Pj = change_dimension(Pj, 0, dl + 1);
+      if (i <= j) {
+        Pj.at(range(dl), range(), range(), range(closing)) = Hj;
+      }
+      if (i != j && j + 1 < end) {
+        Pj.at(range(dl), range(), range(), range(dr)) =
+            sign ? *sign : Tensor::eye(Hj.rows());
+      }
+    }
+#else
+    if (j > start) {
+      Pj = change_dimension(Pj, 0, dl + 1);
+    }
+    if (j + 1 < end) {
+      Pj = change_dimension(Pj, 3, dr + 1);
+    } else {
+      closing = last_closing;
+    }
+    if (j == i) {
+      // We are on the origin of the interaction
+      // We close all terms that came from the left
+      if (j > start) {
+        Pj.at(range(dl), range(), range(), range(closing)) = Hj;
+      }
+      // We open all terms that did not have anything on the left
+      if (j + 1 < end) {
+        Pj.at(range(opening), range(), range(), range(dr)) = Hj;
+      }
+    } else if (j < i) {
+      // We open new terms
+      Pj.at(range(opening), range(), range(), range(dr)) = Hj;
+      if (j > start) {
+        Pj.at(range(dl), range(), range(), range(dr)) =
+            sign ? *sign : Tensor::eye(Hj.rows());
+      }
+    } else {
+      // We close terms opened by the qubit
+      Pj.at(range(dl), range(), range(), range(closing)) = Hj;
+      if (j + 1 < end) {
+        Pj.at(range(dl), range(), range(), range(dr)) =
+            sign ? *sign : Tensor::eye(Hj.rows());
+      }
+    }
+#endif
+    mpo.at(j) = Pj;
+  }
+}
 
-} // namespace mps
+}  // namespace mps

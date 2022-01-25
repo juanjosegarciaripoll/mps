@@ -24,40 +24,40 @@
 
 namespace tensor_test {
 
-  using namespace tensor;
+using namespace tensor;
 
-  //////////////////////////////////////////////////////////////////////
-  // SPIN OPERATORS
-  //
+//////////////////////////////////////////////////////////////////////
+// SPIN OPERATORS
+//
 
-  TEST(RMPSTest, SpinSafetyTest) {
+TEST(RMPSTest, SpinSafetyTest) {
 #ifndef NDEBUG
-    CTensor s[3];
-    ASSERT_DEATH(mps::spin_operators(0, s, s+1, s+2), ".*");
-    ASSERT_DEATH(mps::spin_operators(-1, s, s+1, s+2), ".*");
-    ASSERT_DEATH(mps::spin_operators(0.1, s, s+1, s+2), ".*");
+  CTensor s[3];
+  ASSERT_DEATH(mps::spin_operators(0, s, s + 1, s + 2), ".*");
+  ASSERT_DEATH(mps::spin_operators(-1, s, s + 1, s + 2), ".*");
+  ASSERT_DEATH(mps::spin_operators(0.1, s, s + 1, s + 2), ".*");
 #endif
-  }
+}
 
-  TEST(RMPSTest, SpinCommutations) {
-    for (double s = 0.5; s <= 1.2; s += 0.5) {
-      CTensor S[3];
-      mps::spin_operators(s, S, S+1, S+2);
-      for (int i = 0; i < 3; i++) {
-        int j = (i + 1) % 3;
-        int k = (j + 1) % 3;
-        EXPECT_TRUE(approx_eq(mmult(S[i], S[j])-mmult(S[j],S[i]),
-                              to_complex(0.0,1.0) * S[k]));
-      }
+TEST(RMPSTest, SpinCommutations) {
+  for (double s = 0.5; s <= 1.2; s += 0.5) {
+    CTensor S[3];
+    mps::spin_operators(s, S, S + 1, S + 2);
+    for (int i = 0; i < 3; i++) {
+      int j = (i + 1) % 3;
+      int k = (j + 1) % 3;
+      EXPECT_TRUE(approx_eq(mmult(S[i], S[j]) - mmult(S[j], S[i]),
+                            to_complex(0.0, 1.0) * S[k]));
     }
   }
-
-  TEST(RMPSTest, SpinHalf) {
-    CTensor S[3];
-    mps::spin_operators(0.5, S, S+1, S+2);
-    EXPECT_TRUE(all_equal(to_complex(mps::Pauli_x/2.0), S[0]));
-    EXPECT_TRUE(all_equal(mps::Pauli_y/2.0, S[1]));
-    EXPECT_TRUE(all_equal(to_complex(mps::Pauli_z/2.0), S[2]));
-  }
-
 }
+
+TEST(RMPSTest, SpinHalf) {
+  CTensor S[3];
+  mps::spin_operators(0.5, S, S + 1, S + 2);
+  EXPECT_TRUE(all_equal(to_complex(mps::Pauli_x / 2.0), S[0]));
+  EXPECT_TRUE(all_equal(mps::Pauli_y / 2.0, S[1]));
+  EXPECT_TRUE(all_equal(to_complex(mps::Pauli_z / 2.0), S[2]));
+}
+
+}  // namespace tensor_test

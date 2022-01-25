@@ -22,20 +22,18 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
-  double expected(const RMPS &a, const RTensor &op, index k)
-  {
-    return single_site_expected(a, op, k);
+double expected(const RMPS &a, const RTensor &op, index k) {
+  return single_site_expected(a, op, k);
+}
+
+double expected(const RMPS &a, const RTensor &op) {
+  double output = 0.0;
+  for (index i = 0; i < a.size(); i++) {
+    output += single_site_expected(a, op, i);
   }
+  return output;
+}
 
-  double expected(const RMPS &a, const RTensor &op)
-  {
-    double output = 0.0;
-    for (index i = 0; i < a.size(); i++) {
-      output += single_site_expected(a, op, i);
-    }
-    return output;
-  }
-
-} // namespace mps
+}  // namespace mps

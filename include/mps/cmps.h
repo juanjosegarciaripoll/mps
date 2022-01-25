@@ -25,39 +25,37 @@
 /*!\addtogroup TheMPS*/
 /* @{ */
 
-namespace mps
-{
+namespace mps {
 
-  /**Real matrix product structure.*/
-  class CMPS : public MP<tensor::CTensor>
-  {
-  public:
-    CMPS(const RMPS &real_mps);
-    CMPS(index size, index physical_dimension = 0, index bond_dimension = 1,
-         bool periodic = false);
-    CMPS(const tensor::Indices &physical_dimension, index bond_dimension = 1,
-         bool periodic = false);
-    CMPS(const std::vector<elt_t> &data) : parent(data){};
-    CMPS();
+/**Real matrix product structure.*/
+class CMPS : public MP<tensor::CTensor> {
+ public:
+  CMPS(const RMPS &real_mps);
+  CMPS(index size, index physical_dimension = 0, index bond_dimension = 1,
+       bool periodic = false);
+  CMPS(const tensor::Indices &physical_dimension, index bond_dimension = 1,
+       bool periodic = false);
+  CMPS(const std::vector<elt_t> &data) : parent(data){};
+  CMPS();
 
-    index normal_index(index i) const;
+  index normal_index(index i) const;
 
-    /**Can the CMP be used for a periodic boundary condition problem?*/
-    bool is_periodic() const;
+  /**Can the CMP be used for a periodic boundary condition problem?*/
+  bool is_periodic() const;
 
-    /**Create a random MPS. */
-    static CMPS random(index length, index physical_dimension,
-                       index bond_dimension, bool periodic = false);
+  /**Create a random MPS. */
+  static CMPS random(index length, index physical_dimension,
+                     index bond_dimension, bool periodic = false);
 
-    /**Create a random MPS. */
-    static CMPS random(const tensor::Indices &physical_dimensions,
-                       index bond_dimension, bool periodic = false);
+  /**Create a random MPS. */
+  static CMPS random(const tensor::Indices &physical_dimensions,
+                     index bond_dimension, bool periodic = false);
 
-  private:
-    typedef MP<elt_t> parent;
-  };
+ private:
+  typedef MP<elt_t> parent;
+};
 
-}
+}  // namespace mps
 
 /* @} */
 

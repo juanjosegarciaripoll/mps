@@ -22,17 +22,13 @@
 
 namespace mps {
 
-  double
-  expected(const RiTEBD &psi, const RTensor &Op1, const RTensor &Op2)
-  {
-    return expected(psi, Op1, 0, Op2, 1);
-  }
-
-  double
-  expected(const RiTEBD &psi, const RTensor &Op1, int i,
-	   const RTensor &Op2, int j)
-  {
-    return string_order(psi, Op1, i, RTensor(), Op2, j);
-  }
-
+double expected(const RiTEBD &psi, const RTensor &Op1, const RTensor &Op2) {
+  return expected(psi, Op1, 0, Op2, 1);
 }
+
+double expected(const RiTEBD &psi, const RTensor &Op1, int i,
+                const RTensor &Op2, int j) {
+  return string_order(psi, Op1, i, RTensor(), Op2, j);
+}
+
+}  // namespace mps

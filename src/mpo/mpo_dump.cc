@@ -22,23 +22,22 @@
 
 namespace mps {
 
-  template<class MPO>
-  static std::ostream &do_dump_mpo(std::ostream &s, const MPO &mpo, const char *name)
-  {
-    for (index n = 0; n < mpo.size(); n++) {
-      const typename MPO::elt_t P = mpo[n];
-      index r = P.dimension(1);
-      index c = P.dimension(2);
-      for (index i = 0; i < P.dimension(0); i++) {
-	for (index j = 0; j < P.dimension(3); j++) {
-	  s << name << '[' << n << "](" << i << ",:,:," << j << ")=\n"
-	    << matrix_form(reshape(P(range(i),range(),range(),range(j)),
-				r, c))
-	    << std::endl;
-	}
+template <class MPO>
+static std::ostream &do_dump_mpo(std::ostream &s, const MPO &mpo,
+                                 const char *name) {
+  for (index n = 0; n < mpo.size(); n++) {
+    const typename MPO::elt_t P = mpo[n];
+    index r = P.dimension(1);
+    index c = P.dimension(2);
+    for (index i = 0; i < P.dimension(0); i++) {
+      for (index j = 0; j < P.dimension(3); j++) {
+        s << name << '[' << n << "](" << i << ",:,:," << j << ")=\n"
+          << matrix_form(reshape(P(range(i), range(), range(), range(j)), r, c))
+          << std::endl;
       }
     }
-    return s;
   }
+  return s;
+}
 
-} // namespace mps
+}  // namespace mps

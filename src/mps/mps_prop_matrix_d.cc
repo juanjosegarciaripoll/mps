@@ -22,27 +22,21 @@
 
 namespace mps {
 
-  const RTensor prop_matrix_close(const RTensor &N)
-  {
-    return do_prop_close(N);
-  }
+const RTensor prop_matrix_close(const RTensor &N) { return do_prop_close(N); }
 
-  const RTensor prop_matrix_close(const RTensor &L, const RTensor &R)
-  {
-    return do_prop_close(L, R);
-  }
+const RTensor prop_matrix_close(const RTensor &L, const RTensor &R) {
+  return do_prop_close(L, R);
+}
 
-  const RTensor prop_matrix(const RTensor &M0, int sense, const RTensor &Q,
-			    const RTensor &P, const RTensor *op)
-  {
-    if (M0.is_empty()) {
-      return do_prop_init(Q, P, op);
-    } else if (sense > 0) {
-      return do_prop_right(M0, Q, P, op);
-    } else {
-      return do_prop_left(M0, Q, P, op);
-    }
+const RTensor prop_matrix(const RTensor &M0, int sense, const RTensor &Q,
+                          const RTensor &P, const RTensor *op) {
+  if (M0.is_empty()) {
+    return do_prop_init(Q, P, op);
+  } else if (sense > 0) {
+    return do_prop_right(M0, Q, P, op);
+  } else {
+    return do_prop_left(M0, Q, P, op);
   }
+}
 
-} //namespace mps
-  
+}  //namespace mps

@@ -21,9 +21,8 @@
 
 namespace mps {
 
-  void dump(sdf::OutDataFile &d, const CMPS &mps, const std::string &name)
-  {
-    d.dump(mps.to_vector(), name);    
-  }
+void dump(sdf::OutDataFile &d, const CMPS &mps, const std::string &name) {
+  d.dump(mps.to_vector(), name);
+}
 
-} // namespace mps
+}  // namespace mps

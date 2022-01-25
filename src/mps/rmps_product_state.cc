@@ -22,18 +22,17 @@
 
 namespace mps {
 
-  using namespace tensor;
+using namespace tensor;
 
-  const RMPS product_state(index length, const RTensor &local_state)
-  {
-    assert(local_state.rank() == 1);
-    assert(local_state.size());
-    assert(length > 0);
+const RMPS product_state(index length, const RTensor &local_state) {
+  assert(local_state.rank() == 1);
+  assert(local_state.size());
+  assert(length > 0);
 
-    index d = local_state.size();
-    RMPS output(length);
-    std::fill(output.begin(), output.end(), reshape(local_state, 1, d, 1));
-    return output;
-  }
+  index d = local_state.size();
+  RMPS output(length);
+  std::fill(output.begin(), output.end(), reshape(local_state, 1, d, 1));
+  return output;
+}
 
-} // namespace mps
+}  // namespace mps
