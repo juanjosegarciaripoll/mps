@@ -17,6 +17,9 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <type_traits>
+#include <mps/imath.h>
+
 namespace mps {
 
 //----------------------------------------------------------------------
@@ -36,21 +39,21 @@ static const sparse do_pair_Hamiltonian(const sparse &H12, const sparse &H1,
         << "supply either an interaction or a local Hamiltonian for each site.";
     abort();
   }
-  int d2 = H12.rows();
-  int d = std::max((int)H1.rows(), (int)sqrt((double)d2));
-  int D = (index)pow((double)d, (double)N);
+  index d2 = H12.rows();
+  index d = std::max(H1.rows(), isqrt(d));
+  index D = ipower(d, N);
   sparse output(D, D, 0);
 
   if (H12.length()) {
     for (index k = 1; k < N; k++) {
-      index D1 = (index)pow((double)d, (double)(k - 1));
-      index D2 = (index)pow((double)d, (double)(N - k - 1));
+      index D1 = ipow(d, k - 1);
+      index D2 = ipow(d, N - k - 1);
       output = output + kron(sparse::eye(D1), kron(H12, sparse::eye(D2)));
     }
     if (periodic && (N > 1)) {
       tensor O1, O2;
       decompose_operator(full(H12), &O1, &O2);
-      sparse aux = sparse::eye((index)pow((double)d, (double)(N - 2)));
+      sparse aux = sparse::eye(ipow(d, N - 2));
       for (index i = 0; i < O1.dimension(-1); i++) {
         sparse sO1 = sparse(squeeze(O1(range(), range(), range(i))));
         sparse sO2 = sparse(squeeze(O2(range(), range(), range(i))));
@@ -60,8 +63,8 @@ static const sparse do_pair_Hamiltonian(const sparse &H12, const sparse &H1,
   }
   if (H1.length()) {
     for (index k = 0; k < N; k++) {
-      index D1 = (index)pow((double)d, (double)k);
-      index D2 = (index)pow((double)d, (double)(N - k - 1));
+      index D1 = ipow(d, k);
+      index D2 = ipow(d, N - k - 1);
       output = output + kron(sparse::eye(D1), kron(H1, sparse::eye(D2)));
     }
   }

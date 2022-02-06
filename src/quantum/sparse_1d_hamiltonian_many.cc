@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <mps/imath.h>
 #include <mps/quantum.h>
 
 namespace mps {
@@ -36,7 +37,7 @@ static sparse do_sparse_1d_hamiltonian(const std::vector<sparse> &H12,
     if (!H1[k].is_empty()) {
       d.at(k) = H1[k].rows();
     } else if (!H12[k].is_empty()) {
-      d.at(k) = (int)sqrt((double)H12[k].rows());
+      d.at(k) = isqrt(H12[k].rows());
     } else {
       std::cerr
           << "In pair_Hamiltonian(H12[], H1[], N), you have not supplied any\n"

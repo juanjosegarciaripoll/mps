@@ -18,6 +18,7 @@
 */
 
 #include <tensor/linalg.h>
+#include <mps/imath.h>
 #include <mps/quantum.h>
 #include <mps/tools.h>
 
@@ -41,7 +42,7 @@ static inline void do_decompose_operator(const tensor &U0, tensor *O1,
      * following statement and which simplifies the application of O1 and O2 on a
      * given vector.
      */
-  index d1 = (index)sqrt((double)U0.rows());
+  index d1 = isqrt(U0.rows());
   index d2 = d1;
 
   if (U0.rows() != U0.columns()) {

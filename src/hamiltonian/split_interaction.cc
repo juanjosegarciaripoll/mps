@@ -19,6 +19,7 @@
 
 #include <cmath>
 #include <tensor/linalg.h>
+#include <mps/imath.h>
 #include <mps/quantum.h>
 #include <mps/hamiltonian.h>
 
@@ -35,7 +36,7 @@ void split_interaction(const CTensor &H12, std::vector<CTensor> *v1,
      * following statement and which simplifies the application of O1 and O2 on a
      * given vector.
      */
-  index d1 = static_cast<index>(sqrt((double)H12.rows()));
+  index d1 = isqrt(H12.rows());
   index d2 = d1;
 
   CTensor O1, O2;

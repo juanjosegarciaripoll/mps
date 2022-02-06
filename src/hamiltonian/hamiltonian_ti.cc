@@ -21,6 +21,7 @@
 // TRANSLATIONALLY INVARIANT HAMILTONIAN
 //
 
+#include <mps/imath.h>
 #include <mps/hamiltonian.h>
 
 namespace mps {
@@ -38,7 +39,7 @@ TIHamiltonian::TIHamiltonian(index N, const CTensor &H12, const CTensor &H1,
                    "term or an interaction.\n";
       abort();
     } else {
-      index d = static_cast<index>(round(sqrt(H12.rows())));
+      index d = isqrt(H12.rows());
       H1_ = RTensor::zeros(d, d);
     }
   }
