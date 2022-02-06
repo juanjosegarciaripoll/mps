@@ -7,7 +7,12 @@ endif()
 message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 
 # Source files are named relative but transformed into absolute paths
-cmake_policy(SET CMP0076 NEW)
+if(POLICY CMP0076)
+  cmake_policy(SET CMP0076 NEW)
+endif()
+if(POLICY CMP0111)
+  cmake_policy(SET CMP0111 OLD)
+endif()
 
 # set the project name and version
 project(mps
@@ -37,7 +42,7 @@ option(MPS_TEST "Enable support for tests with GoogleTest" ON)
 # Compiler settings and other tooling
 make_mps_options()
 
-find_package(tensor)
+find_package(tensor REQUIRED)
 set(MPS_DEPENDENCIES "find_package(tensor)")
 
 ############################################################
