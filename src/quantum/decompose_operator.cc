@@ -24,6 +24,8 @@
 
 namespace mps {
 
+using namespace imath;
+
 //----------------------------------------------------------------------
 // SCHMIDT DECOMPOSITION FOR OPERATORS
 //

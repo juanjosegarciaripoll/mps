@@ -22,6 +22,8 @@
 
 namespace mps {
 
+using namespace imath;
+
 template <class sparse, class tensor>
 static sparse do_sparse_1d_hamiltonian(const std::vector<sparse> &H12,
                                        const std::vector<sparse> &H1,

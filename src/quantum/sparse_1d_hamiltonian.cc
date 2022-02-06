@@ -22,6 +22,8 @@
 
 namespace mps {
 
+using namespace imath;
+
 //----------------------------------------------------------------------
 // PAIR HAMILTONIAN
 //
@@ -39,7 +41,6 @@ static const sparse do_pair_Hamiltonian(const sparse &H12, const sparse &H1,
         << "supply either an interaction or a local Hamiltonian for each site.";
     abort();
   }
-  index d2 = H12.rows();
   index d = std::max(H1.rows(), isqrt(d));
   index D = ipower(d, N);
   sparse output(D, D, 0);

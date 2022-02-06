@@ -53,7 +53,7 @@ template <typename base,
           typename = std::enable_if<std::is_integral<base>::value>>
 static inline base isqrt(base b) {
   if (b < 0) {
-    throw std::invalid_argument("Negative argument to isqrt()")
+    throw std::invalid_argument("Negative argument to isqrt()");
   }
   if (b < 2) {
     return b;

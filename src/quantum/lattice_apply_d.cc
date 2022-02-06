@@ -25,8 +25,9 @@
 #include "lattice_apply.cc"
 
 namespace mps {
-const RTensor Lattice::eigs(const RTensor &J, const RTensor &U, int eig_type,
-                            size_t neig, RTensor *vectors, bool *converged,
+const RTensor Lattice::eigs(const RTensor &J, const RTensor &U,
+                            linalg::EigType eig_type, size_t neig,
+                            RTensor *vectors, bool *converged,
                             particle_kind_t kind) const {
   return linalg::eigs(
       [&](const RTensor &psi) {
