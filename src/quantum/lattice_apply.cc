@@ -24,8 +24,8 @@
 namespace mps {
 
 template <class Tensor>
-const Tensor apply_lattice(const Tensor &psi, const Lattice &L, const Tensor &J,
-                           const Tensor &U, Lattice::particle_kind_t kind) {
+Tensor apply_lattice(const Tensor &psi, const Lattice &L, const Tensor &J,
+                     const Tensor &U, Lattice::particle_kind_t kind) {
   Tensor output = Tensor::zeros(psi.dimensions());
   {
     RTensor values;

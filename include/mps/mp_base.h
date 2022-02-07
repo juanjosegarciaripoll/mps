@@ -81,8 +81,8 @@ class MP {
   data_type data_;
 };
 
-int largest_bond_dimension(const MP<tensor::RTensor> &mp);
-int largest_bond_dimension(const MP<tensor::CTensor> &mp);
+index largest_bond_dimension(const MP<tensor::RTensor> &mp);
+index largest_bond_dimension(const MP<tensor::CTensor> &mp);
 
 }  // namespace mps
 

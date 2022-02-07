@@ -26,6 +26,7 @@
 namespace mps {
 
 using namespace tensor;
+using mps::imath::isqrt;
 using tensor::index;
 
 void split_interaction(const CTensor &H12, std::vector<CTensor> *v1,
@@ -49,9 +50,9 @@ void split_interaction(const CTensor &H12, std::vector<CTensor> *v1,
   v2->resize(n_op);
   for (index i = 0; i < n_op; i++) {
     double sqrts = sqrt(s[i]);
-    v1->at(i) = sqrts * tensor::reshape(O1(range(), range(i)), d1, d1);
-    v2->at(i) =
-        tensor::conj(sqrts * tensor::reshape(O2(range(i), range()), d2, d2));
+    v1->at(i) = sqrts * tensor::reshape(O1(range(), range(i)).copy(), d1, d1);
+    v2->at(i) = tensor::conj(
+        sqrts * tensor::reshape(O2(range(i), range()).copy(), d2, d2));
   }
 }
 

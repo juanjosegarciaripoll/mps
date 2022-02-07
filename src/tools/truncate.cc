@@ -24,13 +24,15 @@
 
 namespace mps {
 
-size_t where_to_truncate(const RTensor &s, double tol, tensor::index max_dim) {
+using tensor::index;
+
+size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
   /* S is a vector of positive numbers arranged in decreasing order.  This
      * routine looks for a point to truncate S such that the norm-2 error made
      * is smaller than the relative tolerance (TOL) or the length of the output
      * is smaller than MAX_DIM.
      */
-  const size_t L = s.size();
+  const index L = s.ssize();
   bool debug = FLAGS.get(MPS_DEBUG_TRUNCATION);
 
   if (max_dim == 0 || max_dim > L) {
@@ -48,7 +50,7 @@ size_t where_to_truncate(const RTensor &s, double tol, tensor::index max_dim) {
   if (tol == 0 /* MPS_TRUNCATE_ZEROS */) {
     /* If the tolerance is zero, we only drop the trailing zero elements. There
        * is no need to accumulate values. */
-    for (size_t i = L; i--;) {
+    for (index i = L; i--;) {
       if (s[i]) {
         if (debug) {
           std::cout << "Truncated only zeros, new size " << i << " vs " << L
@@ -69,7 +71,7 @@ size_t where_to_truncate(const RTensor &s, double tol, tensor::index max_dim) {
      */
   double *cumulated = new double[L];
   double total = 0;
-  for (size_t i = L; i--;) {
+  for (index i = L; i--;) {
     total += square(s[i]);
     cumulated[i] = total;
   }
@@ -79,7 +81,7 @@ size_t where_to_truncate(const RTensor &s, double tol, tensor::index max_dim) {
      * DBL_EPSILON is irrelevant for all purposes.
      */
   double limit = std::max(tol, DBL_EPSILON) * total;
-  for (size_t i = 0; i < max_dim; i++) {
+  for (index i = 0; i < max_dim; i++) {
     if (cumulated[i] <= limit) {
       max_dim = i + 1;
       break;

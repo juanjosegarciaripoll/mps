@@ -22,7 +22,8 @@
 
 namespace mps {
 
-using namespace imath;
+using mps::imath::ipow;
+using mps::imath::isqrt;
 
 //----------------------------------------------------------------------
 // PAIR HAMILTONIAN
@@ -42,7 +43,7 @@ static const sparse do_pair_Hamiltonian(const sparse &H12, const sparse &H1,
     abort();
   }
   index d = std::max(H1.rows(), isqrt(d));
-  index D = ipower(d, N);
+  index D = ipow(d, N);
   sparse output(D, D, 0);
 
   if (H12.length()) {

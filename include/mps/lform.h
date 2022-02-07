@@ -51,7 +51,7 @@ class LinearForm {
   void propagate(const tensor_t &ketP, int sense);
 
   /** The site at which the quadratic form is defined. */
-  int here() const { return current_site_; }
+  index here() const { return current_site_; }
   /** Number of sites in the lattice. */
   index size() const { return bra_[0].size(); }
   /** Number of vectors that create the linear form. */

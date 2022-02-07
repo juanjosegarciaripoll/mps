@@ -113,12 +113,12 @@ struct Minimizer : public MinimizerOptions {
     }
   }
 
-  tensor_list_t orthogonal_projectors(index site, int sense) {
+  tensor_list_t orthogonal_projectors(index current_site, int sense) {
     tensor_list_t output;
     for (typename std::list<lform_t>::iterator it = OrthoLform.begin();
          it != OrthoLform.end(); ++it) {
-      if (site != it->here()) {
-        std::cout << "DMRG algorithm place at " << site
+      if (current_site != it->here()) {
+        std::cout << "DMRG algorithm place at " << current_site
                   << " while projectors at " << it->here() << std::endl;
         abort();
       }
@@ -129,15 +129,16 @@ struct Minimizer : public MinimizerOptions {
     return output;
   }
 
-  void propagate(const tensor_t &P, index site, int step) {
+  // TODO: Why P is not referenced?
+  void propagate(const tensor_t & /*P*/, index this_site, int this_step) {
     // Update Hamiltonian, constraints and linear forms for orthogonal
     // states with the new tensors that have just been introduced into
     // 'psi'.
-    Hqform.propagate(psi[site], psi[site], step);
-    if (Nqform) Nqform->propagate(psi[site], psi[site], step);
+    Hqform.propagate(psi[this_site], psi[this_site], this_step);
+    if (Nqform) Nqform->propagate(psi[this_site], psi[this_site], this_step);
     for (typename std::list<lform_t>::iterator it = OrthoLform.begin();
          it != OrthoLform.end(); ++it) {
-      it->propagate(psi[site], step);
+      it->propagate(psi[this_site], this_step);
     }
   }
 
@@ -158,15 +159,15 @@ struct Minimizer : public MinimizerOptions {
         P.size(), linalg::SmallestAlgebraic, 1, &P, &converged);
     if (site == psi.size() / 2 && compute_gap) {
       tensor_t newP = P;
-      tensor_t E = linalg::eigs(
+      tensor_t Egap = linalg::eigs(
           [&](const tensor_t &v) -> tensor_t {
             return apply_qform1<tensor_t, qform_t>(v, d, Hqform, orthogonal_to);
           },
           newP.size(), linalg::SmallestAlgebraic, 2, &newP, &converged);
+      constrained_gap = gap = real(Egap[1] - Egap[0]);
       if (debug) {
-        std::cout << "\thalf-size gap " << E[1] - E[0] << std::endl;
+        std::cout << "\thalf-size gap " << constrained_gap << std::endl;
       }
-      constrained_gap = gap = real(E[1] - E[0]);
     }
     if (converged) {
       set_canonical(psi, site, reshape(P, d), step, false);
@@ -180,7 +181,7 @@ struct Minimizer : public MinimizerOptions {
   }
 
   double single_site_sweep() {
-    double E;
+    double E = 0.0;
     if (step > 0) {
       for (site = 0; (site < size()) && converged; site++) {
         E = single_site_step();
@@ -219,12 +220,12 @@ struct Minimizer : public MinimizerOptions {
         return apply_qform2<tensor_t, qform_t>(v, step, newP12.dimensions(),
                                                Hqform, orthogonal_to);
       };
-      tensor_t E = linalg::eigs(fn, newP12.size(), linalg::SmallestAlgebraic, 2,
-                                &newP12);
+      tensor_t Egap = linalg::eigs(fn, newP12.size(), linalg::SmallestAlgebraic,
+                                   2, &newP12);
+      constrained_gap = gap = real(Egap[1] - Egap[0]);
       if (debug) {
-        std::cout << "\thalf-size gap " << E[1] - E[0] << std::endl;
+        std::cout << "\thalf-size gap " << constrained_gap << std::endl;
       }
-      constrained_gap = gap = real(E[1] - E[0]);
     }
     if (Nqform) {
       Indices subspace;
@@ -259,13 +260,14 @@ struct Minimizer : public MinimizerOptions {
           return apply_qform2_with_subspace(v, step, P12, Hqform, subspace,
                                             orthogonal_to);
         };
-        tensor_t E = linalg::eigs(fn, newP12.size(), linalg::SmallestAlgebraic,
-                                  2, &newP12, &converged);
+        tensor_t Egap =
+            linalg::eigs(fn, newP12.size(), linalg::SmallestAlgebraic, 2,
+                         &newP12, &converged);
+        constrained_gap = real(Egap[1] - Egap[0]);
         if (debug) {
-          std::cout << "\tconstrained half-size gap " << (E[1] - E[0])
+          std::cout << "\tconstrained half-size gap " << constrained_gap
                     << std::endl;
         }
-        constrained_gap = real(E[1] - E[0]);
       }
       P12.fill_with_zeros();
       P12.at(range(subspace)) = subP12;
@@ -293,7 +295,7 @@ struct Minimizer : public MinimizerOptions {
   }
 
   double two_site_sweep() {
-    double E;
+    double E = 0.0;
     if (step > 0) {
       for (site = 0; (site + 1 < size()) && converged; ++site) {
         E = two_site_step();
@@ -310,7 +312,7 @@ struct Minimizer : public MinimizerOptions {
 
   bool single_site() { return !Dmax; }
 
-  double full_sweep(mps_t *psi) {
+  double full_sweep(mps_t *psi_out) {
     double E = 1e28;
     if (debug) {
       tic();
@@ -327,7 +329,7 @@ struct Minimizer : public MinimizerOptions {
                   << "s" << std::endl;
       }
       if (!converged) {
-        *psi = mps_t();
+        *psi_out = mps_t();
         return E;
       }
       if (i) {
@@ -353,7 +355,7 @@ struct Minimizer : public MinimizerOptions {
       }
       E = newE;
     }
-    *psi = state();
+    *psi_out = state();
     return E;
   }
 };

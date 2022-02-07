@@ -26,7 +26,6 @@ namespace mps {
 
 template <class Tensor>
 static const Tensor do_split(Tensor *pU, Tensor psi, int sense, bool truncate) {
-  index b1, i1, b2;
   Tensor &U = *pU, V;
   Indices d = psi.dimensions();
   if (sense > 0) {

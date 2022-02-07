@@ -38,36 +38,36 @@ void test_mps_constructor() {
     MPS psi(/* size */ 1, /* physical dimension */ 2, /* bond dimension */ 3,
             /* periodic */ false);
     EXPECT_EQ(psi.size(), 1);
-    EXPECT_EQ(psi[0].dimensions(), igen << 1 << 2 << 1);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 1}));
   }
   {
     MPS psi(/* size */ 1, /* physical dimension */ 2, /* bond dimension */ 3,
             /* periodic */ true);
     EXPECT_EQ(psi.size(), 1);
-    EXPECT_EQ(psi[0].dimensions(), igen << 3 << 2 << 3);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({3, 2, 3}));
   }
   {
     MPS psi(/* size */ 2, /* physical dimension */ 2, /* bond dimension */ 3,
             /* periodic */ false);
     EXPECT_EQ(psi.size(), 2);
-    EXPECT_EQ(psi[0].dimensions(), igen << 1 << 2 << 3);
-    EXPECT_EQ(psi[1].dimensions(), igen << 3 << 2 << 1);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 2, 1}));
   }
   {
     MPS psi(/* size */ 3, /* physical dimension */ 2, /* bond dimension */ 3,
             /* periodic */ false);
     EXPECT_EQ(psi.size(), 3);
-    EXPECT_EQ(psi[0].dimensions(), igen << 1 << 2 << 3);
-    EXPECT_EQ(psi[1].dimensions(), igen << 3 << 2 << 3);
-    EXPECT_EQ(psi[2].dimensions(), igen << 3 << 2 << 1);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 2, 3}));
+    EXPECT_EQ(psi[2].dimensions(), Dimensions({3, 2, 1}));
   }
   {
     MPS psi(/* size */ 3, /* physical dimension */ 2, /* bond dimension */ 3,
             /* periodic */ true);
     EXPECT_EQ(psi.size(), 3);
-    EXPECT_EQ(psi[0].dimensions(), igen << 3 << 2 << 3);
-    EXPECT_EQ(psi[1].dimensions(), igen << 3 << 2 << 3);
-    EXPECT_EQ(psi[2].dimensions(), igen << 3 << 2 << 3);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({3, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 2, 3}));
+    EXPECT_EQ(psi[2].dimensions(), Dimensions({3, 2, 3}));
   }
 }
 
@@ -78,40 +78,40 @@ void test_mps_random() {
                           /* bond dimension */ 3,
                           /* periodic */ false);
     EXPECT_EQ(psi.size(), 1);
-    EXPECT_EQ(psi[0].dimensions(), igen << 1 << 2 << 1);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 1}));
   }
   {
     MPS psi = MPS::random(/* size */ 1, /* physical dimension */ 2,
                           /* bond dimension */ 3,
                           /* periodic */ true);
     EXPECT_EQ(psi.size(), 1);
-    EXPECT_EQ(psi[0].dimensions(), igen << 3 << 2 << 3);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({3, 2, 3}));
   }
   {
     MPS psi = MPS::random(/* size */ 2, /* physical dimension */ 2,
                           /* bond dimension */ 3,
                           /* periodic */ false);
     EXPECT_EQ(psi.size(), 2);
-    EXPECT_EQ(psi[0].dimensions(), igen << 1 << 2 << 3);
-    EXPECT_EQ(psi[1].dimensions(), igen << 3 << 2 << 1);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 2, 1}));
   }
   {
     MPS psi = MPS::random(/* size */ 3, /* physical dimension */ 2,
                           /* bond dimension */ 3,
                           /* periodic */ false);
     EXPECT_EQ(psi.size(), 3);
-    EXPECT_EQ(psi[0].dimensions(), igen << 1 << 2 << 3);
-    EXPECT_EQ(psi[1].dimensions(), igen << 3 << 2 << 3);
-    EXPECT_EQ(psi[2].dimensions(), igen << 3 << 2 << 1);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 2, 3}));
+    EXPECT_EQ(psi[2].dimensions(), Dimensions({3, 2, 1}));
   }
   {
     MPS psi = MPS::random(/* size */ 3, /* physical dimension */ 2,
                           /* bond dimension */ 3,
                           /* periodic */ true);
     EXPECT_EQ(psi.size(), 3);
-    EXPECT_EQ(psi[0].dimensions(), igen << 3 << 2 << 3);
-    EXPECT_EQ(psi[1].dimensions(), igen << 3 << 2 << 3);
-    EXPECT_EQ(psi[2].dimensions(), igen << 3 << 2 << 3);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({3, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 2, 3}));
+    EXPECT_EQ(psi[2].dimensions(), Dimensions({3, 2, 3}));
   }
 }
 

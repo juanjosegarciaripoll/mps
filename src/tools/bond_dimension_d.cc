@@ -21,9 +21,9 @@
 
 namespace mps {
 
-int largest_bond_dimension(const MP<tensor::RTensor> &mp) {
-  int i = 0;
-  for (int j = 0; j < mp.size(); j++) i = std::max<int>(i, mp[j].dimension(0));
+index largest_bond_dimension(const MP<tensor::RTensor> &mp) {
+  index i = 0;
+  for (index j = 0; j < mp.size(); j++) i = std::max(i, mp[j].dimension(0));
   return i;
 }
 

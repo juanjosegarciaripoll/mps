@@ -22,7 +22,7 @@
 
 namespace mps {
 
-static const int byte[256] = {
+static const index byte[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4,
     2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
     2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4,
@@ -35,7 +35,7 @@ static const int byte[256] = {
     4, 5, 5, 6, 5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
     4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8};
 
-int Lattice::count_bits(Lattice::word w) {
+index Lattice::count_bits(Lattice::word w) {
   if (sizeof(w) == 4) {
     return byte[w & 0xff] + byte[(w >> 8) & 0xff] + byte[(w >> 16) & 0xff] +
            byte[(w >> 24) & 0xff];
@@ -45,7 +45,7 @@ int Lattice::count_bits(Lattice::word w) {
   }
 }
 
-const Indices Lattice::states_with_n_particles(int sites, int filling) {
+const Indices Lattice::states_with_n_particles(index sites, index filling) {
   if (sizeof(word) == 4) {
     if (sites >= 32) {
       std::cerr << "In this architecture with 32-bit words, Lattice can only "
@@ -79,14 +79,14 @@ const Indices Lattice::states_with_n_particles(int sites, int filling) {
   return output;
 }
 
-Lattice::Lattice(int sites, int N)
+Lattice::Lattice(index sites, index N)
     : number_of_sites(sites),
       number_of_particles(N),
       configurations(
           states_with_n_particles(number_of_sites, number_of_particles)) {}
 
-void Lattice::hopping_inner(RTensor *values, Indices *ndx, int to_site,
-                            int from_site, particle_kind_t kind) const {
+void Lattice::hopping_inner(RTensor *values, Indices *ndx, index to_site,
+                            index from_site, particle_kind_t kind) const {
   word L = configurations.size();
   *values = RTensor::zeros(igen << L);
 
@@ -144,7 +144,7 @@ void Lattice::hopping_inner(RTensor *values, Indices *ndx, int to_site,
   }
 }
 
-const RSparse Lattice::hopping_operator(int to_site, int from_site,
+const RSparse Lattice::hopping_operator(index to_site, index from_site,
                                         particle_kind_t kind) const {
   if (to_site == from_site) return number_operator(from_site);
   Indices rows;
@@ -159,18 +159,18 @@ const RSparse Lattice::hopping_operator(int to_site, int from_site,
   return RSparse(rows, cols, values, rows.size(), rows.size());
 }
 
-const RSparse Lattice::number_operator(int site) const {
+const RSparse Lattice::number_operator(index site) const {
   return interaction_operator(site, site);
 }
 
-const RSparse Lattice::interaction_operator(int site1, int site2) const {
+const RSparse Lattice::interaction_operator(index site1, index site2) const {
   word L = configurations.size();
   RTensor values = interaction_inner(site1, site2);
   Indices n = iota(0, L - 1);
   return RSparse(n, n, values, L, L);
 }
 
-const RTensor Lattice::interaction_inner(int site1, int site2) const {
+const RTensor Lattice::interaction_inner(index site1, index site2) const {
   word L = configurations.size();
   RTensor values = RTensor::empty(L);
 
@@ -197,8 +197,8 @@ void maybe_add(Sparse *H, const Sparse &Op) {
 const RSparse Lattice::Hamiltonian(const RTensor &J, const RTensor &U,
                                    double mu, particle_kind_t kind) const {
   RSparse H;
-  for (int i = 0; i < J.rows(); i++) {
-    for (int j = 0; j < J.columns(); j++) {
+  for (index i = 0; i < J.rows(); i++) {
+    for (index j = 0; j < J.columns(); j++) {
       double Jij = J(i, j) - (i == j) * mu;
       if (Jij) {
         maybe_add<RSparse>(&H, Jij * hopping_operator(i, j, kind));
@@ -215,8 +215,8 @@ const RSparse Lattice::Hamiltonian(const RTensor &J, const RTensor &U,
 const CSparse Lattice::Hamiltonian(const CTensor &J, const CTensor &U,
                                    double mu, particle_kind_t kind) const {
   CSparse H;
-  for (int i = 0; i < J.rows(); i++) {
-    for (int j = 0; j < J.columns(); j++) {
+  for (index i = 0; i < J.rows(); i++) {
+    for (index j = 0; j < J.columns(); j++) {
       cdouble Jij = J(i, j) - (i == j) * mu;
       if (real(Jij) || imag(Jij)) {
         maybe_add<CSparse>(&H, Jij * hopping_operator(i, j, kind));
@@ -230,9 +230,9 @@ const CSparse Lattice::Hamiltonian(const CTensor &J, const CTensor &U,
   return H;
 }
 
-int Lattice::size() const { return number_of_sites; }
+index Lattice::size() const { return number_of_sites; }
 
-int Lattice::particles() const { return number_of_particles; }
+index Lattice::particles() const { return number_of_particles; }
 
 tensor::index Lattice::dimension() const { return configurations.size(); }
 

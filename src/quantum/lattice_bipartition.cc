@@ -22,7 +22,8 @@
 
 namespace mps {
 
-const Indices Lattice::states_in_particle_range(int sites, int nmin, int nmax) {
+const Indices Lattice::states_in_particle_range(index sites, index nmin,
+                                                index nmax) {
   if (sizeof(word) == 4) {
     if (sites >= 32) {
       std::cerr << "In this architecture with 32-bit words, Lattice can only "
@@ -40,13 +41,13 @@ const Indices Lattice::states_in_particle_range(int sites, int nmin, int nmax) {
   }
   word n = 0;
   for (word c = 0, l = (word)1 << sites; c < l; c++) {
-    int b = count_bits(c);
+    index b = count_bits(c);
     if (b >= nmin && b <= nmax) n++;
   }
   Indices output(n);
   n = 0;
   for (word c = 0, l = (word)1 << sites; c < l; c++) {
-    int b = count_bits(c);
+    index b = count_bits(c);
     if (b >= nmin && b <= nmax) output.at(n++) = c;
   }
   return output;
@@ -72,10 +73,10 @@ static Lattice::word find_configuration(Lattice::word w,
   return i;
 }
 
-void Lattice::bipartition(int sites_left, Indices *left_states,
+void Lattice::bipartition(index sites_left, Indices *left_states,
                           Indices *right_states,
                           Indices *matrix_indices) const {
-  int sites_right = size() - sites_left;
+  index sites_right = size() - sites_left;
   if (sites_left <= 0 || sites_right <= 0) {
     std::cerr << "In Lattice::bipartition(), the number of sites "
                  "in any bipartition cannot be less than one."
@@ -87,19 +88,19 @@ void Lattice::bipartition(int sites_left, Indices *left_states,
 
   // The lowest number of particles in the left bipartition is
   // achieved when all are in the right half.
-  int left_nmin = std::max<int>(0, particles() - sites_right);
-  int right_nmin = std::max<int>(0, particles() - sites_left);
+  index left_nmin = std::max<index>(0, particles() - sites_right);
+  index right_nmin = std::max<index>(0, particles() - sites_left);
   // The highest number of particles in a half of the lattice is
   // achieved by filling with the most possible number of particles
-  int left_nmax = std::min<int>(sites_left, particles());
-  int right_nmax = std::min<int>(sites_right, particles());
+  index left_nmax = std::min<index>(sites_left, particles());
+  index right_nmax = std::min<index>(sites_right, particles());
 
   *left_states = states_in_particle_range(sites_left, left_nmin, left_nmax);
   *right_states = states_in_particle_range(sites_right, right_nmin, right_nmax);
   *matrix_indices = Indices(dimension());
 
-  int right_mask = ((word)1 << sites_right) - 1;
-  for (word i = 0; i < configurations.size(); i++) {
+  index right_mask = ((word)1 << sites_right) - 1;
+  for (word i = 0; i < static_cast<word>(configurations.size()); i++) {
     word w = configurations[i];
     word wl = w >> sites_right;
     word wr = w & right_mask;

@@ -26,6 +26,8 @@
 
 namespace mps {
 
+using mps::imath::isqrt;
+
 /**Create a translationally invariant Hamiltonian. 'N' is the number of lattice
    * sites, 'H12' is the nearest neighbor interaction between every two sites,
    * 'H1' is the local term and 'periodic' determines whether there is also

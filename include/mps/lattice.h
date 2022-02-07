@@ -20,11 +20,13 @@
 #ifndef MPS_LATTICE_H
 #define MPS_LATTICE_H
 
+#include <tensor/linalg.h>
 #include <tensor/sparse.h>
 
 namespace mps {
 
 using namespace tensor;
+using linalg::EigType;
 
 /** Class representing fermionic or hard-core-bosons particles hopping in a
    * finite lattice. The lattice constructs operators representing the motion of
@@ -44,17 +46,17 @@ class Lattice {
 
   /** Construct the internal representation for a lattice with N particles in
         those 'sites'*/
-  Lattice(int sites, int N);
+  Lattice(index sites, index N);
 
   /** Hopping operator for a particle between two sites. Returns the
         equivalent of \$a^\dagger_{to}a_{from}\$. */
-  const RSparse hopping_operator(int to, int from,
+  const RSparse hopping_operator(index to, index from,
                                  particle_kind_t kind = FERMIONS) const;
   /** Number operator for the given lattice site.*/
-  const RSparse number_operator(int site) const;
+  const RSparse number_operator(index site) const;
   /** Hubbard interaction between different lattice site. It implements
         operator \$ n_{site1} n_{site2} \$.*/
-  const RSparse interaction_operator(int site1, int site2) const;
+  const RSparse interaction_operator(index site1, index site2) const;
 
   /** Full Hamiltonian containing hopping of kind and
         interactions. Matrix J(i,j) is nonzero when there is hopping between
@@ -77,13 +79,13 @@ class Lattice {
         of a wavefunction is mapped to the ndx[i] entry of a reduced density
         matrix, of size L1 * L2.
     */
-  void bipartition(int sites_left, Indices *left_states, Indices *right_states,
-                   Indices *matrix_indices) const;
+  void bipartition(index sites_left, Indices *left_states,
+                   Indices *right_states, Indices *matrix_indices) const;
 
   /** Number of sites in the lattice. */
-  int size() const;
+  index size() const;
   /** Preconfigured number of particles. */
-  int particles() const;
+  index particles() const;
   /** Dimensionality of the constrained Hilbert space. */
   tensor::index dimension() const;
 
@@ -92,29 +94,28 @@ class Lattice {
   CTensor apply(const CTensor &psi, const CTensor &J, const CTensor &U,
                 particle_kind_t kind = FERMIONS) const;
 
-  const RTensor eigs(const RTensor &J, const RTensor &U, int eig_type,
-                     size_t neig, RTensor *vectors = NULL,
-                     bool *converged = NULL,
-                     particle_kind_t kind = FERMIONS) const;
-  const CTensor eigs(const CTensor &J, const CTensor &U, int eig_type,
-                     size_t neig, CTensor *vectors = NULL,
-                     bool *converged = NULL,
-                     particle_kind_t kind = FERMIONS) const;
+  RTensor eigs(const RTensor &J, const RTensor &U, EigType eig_type,
+               size_t neig, RTensor *vectors = NULL, bool *converged = NULL,
+               particle_kind_t kind = FERMIONS) const;
+  CTensor eigs(const CTensor &J, const CTensor &U, EigType eig_type,
+               size_t neig, CTensor *vectors = NULL, bool *converged = NULL,
+               particle_kind_t kind = FERMIONS) const;
 
-  void hopping_inner(RTensor *values, Indices *ndx, int to_site, int from_site,
-                     particle_kind_t kind) const;
-  const RTensor interaction_inner(int site1, int site2) const;
+  void hopping_inner(RTensor *values, Indices *ndx, index to_site,
+                     index from_site, particle_kind_t kind) const;
+  const RTensor interaction_inner(index site1, index site2) const;
 
  private:
   const tensor::index number_of_sites;
-  const int number_of_particles;
+  const index number_of_particles;
   const Indices configurations;
 
-  static int count_bits(Lattice::word w);
+  static index count_bits(Lattice::word w);
 
-  static const Indices states_with_n_particles(int sites,
-                                               int number_of_particles);
-  static const Indices states_in_particle_range(int sites, int nmin, int nmax);
+  static const Indices states_with_n_particles(index sites,
+                                               index number_of_particles);
+  static const Indices states_in_particle_range(index sites, index nmin,
+                                                index nmax);
 };
 
 }  // namespace mps
