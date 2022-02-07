@@ -143,7 +143,7 @@ double DMRG<MPS>::minimize_single_site(MPS &P, index k, int dk) {
      * matrix.  NOTE: For small sizes, our iterative algorithm (ARPACK) fails
      * and we have to resort to a full diagonalization.
      */
-  index neig = std::max<int>(1, neigenvalues);
+  index neig = std::max<index>(index(1), neigenvalues);
   elt_t aux;
   if (a1 * i1 * b1 <= 10) {
     elt_t Heff = kron2(Opli, elt_t::eye(b1)) + kron2(elt_t::eye(a1), Opir);
@@ -303,7 +303,7 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
      */
   elt_t aux;
   index smallL = Pi.size();
-  index neig = std::max<int>(1, neigenvalues);
+  index neig = std::max(index(1), neigenvalues);
   if (Q_values.size()) {
     if (smallL <= 10) {
       //cout << "Heff=\n"; show_matrix(std::cout, kron2(Opli, elt_t::eye(j1*c1)) + kron2(elt_t::eye(a1*i1), Opjr));
@@ -387,7 +387,7 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
      * Since the projector that we obtained spans two sites, we have to split
      * it, ensuring that we remain below the desired dimension Dmax.
      */
-  set_canonical_2_sites(P, Pi, k, svd_tolerance, Dmax,
+  set_canonical_2_sites(P, Pi, k, dk, svd_tolerance, Dmax,
                         false /* Do not canonicalize the tensor, since we
                                  * are going to change it soon */
   );
@@ -662,9 +662,10 @@ index DMRG<MPS>::n_orth_states() const {
   return P0_.size();
 }
 
+/* TODO: Why Pk is not used */
 template <class MPS>
 const typename DMRG<MPS>::elt_t DMRG<MPS>::projector(
-    const typename DMRG<MPS>::elt_t &Pk, index k) {
+    const typename DMRG<MPS>::elt_t & /*Pk*/, index k) {
   elt_t V;
   for (index state = 0; state < n_orth_states(); state++) {
     elt_t Qk = P0_[state][k];
@@ -691,7 +692,7 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::projector(
 
 template <class MPS>
 const typename DMRG<MPS>::elt_t DMRG<MPS>::projector_twosites(
-    const typename DMRG<MPS>::elt_t &Pk, index k) {
+    const typename DMRG<MPS>::elt_t & /*Pk*/, index k) {
   elt_t V;
   for (index state = 0; state < n_orth_states(); state++) {
     elt_t Qk = fold(P0_[state][k], -1, P0_[state][k + 1], 0);

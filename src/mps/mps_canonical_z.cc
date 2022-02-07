@@ -28,19 +28,19 @@ void set_canonical(CMPS &psi, index site, const CTensor &t, int sense,
   set_canonical_inner(psi, site, t, sense, truncate);
 }
 
-const CMPS canonical_form(const CMPS &psi, int sense) {
+CMPS canonical_form(const CMPS &psi, int sense) {
   return canonical_form_at(psi, (sense < 0) ? 0 : (psi.size() - 1));
 }
 
-const CMPS normal_form(const CMPS &psi, int sense) {
+CMPS normal_form(const CMPS &psi, int sense) {
   return normal_form_at(psi, (sense < 0) ? 0 : (psi.size() - 1));
 }
 
-const CMPS canonical_form_at(const CMPS &psi, index site) {
+CMPS canonical_form_at(const CMPS &psi, index site) {
   return either_form_inner(psi, site, false);
 }
 
-const CMPS normal_form_at(const CMPS &psi, index site) {
+CMPS normal_form_at(const CMPS &psi, index site) {
   return either_form_inner(psi, site, true);
 }
 

@@ -44,7 +44,7 @@ static void set_canonical_inner(MPS &psi, index ndx, const Tensor &t, int sense,
 }
 
 template <class MPS>
-static const MPS either_form_inner(MPS psi, index site, bool normalize) {
+static MPS either_form_inner(MPS psi, index site, bool normalize) {
   index i;
   for (i = psi.last(); i > site; i--) set_canonical(psi, i, psi[i], -1);
   for (i = 0; i < site; i++) set_canonical(psi, i, psi[i], +1);

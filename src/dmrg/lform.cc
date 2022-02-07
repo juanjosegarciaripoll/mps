@@ -150,7 +150,7 @@ static tensor_t compose4(const tensor_t L, const tensor_t &P1,
   if (R.is_empty()) {
     return compose4(L, P1, P2, tensor_t::ones(1, 1, 1, 1));
   }
-  index a1, a2, b1, b2, a3, b3, a4, b4, i, j;
+  index a1, a2, b1, b2, a3, /*b3,*/ a4, b4, i, j;
   L.get_dimensions(&a1, &b1, &a2, &b2);
   R.get_dimensions(&a4, &b4, &a1, &b1);
   assert(a1 == 1 && b1 == 1);

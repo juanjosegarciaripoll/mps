@@ -28,19 +28,19 @@ void set_canonical(RMPS &psi, index site, const RTensor &t, int sense,
   set_canonical_inner(psi, site, t, sense, truncate);
 }
 
-const RMPS canonical_form(const RMPS &psi, int sense) {
+RMPS canonical_form(const RMPS &psi, int sense) {
   return canonical_form_at(psi, (sense < 0) ? 0 : (psi.size() - 1));
 }
 
-const RMPS normal_form(const RMPS &psi, int sense) {
+RMPS normal_form(const RMPS &psi, int sense) {
   return normal_form_at(psi, (sense < 0) ? 0 : (psi.size() - 1));
 }
 
-const RMPS canonical_form_at(const RMPS &psi, index site) {
+RMPS canonical_form_at(const RMPS &psi, index site) {
   return either_form_inner(psi, site, false);
 }
 
-const RMPS normal_form_at(const RMPS &psi, index site) {
+RMPS normal_form_at(const RMPS &psi, index site) {
   return either_form_inner(psi, site, true);
 }
 
