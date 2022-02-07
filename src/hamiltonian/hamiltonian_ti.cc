@@ -63,24 +63,26 @@ bool TIHamiltonian::is_constant() const { return 1; }
 
 bool TIHamiltonian::is_periodic() const { return periodic_; }
 
-const CTensor TIHamiltonian::interaction(index k, double t) const {
+const CTensor TIHamiltonian::interaction(index /*k*/, double /*t*/) const {
   return H12_;
 }
 
-const CTensor TIHamiltonian::interaction_left(index k, index ndx,
-                                              double t) const {
+const CTensor TIHamiltonian::interaction_left(index /*k*/, index ndx,
+                                              double /*t*/) const {
   return H12_left_[ndx];
 }
 
-const CTensor TIHamiltonian::interaction_right(index k, index ndx,
-                                               double t) const {
+const CTensor TIHamiltonian::interaction_right(index /*k*/, index ndx,
+                                               double /*t*/) const {
   return H12_right_[ndx];
 }
 
-index TIHamiltonian::interaction_depth(index k, double t) const {
+index TIHamiltonian::interaction_depth(index /*k*/, double /*t*/) const {
   return H12_left_.size();
 }
 
-const CTensor TIHamiltonian::local_term(index k, double t) const { return H1_; }
+const CTensor TIHamiltonian::local_term(index /*k*/, double /*t*/) const {
+  return H1_;
+}
 
 }  // namespace mps
