@@ -45,7 +45,7 @@ bool ConstantHamiltonian::is_constant() const { return 1; }
 
 bool ConstantHamiltonian::is_periodic() const { return periodic_; }
 
-const CTensor ConstantHamiltonian::interaction(index k, double t) const {
+const CTensor ConstantHamiltonian::interaction(index k, double /*t*/) const {
   const CTensor &H = H12_[k];
   if (H.is_empty()) {
     index d1 = dimension(k);
@@ -57,7 +57,7 @@ const CTensor ConstantHamiltonian::interaction(index k, double t) const {
 }
 
 const CTensor ConstantHamiltonian::interaction_left(index k, index ndx,
-                                                    double t) const {
+                                                    double /*t*/) const {
   return H12_left_[k][ndx];
 }
 
@@ -66,11 +66,11 @@ const CTensor ConstantHamiltonian::interaction_right(index k, index ndx,
   return H12_right_[k][ndx];
 }
 
-index ConstantHamiltonian::interaction_depth(index k, double t) const {
+index ConstantHamiltonian::interaction_depth(index k, double /*t*/) const {
   return H12_left_[k].size();
 }
 
-const CTensor ConstantHamiltonian::local_term(index k, double t) const {
+const CTensor ConstantHamiltonian::local_term(index k, double /*t*/) const {
   return H1_[k];
 }
 
