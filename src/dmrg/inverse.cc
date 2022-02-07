@@ -65,7 +65,7 @@ double do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense,
   MPS &P = *ptrP;
   if (!P.size()) P = Q;
 
-  // 'sense' can be NULL.
+  // 'sense' can be nullptr.
   int aux = -1;
   if (!sense) sense = &aux;
   assert(sweeps > 0);

@@ -30,7 +30,7 @@ double expected(const RMPS &a, const RTensor &op, index k) {
 
 double expected(const RMPS &a, const RTensor &op) {
   double output = 0.0;
-  for (index i = 0; i < a.size(); i++) {
+  for (index i = 0; i < a.ssize(); i++) {
     output += single_site_expected(a, op, i);
   }
   return output;

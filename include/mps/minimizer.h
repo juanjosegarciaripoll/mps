@@ -53,10 +53,10 @@ struct MinimizerOptions {
 
 double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt,
                 const RMPO &constraint, double value,
-                const std::list<RMPS> *other = NULL);
+                const std::list<RMPS> *other = nullptr);
 double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt,
                 const CMPO &constraint, cdouble value,
-                const std::list<CMPS> *other = NULL);
+                const std::list<CMPS> *other = nullptr);
 
 double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt);
 double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt);

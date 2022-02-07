@@ -95,10 +95,12 @@ class Lattice {
                 particle_kind_t kind = FERMIONS) const;
 
   RTensor eigs(const RTensor &J, const RTensor &U, EigType eig_type,
-               size_t neig, RTensor *vectors = NULL, bool *converged = NULL,
+               size_t neig, RTensor *vectors = nullptr,
+               bool *converged = nullptr,
                particle_kind_t kind = FERMIONS) const;
   CTensor eigs(const CTensor &J, const CTensor &U, EigType eig_type,
-               size_t neig, CTensor *vectors = NULL, bool *converged = NULL,
+               size_t neig, CTensor *vectors = nullptr,
+               bool *converged = nullptr,
                particle_kind_t kind = FERMIONS) const;
 
   void hopping_inner(RTensor *values, Indices *ndx, index to_site,

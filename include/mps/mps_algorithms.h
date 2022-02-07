@@ -30,14 +30,14 @@ const RTensor prop_matrix_close(const RTensor &N);
 const RTensor prop_matrix_close(const RTensor &L, const RTensor &R);
 
 const RTensor prop_matrix(const RTensor &M0, int sense, const RTensor &Q,
-                          const RTensor &P, const RTensor *op = NULL);
+                          const RTensor &P, const RTensor *op = nullptr);
 
 const CTensor prop_matrix_close(const CTensor &N);
 
 const CTensor prop_matrix_close(const CTensor &L, const CTensor &R);
 
 const CTensor prop_matrix(const CTensor &M0, int sense, const CTensor &Q,
-                          const CTensor &P, const CTensor *op = NULL);
+                          const CTensor &P, const CTensor *op = nullptr);
 
 /** Given an MPS, produce another with bond dimension <= Dmax, by truncating it. */
 bool truncate(RMPS *P, const RMPS &Q, index Dmax, bool periodicbc,

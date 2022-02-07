@@ -55,7 +55,8 @@ class MP {
   explicit MP(size_t size) : data_(size) {}
   MP(const std::vector<Tensor> &other) : data_(other) {}
 
-  index size() const { return static_cast<index>(data_.size()); }
+  size_t ssize() const { return data_.size(); }
+  index ssize() const { return static_cast<index>(size()); }
   index last() const { return size() - 1; }
   void resize(index new_size) { data_.resize(new_size); }
 

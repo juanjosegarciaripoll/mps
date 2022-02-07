@@ -44,7 +44,7 @@ typename Tensor::elt_t two_sites_expected(const MPS &a, const Tensor &Op1,
       } else if (k == k2) {
         op = &Op2;
       } else {
-        op = NULL;
+        op = nullptr;
       }
       M = prop_matrix(M, +1, Pk, Pk, op);
     }
