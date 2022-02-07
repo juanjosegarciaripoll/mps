@@ -29,7 +29,7 @@ static const Tensor do_split(Tensor *pU, Tensor psi, int sense, bool truncate) {
   Tensor &U = *pU, V;
   Indices d = psi.dimensions();
   if (sense > 0) {
-    int r = psi.rank();
+    index r = psi.rank();
     index b = d[r - 1];
     index ai = psi.size() / b;
     RTensor s =
