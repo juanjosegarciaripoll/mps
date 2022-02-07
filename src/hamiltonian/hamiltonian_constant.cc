@@ -62,7 +62,7 @@ const CTensor ConstantHamiltonian::interaction_left(index k, index ndx,
 }
 
 const CTensor ConstantHamiltonian::interaction_right(index k, index ndx,
-                                                     double t) const {
+                                                     double /*t*/) const {
   return H12_right_[k][ndx];
 }
 

@@ -29,7 +29,6 @@ const RMPS cluster_state(index length) {
     return ghz_state(length);
   } else {
     RMPS output(length, 2, 2);
-    double v0 = 1.0 / sqrt(sqrt(2.0));
     double v = 1.0 / sqrt(2.0);
 
     RTensor &P0 = output.at(0);

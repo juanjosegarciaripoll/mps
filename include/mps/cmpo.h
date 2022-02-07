@@ -35,7 +35,6 @@ class CMPO : public MP<tensor::CTensor> {
   CMPO(index size, index physical_dimension);
   CMPO(const tensor::Indices &physical_dimension);
   CMPO(const Hamiltonian &H, double t = 0.0);
-  CMPO();
 
  private:
   typedef MP<elt_t> parent;

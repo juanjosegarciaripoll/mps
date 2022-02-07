@@ -38,19 +38,20 @@ namespace mps {
 template <class MPO, class Tensor>
 static MPO do_local_Hamiltonian_mpo(const std::vector<Tensor> &Hloc) {
   MPO output(Hloc.size(), 1);
-
-  for (index i = 0; i < Hloc.size(); ++i) {
-    index d = Hloc[i].rows();
+  index i = 0, last = static_cast<index>(Hloc.size()) - 1;
+  for (auto &H : Hloc) {
+    index d = H.rows();
     Tensor aux = Tensor::zeros(2, d, d, 2);
-    aux.at(range(0), range(), range(), range(1)) = Hloc[i];
+    aux.at(range(0), range(), range(), range(1)) = H;
 
     Tensor id = Tensor::eye(d);
     aux.at(range(1), range(), range(), range(1)) = id;
     aux.at(range(0), range(), range(), range(0)) = id;
 
     if (i == 0) aux = aux(range(0), range(), range(), range());
-    if (i + 1 == Hloc.size()) aux = aux(range(), range(), range(), range(1));
+    if (i == last) aux = aux(range(), range(), range(), range(1));
     output.at(i) = aux;
+    ++i;
   }
   return output;
 }

@@ -46,8 +46,6 @@ index RMPS::normal_index(index mps_index) const {
   }
 }
 
-RMPS::RMPS() : parent() {}
-
 RMPS::RMPS(index length, index physical_dimension, index bond_dimension,
            bool periodic)
     : parent(length) {

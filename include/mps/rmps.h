@@ -35,7 +35,6 @@ class RMPS : public MP<tensor::RTensor> {
   RMPS(const tensor::Indices &physical_dimension, index bond_dimension = 1,
        bool periodic = false);
   RMPS(const std::vector<elt_t> &data) : parent(data){};
-  RMPS();
 
   index normal_index(index i) const;
 

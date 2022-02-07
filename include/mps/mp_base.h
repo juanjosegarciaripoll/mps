@@ -51,12 +51,11 @@ class MP {
   typedef typename data_type::iterator iterator;
   typedef typename data_type::const_iterator const_iterator;
 
-  MP() : data_() {}
-  MP(size_t size) : data_(size) {}
+  MP() = default;
+  explicit MP(size_t size) : data_(size) {}
   MP(const std::vector<Tensor> &other) : data_(other) {}
-  MP(const MP<Tensor> &other) : data_(other.data_) {}
 
-  index size() const { return data_.size(); }
+  index size() const { return static_cast<index>(data_.size()); }
   index last() const { return size() - 1; }
   void resize(index new_size) { data_.resize(new_size); }
 

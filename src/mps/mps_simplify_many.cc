@@ -124,8 +124,8 @@ struct MPSManySimplifier {
 
   Tensor &matrix(index site, index vector) { return A[site + 1].at(vector); }
 
-  void dump_matrices(const char *context = "foo") {
 #if 0
+  void dump_matrices(const char *context = "foo") {
       std::cout << context << std::endl;
       for (int j = 0; j < A.size(); j++) {
         for (int i = 0; i < A[j].size(); i++) {
@@ -133,8 +133,10 @@ struct MPSManySimplifier {
                     << std::endl;
         }
       }
-#endif
   }
+#else
+  void dump_matrices(const char *) {}
+#endif
 
   void update_matrices(index site, const Tensor &Pk, int sense) {
     if (sense > 0) {
@@ -319,7 +321,7 @@ struct MPSManySimplifier {
 
   const Tensor next_projector_2_sites(index site) {
     Tensor output;
-    index a1, i1, i2, a2;
+    index a1, i1 = 0, i2 = 0, a2;
     for (int i = 0; i < nvectors; i++) {
       Tensor P = fold(Q[i][site], -1, Q[i][site + 1], 0);
       P.get_dimensions(&a1, &i1, &i2, &a2);

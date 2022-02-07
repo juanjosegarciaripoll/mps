@@ -29,7 +29,6 @@ const RTensor mps_to_vector(const RMPS &mps) {
 
   RTensor output = mps[0];
   index d0 = output.dimension(0);
-  index d = output.dimension(1);
   for (index i = 1; i < mps.size(); i++) {
     output = fold(output, -1, mps[i], 0);
     output = reshape(output, d0, output.dimension(1) * output.dimension(2),

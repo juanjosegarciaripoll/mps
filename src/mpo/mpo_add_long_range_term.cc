@@ -42,7 +42,7 @@ static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H, index i,
   // This function add terms \sum_{j,j\neq i} H[i]*H[j] to a Hamiltonian.
   // The origin of interactions is thus marked by "i"
   //
-  int start = 0, end = mpo.size();
+  index start = 0, end = mpo.size();
   if (i < 0 || i >= end) {
     std::cerr << "In add_interaction(), the index " << i
               << " is outside the lattice.\n";
@@ -51,7 +51,7 @@ static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H, index i,
   if (norm2(H[i]) == 0) {
     return;
   }
-  int last_closing = 0;
+  index last_closing = 0;
   while (start < end && norm2(H[start]) == 0) {
     ++start;
   }
@@ -59,12 +59,12 @@ static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H, index i,
     --end;
     last_closing = 1;
   }
-  for (int j = start; j < end; ++j) {
+  for (index j = start; j < end; ++j) {
     const Tensor &Hj = H[j];
     Tensor Pj = mpo[j];
     index dl = Pj.dimension(0);
     index dr = Pj.dimension(3);
-    int opening = 0, closing = 1;
+    index opening = 0, closing = 1;
 #if 1
     if (j + 1 < end) {
       Pj = change_dimension(Pj, 3, dr + 1);

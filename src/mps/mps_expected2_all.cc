@@ -31,7 +31,7 @@ Tensor all_correlations_fast(const MPS &a, const std::vector<Tensor> &op1,
                              const std::vector<Tensor> &op2, const MPS &b,
                              bool symmetric = false,
                              const Tensor *jordan_wigner_op = 0) {
-  size_t L = a.size();
+  index L = a.size();
   if (b.size() != L) {
     std::cerr << "In expected(MPS, Tensor, Tensor, MPS), two MPS of different "
                  "size were passed";
@@ -51,18 +51,18 @@ Tensor all_correlations_fast(const MPS &a, const std::vector<Tensor> &op1,
   std::vector<Tensor> auxLeft(L);
   {
     Tensor aux;
-    for (size_t i = 1; i < L; i++) {
+    for (index i = 1; i < L; i++) {
       auxLeft[i] = aux = prop_matrix(aux, +1, a[i - 1], b[i - 1], 0);
     }
   }
   {
     Tensor aux;
-    for (size_t i = L - 1; i; --i) {
+    for (index i = L - 1; i; --i) {
       auxRight[i - 1] = aux = prop_matrix(aux, -1, a[i], b[i], 0);
     }
   }
   Tensor output = Tensor::zeros(L, L);
-  for (size_t i = 0; i < L; i++) {
+  for (index i = 0; i < L; i++) {
     {
       Tensor op12 = mmult(op1[i], op2[i]);
       Tensor aux = prop_matrix(auxLeft[i], +1, a[i], b[i], &op12);
@@ -70,7 +70,7 @@ Tensor all_correlations_fast(const MPS &a, const std::vector<Tensor> &op1,
     }
     {
       Tensor aux = prop_matrix(auxLeft[i], +1, a[i], b[i], &op1[i]);
-      for (size_t j = i + 1; j < L; j++) {
+      for (index j = i + 1; j < L; j++) {
         Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op2[j]);
         output.at(i, j) = prop_matrix_close(aux2, auxRight[j])[0];
         aux = prop_matrix(aux, +1, a[j], b[j], jordan_wigner_op);
@@ -80,9 +80,9 @@ Tensor all_correlations_fast(const MPS &a, const std::vector<Tensor> &op1,
     }
   }
   if (!symmetric) {
-    for (size_t i = 0; i < L; i++) {
+    for (index i = 0; i < L; i++) {
       Tensor aux = prop_matrix(auxLeft[i], +1, a[i], b[i], &op2[i]);
-      for (size_t j = i + 1; j < L; j++) {
+      for (index j = i + 1; j < L; j++) {
         Tensor aux2 = prop_matrix(aux, +1, a[j], b[j], &op1[j]);
         std::cout << "(" << j << "," << i << ")," << std::flush;
         output.at(j, i) = prop_matrix_close(aux2, auxRight[j])[0];

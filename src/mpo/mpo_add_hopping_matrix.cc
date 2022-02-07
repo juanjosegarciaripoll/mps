@@ -33,10 +33,10 @@ static void do_add_hopping_matrix(MPO &mpo, const Tensor &J, const Tensor &ad,
   assert(J.rows() == J.columns());
   assert(J.rows() == mpo.size());
 
-  int L = mpo.size();
-  for (int j = 0; j < L; ++j) {
+  index L = mpo.size();
+  for (index j = 0; j < L; ++j) {
     std::vector<Tensor> ops(L);
-    for (int i = 0; i < L; ++i) {
+    for (index i = 0; i < L; ++i) {
       if (i == j)
         ops.at(j) = ad;
       else

@@ -36,7 +36,6 @@ class CMPS : public MP<tensor::CTensor> {
   CMPS(const tensor::Indices &physical_dimension, index bond_dimension = 1,
        bool periodic = false);
   CMPS(const std::vector<elt_t> &data) : parent(data){};
-  CMPS();
 
   index normal_index(index i) const;
 

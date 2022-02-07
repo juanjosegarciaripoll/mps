@@ -92,7 +92,8 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
     std::cout << "Arnoldi step\n";
   }
   for (int ndx = 1; ndx < max_states_; ndx++) {
-    const CMPS &last = states[ndx - 1];
+    // TODO: why unused?
+    // const CMPS &last = states[ndx - 1];
     //
     // 0) Estimate a new vector of the basis.
     //	scurrent = H v[0] - <v[1]|H|v[0]> v[1] - <v[2]|H|v[0]> v[2]

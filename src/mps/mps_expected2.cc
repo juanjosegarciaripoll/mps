@@ -28,8 +28,8 @@ using namespace tensor;
 
 template <class MPS, class Tensor>
 typename Tensor::elt_t two_sites_expected(const MPS &a, const Tensor &Op1,
-                                          size_t k1, const Tensor &Op2,
-                                          size_t k2) {
+                                          index k1, const Tensor &Op2,
+                                          index k2) {
   if (k1 == k2) {
     return expected(a, mmult(Op1, Op2), k1);
   } else {

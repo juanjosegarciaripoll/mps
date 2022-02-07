@@ -50,7 +50,7 @@ static void set_canonical_2_sites_inner(MPS &P, const Tensor &Pij, index site,
     abort();
   }
   index b1 = where_to_truncate(s, tol, Dmax);
-  if (b1 != s.size()) {
+  if (b1 != s.ssize()) {
     Pi = change_dimension(Pi, -1, b1);
     Pj = change_dimension(Pj, 0, b1);
     s = change_dimension(s, 0, b1);

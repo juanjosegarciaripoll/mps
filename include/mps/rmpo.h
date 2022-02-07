@@ -35,7 +35,6 @@ class RMPO : public MP<tensor::RTensor> {
   RMPO(index size, index physical_dimension);
   RMPO(const tensor::Indices &physical_dimension);
   RMPO(const Hamiltonian &H, double t = 0.0);
-  RMPO();
 
  private:
   typedef MP<elt_t> parent;

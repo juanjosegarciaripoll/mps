@@ -47,7 +47,7 @@ static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H) {
   // This function adds a term \prod_j H[j] to a Hamiltonian.
   //
   index closing = 0, opening = 0;
-  int start = 0, end = mpo.size();
+  index start = 0, end = mpo.size();
   while (start < end && is_identity(H[start])) {
     ++start;
   }
@@ -55,7 +55,7 @@ static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H) {
     --end;
     closing = 1;
   }
-  for (int j = start; j < end; ++j) {
+  for (index j = start; j < end; ++j) {
     const Tensor &Hj = H[j];
     Tensor Pj = mpo[j];
     index dl = Pj.dimension(0);
