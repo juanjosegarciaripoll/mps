@@ -69,18 +69,8 @@ class MP {
   index last() const { return size() - 1; }
   void resize(index new_size) { data_.resize(new_size); }
 
-  const Tensor &operator[](index n) const {
-    if (n < 0 || n > ssize()) {
-      throw mps_out_of_range();
-    }
-    return data_[n];
-  }
-  Tensor &at(index n) {
-    if (n < 0 || n > ssize()) {
-      throw mps_out_of_range();
-    }
-    return data_.at(n);
-  }
+  const Tensor &operator[](index n) const { return data_[normal_index(n)]; }
+  Tensor &at(index n) { return data_.at(normal_index(n)); }
 
   iterator begin() { return data_.begin(); }
   const_iterator begin() const { return data_.begin(); }
@@ -93,11 +83,11 @@ class MP {
   index normal_index(index mps_index) const {
     index mps_size = ssize();
     if (mps_index < 0) {
-      mps_index = mps_index + mps_size;
+      mps_index += mps_size;
       if (mps_index < 0 || mps_index >= mps_size) {
         throw mps_out_of_range();
       }
-      return mps_index + mps_size;
+      return mps_index;
     } else {
       if (mps_index >= mps_size) {
         throw mps_out_of_range();
