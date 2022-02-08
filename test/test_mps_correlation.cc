@@ -19,6 +19,7 @@
 
 #include "loops.h"
 #include <gtest/gtest.h>
+#include <mps/except.h>
 #include <mps/mps.h>
 #include <mps/quantum.h>
 
@@ -38,10 +39,14 @@ void test_correlation_basic() {
     psi.at(1) = reshape(e1, 1, 2, 1);
     psi.at(2) = reshape((e1 + e0) / sqrt(2), 1, 2, 1);
 
-    EXPECT_DEATH(expected(psi, mps::Pauli_id, 3, mps::Pauli_id, 0), ".*");
-    EXPECT_DEATH(expected(psi, mps::Pauli_id, -4, mps::Pauli_id, 0), ".*");
-    EXPECT_DEATH(expected(psi, mps::Pauli_id, 0, mps::Pauli_id, 3), ".*");
-    EXPECT_DEATH(expected(psi, mps::Pauli_id, 0, mps::Pauli_id, -4), ".*");
+    EXPECT_THROW(expected(psi, mps::Pauli_id, 3, mps::Pauli_id, 0),
+                 mps_out_of_range);
+    EXPECT_THROW(expected(psi, mps::Pauli_id, -4, mps::Pauli_id, 0),
+                 mps_out_of_range);
+    EXPECT_THROW(expected(psi, mps::Pauli_id, 0, mps::Pauli_id, 3),
+                 mps_out_of_range);
+    EXPECT_THROW(expected(psi, mps::Pauli_id, 0, mps::Pauli_id, -4),
+                 mps_out_of_range);
 
     EXPECT_CEQ(expected(psi, mps::Pauli_z, 0, mps::Pauli_z, 1), -1.0);
     EXPECT_CEQ(expected(psi, mps::Pauli_z, 0, mps::Pauli_z, 2), 0.0);
