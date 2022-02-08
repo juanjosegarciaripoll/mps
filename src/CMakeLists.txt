@@ -63,7 +63,6 @@ target_sources(mps
     mps/rmps_cluster_state.cc
     mps/rmps_to_vector.cc
     mps/cmps.cc
-    mps/cmps_from_rmps.cc
     mps/cmps_product_state.cc
     mps/cmps_to_vector.cc
     mps/mps_prop_matrix_d.cc

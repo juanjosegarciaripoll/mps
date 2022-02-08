@@ -189,9 +189,6 @@ const RTensor mps_to_vector(const RMPS &mps);
 /**Convert a CMPS to a complex vector, contracting all tensors.*/
 const CTensor mps_to_vector(const CMPS &mps);
 
-/**Convert an RMPS to CMPS.*/
-CMPS to_cmps(const RMPS &other);
-
 /**Norm of a RMPS.*/
 double norm2(const RMPS &psi);
 
