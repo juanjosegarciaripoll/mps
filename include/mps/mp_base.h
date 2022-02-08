@@ -70,11 +70,15 @@ class MP {
   void resize(index new_size) { data_.resize(new_size); }
 
   const Tensor &operator[](index n) const {
-    assert((n >= 0) && (n < size()));
+    if (n < 0 || n > ssize()) {
+      throw mps_out_of_range();
+    }
     return data_[n];
   }
   Tensor &at(index n) {
-    assert((n >= 0) && (n < size()));
+    if (n < 0 || n > ssize()) {
+      throw mps_out_of_range();
+    }
     return data_.at(n);
   }
 
