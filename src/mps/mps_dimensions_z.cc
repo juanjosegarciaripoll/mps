@@ -23,7 +23,7 @@ namespace mps {
 
 const Indices dimensions(const CMPS &psi) {
   Indices d(psi.size());
-  for (index i = 0; i < psi.size(); i++) {
+  for (index i = 0; i < psi.ssize(); i++) {
     d.at(i) = psi[i].dimension(1);
   }
   return d;

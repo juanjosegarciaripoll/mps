@@ -36,8 +36,7 @@ double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
   bool single_site =
       !Dmax && (FLAGS.get(MPS_SIMPLIFY_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM);
   double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
-  int debug = FLAGS.get(MPS_DEBUG_SIMPLIFY);
-  typedef typename MPS::elt_t Tensor;
+  int debug = FLAGS.get_int(MPS_DEBUG_SIMPLIFY);
   MPS &P = *ptrP;
 
   // The distance between vectors is
@@ -52,7 +51,7 @@ double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
   //	    err^2 = 1 - (norm(Pk)^2/normQ2)
   Sweeper s = P.sweeper(-*sense);
   LinearForm<MPS> lf(w, Q, P, s.site());
-  double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2, scp;
+  double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2 = 0.0;
   if (debug) {
     std::cout << "simplify_obc: " << (single_site ? "single_site" : "two-sites")
               << ", dmax=" << Dmax << ", truncate_tol=" << tol

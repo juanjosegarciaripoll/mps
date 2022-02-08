@@ -25,7 +25,7 @@ namespace mps {
 template <class MPO>
 static std::ostream &do_dump_mpo(std::ostream &s, const MPO &mpo,
                                  const char *name) {
-  for (index n = 0; n < mpo.size(); n++) {
+  for (index n = 0; n < mpo.ssize(); n++) {
     const typename MPO::elt_t P = mpo[n];
     index r = P.dimension(1);
     index c = P.dimension(2);

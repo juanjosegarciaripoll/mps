@@ -27,28 +27,16 @@
 namespace mps {
 
 struct MinimizerOptions {
-  MinimizerOptions()
-      : sweeps(32),
-        display(false),
-        debug(false),
-        tolerance(1e-10),
-        svd_tolerance(1e-11),
-        allow_E_growth(1),
-        Dmax(0),
-        compute_gap(false),
-        gap(0),
-        constrained_gap(0) {}
+  index sweeps{32};
+  bool display{false};
+  index debug{false};
+  double tolerance{1e-10};
+  double svd_tolerance{1e-11};
+  int allow_E_growth{1};
+  index Dmax{0};
 
-  index sweeps;
-  bool display;
-  index debug;
-  double tolerance;
-  double svd_tolerance;
-  int allow_E_growth;
-  index Dmax;
-
-  bool compute_gap;
-  double gap, constrained_gap;
+  bool compute_gap{false};
+  double gap{0}, constrained_gap{0};
 };
 
 double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt,

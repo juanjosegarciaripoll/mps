@@ -37,7 +37,7 @@ namespace mps {
 
 template <class MPO, class Tensor>
 static void do_add_local_term(MPO &mpo, const Tensor &Hloc, index i) {
-  if (i < 0 || i >= mpo.size()) {
+  if (i < 0 || i >= mpo.ssize()) {
     std::cerr << "In add_local_term(), the index " << i
               << " is outside the lattice.\n";
     abort();
@@ -81,7 +81,7 @@ static void do_add_interaction(MPO &mpo, const Tensor &Hi, index i,
               << " is outside the lattice.\n";
     abort();
   }
-  if ((i + 1) >= mpo.size()) {
+  if ((i + 1) >= mpo.ssize()) {
     std::cerr << "In add_interaction(), the index " << i
               << "+1 is outside the lattice.\n";
     abort();
@@ -115,7 +115,7 @@ static void do_add_interaction(MPO &mpo, const Tensor &Hi, index i,
   }
 
   Pi.at(range(0), range(), range(), range(b - 1)) = reshape(Hi, 1, di, di, 1);
-  if (i + 2 == mpo.size()) {
+  if (i + 2 == mpo.ssize()) {
     Pj.at(range(b - 1), range(), range(), range(0)) = reshape(Hj, 1, dj, dj, 1);
   } else {
     Pj.at(range(b - 1), range(), range(), range(1)) = reshape(Hj, 1, dj, dj, 1);

@@ -23,7 +23,7 @@ namespace mps {
 
 index largest_bond_dimension(const MP<tensor::CTensor> &mp) {
   index i = 0;
-  for (index j = 0; j < mp.size(); j++) i = std::max(i, mp[j].dimension(0));
+  for (index j = 0; j < mp.ssize(); j++) i = std::max(i, mp[j].dimension(0));
   return i;
 }
 

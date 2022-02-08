@@ -29,12 +29,12 @@ using namespace tensor;
 template <class MPS, class Tensor>
 Tensor all_expected_vector_fast(const MPS &a, const std::vector<Tensor> &op,
                                 const MPS &b) {
-  index L = a.size();
-  if (b.size() != L) {
+  index L = a.ssize();
+  if (b.ssize() != L) {
     std::cerr << "In expected_vector(), two MPS of different size were passed";
     abort();
   }
-  if (op.size() != L) {
+  if (ssize(op) != L) {
     std::cerr << "In expected_vector(), there are less operators than the "
                  "state size.";
     abort();

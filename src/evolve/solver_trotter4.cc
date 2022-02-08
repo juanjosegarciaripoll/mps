@@ -23,10 +23,10 @@
 namespace mps {
 
 /**********************************************************************
-   * Trotter's method of fourth order.
-   */
+ * Trotter's method of fourth order.
+ */
 
-static const double inv_theta = 0.74007895010513;
+//static const double inv_theta = 0.74007895010513;
 static const double FR_param[5] = {0.67560359597983, 1.35120719195966,
                                    -0.17560359597983, -1.70241438391932};
 

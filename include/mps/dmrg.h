@@ -33,19 +33,19 @@ class DMRG {
   typedef typename std::vector<MPS> mps_vector_t;
   typedef typename tensor::Sparse<typename elt_t::elt_t> sparse_t;
 
-  bool error;
-  index sweeps;
-  bool display;
-  index debug;
-  double tolerance;
-  double svd_tolerance;
+  bool error{false};
+  index sweeps{32};
+  bool display{true};
+  index debug{0};
+  double tolerance{1e-6};
+  double svd_tolerance{1e-8};
   int allow_E_growth;
-  index neigenvalues;
+  index neigenvalues{1};
 
-  RTensor eigenvalues;
+  RTensor eigenvalues{};
 
-  RTensor Q_values;
-  elt_vector_t Q_operators;
+  RTensor Q_values{};
+  elt_vector_t Q_operators{};
 
   DMRG(const Hamiltonian &H);
   virtual ~DMRG();
@@ -66,11 +66,11 @@ class DMRG {
   elt_vector_t Hl_;
   elt_vector_t &Hr_;
 
-  mps_vector_t P0_, Proj_;
+  mps_vector_t P0_{}, Proj_{};
 
-  mps_vector_t Ql_, Qr_;
-  index full_size_;
-  Indices valid_cells_;
+  mps_vector_t Ql_{}, Qr_{};
+  index full_size_{0};
+  Indices valid_cells_{};
 
   const elt_t interaction(index k) const;
   const elt_t interaction_left(index k, index m) const;

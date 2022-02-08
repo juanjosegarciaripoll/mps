@@ -27,7 +27,7 @@ MPO do_simplify(const MPO &old_mpo, int sense, bool debug) {
   MPS psi = canonical_form(mpo_to_mps(old_mpo), sense);
   MPO mpo = old_mpo;
 
-  for (int i = 0; i < mpo.size(); i++) {
+  for (int i = 0; i < mpo.ssize(); i++) {
     const Tensor &m1 = mpo[i];
     const Tensor &m2 = psi[i];
     mpo.at(i) = reshape(m2, m2.dimension(0), m1.dimension(1), m1.dimension(2),

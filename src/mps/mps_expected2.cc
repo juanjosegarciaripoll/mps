@@ -37,7 +37,7 @@ typename Tensor::elt_t two_sites_expected(const MPS &a, const Tensor &Op1,
     const Tensor *op;
     k1 = a.normal_index(k1);
     k2 = a.normal_index(k2);
-    for (index k = 0; k < a.size(); k++) {
+    for (index k = 0; k < a.ssize(); k++) {
       Tensor Pk = a[k];
       if (k == k1) {
         op = &Op1;

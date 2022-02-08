@@ -30,12 +30,18 @@ namespace mps {
 /**Real matrix product structure.*/
 class CMPS : public MP<tensor::CTensor> {
  public:
+  CMPS() = default;
+  CMPS(const CMPS &) = default;
+  CMPS(CMPS &&) = default;
+  CMPS &operator=(const CMPS &) = default;
+  CMPS &operator=(CMPS &&) = default;
+
   CMPS(const RMPS &real_mps);
   CMPS(index size, index physical_dimension = 0, index bond_dimension = 1,
        bool periodic = false);
   CMPS(const tensor::Indices &physical_dimension, index bond_dimension = 1,
        bool periodic = false);
-  CMPS(const std::vector<elt_t> &data) : parent(data){};
+  explicit CMPS(const std::vector<elt_t> &data) : parent(data){};
 
   index normal_index(index i) const;
 

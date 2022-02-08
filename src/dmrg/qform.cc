@@ -49,7 +49,7 @@ typename QuadraticForm<MPO>::matrix_database_t
 QuadraticForm<MPO>::make_matrix_database(const MPO &mpo) {
   // We only support open boundary condition problems
   assert(mpo[0].dimension(0) == 1);
-  index d, L = mpo.size();
+  index L = mpo.size();
   matrix_database_t output(L + 1);
   typename MPO::elt_t tensor;
   for (index i = 1; i < L; i++) {
@@ -63,8 +63,8 @@ template <class MPO>
 void QuadraticForm<MPO>::dump_matrices() {
   // We only support open boundary condition problems
   std::cout << "All matrices around " << here() << std::endl;
-  for (index i = 0; i < matrix_.size(); i++) {
-    for (index j = 0; j < matrix_[i].size(); j++) {
+  for (index i = 0; i < ssize(matrix_); i++) {
+    for (index j = 0; j < ssize(matrix_[i]); j++) {
       std::cout << " matrix(" << i << "," << j << ")=" << matrix_[i][j]
                 << std::endl;
     }
@@ -75,7 +75,7 @@ template <class MPO>
 typename QuadraticForm<MPO>::pair_tree_t QuadraticForm<MPO>::make_pairs(
     const MPO &mpo) {
   pair_tree_t output(mpo.size());
-  for (index m = 0; m < mpo.size(); m++) {
+  for (index m = 0; m < ssize(mpo); m++) {
     const elt_t &tensor = mpo[m];
     for (index i = 0; i < tensor.dimension(0); i++) {
       for (index j = 0; j < tensor.dimension(3); j++) {

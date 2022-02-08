@@ -57,27 +57,10 @@ namespace mps {
    *	|psi> = P(a,i,b)Q(b,j,c) |a>|i>|j>|b>
    */
 
+/* TODO: Constructors should be noexcept and cause no errors. */
 template <class MPS>
 DMRG<MPS>::DMRG(const Hamiltonian &H)
-    : H_(H.duplicate()),
-      Hl_(H.size()),
-      Hr_(Hl_),
-      Ql_(0),
-      Qr_(0),
-      full_size_(0),
-      valid_cells_(),
-      error(false),
-      sweeps(32),
-      display(true),
-      debug(0),
-      tolerance(1e-6),
-      svd_tolerance(1e-8),
-      eigenvalues(),
-      neigenvalues(1),
-      Q_values(),
-      Q_operators(0),
-      P0_(),
-      Proj_() {
+    : H_(H.duplicate()), Hl_(H.size()), Hr_(Hl_) {
   if (size() < 2) {
     std::cerr
         << "The DMRG solver only solves problems with more than two sites";
@@ -209,7 +192,7 @@ void DMRG<MPS>::prepare_simplifier(index k, const elt_t &Pij) {
     Booleans flag;
     for (index n = 0; n < n_Q; n++) {
       RTensor Nl = (k > 0) ? tensor::real(Ql_[n][k - 1]) : Z;
-      RTensor Nr = ((k + 2) < Qr_[n].size()) ? tensor::real(Qr_[n][k + 2]) : Z;
+      RTensor Nr = ((k + 2) < ssize(Qr_[n])) ? tensor::real(Qr_[n][k + 2]) : Z;
       RTensor Ni = tensor::real(take_diag(Q_operators[n]));
       double desired_N = Q_values[n];
       RTensor N = direct_sum(direct_sum(Nl, Ni), direct_sum(Ni, Nr));
@@ -630,7 +613,7 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::block_site_interaction_right(
   if (k + 1 < size()) {
     elt_vector_t Heffir = compute_interactions_right(P, k);
     Heff = kron2(elt_t::eye(i1), Hr_[k + 1]);
-    for (index m = 0; m < Heffir.size(); m++) {
+    for (index m = 0; m < ssize(Heffir); m++) {
       Heff = Heff + kron2(interaction_left(k, m), Heffir[m]);
     }
   }
@@ -646,7 +629,7 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::block_site_interaction_left(
   if (k > 0) {
     elt_vector_t Heffli = compute_interactions_left(P, k);
     Heff = kron2(Hl_[k - 1], elt_t::eye(i1));
-    for (index m = 0; m < Heffli.size(); m++) {
+    for (index m = 0; m < ssize(Heffli); m++) {
       Heff = Heff + kron2(Heffli[m], interaction_right(k - 1, m));
     }
   }
@@ -775,7 +758,7 @@ void DMRG<MPS>::update_matrices_left(const MPS &P, index k) {
   Hl_.at(k) = foldc(Pk, 0, mmult(reshape(Hblock, b1 * i1, b1 * i1), Pk), 0);
 
   // Conserved quantities:
-  for (index n = 0; n < Q_values.size(); n++) {
+  for (index n = 0; n < ssize(Q_values); n++) {
     elt_t prev_Q = (k > 0) ? Ql_[n][k - 1] : elt_t::zeros(1);
     prev_Q = direct_sum(prev_Q, elt_t(take_diag(Q_operators[n])));
     prev_Q = foldc(Pk, 0, scale(Pk, 0, prev_Q), 0);

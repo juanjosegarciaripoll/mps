@@ -66,7 +66,6 @@ static void ortho_basis(const Tensor V, Tensor *U, Tensor *Uinv) {
 
 template <class Tensor>
 static Tensor itebd_power_eig(const Tensor &G, int sense) {
-  typedef typename Tensor::elt_t elt_t;
   tensor::index a, i;
   G.get_dimensions(&a, &i, &a);
   Tensor v = reshape(Tensor::eye(a), a * a) / (double)a;
@@ -174,7 +173,6 @@ iTEBD<Tensor>::iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance,
 template <class Tensor>
 static Tensor itebd_power_eig(const Tensor &A, const Tensor &lA,
                               const Tensor &B, const Tensor &lB, int sense) {
-  typedef typename Tensor::elt_t elt_t;
   tensor::index a = lB.size();
   Tensor v = reshape(Tensor::eye(a, a) / sqrt((double)a), a * a);
   Tensor A1, A2;

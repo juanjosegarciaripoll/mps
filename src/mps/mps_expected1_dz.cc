@@ -28,7 +28,7 @@ cdouble expected(const RMPS &a, const CTensor &op, index k) {
 
 cdouble expected(const RMPS &a, const CTensor &op) {
   cdouble output = 0.0;
-  for (index i = 0; i < a.size(); i++) {
+  for (index i = 0; i < a.ssize(); i++) {
     output += expected(a, op, i);
   }
   return output;

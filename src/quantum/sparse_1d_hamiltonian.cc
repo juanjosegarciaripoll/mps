@@ -42,7 +42,7 @@ static const sparse do_pair_Hamiltonian(const sparse &H12, const sparse &H1,
         << "supply either an interaction or a local Hamiltonian for each site.";
     abort();
   }
-  index d = std::max(H1.rows(), isqrt(d));
+  index d = std::max(H1.rows(), isqrt(H12.rows()));
   index D = ipow(d, N);
   sparse output(D, D, 0);
 

@@ -29,11 +29,11 @@ namespace mps {
       terms and interactions.*/
 ConstantHamiltonian::ConstantHamiltonian(index N, bool periodic)
     : H12_(N),
-      H12_left_(N, std::vector<CTensor>(0)),
-      H12_right_(N, std::vector<CTensor>(0)),
       H1_(N),
-      periodic_(periodic),
-      dimensions_(N) {}
+      H12_left_(N, std::vector<CTensor>()),
+      H12_right_(N, std::vector<CTensor>()),
+      dimensions_(N),
+      periodic_(periodic) {}
 
 const Hamiltonian *ConstantHamiltonian::duplicate() const {
   return new ConstantHamiltonian(*this);
@@ -106,7 +106,7 @@ void ConstantHamiltonian::add_interaction(index k, const CTensor &H1,
 const CTensor ConstantHamiltonian::compute_interaction(index k) const {
   assert((k >= 0) && (k + 1 < H12_.size()));
   CTensor H;
-  for (index i = 0; i < H12_left_[k].size(); i++) {
+  for (index i = 0; i < ssize(H12_left_[k]); i++) {
     CTensor op = kron2(H12_left_[k][i], H12_right_[k][i]);
     if (i == 0)
       H = op;

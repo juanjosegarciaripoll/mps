@@ -25,10 +25,10 @@ namespace mps {
 
 CMPO::CMPO(const Hamiltonian &H, double t) : parent(H.size()) {
   clear(H.dimensions());
-  for (index i = 0; i < size(); i++) {
+  for (index i = 0; i < ssize(); i++) {
     add_local_term(this, H.local_term(i, t), i);
   }
-  for (index i = 0; i < (size() - 1); i++) {
+  for (index i = 0; i < (ssize() - 1); i++) {
     for (index j = 0; j < H.interaction_depth(i, t); j++) {
       CTensor Hi = H.interaction_left(i, j, t);
       CTensor Hj = H.interaction_right(i, j, t);

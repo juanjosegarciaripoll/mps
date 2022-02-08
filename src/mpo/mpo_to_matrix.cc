@@ -29,7 +29,7 @@ static const Tensor to_matrix(const MPO &A) {
   tensor::index D = 1;
   tensor::index a = 1;
 
-  for (int i = 0; i < A.size(); ++i) {
+  for (int i = 0; i < A.ssize(); ++i) {
     Tensor Ai = A[i];
     tensor::index d = Ai.dimension(1);
     tensor::index b = Ai.dimension(3);

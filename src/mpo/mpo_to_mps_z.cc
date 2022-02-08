@@ -24,7 +24,7 @@ namespace mps {
 const CMPS mpo_to_mps(const CMPO &mpo) {
   CMPS psi(mpo.size());
 
-  for (int i = 0; i < mpo.size(); i++) {
+  for (int i = 0; i < mpo.ssize(); i++) {
     const CTensor &m = mpo[i];
     psi.at(i) = reshape(m, m.dimension(0), m.dimension(1) * m.dimension(2),
                         m.dimension(3));

@@ -110,7 +110,6 @@ class TrotterSolver : public TimeSolver {
   */
 class Trotter2Solver : public TrotterSolver {
   Unitary Ueven, Uodd;
-  bool optimize;
   int sense;
 
  public:

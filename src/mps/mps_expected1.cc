@@ -32,7 +32,7 @@ typename Tensor::elt_t single_site_expected(const MPS &a, const Tensor &Op1,
   Tensor M;
   const Tensor *op;
   k1 = a.normal_index(k1);
-  for (index k = 0; k < a.size(); k++) {
+  for (index k = 0; k < a.ssize(); k++) {
     Tensor Pk = a[k];
     if (k == k1) {
       op = &Op1;
@@ -49,7 +49,7 @@ typename Tensor::elt_t single_site_expected(const MPS &a, const Tensor &Op1,
 template <class MPS>
 static double state_norm(const MPS &a) {
   typename MPS::elt_t M;
-  for (index k = 0; k < a.size(); k++) {
+  for (index k = 0; k < a.ssize(); k++) {
     M = prop_matrix(M, +1, a[k], a[k], nullptr);
   }
   return sqrt(tensor::abs(real(prop_matrix_close(M)[0])));
@@ -63,11 +63,11 @@ static typename MPS::number_t scalar_product(const MPS &a, const MPS &b,
   typename MPS::elt_t M;
   assert(a.size() == b.size());
   if (sense >= 0) {
-    for (index k = 0; k < a.size(); k++) {
+    for (index k = 0; k < a.ssize(); k++) {
       M = prop_matrix(M, +1, a[k], b[k], nullptr);
     }
   } else {
-    for (index k = a.size(); k--;) {
+    for (index k = a.ssize(); k--;) {
       M = prop_matrix(M, -1, a[k], b[k], nullptr);
     }
   }

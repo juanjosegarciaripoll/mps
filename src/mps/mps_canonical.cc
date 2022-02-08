@@ -27,7 +27,7 @@ template <class MPS, class Tensor>
 static void set_canonical_inner(MPS &psi, index ndx, const Tensor &t, int sense,
                                 bool truncate) {
   if (sense > 0) {
-    if (ndx + 1 == psi.size()) {
+    if (ndx + 1 == psi.ssize()) {
       psi.at(ndx) = t;
     } else {
       Tensor V = split(&psi.at(ndx), t, +1, truncate);

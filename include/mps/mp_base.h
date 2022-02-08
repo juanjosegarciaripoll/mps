@@ -27,6 +27,10 @@ namespace mps {
 
 using tensor::index;
 
+template <class sequence>
+index ssize(const sequence &s) {
+  return static_cast<index>(s.size());
+}
 class Sweeper {
  public:
   Sweeper(index L, index sense);
@@ -52,10 +56,14 @@ class MP {
   typedef typename data_type::const_iterator const_iterator;
 
   MP() = default;
+  MP(const MP &) = default;
+  MP(MP &&) = default;
+  MP &operator=(const MP &) = default;
+  MP &operator=(MP &&) = default;
   explicit MP(size_t size) : data_(size) {}
-  MP(const std::vector<Tensor> &other) : data_(other) {}
+  explicit MP(const std::vector<Tensor> &other) : data_(other) {}
 
-  size_t ssize() const { return data_.size(); }
+  size_t size() const { return data_.size(); }
   index ssize() const { return static_cast<index>(size()); }
   index last() const { return size() - 1; }
   void resize(index new_size) { data_.resize(new_size); }
@@ -78,7 +86,7 @@ class MP {
   Sweeper sweeper(index sense) const { return Sweeper(size(), sense); }
 
  private:
-  data_type data_;
+  data_type data_{};
 };
 
 index largest_bond_dimension(const MP<tensor::RTensor> &mp);

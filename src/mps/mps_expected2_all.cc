@@ -31,18 +31,18 @@ Tensor all_correlations_fast(const MPS &a, const std::vector<Tensor> &op1,
                              const std::vector<Tensor> &op2, const MPS &b,
                              bool symmetric = false,
                              const Tensor *jordan_wigner_op = 0) {
-  index L = a.size();
-  if (b.size() != L) {
+  index L = a.ssize();
+  if (b.ssize() != L) {
     std::cerr << "In expected(MPS, Tensor, Tensor, MPS), two MPS of different "
                  "size were passed";
     abort();
   }
-  if (op1.size() != L) {
+  if (ssize(op1) != L) {
     std::cerr << "In expected(MPS, std::vector<Tensor>, std::vector<Tensor>, "
                  "MPS), the 1st argument differs from the MPS size.";
     abort();
   }
-  if (op2.size() != L) {
+  if (ssize(op2) != L) {
     std::cerr << "In expected(MPS, std::vector<Tensor>, std::vector<Tensor>, "
                  "MPS), the 2n argument differs from the MPS size.";
     abort();

@@ -28,7 +28,7 @@ static void do_apply_rightwards(MPS &chi, const MPO &mpdo, const MPS &psi,
   index b = 1, a1, c1, di, dj, c2, a2;
   Tensor L = Tensor::ones(1, 1, 1); /* L(b,c1,a1) */
 
-  for (index ndx = 0; ndx < psi.size(); ++ndx) {
+  for (index ndx = 0; ndx < psi.ssize(); ++ndx) {
     const Tensor &A = psi[ndx]; /* A(a1,i,a2) */
     A.get_dimensions(&a1, &di, &a2);
 
@@ -43,7 +43,7 @@ static void do_apply_rightwards(MPS &chi, const MPO &mpdo, const MPS &psi,
                reshape(C, b, c1 * di, a2), 1);
     C = reshape(C, b, dj, c2 * a2);
 
-    if (ndx + 1 == psi.size()) {
+    if (ndx + 1 == psi.ssize()) {
       chi.at(ndx) = C;
     } else {
       L = split(&chi.at(ndx), C, +1, truncate);
@@ -59,7 +59,7 @@ static void do_apply_leftwards(MPS &chi, const MPO &mpdo, const MPS &psi,
   index b = 1, a1, c1, di, dj, c2, a2;
   Tensor L = Tensor::ones(1, 1, 1); /* L(a2,c2,b) */
 
-  for (index ndx = psi.size(); ndx--;) {
+  for (index ndx = psi.ssize(); ndx--;) {
     const Tensor &A = psi[ndx]; /* A(a1,i,a2) */
     A.get_dimensions(&a1, &di, &a2);
 
@@ -87,7 +87,7 @@ static const MPS do_apply(const MPO &mpdo, const MPS &psi, int sense,
                           bool truncate) {
   assert(mpdo.size() == psi.size());
 
-  MPS chi(psi.size());
+  MPS chi(psi.ssize());
   if (sense > 0) {
     do_apply_rightwards(chi, mpdo, psi, truncate);
   } else {

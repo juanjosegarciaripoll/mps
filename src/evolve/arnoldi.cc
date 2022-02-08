@@ -62,10 +62,10 @@ ArnoldiSolver::ArnoldiSolver(const CMPO &H, cdouble dt, int nvectors)
 double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
   // Number of passes in simplify_obc when building the Arnoldi matrix
   const int simplify_internal_sweeps =
-      mps::FLAGS.get(MPS_ARNOLDI_SIMPLIFY_INTERNAL_SWEEPS);
+      mps::FLAGS.get_int(MPS_ARNOLDI_SIMPLIFY_INTERNAL_SWEEPS);
   // Number of passes in simplify_obc when computing the final state
   const int simplify_final_sweeps =
-      mps::FLAGS.get(MPS_ARNOLDI_SIMPLIFY_FINAL_SWEEPS);
+      mps::FLAGS.get_int(MPS_ARNOLDI_SIMPLIFY_FINAL_SWEEPS);
   // When computing H * psi, truncate small singular values
   const bool truncate_mpo_on_mps = true;
   // We keep all states in canonical form w.r.t. this sense
@@ -75,7 +75,7 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
   CTensor Heff = N;
   CMPS current = *psi;
   CMPS Hcurrent = apply_canonical(H_, current, mps_sense, truncate_mpo_on_mps);
-  int debug = mps::FLAGS.get(MPS_DEBUG_ARNOLDI);
+  int debug = mps::FLAGS.get_int(MPS_DEBUG_ARNOLDI);
 
   std::vector<CMPS> states;
   states.reserve(max_states_);
@@ -86,12 +86,10 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
   std::vector<CMPS> vectors(3);
   std::vector<cdouble> coeffs(3);
   std::vector<double> errors;
-  double err, n;
-  int sense;
   if (debug) {
     std::cout << "Arnoldi step\n";
   }
-  for (int ndx = 1; ndx < max_states_; ndx++) {
+  for (index ndx = 1; ndx < max_states_; ndx++) {
     // TODO: why unused?
     // const CMPS &last = states[ndx - 1];
     //
@@ -103,6 +101,7 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
     //
     current = Hcurrent;
     {
+      double nrm;
       vectors.clear();
       coeffs.clear();
 
@@ -119,9 +118,9 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
         coeffs.push_back(-Heff(ndx - 1, ndx - 2));
       }
       int sense = mps_sense;
-      err = simplify_obc(&current, coeffs, vectors, &sense,
-                         simplify_internal_sweeps, true, 2 * Dmax,
-                         MPS_DEFAULT_TOLERANCE, &n);
+      double err = simplify_obc(&current, coeffs, vectors, &sense,
+                                simplify_internal_sweeps, true, 2 * Dmax,
+                                MPS_DEFAULT_TOLERANCE, &nrm);
       /* We ensure that the states are normalized and with a canonical
          * form opposite to the sense of the simplification above. This
          * improves stability and speed in the SVDs. */
@@ -134,12 +133,12 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
       if (debug) {
         std::cout << "\tndx=" << ndx << ", err=" << err
                   << ", tol=" << tolerance_ << ", sense=" << sense
-                  << ", n=" << n;
+                  << ", n=" << nrm;
         if (debug >= 2) std::cout << "=" << norm2(current);
         std::cout << std::endl;
       }
-      if (n < 1e-15 ||
-          (tolerance_ && (n < tolerance_ * std::max(norm2(Hcurrent), 1.0)))) {
+      if (nrm < 1e-15 ||
+          (tolerance_ && (nrm < tolerance_ * std::max(norm2(Hcurrent), 1.0)))) {
         if (debug) {
           std::cout << "Arnoldi method converged before tolerance\n";
         }
@@ -147,7 +146,7 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
         Heff = Heff(range(0, ndx - 1), range(0, ndx - 1));
         break;
       }
-      errors.push_back(err / n);
+      errors.push_back(err / nrm);
     }
 
     //
@@ -157,7 +156,7 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
     //
     states.push_back(current);
     Hcurrent = apply_canonical(H_, current, mps_sense, truncate_mpo_on_mps);
-    for (int n = 0; n < ndx; n++) {
+    for (index n = 0; n < ndx; n++) {
       cdouble aux;
       N.at(n, ndx) = aux = scprod(states[n], current, mps_sense);
       N.at(ndx, n) = tensor::conj(aux);
@@ -197,20 +196,22 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
   //
   // 4) Here is where we perform the truncation from our basis to a single MPS.
   //
-  sense = mps_sense;
-  err = simplify_obc(psi, coef, states, &sense, simplify_final_sweeps, true,
-                     Dmax, MPS_DEFAULT_TOLERANCE);
-  if (sense * mps_sense < 0) {
-    if (debug) {
-      std::cout << "\tspurious canonical form\n";
+  {
+    int sense = mps_sense;
+    double err = simplify_obc(psi, coef, states, &sense, simplify_final_sweeps,
+                              true, Dmax, MPS_DEFAULT_TOLERANCE);
+    if (sense * mps_sense < 0) {
+      if (debug) {
+        std::cout << "\tspurious canonical form\n";
+      }
+      current = canonical_form(current, mps_sense);
     }
-    current = canonical_form(current, mps_sense);
+    err += scprod(RTensor(errors), square(abs(coef)));
+    if (debug) {
+      std::cout << "Arnoldi final truncation error " << err << std::endl;
+    }
+    return err;
   }
-  err += scprod(RTensor(errors), square(abs(coef)));
-  if (debug) {
-    std::cout << "Arnoldi final truncation error " << err << std::endl;
-  }
-  return err;
 }
 
 }  // namespace mps

@@ -42,14 +42,14 @@ void RMPO::clear(const tensor::Indices &physical_dimensions) {
     abort();
   }
   elt_t P;
-  for (index i = 0; i < size(); i++) {
+  for (index i = 0; i < ssize(); i++) {
     index d = physical_dimensions[i];
     elt_t Id = reshape(elt_t::eye(d, d), 1, d, d, 1);
     if (i == 0) {
       /* first */
       P = elt_t::zeros(1, d, d, 2);
       P.at(range(0), range(), range(), range(0)) = Id;
-    } else if (i + 1 < size()) {
+    } else if (i + 1 < ssize()) {
       /* last */
       P = elt_t::zeros(2, d, d, 2);
       P.at(range(1), range(), range(), range(1)) = Id;

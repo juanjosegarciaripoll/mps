@@ -27,7 +27,7 @@ namespace mps {
 
 TrotterSolver::Unitary::Unitary(const Hamiltonian &H, index k, cdouble dt,
                                 int do_debug)
-    : debug(do_debug), k0(k), kN(H.size()), U(H.size()) {
+    : debug(do_debug), k0(k), kN(ssize(H)), U(H.size()) {
   /*
      * When we do 'Trotter' evolution, the Hamiltonian is split into
      * 'even' and 'odd' contributions made of mutually commuting terms.
@@ -138,7 +138,7 @@ double TrotterSolver::Unitary::apply_onto_two_sites(CMPS &P, const CTensor &U12,
     P1 = change_dimension(P1, -1, new_a2);
     P2 = change_dimension(P2, 0, new_a2);
     a2 = new_a2;
-    for (index i = a2; i < s.size(); i++) err += square(s[i]);
+    for (index i = a2; i < s.ssize(); i++) err += square(s[i]);
   }
   if (max_a2) {
     /* If we impose a truncation at this stage, we are using
@@ -200,27 +200,27 @@ double TrotterSolver::Unitary::apply(CMPS *psi, int *sense, double tolerance,
 
   index L = psi->size();
   double err = 0;
-  int dk = 2;
+  index dk = 2;
   if (*sense > 0) {
-    for (int k = 0; k < k0; k++) {
+    for (index k = 0; k < k0; k++) {
       apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
     }
-    for (int k = k0; k < kN; k += dk) {
+    for (index k = k0; k < kN; k += dk) {
       err +=
           apply_onto_two_sites(*psi, U[k], k, k + 1, *sense, tolerance, Dmax);
     }
-    for (int k = kN; k < (int)L; k++) {
+    for (index k = kN; k < (int)L; k++) {
       apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
     }
   } else {
-    for (int k = L - 1; k >= kN; k--) {
+    for (index k = L - 1; k >= kN; k--) {
       apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
     }
-    for (int k = kN - dk; k >= k0; k -= dk) {
+    for (index k = kN - dk; k >= k0; k -= dk) {
       err +=
           apply_onto_two_sites(*psi, U[k], k, k + 1, *sense, tolerance, Dmax);
     }
-    for (int k = k0 - 1; k >= 0; k--) {
+    for (index k = k0 - 1; k >= 0; k--) {
       apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
     }
   }

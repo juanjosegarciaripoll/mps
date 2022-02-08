@@ -30,11 +30,17 @@ namespace mps {
 /**Real matrix product structure.*/
 class RMPS : public MP<tensor::RTensor> {
  public:
+  RMPS() = default;
+  RMPS(const RMPS &) = default;
+  RMPS(RMPS &&) = default;
+  RMPS &operator=(const RMPS &) = default;
+  RMPS &operator=(RMPS &&) = default;
+
   RMPS(index size, index physical_dimension = 0, index bond_dimension = 1,
        bool periodic = false);
   RMPS(const tensor::Indices &physical_dimension, index bond_dimension = 1,
        bool periodic = false);
-  RMPS(const std::vector<elt_t> &data) : parent(data){};
+  explicit RMPS(const std::vector<elt_t> &data) : parent(data){};
 
   index normal_index(index i) const;
 
