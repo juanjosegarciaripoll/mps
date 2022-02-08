@@ -31,7 +31,7 @@ static void do_add_hopping_matrix(MPO &mpo, const Tensor &J, const Tensor &ad,
   //
   assert(J.rank() == 2);
   assert(J.rows() == J.columns());
-  assert(J.rows() == mpo.size());
+  assert(J.rows() == ssize(mpo));
 
   index L = mpo.size();
   for (index j = 0; j < L; ++j) {
