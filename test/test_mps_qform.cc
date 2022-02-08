@@ -139,7 +139,7 @@ void test_qform_expected2sites(typename MPO::MPS psi) {
 
 template <class MPS, void (*f)(MPS)>
 void try_over_states(int size) {
-  f(cluster_state(size));
+  f(MPS(cluster_state(size)));
   f(MPS::random(size, 2, 1));
   f(MPS::random(size, 3, 1));
   f(MPS::random(size, 4, 1));

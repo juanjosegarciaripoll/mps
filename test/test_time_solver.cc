@@ -61,7 +61,7 @@ void split_Hamiltonian(Hamiltonian **ppHeven, Hamiltonian **ppHodd,
 
 void evolve_identity(int size, const CMPS apply_U(const Hamiltonian &H,
                                                   double dt, const CMPS &psi)) {
-  CMPS psi = ghz_state(size);
+  auto psi = CMPS(ghz_state(size));
   // Id is a zero operator that causes the evolution operator to
   // be the identity
   TIHamiltonian H(size, RTensor(), RTensor::zeros(2, 2));
@@ -74,7 +74,7 @@ void evolve_identity(int size, const CMPS apply_U(const Hamiltonian &H,
 void evolve_global_phase(int size,
                          const CMPS apply_U(const Hamiltonian &H, double dt,
                                             const CMPS &psi)) {
-  CMPS psi = ghz_state(size);
+  auto psi = CMPS(ghz_state(size));
   // H is a multiple of the identity, causing the evolution
   // operator to be just a global phase
   TIHamiltonian H(size, RTensor(), RTensor::eye(2, 2));
@@ -91,8 +91,8 @@ void evolve_local_operator_sz(int size,
   for (int i = 0; i < size; i++) {
     H.set_local_term(i, mps::Pauli_z * (dphi * i));
   }
-  do_test(H, 0.1, ghz_state(size));
-  do_test(H, 0.1, cluster_state(size));
+  do_test(H, 0.1, CMPS(ghz_state(size)));
+  do_test(H, 0.1, CMPS(cluster_state(size)));
 }
 
 void evolve_local_operator_sx(int size,
@@ -106,8 +106,8 @@ void evolve_local_operator_sx(int size,
     if (i > 0)
       H.add_interaction(i - 1, CTensor::zeros(2, 2), CTensor::zeros(2, 2));
   }
-  do_test(H, 0.1, ghz_state(size));
-  do_test(H, 0.1, cluster_state(size));
+  do_test(H, 0.1, CMPS(ghz_state(size)));
+  do_test(H, 0.1, CMPS(cluster_state(size)));
 }
 
 void evolve_interaction_zz(int size, void do_test(const Hamiltonian &H,
@@ -118,8 +118,8 @@ void evolve_interaction_zz(int size, void do_test(const Hamiltonian &H,
     H.set_local_term(i, mps::Pauli_id * 0.0);
     if (i > 0) H.add_interaction(i - 1, mps::Pauli_z, mps::Pauli_z);
   }
-  do_test(H, 0.1, ghz_state(size));
-  do_test(H, 0.1, cluster_state(size));
+  do_test(H, 0.1, CMPS(ghz_state(size)));
+  do_test(H, 0.1, CMPS(cluster_state(size)));
 }
 
 void evolve_interaction_xx(int size, void do_test(const Hamiltonian &H,
@@ -130,8 +130,8 @@ void evolve_interaction_xx(int size, void do_test(const Hamiltonian &H,
     H.set_local_term(i, mps::Pauli_id * 0.0);
     if (i > 0) H.add_interaction(i - 1, mps::Pauli_x, mps::Pauli_x);
   }
-  do_test(H, 0.1, ghz_state(size));
-  do_test(H, 0.1, cluster_state(size));
+  do_test(H, 0.1, CMPS(ghz_state(size)));
+  do_test(H, 0.1, CMPS(cluster_state(size)));
 }
 
 }  // namespace tensor_test

@@ -31,7 +31,7 @@ using namespace mps;
 //
 template <class MPS>
 void test_canonical_form(int size) {
-  MPS psi = cluster_state(size);
+  auto psi = MPS(cluster_state(size));
   {
     MPS aux = canonical_form(psi, -1);
     EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);
@@ -51,7 +51,7 @@ void test_canonical_form(int size) {
 //
 template <class MPS>
 void test_normal_form(int size) {
-  MPS psi = cluster_state(size);
+  auto psi = MPS(cluster_state(size));
   {
     MPS aux = normal_form(psi, -1);
     EXPECT_CEQ3(norm2(aux), 1.0, 10 * EPSILON);

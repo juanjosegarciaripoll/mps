@@ -117,7 +117,7 @@ void try_over_states(int size) {
     mps::FLAGS.set(MPS_SOLVE_ALGORITHM, MPS_TWO_SITE_ALGORITHM);
   else
     mps::FLAGS.set(MPS_SOLVE_ALGORITHM, MPS_SINGLE_SITE_ALGORITHM);
-  f(cluster_state(size));
+  f(MPS(cluster_state(size)));
   f(MPS::random(size, 2, 1));
 }
 

@@ -113,8 +113,8 @@ TEST(MPSNorm, GlobalPhases) {
   // scprod() had a problem when computing the expectation value
   // over states that were affected by a global phase because it
   // took the real part or made conj() where it should not.
-  CMPS psi = cluster_state(2);
-  CMPS psa = psi;
+  auto psi = CMPS(cluster_state(2));
+  auto psa = psi;
   psi.at(0) = psi[0] * exp(to_complex(0, 0.03));
   psi.at(1) = psi[1] * exp(to_complex(0, 0.15));
   EXPECT_CEQ(norm2(psi), 1.0);

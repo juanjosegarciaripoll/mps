@@ -18,19 +18,15 @@
 */
 
 #include <algorithm>
-#include <mps/rmps.h>
-#include <mps/cmps.h>
+#include <mps/mps.h>
 
 namespace mps {
 
-CMPS::CMPS(const RMPS &other) : parent(other.size()) {
-  CMPS::iterator a = begin();
-  RMPS::const_iterator b = other.begin();
-  while (a != end()) {
-    *a = tensor::CTensor(*b);
-    ++a;
-    ++b;
-  }
+CMPS to_cmps(const RMPS &other) {
+  CMPS output(other.size());
+  std::transform(std::begin(other), std::end(other), std::begin(output),
+                 [](const RTensor &r) { return to_complex(r); });
+  return output;
 }
 
 }  // namespace mps

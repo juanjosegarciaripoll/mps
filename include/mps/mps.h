@@ -20,13 +20,111 @@
 #ifndef MPS_MPS_H
 #define MPS_MPS_H
 
+#include <algorithm>
 #include <mps/tools.h>
-#include <mps/rmps.h>
-#include <mps/cmps.h>
+#include <mps/mp_base.h>
 
 namespace mps {
 
 using namespace tensor;
+
+/**Generic basi for matrix product state.*/
+template <typename Tensor>
+class MPS : public MP<Tensor> {
+ public:
+  MPS() = default;
+  MPS(const MPS &) = default;
+  MPS(MPS &&) = default;
+  MPS &operator=(const MPS &) = default;
+  MPS &operator=(MPS &&) = default;
+
+  template <typename otherT>
+  explicit MPS(const MPS<otherT> &mps) : parent(mps.size()) {
+    std::transform(std::begin(mps), std::end(mps), this->begin(),
+                   [](const otherT &t) { return Tensor(t); });
+  }
+
+  MPS(index size, index physical_dimension = 0, index bond_dimension = 1,
+      bool periodic = false)
+      : parent(size) {
+    if (physical_dimension) {
+      auto d = tensor::Indices::empty(size);
+      std::fill(d.begin(), d.end(), physical_dimension);
+      presize(d, bond_dimension, periodic);
+    }
+  }
+
+  MPS(const tensor::Indices &physical_dimensions, index bond_dimension = 1,
+      bool periodic = false)
+      : parent(physical_dimensions.size()) {
+    presize(physical_dimensions, bond_dimension, periodic);
+  }
+
+  explicit MPS(const std::vector<Tensor> &data) : parent(data){};
+
+  /**Can the RMP be used for a periodic boundary condition problem?*/
+  bool is_periodic() const {
+    if (this->size()) {
+      index d0 = (*this)[0].dimension(0);
+      index dl = (*this)[-1].dimension(2);
+      if (d0 == dl && d0 > 1) return true;
+    }
+    return false;
+  }
+
+  /**Create a random MPS. */
+  static MPS<Tensor> random(index length, index physical_dimension,
+                            index bond_dimension, bool periodic = false) {
+    MPS<Tensor> output(length, physical_dimension, bond_dimension, periodic);
+    randomize(output);
+    return output;
+  }
+
+  /**Create a random MPS. */
+  static MPS random(const tensor::Indices &physical_dimensions,
+                    index bond_dimension, bool periodic = false) {
+    MPS<Tensor> output(physical_dimensions.size(), bond_dimension, periodic);
+    randomize(output);
+    return output;
+  }
+
+ private:
+  typedef MP<Tensor> parent;
+
+  inline void presize(const tensor::Indices &physical_dimensions,
+                      tensor::index bond_dimension, bool periodic) {
+    assert(bond_dimension > 0);
+    assert(this->size() == physical_dimensions.size());
+    tensor::index l = physical_dimensions.size();
+    tensor::Indices dimensions = {bond_dimension, tensor::index(0),
+                                  bond_dimension};
+    for (tensor::index i = 0; i < l; i++) {
+      assert(physical_dimensions[i] > 0);
+      dimensions.at(1) = physical_dimensions[i];
+      dimensions.at(0) = (periodic || (i > 0)) ? bond_dimension : 1;
+      dimensions.at(2) = (periodic || (i < (l - 1))) ? bond_dimension : 1;
+      this->at(i) = Tensor::zeros(dimensions);
+    }
+  }
+
+  static void randomize(MPS<Tensor> &mps) {
+    for (auto &t : mps) {
+      t.randomize();
+    }
+  }
+};
+
+extern template class MPS<RTensor>;
+extern template class MPS<CTensor>;
+#ifdef DOXYGEN_ONLY
+/**Real matrix product structure.*/
+struct RMPS : public MPS<RTensor> {};
+/**Complex matrix product structure.*/
+struct CMPS : public MPS<CTensor> {};
+#else
+typedef MPS<RTensor> RMPS;
+typedef MPS<CTensor> CMPS;
+#endif
 
 /*!\defgroup TheMPS Matrix product states
 
@@ -90,6 +188,9 @@ const RTensor mps_to_vector(const RMPS &mps);
 
 /**Convert a CMPS to a complex vector, contracting all tensors.*/
 const CTensor mps_to_vector(const CMPS &mps);
+
+/**Convert an RMPS to CMPS.*/
+CMPS to_cmps(const RMPS &other);
 
 /**Norm of a RMPS.*/
 double norm2(const RMPS &psi);

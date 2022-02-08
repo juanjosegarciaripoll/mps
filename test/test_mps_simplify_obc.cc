@@ -43,7 +43,7 @@ const MPS add_errors(const MPS &psi) {
 //
 template <class MPS, bool two_sites>
 void trivial_simplify(int size) {
-  MPS psi = cluster_state(size);
+  auto psi = MPS(cluster_state(size));
   MPS aux = psi;
   int sense;
 
@@ -77,8 +77,8 @@ void trivial_simplify(int size) {
 //
 template <class MPS, bool two_sites>
 void trivial_simplify_with_errors(int size) {
-  MPS psi = cluster_state(size);
-  MPS aux = psi;
+  auto psi = MPS(cluster_state(size));
+  auto aux = psi;
   int sense;
 
   if (two_sites)

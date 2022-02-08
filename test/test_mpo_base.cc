@@ -58,7 +58,7 @@ void test_zero_mpo(int size) {
     EXPECT_TRUE(all_equal(mpo[i], target));
   }
 
-  typename MPO::MPS psi = cluster_state(size);
+  auto psi = typename MPO::MPS(cluster_state(size));
   EXPECT_CEQ(norm2(apply(mpo, psi)), 0.0);
 }
 
@@ -70,7 +70,7 @@ void test_small_local_mpo() {
   typedef typename MPO::elt_t Tensor;
   typedef typename MPO::MPS MPS;
 
-  MPS psi = cluster_state(2);
+  auto psi = MPS(cluster_state(2));
   {
     MPO mpo(2, 2);
     add_local_term(&mpo, mps::Pauli_z, 0);
@@ -104,7 +104,7 @@ void test_small_local_mpo() {
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
 
-  psi = cluster_state(3);
+  psi = MPS(cluster_state(3));
   {
     MPO mpo(3, 2);
     add_local_term(&mpo, mps::Pauli_z, 0);
@@ -157,7 +157,7 @@ void test_small_nn_mpo() {
   typedef typename MPO::elt_t Tensor;
   typedef typename MPO::MPS MPS;
 
-  MPS psi = cluster_state(2);
+  auto psi = MPS(cluster_state(2));
   {
     MPO mpo(2, 2);
     add_interaction(&mpo, mps::Pauli_z, 0, mps::Pauli_z);
@@ -168,7 +168,7 @@ void test_small_nn_mpo() {
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
-  psi = cluster_state(3);
+  psi = MPS(cluster_state(3));
   {
     MPO mpo(3, 2);
     add_interaction(&mpo, mps::Pauli_z, 0, mps::Pauli_z);
@@ -208,7 +208,7 @@ void test_random_mpo(int size) {
   typedef typename MPO::elt_t Tensor;
   typedef typename MPO::MPS MPS;
 
-  MPS psi = cluster_state(size);
+  auto psi = MPS(cluster_state(size));
 
   for (int i = 0; i < size; i++) {
     ConstantHamiltonian H(size);

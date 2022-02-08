@@ -58,13 +58,11 @@ target_sources(mps
     iTEBD/itebd_string_order_many_d.cc
     iTEBD/itebd_string_order_many_z.cc
     mps/rmps.cc
-    mps/rmps_random.cc
     mps/rmps_product_state.cc
     mps/rmps_ghz_state.cc
     mps/rmps_cluster_state.cc
     mps/rmps_to_vector.cc
     mps/cmps.cc
-    mps/cmps_random.cc
     mps/cmps_from_rmps.cc
     mps/cmps_product_state.cc
     mps/cmps_to_vector.cc
