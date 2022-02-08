@@ -100,8 +100,14 @@ class MP {
   data_type data_{};
 };
 
-index largest_bond_dimension(const MP<tensor::RTensor> &mp);
-index largest_bond_dimension(const MP<tensor::CTensor> &mp);
+template <typename Tensor>
+inline index largest_bond_dimension(const MP<Tensor> &mp) {
+  index output = 0;
+  for (auto &t : mp) {
+    output = std::max(output, t.dimension(0));
+  }
+  return output;
+}
 
 }  // namespace mps
 

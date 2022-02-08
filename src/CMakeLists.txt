@@ -19,8 +19,6 @@ target_sources(mps
     hamiltonian/hamiltonian_ti.cc
     hamiltonian/hamiltonian_constant.cc
     hamiltonian/split_interaction.cc
-    tools/bond_dimension_d.cc
-    tools/bond_dimension_z.cc
     tools/debug.cc
     tools/entropy.cc
     tools/flags.cc
