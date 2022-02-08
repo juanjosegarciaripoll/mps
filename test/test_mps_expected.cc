@@ -63,15 +63,19 @@ void test_expected1_order(int size) {
   }
 
   MPS psi = product_state(size, states[0]);
-  for (index i = 0; i < size; i++) psi.at(i) = reshape(states[i], 1, 2, 1);
+  for (index i = 0; i < size; i++) {
+    psi.at(i) = reshape(states[i], 1, 2, 1);
+  }
 
-  for (index i = 0; i < size; i++)
+  for (index i = 0; i < size; i++) {
     EXPECT_CEQ(expected(psi, mps::Pauli_z, i),
                scprod(states[i], mmult(mps::Pauli_z, states[i])));
+  }
 
-  for (index i = 1, j = size - 1; i < size; i++, j--)
+  for (index i = 1, j = size - 1; i < size; i++, j--) {
     EXPECT_CEQ(expected(psi, mps::Pauli_z, -i),
                scprod(states[j], mmult(mps::Pauli_z, states[j])));
+  }
 }
 
 ////////////////////////////////////////////////////////////
