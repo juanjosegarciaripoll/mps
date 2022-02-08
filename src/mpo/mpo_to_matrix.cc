@@ -26,13 +26,13 @@ using namespace tensor;
 template <class MPO, class Tensor>
 static const Tensor to_matrix(const MPO &A) {
   Tensor B = Tensor::ones(1, 1, 1);
-  tensor::index D = 1;
-  tensor::index a = 1;
+  index D = 1;
+  index a = 1;
 
   for (int i = 0; i < A.ssize(); ++i) {
     Tensor Ai = A[i];
-    tensor::index d = Ai.dimension(1);
-    tensor::index b = Ai.dimension(3);
+    index d = Ai.dimension(1);
+    index b = Ai.dimension(3);
     /* B(D,D',a)*A(a,d,d',b) -> B(D,D',d,d',b) */
     B = fold(B, 2, Ai, 0);
     /* B(D,D',a)*A(a,d,d',b) -> B(D,d,D',d',,b) */

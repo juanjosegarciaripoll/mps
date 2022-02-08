@@ -72,7 +72,7 @@ double do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense,
 
   double olderr = 0.0, err = 0.0;  // err = <P|H^2|P> + <Q|Q> - 2re<Q|H|P>
   double normHP;                   // <P|H^2|P>
-  typename Tensor::elt_t scp;      // <Q|H|P>
+  tensor_scalar_t<Tensor> scp;     // <Q|H|P>
   double normQ2 = abs(scprod(Q[0], Q[0]));  // <Q|Q>
   if (normQ2 < 1e-16) {
     std::cerr << "Right-hand side in solve(MPO, MPS, ...) is zero\n";

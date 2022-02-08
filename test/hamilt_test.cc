@@ -24,7 +24,6 @@
 namespace tensor_test {
 
 using namespace mps;
-using tensor::index;
 
 TestHamiltonian::TestHamiltonian(index amodel, double spin, index size, bool ti,
                                  bool pbc)
@@ -66,10 +65,10 @@ TestHamiltonian::TestHamiltonian(index amodel, double spin, index size, bool ti,
   CTensor op[4] = {sz, sx, imag(sy), sz};
   double sgn[4] = {1, 1, -1, 1};
 
-  for (tensor::index i = 0; i < size; i++) {
+  for (index i = 0; i < size; i++) {
     set_local_term(i, coefs(0, i) * op[0]);
   }
-  for (tensor::index i = 1; i < size; i++) {
+  for (index i = 1; i < size; i++) {
     for (int n = 1; n < 4; n++) {
       if (coefs(n, i)) {
         add_interaction(i - 1, sgn[n] * coefs(n, i) * op[n], op[n]);

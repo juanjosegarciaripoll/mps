@@ -29,7 +29,7 @@ static const Tensor ensure_3_indices(const Tensor &G) {
   if (G.rank() == 3) {
     return G;
   } else if (G.rank() == 4) {
-    tensor::index a, i, j, b;
+    index a, i, j, b;
     G.get_dimensions(&a, &i, &j, &b);
     return reshape(G, a, i * j, b);
   } else {
@@ -66,7 +66,7 @@ static void ortho_basis(const Tensor V, Tensor *U, Tensor *Uinv) {
 
 template <class Tensor>
 static Tensor itebd_power_eig(const Tensor &G, int sense) {
-  tensor::index a, i;
+  index a, i;
   G.get_dimensions(&a, &i, &a);
   Tensor v = reshape(Tensor::eye(a), a * a) / (double)a;
   linalg::eigs(
@@ -98,7 +98,7 @@ static void ortho_left(const Tensor &G, const Tensor &l, Tensor *Y,
 
 template <class Tensor>
 static void canonical_form(Tensor G, Tensor l, Tensor *pGout, Tensor *plout,
-                           double tolerance, tensor::index max_dim) {
+                           double tolerance, index max_dim) {
   Tensor X;    /* X(b,c) */
   Tensor Xinv; /* Xinv(c,b) */
   ortho_right<Tensor>(G, l, &X, &Xinv);
@@ -125,8 +125,8 @@ static void canonical_form(Tensor G, Tensor l, Tensor *pGout, Tensor *plout,
 template <class Tensor>
 static void split_tensor(Tensor GAB, Tensor lAB, Tensor *pA, Tensor *plA,
                          Tensor *pB, Tensor *plB, double tolerance,
-                         tensor::index max_dim, bool is_canonical = false) {
-  tensor::index a, i, j, b;
+                         index max_dim, bool is_canonical = false) {
+  index a, i, j, b;
   /*
      * GAB is a coarse grain tensor that spans two sites. lB are the Schmidt
      * coefficients associated to this tensor. We first find the canonical form
@@ -160,7 +160,7 @@ static void split_tensor(Tensor GAB, Tensor lAB, Tensor *pA, Tensor *plA,
 
 template <class Tensor>
 iTEBD<Tensor>::iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance,
-                     tensor::index max_dim)
+                     index max_dim)
     : canonical_(false) {
   split_tensor<Tensor>(AB, lAB, &A_, &lA_, &B_, &lB_, tolerance, max_dim);
   AlA_ = scale(A_, -1, lA_);
@@ -173,7 +173,7 @@ iTEBD<Tensor>::iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance,
 template <class Tensor>
 static Tensor itebd_power_eig(const Tensor &A, const Tensor &lA,
                               const Tensor &B, const Tensor &lB, int sense) {
-  tensor::index a = lB.size();
+  index a = lB.size();
   Tensor v = reshape(Tensor::eye(a, a) / sqrt((double)a), a * a);
   Tensor A1, A2;
   if (sense > 0) {
@@ -213,7 +213,7 @@ static void ortho_left(const Tensor &A, const Tensor &lA, const Tensor &B,
 }
 
 template <class Tensor>
-const iTEBD<Tensor> iTEBD<Tensor>::canonical_form(double, tensor::index) const {
+const iTEBD<Tensor> iTEBD<Tensor>::canonical_form(double, index) const {
   Tensor X;    /* X(b,c) */
   Tensor Xinv; /* Xinv(c,b) */
   ortho_right<Tensor>(A_, lA_, B_, lB_, &X, &Xinv);
@@ -247,7 +247,7 @@ const iTEBD<Tensor> iTEBD<Tensor>::canonical_form(double, tensor::index) const {
 template <class Tensor>
 const iTEBD<Tensor> iTEBD<Tensor>::apply_operator(const Tensor &U, int site,
                                                   double tolerance,
-                                                  tensor::index max_dim) const {
+                                                  index max_dim) const {
   Tensor A, lA, B, lB;
 #if 1
   if (site & 1) {
@@ -258,7 +258,7 @@ const iTEBD<Tensor> iTEBD<Tensor>::apply_operator(const Tensor &U, int site,
     return canonical_form().apply_operator(U, 0, tolerance, max_dim);
   } else {
     Tensor GAB = fold(AlA_, -1, B_, 0);
-    tensor::index a, i, j, b;
+    index a, i, j, b;
     GAB.get_dimensions(&a, &i, &j, &b);
     GAB = reshape(foldin(U, -1, reshape(GAB, a, i * j, b), 1), a, i, j, b);
     split_tensor(GAB, lB_, &A, &lA, &B, &lB, tolerance, max_dim,
@@ -268,14 +268,14 @@ const iTEBD<Tensor> iTEBD<Tensor>::apply_operator(const Tensor &U, int site,
 #else
   if (site & 1) {
     Tensor GBA = fold(BlB_, -1, A_, 0);
-    tensor::index a, i, j, b;
+    index a, i, j, b;
     GBA.get_dimensions(&a, &i, &j, &b);
     GBA = reshape(foldin(U, -1, reshape(GBA, a, i * j, b), 1), a, i, j, b);
     split_tensor(GBA, lA_, &B, &lB, &A, &lA, tolerance, max_dim);
     return iTEBD<Tensor>(A, lA, B, lB, false);
   } else {
     Tensor GAB = fold(AlA_, -1, B_, 0);
-    tensor::index a, i, j, b;
+    index a, i, j, b;
     GAB.get_dimensions(&a, &i, &j, &b);
     GAB = reshape(foldin(U, -1, reshape(GAB, a, i * j, b), 1), a, i, j, b);
     split_tensor(GAB, lB_, &A, &lA, &B, &lB, tolerance, max_dim);

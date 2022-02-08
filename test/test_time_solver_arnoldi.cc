@@ -35,7 +35,7 @@ namespace tensor_test {
 template <class Ham, class Tensor>
 CTensor arnoldi_expm(const Ham &H, const Tensor &psi, cdouble idt,
                      int max_states = 5) {
-  typedef typename Tensor::elt_t number;
+  typedef tensor_scalar_t<Tensor> number;
   double tolerance = 1e-10;
 
   if (max_states <= 0) {

@@ -223,7 +223,7 @@ void test_over_fixed_rank_tensors(unop test, int rank, int max_dimension = 10) {
   for (fixed_rank_iterator it(rank, max_dimension); !it.finished(); it.next()) {
     Tensor<elt_t> data(it.dimensions());
     // Make all elements different to make accurate comparisons
-    for (tensor::index i = 0; i < data.size(); i++) data.at(i) = i;
+    for (index i = 0; i < data.size(); i++) data.at(i) = i;
     test(data);
   }
 }
@@ -234,12 +234,12 @@ void test_over_fixed_rank_pairs(binop test, int rank, int max_dimension = 6) {
        it1.next()) {
     Tensor<elt_t> data1(it1.dimensions());
     // Make all elements different to make accurate comparisons
-    for (tensor::index i = 0; i < data1.size(); i++) data1.at(i) = i;
+    for (index i = 0; i < data1.size(); i++) data1.at(i) = i;
     for (fixed_rank_iterator it2(rank, max_dimension); !it2.finished();
          it2.next()) {
       Tensor<elt_t> data2(it2.dimensions());
       // Make all elements different to make accurate comparisons
-      for (tensor::index i = 0; i < data2.size(); i++) data2.at(i) = i;
+      for (index i = 0; i < data2.size(); i++) data2.at(i) = i;
       test(data1, data2);
     }
   }
@@ -371,7 +371,7 @@ static struct Foo {
    */
 
 class TestHamiltonian : public mps::ConstantHamiltonian {
-  tensor::index model;
+  index model;
   RTensor coefs;
   bool periodic;
   bool translational_invariance;
@@ -390,11 +390,10 @@ class TestHamiltonian : public mps::ConstantHamiltonian {
 
   CTensor sx, sy, sz;
 
-  TestHamiltonian(tensor::index amodel, double spin, tensor::index size,
-                  bool ti, bool pbc);
+  TestHamiltonian(index amodel, double spin, index size, bool ti, bool pbc);
 
-  static const char *model_name(tensor::index model);
-  static tensor::index last_model();
+  static const char *model_name(index model);
+  static index last_model();
 };
 
 extern void test_over_H(bool test(const mps::Hamiltonian &H, double &err),

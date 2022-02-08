@@ -21,25 +21,24 @@
 
 namespace mps {
 
-  template<class Tensor>
-  static inline const Tensor
-  do_propagate_right(Tensor v, const Tensor &A, const Tensor &op)
-  {
-    /* v(a,a') A(a',i,b') */
-    v = fold(v, -1, A, 0);
+template <class Tensor>
+static inline const Tensor do_propagate_right(Tensor v, const Tensor &A,
+                                              const Tensor &op) {
+  /* v(a,a') A(a',i,b') */
+  v = fold(v, -1, A, 0);
 
-    /* v(a,i,b') Op(i,j) -> v(a,j,b') */
-    if (!op.is_empty()) {
-	v = foldin(op, -1, v, 1);
-    }
-
-    /* v(a,i,b') A*(a,i,b) -> v(b,b') Note that dim(b) = dim(b')*/
-
-    tensor::index a,i,b;
-    v.get_dimensions(&a,&i,&b);
-    v = foldc(reshape(A, a*i,b), 0, reshape(v, a*i,b), 0);
-
-    return v;
+  /* v(a,i,b') Op(i,j) -> v(a,j,b') */
+  if (!op.is_empty()) {
+    v = foldin(op, -1, v, 1);
   }
 
+  /* v(a,i,b') A*(a,i,b) -> v(b,b') Note that dim(b) = dim(b')*/
+
+  index a, i, b;
+  v.get_dimensions(&a, &i, &b);
+  v = foldc(reshape(A, a * i, b), 0, reshape(v, a * i, b), 0);
+
+  return v;
 }
+
+}  // namespace mps

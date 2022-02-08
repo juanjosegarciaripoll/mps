@@ -27,7 +27,6 @@ namespace tensor_test {
 
 using namespace tensor;
 using namespace mps;
-using tensor::index;
 
 template <class MPS>
 void test_correlation_basic() {

@@ -29,7 +29,6 @@ namespace tensor_test {
 
 using namespace mps;
 using namespace linalg;
-using tensor::index;
 
 //////////////////////////////////////////////////////////////////////
 // EXACT SOLVERS

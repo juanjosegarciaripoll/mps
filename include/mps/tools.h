@@ -30,32 +30,30 @@ using namespace tensor;
 enum { MPS_DEBUG_NONE = 0, MPS_DEBUG_SIMPLIFY_MANY = 2 };
 extern int debug_flags;
 
-size_t where_to_truncate(const RTensor &s, double tol, tensor::index max_dim);
+size_t where_to_truncate(const RTensor &s, double tol, index max_dim);
 
 const RTensor limited_svd(RTensor A, RTensor *U, RTensor *V, double tolerance,
-                          tensor::index max_dim = 0);
+                          index max_dim = 0);
 
 const RTensor split(RTensor *A, const RTensor &origA, int sense, bool truncate);
 
-const RTensor build_E_matrix(const RTensor &A, tensor::index *a = 0,
-                             tensor::index *b = 0);
+const RTensor build_E_matrix(const RTensor &A, index *a = 0, index *b = 0);
 
-const RTensor build_E_matrix(const RTensor &A, const RTensor &B,
-                             tensor::index *a = 0, tensor::index *b = 0);
+const RTensor build_E_matrix(const RTensor &A, const RTensor &B, index *a = 0,
+                             index *b = 0);
 
 const RTensor propagate_right(const RTensor &v, const RTensor &A,
                               const RTensor &op);
 
 const RTensor limited_svd(CTensor A, CTensor *U, CTensor *V, double tolerance,
-                          tensor::index max_dim = 0);
+                          index max_dim = 0);
 
 const CTensor split(CTensor *A, const CTensor &origA, int sense, bool truncate);
 
-const CTensor build_E_matrix(const CTensor &A, tensor::index *a = 0,
-                             tensor::index *b = 0);
+const CTensor build_E_matrix(const CTensor &A, index *a = 0, index *b = 0);
 
-const CTensor build_E_matrix(const CTensor &A, const CTensor &B,
-                             tensor::index *a = 0, tensor::index *b = 0);
+const CTensor build_E_matrix(const CTensor &A, const CTensor &B, index *a = 0,
+                             index *b = 0);
 
 const CTensor propagate_right(const CTensor &v, const CTensor &A,
                               const CTensor &op);

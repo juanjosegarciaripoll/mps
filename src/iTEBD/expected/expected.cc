@@ -25,22 +25,22 @@
 namespace mps {
 
 template <class Tensor>
-typename Tensor::elt_t iTEBD<Tensor>::expected_value(const Tensor &Op1,
-                                                     const Tensor &Op2) const {
+tensor_scalar_t<Tensor> iTEBD<Tensor>::expected_value(const Tensor &Op1,
+                                                      const Tensor &Op2) const {
   return string_order(Op1, 0, Tensor(), Op2, 1);
 }
 
 template <class Tensor>
-typename Tensor::elt_t iTEBD<Tensor>::expected_value(const Tensor &Op1, int i,
-                                                     const Tensor &Op2,
-                                                     int j) const {
+tensor_scalar_t<Tensor> iTEBD<Tensor>::expected_value(const Tensor &Op1, int i,
+                                                      const Tensor &Op2,
+                                                      int j) const {
   return string_order(Op1, i, Tensor(), Op2, j);
 }
 
 template <class Tensor>
-typename Tensor::elt_t string_order(const Tensor &Opi, int i,
-                                    const Tensor &Opmiddle, const Tensor &Opj,
-                                    int j) const {
+tensor_scalar_t<Tensor> string_order(const Tensor &Opi, int i,
+                                     const Tensor &Opmiddle, const Tensor &Opj,
+                                     int j) const {
   if (i > j) return string_order(Opj, j, Opmiddle, Opi, i);
   assert(is_canonical());
   int site = i;
@@ -60,9 +60,9 @@ typename Tensor::elt_t string_order(const Tensor &Opi, int i,
 }
 
 template <class Tensor>
-typename Tensor::elt_t iTEBD<Tensor>::expected_value12(const Tensor &Op12,
-                                                       int site) const {
-  tensor::index a, i, b, j, c;
+tensor_scalar_t<Tensor> iTEBD<Tensor>::expected_value12(const Tensor &Op12,
+                                                        int site) const {
+  index a, i, b, j, c;
   const Tensor &AlA = (site & 1) ? BlB_ : AlA_;
   const Tensor &B = (site & 1) ? A_ : B_;
   const Tensor &lB = (site & 1) ? lA_ : lB_;

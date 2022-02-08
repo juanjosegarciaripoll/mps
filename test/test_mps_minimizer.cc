@@ -27,7 +27,6 @@
 namespace tensor_test {
 
 using namespace mps;
-using tensor::index;
 
 template <class MPO, class MPS>
 double ground_state(const MPO &mpo, MPS *output) {
@@ -56,7 +55,7 @@ template <class MPO, int model>
 void test_minimizer_model(index L) {
   typedef typename MPO::MPS MPS;
   typedef typename MPS::elt_t Tensor;
-  typedef typename Tensor::elt_t number;
+  typedef tensor_scalar_t<Tensor> number;
   // Random Hamiltonian of spin 1/2 model with the given
   TestHamiltonian H(model, 0.5, L, false, false);
 

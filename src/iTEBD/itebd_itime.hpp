@@ -26,9 +26,8 @@ namespace mps {
 
 template <class Tensor>
 const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
-                                 double dt, tensor::index nsteps,
-                                 double tolerance, tensor::index max_dim,
-                                 tensor::index deltan, int method,
+                                 double dt, index nsteps, double tolerance,
+                                 index max_dim, index deltan, int method,
                                  std::vector<double> *energies,
                                  std::vector<double> *entropies) {
   static const double FR_param[5] = {0.67560359597983, 1.35120719195966,

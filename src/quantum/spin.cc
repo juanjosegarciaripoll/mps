@@ -43,15 +43,15 @@ void spin_operators(double s, CTensor *sx, CTensor *sy, CTensor *sz) {
     std::cerr << "spin_operators(): the spin value " << s << " is not valid\n";
     abort();
   }
-  tensor::index d = (tensor::index)floor(2 * s + 1);
+  index d = (index)floor(2 * s + 1);
 
   auto aux1 = RTensor::empty(d);
-  for (tensor::index i = 0; i < d; i++) {
+  for (index i = 0; i < d; i++) {
     double m = s - i;
     aux1.at(i) = m;
   }
   auto aux2 = RTensor::empty(d - 1);
-  for (tensor::index i = 0; i < (d - 1); i++) {
+  for (index i = 0; i < (d - 1); i++) {
     double m = s - i;
     aux2.at(i) = sqrt(s * (s + 1) - (m - 1) * m);
   }

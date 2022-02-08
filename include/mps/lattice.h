@@ -35,7 +35,7 @@ using linalg::EigType;
    */
 class Lattice {
  public:
-  typedef tensor::index word;
+  typedef index word;
 
   enum particle_kind_t {
     /** The lattice will contain impenetrable bosonic particles. */
@@ -87,7 +87,7 @@ class Lattice {
   /** Preconfigured number of particles. */
   index particles() const;
   /** Dimensionality of the constrained Hilbert space. */
-  tensor::index dimension() const;
+  index dimension() const;
 
   RTensor apply(const RTensor &psi, const RTensor &J, const RTensor &U,
                 particle_kind_t kind = FERMIONS) const;
@@ -108,7 +108,7 @@ class Lattice {
   const RTensor interaction_inner(index site1, index site2) const;
 
  private:
-  const tensor::index number_of_sites;
+  const index number_of_sites;
   const index number_of_particles;
   const Indices configurations;
 

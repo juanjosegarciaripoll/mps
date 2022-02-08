@@ -79,7 +79,7 @@ static void normalize_this(Tensor &Pk, int sense) {
 template <class MPS>
 struct MPSManySimplifier {
   typedef typename MPS::elt_t Tensor;
-  typedef typename Tensor::elt_t number;
+  typedef tensor_scalar_t<Tensor> number;
   typedef std::vector<Tensor> tensor_vector_t;
   typedef std::vector<tensor_vector_t> matrices_t;
   typedef std::vector<MPS> mps_vector_t;

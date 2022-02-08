@@ -22,8 +22,8 @@
 namespace mps {
 
 template const iTEBD<CTensor> evolve_itime(
-    iTEBD<CTensor> psi, const CTensor &H12, double dt, tensor::index nsteps,
-    double tolerance, tensor::index max_dim, tensor::index deltan, int method,
+    iTEBD<CTensor> psi, const CTensor &H12, double dt, index nsteps,
+    double tolerance, index max_dim, index deltan, int method,
     std::vector<double> *energy, std::vector<double> *entropy);
 
 }

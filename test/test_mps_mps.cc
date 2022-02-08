@@ -26,7 +26,6 @@ namespace tensor_test {
 
 using namespace tensor;
 using namespace mps;
-using tensor::index;
 
 //////////////////////////////////////////////////////////////////////
 // CONSTRUCTING SMALL MPS

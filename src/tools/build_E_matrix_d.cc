@@ -25,13 +25,12 @@ using namespace tensor;
 
 /**\cond IGNORED */
 
-const RTensor build_E_matrix(const RTensor &A, tensor::index *a,
-                             tensor::index *b) {
+const RTensor build_E_matrix(const RTensor &A, index *a, index *b) {
   return mps::do_build_E_matrix(A, A, a, b);
 }
 
-const RTensor build_E_matrix(const RTensor &A, const RTensor &B,
-                             tensor::index *a, tensor::index *b) {
+const RTensor build_E_matrix(const RTensor &A, const RTensor &B, index *a,
+                             index *b) {
   return mps::do_build_E_matrix(A, B, a, b);
 }
 

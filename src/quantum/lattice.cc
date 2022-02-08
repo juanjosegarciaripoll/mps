@@ -234,6 +234,6 @@ index Lattice::size() const { return number_of_sites; }
 
 index Lattice::particles() const { return number_of_particles; }
 
-tensor::index Lattice::dimension() const { return configurations.size(); }
+index Lattice::dimension() const { return configurations.size(); }
 
 }  // namespace mps

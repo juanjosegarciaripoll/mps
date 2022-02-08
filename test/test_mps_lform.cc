@@ -25,7 +25,6 @@
 namespace tensor_test {
 
 using namespace mps;
-using tensor::index;
 
 // The norm of a Linear form associated to vector 'v' is the norm of the
 // vector itself

@@ -84,8 +84,8 @@ void test_itime_ising_roman() {
         << "============================================================\n"
         << "Bfield = " << tests[j].hfield << std::endl;
     RTensor spectrum = tests[j].spectrum;
-    tensor::index max_chi = spectrum.size() + 8;
-    tensor::index nsteps = 1000;
+    index max_chi = spectrum.size() + 8;
+    index nsteps = 1000;
     double tolerance = -1;
     Tensor H = -H12 + tests[j].hfield * Hmag;
     double dt;
@@ -95,7 +95,7 @@ void test_itime_ising_roman() {
       nsteps *= 2;
     }
     Tensor schmidt = psi.schmidt(0);
-    tensor::index d = std::min(schmidt.size(), spectrum.size());
+    index d = std::min(schmidt.size(), spectrum.size());
     Tensor v1 = schmidt(range(0, d - 1));
     Tensor v2 = spectrum(range(0, d - 1));
     std::cout << "v1=" << v1 << std::endl << "v2=" << v2 << std::endl;
@@ -106,7 +106,7 @@ void test_itime_ising_roman() {
 
 template <class Tensor>
 void test_itime_ising() {
-  tensor::index max_chi = 30;
+  index max_chi = 30;
   double tolerance = -1;
 
   std::cout << "==============================================================="

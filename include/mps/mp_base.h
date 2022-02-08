@@ -21,12 +21,13 @@
 #define MPS_MP_BASE_H
 
 #include <vector>
+#include <tensor/traits.h>
 #include <tensor/tensor.h>
 #include <mps/except.h>
 
 namespace mps {
 
-using tensor::index;
+using namespace tensor;
 
 template <class sequence>
 index ssize(const sequence &s) {
@@ -52,7 +53,7 @@ class MP {
 
  public:
   typedef Tensor elt_t;
-  typedef typename Tensor::elt_t number_t;
+  typedef tensor_scalar_t<Tensor> number_t;
   typedef typename data_type::iterator iterator;
   typedef typename data_type::const_iterator const_iterator;
 

@@ -28,7 +28,7 @@
 namespace mps {
 
 /**Real matrix product structure.*/
-class RMPO : public MP<tensor::RTensor> {
+class RMPO : public MP<RTensor> {
  public:
   typedef RMPS MPS;
 

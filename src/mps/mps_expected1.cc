@@ -27,8 +27,8 @@ using namespace tensor;
 /* SINGLE-SITE CORRELATION FUNCTION */
 
 template <class MPS, class Tensor>
-typename Tensor::elt_t single_site_expected(const MPS &a, const Tensor &Op1,
-                                            index k1) {
+tensor_scalar_t<Tensor> single_site_expected(const MPS &a, const Tensor &Op1,
+                                             index k1) {
   Tensor M;
   const Tensor *op;
   k1 = a.normal_index(k1);

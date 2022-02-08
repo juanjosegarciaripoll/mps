@@ -23,8 +23,6 @@
 
 namespace mps {
 
-using tensor::index;
-
 /**Return the Fock number operator truncated for a space of up to 'nmax' bosons.
      \ingroup QM
   */

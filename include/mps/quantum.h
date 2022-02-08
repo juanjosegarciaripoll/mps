@@ -26,7 +26,6 @@
 namespace mps {
 
 using namespace tensor;
-using tensor::index;
 
 /*
    * Angular momentum operators.

@@ -25,9 +25,7 @@
 
 namespace mps {
 
-using namespace tensor;
 using mps::imath::isqrt;
-using tensor::index;
 
 void split_interaction(const CTensor &H12, std::vector<CTensor> *v1,
                        std::vector<CTensor> *v2) {

@@ -30,7 +30,7 @@ static const Tensor normalize(const Tensor &v) {
 }
 
 template <class Tensor>
-iTEBD<Tensor>::iTEBD(tensor::index dimension)
+iTEBD<Tensor>::iTEBD(index dimension)
     : A_(normalize<Tensor>(Tensor::random(1, dimension, 1))),
       B_(normalize<Tensor>(Tensor::random(1, dimension, 1))),
       lA_(igen << 1, gen<elt_t>(1)),

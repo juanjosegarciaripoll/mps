@@ -26,7 +26,6 @@
 namespace tensor_test {
 
 using namespace mps;
-using tensor::index;
 
 const CMPO build_MPO(void (*fH)(ConstantHamiltonian &H, const Indices &d),
                      const Indices &d, CSparse *Hsparse) {

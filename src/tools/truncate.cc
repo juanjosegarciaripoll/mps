@@ -24,8 +24,6 @@
 
 namespace mps {
 
-using tensor::index;
-
 size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
   /* S is a vector of positive numbers arranged in decreasing order.  This
      * routine looks for a point to truncate S such that the norm-2 error made

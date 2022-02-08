@@ -28,7 +28,7 @@
 namespace mps {
 
 /**Real matrix product structure.*/
-class CMPO : public MP<tensor::CTensor> {
+class CMPO : public MP<CTensor> {
  public:
   typedef CMPS MPS;
 

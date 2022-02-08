@@ -22,7 +22,7 @@
 
 namespace mps {
 
-const CMPS product_state(index length, const tensor::CTensor &local_state) {
+const CMPS product_state(index length, const CTensor &local_state) {
   assert(local_state.rank() == 1);
   assert(local_state.size());
   assert(length > 0);

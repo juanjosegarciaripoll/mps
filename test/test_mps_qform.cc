@@ -26,7 +26,6 @@
 namespace tensor_test {
 
 using namespace mps;
-using tensor::index;
 
 // Create a MPO with a single, random operator acting on 'site'. All other
 // sites get the identity.
@@ -71,7 +70,7 @@ template <class MPO, int model>
 void test_qform_expected(typename MPO::MPS psi) {
   typedef typename MPO::MPS MPS;
   typedef typename MPS::elt_t Tensor;
-  typedef typename Tensor::elt_t number;
+  typedef tensor_scalar_t<Tensor> number;
   // Random Hamiltonian of spin 1/2 model with the given
   index L = psi.size();
   if (psi[0].dimension(1) == 2) {
@@ -101,7 +100,7 @@ template <class MPO, int model>
 void test_qform_expected2sites(typename MPO::MPS psi) {
   typedef typename MPO::MPS MPS;
   typedef typename MPS::elt_t Tensor;
-  typedef typename Tensor::elt_t number;
+  typedef tensor_scalar_t<Tensor> number;
   // Random Hamiltonian of spin 1/2 model with the given
   index L = psi.size();
   if (psi[0].dimension(1) == 2) {

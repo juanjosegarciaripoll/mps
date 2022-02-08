@@ -27,9 +27,9 @@ using namespace tensor;
 /* TWO-SITE CORRELATION FUNCTION */
 
 template <class MPS, class Tensor>
-typename Tensor::elt_t two_sites_expected(const MPS &a, const Tensor &Op1,
-                                          index k1, const Tensor &Op2,
-                                          index k2) {
+tensor_scalar_t<Tensor> two_sites_expected(const MPS &a, const Tensor &Op1,
+                                           index k1, const Tensor &Op2,
+                                           index k2) {
   if (k1 == k2) {
     return expected(a, mmult(Op1, Op2), k1);
   } else {

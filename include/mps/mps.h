@@ -92,13 +92,13 @@ class MPS : public MP<Tensor> {
   typedef MP<Tensor> parent;
 
   inline void presize(const tensor::Indices &physical_dimensions,
-                      tensor::index bond_dimension, bool periodic) {
+                      index bond_dimension, bool periodic) {
     assert(bond_dimension > 0);
     assert(this->size() == physical_dimensions.size());
-    tensor::index l = physical_dimensions.size();
-    tensor::Indices dimensions = {bond_dimension, tensor::index(0),
+    index l = physical_dimensions.size();
+    tensor::Indices dimensions = {bond_dimension, index(0),
                                   bond_dimension};
-    for (tensor::index i = 0; i < l; i++) {
+    for (index i = 0; i < l; i++) {
       assert(physical_dimensions[i] > 0);
       dimensions.at(1) = physical_dimensions[i];
       dimensions.at(0) = (periodic || (i > 0)) ? bond_dimension : 1;
@@ -166,10 +166,10 @@ const Indices dimensions(const RMPS &psi);
 const Indices dimensions(const CMPS &psi);
 
 /**Create a product state. */
-const RMPS product_state(index length, const tensor::RTensor &local_state);
+const RMPS product_state(index length, const RTensor &local_state);
 
 /**Create a product state. */
-const CMPS product_state(index length, const tensor::CTensor &local_state);
+const CMPS product_state(index length, const CTensor &local_state);
 
 /**Create a GHZ state.*/
 const RMPS ghz_state(index length, bool periodic = false);

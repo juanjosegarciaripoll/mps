@@ -44,7 +44,7 @@ void test_expected_product_norm(int d) {
   mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
   for (int i = 1; i < 100; i++) {
     Tensor id = Tensor::eye(d, d);
-    typename Tensor::elt_t one = id(0, 0);
+    tensor_scalar_t<Tensor> one = id(0, 0);
     iTEBD<Tensor> psiAA = random_product<Tensor>(d, true);
     iTEBD<Tensor> psiAB = random_product<Tensor>(d, false);
     /* The expected value of the identity is the norm */
@@ -83,8 +83,8 @@ void test_expected_projectors(int d) {
     Tensor id = Tensor::eye(d, d);
     Tensor PnA = id - PA;  // Orthogonal projectors
     Tensor PnB = id - PB;
-    typename Tensor::elt_t one = number_one<typename Tensor::elt_t>();
-    typename Tensor::elt_t zero = number_zero<typename Tensor::elt_t>();
+    tensor_scalar_t<Tensor> one = number_one<tensor_scalar_t<Tensor>>();
+    tensor_scalar_t<Tensor> zero = number_zero<tensor_scalar_t<Tensor>>();
 
     EXPECT_CEQ(one, expected(psi, PA, 0));
     EXPECT_CEQ(zero, expected(psi, PnA, 0));
@@ -123,8 +123,8 @@ void test_expected12_projectors(int d) {
     Tensor id = Tensor::eye(d, d);
     Tensor PnA = id - PA;  // Orthogonal projectors
     Tensor PnB = id - PB;
-    typename Tensor::elt_t one = number_one<typename Tensor::elt_t>();
-    typename Tensor::elt_t zero = number_zero<typename Tensor::elt_t>();
+    tensor_scalar_t<Tensor> one = number_one<tensor_scalar_t<Tensor>>();
+    tensor_scalar_t<Tensor> zero = number_zero<tensor_scalar_t<Tensor>>();
 
     EXPECT_CEQ(one, expected12(psi, kron2(PA, PB)));
     EXPECT_CEQ(zero, expected12(psi, kron2(PA, PnB)));
@@ -161,8 +161,8 @@ void test_energy_projectors(int d) {
     Tensor PA = projector(A);  // Projector onto A
     Tensor id = Tensor::eye(d, d);
     Tensor PnA = id - PA;  // Orthogonal projectors
-    typename Tensor::elt_t one = number_one<typename Tensor::elt_t>();
-    typename Tensor::elt_t zero = number_zero<typename Tensor::elt_t>();
+    tensor_scalar_t<Tensor> one = number_one<tensor_scalar_t<Tensor>>();
+    tensor_scalar_t<Tensor> zero = number_zero<tensor_scalar_t<Tensor>>();
 
     EXPECT_CEQ(2.0, energy(psi, kron(PA, PA)));
     EXPECT_CEQ(0.0, energy(psi, kron(PA, PnA)));
@@ -193,9 +193,9 @@ void test_aklt_string_order(int i) {
                       rgen << 0 << v << 0 << v << 0 << v << 0 << v << 0);
   Tensor ExpSx = RTensor(igen << 3 << 3,
                          rgen << 0 << 0 << -1 << 0 << -1 << 0 << -1 << 0 << 0);
-  typename Tensor::elt_t vz = string_order(psi, Sz, 0, ExpSz, Sz, i);
+  tensor_scalar_t<Tensor> vz = string_order(psi, Sz, 0, ExpSz, Sz, i);
   EXPECT_CEQ(vz, -4.0 / 9.0);
-  typename Tensor::elt_t vx = string_order(psi, Sx, 0, ExpSx, Sx, i);
+  tensor_scalar_t<Tensor> vx = string_order(psi, Sx, 0, ExpSx, Sx, i);
   EXPECT_CEQ(vz, vx);
 }
 
