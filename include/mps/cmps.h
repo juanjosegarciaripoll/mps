@@ -43,8 +43,6 @@ class CMPS : public MP<tensor::CTensor> {
        bool periodic = false);
   explicit CMPS(const std::vector<elt_t> &data) : parent(data){};
 
-  index normal_index(index i) const;
-
   /**Can the CMP be used for a periodic boundary condition problem?*/
   bool is_periodic() const;
 

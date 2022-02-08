@@ -42,8 +42,6 @@ class RMPS : public MP<tensor::RTensor> {
        bool periodic = false);
   explicit RMPS(const std::vector<elt_t> &data) : parent(data){};
 
-  index normal_index(index i) const;
-
   /**Can the RMP be used for a periodic boundary condition problem?*/
   bool is_periodic() const;
 

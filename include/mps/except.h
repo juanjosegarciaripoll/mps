@@ -1,4 +1,5 @@
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
+#pragma once
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
 
@@ -16,39 +17,18 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+#ifndef MPS_EXCEPT_H
+#define MPS_EXCEPT_H
 
-#include <cassert>
-#include <mps/rmps.h>
-#include "mps_presize.h"
+#include <stdexcept>
 
 namespace mps {
 
-template class MP<tensor::RTensor>;
-
-bool RMPS::is_periodic() const {
-  index l = size();
-  if (l) {
-    index d0 = (*this)[0].dimension(0);
-    index dl = (*this)[l - 1].dimension(2);
-    if (d0 == dl && d0 > 1) return true;
-  }
-  return false;
-}
-
-RMPS::RMPS(index length, index physical_dimension, index bond_dimension,
-           bool periodic)
-    : parent(length) {
-  if (physical_dimension) {
-    tensor::Indices d(length);
-    std::fill(d.begin(), d.end(), physical_dimension);
-    presize_mps(*this, d, bond_dimension, periodic);
-  }
-}
-
-RMPS::RMPS(const tensor::Indices &physical_dimensions, index bond_dimension,
-           bool periodic)
-    : parent(physical_dimensions.size()) {
-  presize_mps(*this, physical_dimensions, bond_dimension, periodic);
-}
+struct mps_out_of_range : public std::out_of_range {
+  mps_out_of_range(const char *message = "Out of bounds in MPS access")
+      : std::out_of_range(message){};
+};
 
 }  // namespace mps
+
+#endif  // MPS_EXCEPT_H

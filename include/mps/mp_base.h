@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <tensor/tensor.h>
+#include <mps/except.h>
 
 namespace mps {
 
@@ -84,6 +85,22 @@ class MP {
   const std::vector<Tensor> to_vector() const { return data_; }
 
   Sweeper sweeper(index sense) const { return Sweeper(size(), sense); }
+
+  index normal_index(index mps_index) const {
+    index mps_size = ssize();
+    if (mps_index < 0) {
+      mps_index = mps_index + mps_size;
+      if (mps_index < 0 || mps_index >= mps_size) {
+        throw mps_out_of_range();
+      }
+      return mps_index + mps_size;
+    } else {
+      if (mps_index >= mps_size) {
+        throw mps_out_of_range();
+      }
+      return mps_index;
+    }
+  }
 
  private:
   data_type data_{};

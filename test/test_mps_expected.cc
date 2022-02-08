@@ -19,6 +19,7 @@
 
 #include "loops.h"
 #include <gtest/gtest.h>
+#include <mps/except.h>
 #include <mps/mps.h>
 #include <mps/quantum.h>
 
@@ -30,15 +31,15 @@ using tensor::index;
 
 template <class MPS>
 void test_expected1_basic() {
-  typename MPS::elt_t e0 = RTensor(igen << 2, rgen << 1.0 << 0.0);
-  typename MPS::elt_t e1 = RTensor(igen << 2, rgen << 0.0 << 1.0);
+  typename MPS::elt_t e0 = RTensor({1.0, 0.0});
+  typename MPS::elt_t e1 = RTensor({0.0, 1.0});
   {
     // A product state with two vectors
     MPS psi = product_state(2, e0);
     psi.at(1) = reshape(e1, 1, 2, 1);
 
-    EXPECT_DEATH(expected(psi, mps::Pauli_id, 2), ".*");
-    EXPECT_DEATH(expected(psi, mps::Pauli_id, -3), ".*");
+    EXPECT_THROW(expected(psi, mps::Pauli_id, 2), mps_out_of_range);
+    EXPECT_THROW(expected(psi, mps::Pauli_id, -3), mps_out_of_range);
     EXPECT_CEQ(expected(psi, mps::Pauli_z, 0), 1.0);
     EXPECT_CEQ(expected(psi, mps::Pauli_z, 1), -1.0);
     EXPECT_CEQ(expected(psi, mps::Pauli_z, -1), -1.0);
