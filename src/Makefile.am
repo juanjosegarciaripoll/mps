@@ -106,9 +106,7 @@ libmps_la_SOURCES = \
 	mps/apply_local_operator_d.cc \
 	mps/apply_local_operator_z.cc \
 	mpo/rmpo.cc \
-	mpo/rmpo_from_hamiltonian.cc \
 	mpo/cmpo.cc \
-	mpo/cmpo_from_hamiltonian.cc \
 	mpo/mpo_add_term_d.cc \
 	mpo/mpo_add_term_z.cc \
 	mpo/mpo_add_hopping_matrix_d.cc \

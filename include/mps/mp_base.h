@@ -68,6 +68,7 @@ class MP {
   size_t size() const { return data_.size(); }
   index ssize() const { return static_cast<index>(size()); }
   index last() const { return size() - 1; }
+  index last_index() const { return size() - 1; }
   void resize(index new_size) { data_.resize(new_size); }
 
   const Tensor &operator[](index n) const { return data_[normal_index(n)]; }
