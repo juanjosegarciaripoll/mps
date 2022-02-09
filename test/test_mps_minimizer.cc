@@ -39,8 +39,8 @@ double ground_state(const MPO &mpo, MPS *output) {
     Tensor P = RTensor::random(D, 2, D) - 0.5;
     psi.at(i) = P / norm2(P);
   }
-  psi.at(0) = psi[0](range(0), range(), range());
-  psi.at(L - 1) = psi[L - 1](range(), range(), range(0));
+  psi.at(0) = psi[0](range(0), _, _);
+  psi.at(L - 1) = psi[L - 1](_, _, range(0));
 
   MinimizerOptions opts;
   opts.Dmax = std::min(1 << (L / 2), 50);

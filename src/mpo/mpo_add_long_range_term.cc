@@ -69,7 +69,7 @@ static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H, index i,
     if (j + 1 < end) {
       Pj = change_dimension(Pj, 3, dr + 1);
       if (j <= i) {
-        Pj.at(range(opening), range(), range(), range(dr)) = Hj;
+        Pj.at(range(opening), _, _, range(dr)) = Hj;
       }
     } else {
       closing = last_closing;
@@ -77,10 +77,10 @@ static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H, index i,
     if (j > start) {
       Pj = change_dimension(Pj, 0, dl + 1);
       if (i <= j) {
-        Pj.at(range(dl), range(), range(), range(closing)) = Hj;
+        Pj.at(range(dl), _, _, range(closing)) = Hj;
       }
       if (i != j && j + 1 < end) {
-        Pj.at(range(dl), range(), range(), range(dr)) =
+        Pj.at(range(dl), _, _, range(dr)) =
             sign ? *sign : Tensor::eye(Hj.rows());
       }
     }
@@ -97,24 +97,24 @@ static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H, index i,
       // We are on the origin of the interaction
       // We close all terms that came from the left
       if (j > start) {
-        Pj.at(range(dl), range(), range(), range(closing)) = Hj;
+        Pj.at(range(dl), _, _, range(closing)) = Hj;
       }
       // We open all terms that did not have anything on the left
       if (j + 1 < end) {
-        Pj.at(range(opening), range(), range(), range(dr)) = Hj;
+        Pj.at(range(opening), _, _, range(dr)) = Hj;
       }
     } else if (j < i) {
       // We open new terms
-      Pj.at(range(opening), range(), range(), range(dr)) = Hj;
+      Pj.at(range(opening), _, _, range(dr)) = Hj;
       if (j > start) {
-        Pj.at(range(dl), range(), range(), range(dr)) =
+        Pj.at(range(dl), _, _, range(dr)) =
             sign ? *sign : Tensor::eye(Hj.rows());
       }
     } else {
       // We close terms opened by the qubit
-      Pj.at(range(dl), range(), range(), range(closing)) = Hj;
+      Pj.at(range(dl), _, _, range(closing)) = Hj;
       if (j + 1 < end) {
-        Pj.at(range(dl), range(), range(), range(dr)) =
+        Pj.at(range(dl), _, _, range(dr)) =
             sign ? *sign : Tensor::eye(Hj.rows());
       }
     }

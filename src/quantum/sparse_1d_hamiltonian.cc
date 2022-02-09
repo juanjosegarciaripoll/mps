@@ -57,8 +57,8 @@ static const sparse do_pair_Hamiltonian(const sparse &H12, const sparse &H1,
       decompose_operator(full(H12), &O1, &O2);
       sparse aux = sparse::eye(ipow(d, N - 2));
       for (index i = 0; i < O1.dimension(-1); i++) {
-        sparse sO1 = sparse(squeeze(O1(range(), range(), range(i))));
-        sparse sO2 = sparse(squeeze(O2(range(), range(), range(i))));
+        sparse sO1 = sparse(squeeze(O1(_, _, range(i))));
+        sparse sO2 = sparse(squeeze(O2(_, _, range(i))));
         output = output + kron(sO2, kron(aux, sO1));
       }
     }

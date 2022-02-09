@@ -51,12 +51,12 @@ TestHamiltonian::TestHamiltonian(index amodel, double spin, index size, bool ti,
   coefs = RTensor::zeros(4, size);
   if (ti) {
     for (index j = 0; j < size; j++) {
-      coefs.at(range(), range(j)) = aux;
+      coefs.at(_, range(j)) = aux;
     }
   } else {
     coefs.randomize();
     for (index j = 0; j < size; j++) {
-      coefs.at(range(), range(j)) = aux * coefs(0, j);
+      coefs.at(_, range(j)) = aux * coefs(0, j);
     }
   }
   if (!is_periodic()) coefs.at(range(1, -1), range(-1)) = 0.0;

@@ -154,7 +154,7 @@ double DMRG<MPS>::minimize_single_site(MPS &P, index k, int dk) {
   /*
      * And finally we update the matrices.
      */
-  if (neig > 1) Pk = Pk(range(), range(0));
+  if (neig > 1) Pk = Pk(_, range(0));
   set_canonical(P, k, reshape(Pk, a1, i1, b1), dk);
   if (dk > 0) {
     update_matrices_left(P, k);
@@ -364,7 +364,7 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
       aux = eigs.get_data(&Pi);
     }
   }
-  if (neig > 1) Pi = Pi(range(), range(0));
+  if (neig > 1) Pi = Pi(_, range(0));
   Pi = reconstruct_state(Pi);
   /*
      * Since the projector that we obtained spans two sites, we have to split
@@ -668,7 +668,7 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::projector(
       Qk.fill_with_zeros();
     }
     if (V.is_empty()) V = elt_t::empty(Qk.size(), n_orth_states());
-    V.at(range(), range(state)) = Qk;
+    V.at(_, range(state)) = Qk;
   }
   return tensor::conj(V);
 }
@@ -695,7 +695,7 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::projector_twosites(
       Qk.fill_with_zeros();
     }
     if (V.is_empty()) V = elt_t::empty(Qk.size(), n_orth_states());
-    V.at(range(), range(state)) = Qk;
+    V.at(_, range(state)) = Qk;
   }
   return tensor::conj(V);
 }

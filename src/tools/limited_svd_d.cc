@@ -26,8 +26,8 @@ const RTensor limited_svd(RTensor A, RTensor *U, RTensor *V, double tolerance,
                           index max_dim) {
   RTensor s = linalg::block_svd(A, U, V, SVD_ECONOMIC);
   index c = where_to_truncate(s, tolerance, max_dim);
-  *U = (*U)(range(), range(0, c - 1));
-  *V = (*V)(range(0, c - 1), range());
+  *U = (*U)(_, range(0, c - 1));
+  *V = (*V)(range(0, c - 1), _);
   s = s(range(0, c - 1));
   return s / norm2(s);
 }

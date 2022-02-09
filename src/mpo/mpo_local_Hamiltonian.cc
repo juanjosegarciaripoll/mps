@@ -42,14 +42,14 @@ static MPO do_local_Hamiltonian_mpo(const std::vector<Tensor> &Hloc) {
   for (auto &H : Hloc) {
     index d = H.rows();
     Tensor aux = Tensor::zeros(2, d, d, 2);
-    aux.at(range(0), range(), range(), range(1)) = H;
+    aux.at(range(0), _, _, range(1)) = H;
 
     Tensor id = Tensor::eye(d);
-    aux.at(range(1), range(), range(), range(1)) = id;
-    aux.at(range(0), range(), range(), range(0)) = id;
+    aux.at(range(1), _, _, range(1)) = id;
+    aux.at(range(0), _, _, range(0)) = id;
 
-    if (i == 0) aux = aux(range(0), range(), range(), range());
-    if (i == last) aux = aux(range(), range(), range(), range(1));
+    if (i == 0) aux = aux(range(0), _, _, _);
+    if (i == last) aux = aux(_, _, _, range(1));
     output.at(i) = aux;
     ++i;
   }

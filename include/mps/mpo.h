@@ -95,16 +95,16 @@ class MPO : public MP<Tensor> {
       if (i == 0) {
         /* first */
         P = Tensor::zeros(1, d, d, 2);
-        P.at(range(0), range(), range(), range(0)) = Id;
+        P.at(range(0), _, _, range(0)) = Id;
       } else if (i + 1 < this->ssize()) {
         /* last */
         P = Tensor::zeros(2, d, d, 2);
-        P.at(range(1), range(), range(), range(1)) = Id;
-        P.at(range(0), range(), range(), range(0)) = Id;
+        P.at(range(1), _, _, range(1)) = Id;
+        P.at(range(0), _, _, range(0)) = Id;
       } else {
         /* otherwise */
         P = Tensor::zeros(2, d, d, 1);
-        P.at(range(1), range(), range(), range(0)) = Id;
+        P.at(range(1), _, _, range(0)) = Id;
       }
       this->at(i) = P;
     }

@@ -33,10 +33,10 @@ static CTensor ground_state(const CTensor &Heff, const CTensor &N) {
   CTensor E = linalg::eig(solve_with_svd(N, Heff), &U);
   Indices ndx = sort_indices(real(E));
   E = E(range(ndx));
-  U = U(range(), range(ndx));
+  U = U(_, range(ndx));
   std::cout << "Energy = " << E[0] << std::endl;
   std::cout << E << std::endl;
-  return reshape(U(range(), range(0)).copy(), U.rows());
+  return reshape(U(_, range(0)).copy(), U.rows());
 }
 
 ArnoldiSolver::ArnoldiSolver(const Hamiltonian &H, cdouble dt, int nvectors)

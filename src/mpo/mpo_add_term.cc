@@ -56,18 +56,18 @@ static void do_add_local_term(MPO &mpo, const Tensor &Hloc, index i) {
   }
   if (Pi.dimension(0) == 1) {
     /* First */
-    Pi.at(range(0), range(), range(), range(1)) =
-        Tensor(Pi(range(0), range(), range(), range(1))) +
+    Pi.at(range(0), _, _, range(1)) =
+        Tensor(Pi(range(0), _, _, range(1))) +
         reshape(Hloc, 1, d, d, 1);
   } else if (Pi.dimension(3) == 1) {
     /* Last */
-    Pi.at(range(0), range(), range(), range(0)) =
-        Tensor(Pi(range(0), range(), range(), range(0))) +
+    Pi.at(range(0), _, _, range(0)) =
+        Tensor(Pi(range(0), _, _, range(0))) +
         reshape(Hloc, 1, d, d, 1);
   } else {
     /* Middle */
-    Pi.at(range(0), range(), range(), range(1)) =
-        Tensor(Pi(range(0), range(), range(), range(1))) +
+    Pi.at(range(0), _, _, range(1)) =
+        Tensor(Pi(range(0), _, _, range(1))) +
         reshape(Hloc, 1, d, d, 1);
   }
   mpo.at(i) = Pi;
@@ -114,11 +114,11 @@ static void do_add_interaction(MPO &mpo, const Tensor &Hi, index i,
     abort();
   }
 
-  Pi.at(range(0), range(), range(), range(b - 1)) = reshape(Hi, 1, di, di, 1);
+  Pi.at(range(0), _, _, range(b - 1)) = reshape(Hi, 1, di, di, 1);
   if (i + 2 == mpo.ssize()) {
-    Pj.at(range(b - 1), range(), range(), range(0)) = reshape(Hj, 1, dj, dj, 1);
+    Pj.at(range(b - 1), _, _, range(0)) = reshape(Hj, 1, dj, dj, 1);
   } else {
-    Pj.at(range(b - 1), range(), range(), range(1)) = reshape(Hj, 1, dj, dj, 1);
+    Pj.at(range(b - 1), _, _, range(1)) = reshape(Hj, 1, dj, dj, 1);
   }
 
   mpo.at(i) = Pi;

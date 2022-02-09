@@ -88,7 +88,7 @@ class QuadraticForm {
     Pair(int i, int j, const elt_t &tensor)
         : left_ndx(i),
           right_ndx(j),
-          op(reshape(tensor(range(i), range(), range(), range(j)).copy(),
+          op(reshape(tensor(range(i), _, _, range(j)).copy(),
                      tensor.dimension(1), tensor.dimension(2))) {}
 
     bool is_empty() const { return norm2(op) == 0; }

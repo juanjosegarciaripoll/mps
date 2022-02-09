@@ -41,14 +41,14 @@ const CTensor Hamiltonian::interaction_left(index k, index ndx,
                                             double t) const {
   CTensor O1, O2;
   decompose_operator(interaction(k, t), &O1, &O2);
-  return squeeze(O1(range(), range(), range(ndx)));
+  return squeeze(O1(_, _, range(ndx)));
 }
 
 const CTensor Hamiltonian::interaction_right(index k, index ndx,
                                              double t) const {
   CTensor O1, O2;
   decompose_operator(interaction(k, t), &O1, &O2);
-  return squeeze(O2(range(), range(), range(ndx)));
+  return squeeze(O2(_, _, range(ndx)));
 }
 
 index Hamiltonian::interaction_depth(index k, double t) const {

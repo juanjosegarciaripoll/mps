@@ -55,8 +55,7 @@ void test_qform_canonical(typename MPO::MPS psi) {
     MPS aux = canonical_form_at(psi, i);
     QuadraticForm<MPO> f(mpo, aux, aux, i);
     Tensor H = f.single_site_matrix();
-    Tensor op =
-        reshape(mpo[i](range(0), range(), range(), range(0)).copy(), d, d);
+    Tensor op = reshape(mpo[i](range(0), _, _, range(0)).copy(), d, d);
     Tensor L = Tensor::eye(psi[i].dimension(0));
     Tensor R = Tensor::eye(psi[i].dimension(2));
     op = kron(kron(R, op), L);

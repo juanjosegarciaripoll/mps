@@ -32,8 +32,7 @@ static std::ostream &do_dump_mpo(std::ostream &s, const MPO &mpo,
     for (index i = 0; i < P.dimension(0); i++) {
       for (index j = 0; j < P.dimension(3); j++) {
         s << name << '[' << n << "](" << i << ",:,:," << j << ")=\n"
-          << matrix_form(
-                 reshape(P(range(i), range(), range(), range(j)).copy(), r, c))
+          << matrix_form(reshape(P(range(i), _, _, range(j)).copy(), r, c))
           << std::endl;
       }
     }

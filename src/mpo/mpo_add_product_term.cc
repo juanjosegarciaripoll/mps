@@ -71,10 +71,9 @@ static void do_add_interaction(MPO &mpo, const std::vector<Tensor> &H) {
       dr = closing;
     }
     if (dl == opening && dr == closing) {
-      Pj.at(range(dl), range(), range(), range(dr)) =
-          Hj + Pj(range(dl), range(), range(), range(dr));
+      Pj.at(range(dl), _, _, range(dr)) = Hj + Pj(range(dl), _, _, range(dr));
     } else {
-      Pj.at(range(dl), range(), range(), range(dr)) = Hj;
+      Pj.at(range(dl), _, _, range(dr)) = Hj;
     }
     mpo.at(j) = Pj;
   }
