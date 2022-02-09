@@ -19,4 +19,10 @@
 
 #include <mps/mps.h>
 
-template class mps::MPS<tensor::RTensor>;
+namespace mps {
+
+template class MPS<RTensor>;
+
+template RTensor tensor_cast(const MP<RTensor> &mp, CTensor t);
+
+}

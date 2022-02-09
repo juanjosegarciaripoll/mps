@@ -71,9 +71,11 @@ void test_small_local_mpo() {
   typedef typename MPO::MPS MPS;
 
   auto psi = MPS(cluster_state(2));
+  const auto Pauli_z = tensor_cast(psi, mps::Pauli_z);
+  const auto Pauli_id = tensor_cast(psi, mps::Pauli_id);
   {
     MPO mpo(2, 2);
-    add_local_term(&mpo, mps::Pauli_z, 0);
+    add_local_term(&mpo, Pauli_z, 0);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
     Tensor H = kron2(mps::Pauli_z, mps::Pauli_id);
@@ -83,22 +85,21 @@ void test_small_local_mpo() {
   }
   {
     MPO mpo(2, 2);
-    add_local_term(&mpo, mps::Pauli_z, 1);
+    add_local_term(&mpo, Pauli_z, 1);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
-    Tensor H = kron2(mps::Pauli_id, mps::Pauli_z);
+    Tensor H = kron2(Pauli_id, Pauli_z);
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
     MPO mpo(2, 2);
-    add_local_term(&mpo, mps::Pauli_z, 0);
-    add_local_term(&mpo, mps::Pauli_z, 1);
+    add_local_term(&mpo, Pauli_z, 0);
+    add_local_term(&mpo, Pauli_z, 1);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
-    Tensor H =
-        kron2(mps::Pauli_id, mps::Pauli_z) + kron2(mps::Pauli_z, mps::Pauli_id);
+    Tensor H = kron2(Pauli_id, Pauli_z) + kron2(Pauli_z, Pauli_id);
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
@@ -107,42 +108,42 @@ void test_small_local_mpo() {
   psi = MPS(cluster_state(3));
   {
     MPO mpo(3, 2);
-    add_local_term(&mpo, mps::Pauli_z, 0);
+    add_local_term(&mpo, Pauli_z, 0);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
-    Tensor H = kron2(mps::Pauli_z, kron2(mps::Pauli_id, mps::Pauli_id));
+    Tensor H = kron2(Pauli_z, kron2(Pauli_id, Pauli_id));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
     MPO mpo(3, 2);
-    add_local_term(&mpo, mps::Pauli_z, 1);
+    add_local_term(&mpo, Pauli_z, 1);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
-    Tensor H = kron2(mps::Pauli_id, kron2(mps::Pauli_z, mps::Pauli_id));
+    Tensor H = kron2(Pauli_id, kron2(Pauli_z, Pauli_id));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
     MPO mpo(3, 2);
-    add_local_term(&mpo, mps::Pauli_z, 2);
+    add_local_term(&mpo, Pauli_z, 2);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
-    Tensor H = kron2(mps::Pauli_id, kron2(mps::Pauli_id, mps::Pauli_z));
+    Tensor H = kron2(Pauli_id, kron2(Pauli_id, Pauli_z));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
     MPO mpo(3, 2);
-    add_local_term(&mpo, mps::Pauli_z, 0);
-    add_local_term(&mpo, mps::Pauli_z, 2);
+    add_local_term(&mpo, Pauli_z, 0);
+    add_local_term(&mpo, Pauli_z, 2);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
-    Tensor H = kron2(mps::Pauli_z, kron2(mps::Pauli_id, mps::Pauli_id)) +
-               kron2(mps::Pauli_id, kron2(mps::Pauli_id, mps::Pauli_z));
+    Tensor H = kron2(Pauli_z, kron2(Pauli_id, Pauli_id)) +
+               kron2(Pauli_id, kron2(Pauli_id, Pauli_z));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
@@ -158,12 +159,14 @@ void test_small_nn_mpo() {
   typedef typename MPO::MPS MPS;
 
   auto psi = MPS(cluster_state(2));
+  const auto Pauli_z = tensor_cast(psi, mps::Pauli_z);
+  const auto Pauli_id = tensor_cast(psi, mps::Pauli_id);
   {
     MPO mpo(2, 2);
-    add_interaction(&mpo, mps::Pauli_z, 0, mps::Pauli_z);
+    add_interaction(&mpo, Pauli_z, 0, Pauli_z);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
-    Tensor H = kron2(mps::Pauli_z, mps::Pauli_z);
+    Tensor H = kron2(Pauli_z, Pauli_z);
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
@@ -171,32 +174,32 @@ void test_small_nn_mpo() {
   psi = MPS(cluster_state(3));
   {
     MPO mpo(3, 2);
-    add_interaction(&mpo, mps::Pauli_z, 0, mps::Pauli_z);
+    add_interaction(&mpo, Pauli_z, 0, Pauli_z);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
-    Tensor H = kron2(mps::Pauli_z, kron2(mps::Pauli_z, mps::Pauli_id));
+    Tensor H = kron2(Pauli_z, kron2(Pauli_z, Pauli_id));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
     MPO mpo(3, 2);
-    add_interaction(&mpo, mps::Pauli_z, 1, mps::Pauli_z);
+    add_interaction(&mpo, Pauli_z, 1, Pauli_z);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
-    Tensor H = kron2(mps::Pauli_id, kron2(mps::Pauli_z, mps::Pauli_z));
+    Tensor H = kron2(Pauli_id, kron2(Pauli_z, Pauli_z));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
     MPO mpo(3, 2);
-    add_interaction(&mpo, mps::Pauli_z, 0, mps::Pauli_z);
-    add_interaction(&mpo, mps::Pauli_z, 1, mps::Pauli_z);
+    add_interaction(&mpo, Pauli_z, 0, Pauli_z);
+    add_interaction(&mpo, Pauli_z, 1, Pauli_z);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
-    Tensor H = kron2(mps::Pauli_id, kron2(mps::Pauli_z, mps::Pauli_z)) +
-               kron2(mps::Pauli_z, kron2(mps::Pauli_z, mps::Pauli_id));
+    Tensor H = kron2(Pauli_id, kron2(Pauli_z, Pauli_z)) +
+               kron2(Pauli_z, kron2(Pauli_z, Pauli_id));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
 
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
@@ -210,14 +213,17 @@ void test_random_mpo(int size) {
 
   auto psi = MPS(cluster_state(size));
 
+  const auto Pauli_x = tensor_cast(psi, mps::Pauli_x);
+  const auto Pauli_z = tensor_cast(psi, mps::Pauli_z);
+  const auto Pauli_id = tensor_cast(psi, mps::Pauli_id);
   for (int i = 0; i < size; i++) {
     ConstantHamiltonian H(size);
     MPO mpo(size, 2);
 
     for (int j = 0; j < size; j++) {
-      typename MPO::elt_t Hloc = rand<double>() * mps::Pauli_z +
-                                 rand<double>() * mps::Pauli_x +
-                                 rand<double>() * mps::Pauli_id;
+      typename MPO::elt_t Hloc = rand<double>() * Pauli_z +
+                                 rand<double>() * Pauli_x +
+                                 rand<double>() * Pauli_id;
       H.set_local_term(j, Hloc);
       add_local_term(&mpo, Hloc, j);
     }

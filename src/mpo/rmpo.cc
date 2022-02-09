@@ -17,12 +17,30 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <stdexcept>
-#include <algorithm>
 #include <mps/mpo.h>
 
 namespace mps {
 
-template class mps::MPO<tensor::RTensor>;
+template class MPO<RTensor>;
+
+template void add_local_term(RMPO *mpdo, const RTensor &Hloc, index k);
+
+template void add_interaction(RMPO *mpdo, const RTensor &Hi, index i,
+                              const RTensor &Hj);
+
+template void add_product_term(RMPO *mpdo, const std::vector<RTensor> &Hi);
+
+template void add_interaction(RMPO *mpdo, const std::vector<RTensor> &Hi,
+                              index i, const RTensor *sign = nullptr);
+
+template void add_hopping_matrix(RMPO *mpdo, const RTensor &J,
+                                 const RTensor &ad, const RTensor &a,
+                                 const RTensor &sign);
+
+template void add_jordan_wigner_matrix(RMPO *mpdo, const RTensor &J,
+                                       const RTensor &ad, const RTensor &a,
+                                       const RTensor &sign);
+
+template RMPO local_Hamiltonian_mpo(const std::vector<RTensor> &Hloc);
 
 }  // namespace mps

@@ -33,6 +33,7 @@ template <class sequence>
 index ssize(const sequence &s) {
   return static_cast<index>(s.size());
 }
+
 class Sweeper {
  public:
   Sweeper(index L, index sense);
@@ -110,6 +111,22 @@ inline index largest_bond_dimension(const MP<Tensor> &mp) {
   }
   return output;
 }
+
+template <typename dest, typename orig>
+inline dest tensor_cast(const MP<dest> &mp, orig t) {
+  return dest(t);
+}
+
+template <>
+inline RTensor tensor_cast(const MP<RTensor> & /*mp*/, CTensor data) {
+  if (std::any_of(std::begin(data), std::end(data),
+                  [](const cdouble &z) { return z.imag() != 0; })) {
+    throw std::domain_error("Cannot convert complex tensor to real.");
+  }
+  return real(data);
+}
+
+extern template RTensor tensor_cast(const MP<RTensor> &mp, CTensor t);
 
 }  // namespace mps
 

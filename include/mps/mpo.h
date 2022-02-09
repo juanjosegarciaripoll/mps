@@ -1,4 +1,5 @@
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
+#pragma once
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
 
@@ -17,167 +18,69 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef MPO_MPO_H
-#define MPO_MPO_H
+#ifndef MPS_MPO_H
+#define MPS_MPO_H
 
-#include <vector>
 #include <mps/mps.h>
 #include <mps/hamiltonian.h>
+#include <mps/mpo/types.h>
+#include <mps/mpo/interactions.h>
 
 namespace mps {
 
 using namespace tensor;
 
-template <typename dest, typename orig>
-inline dest safe_tensor_coercion(orig t) {
-  return dest(t);
-}
+///////////////////////////////////////////////////////////////
+// REAL SPECIALIZATIONS
+//
 
-template <typename dest>
-inline dest safe_tensor_coercion(dest) {
-  return t;
-}
+extern template void add_local_term(RMPO *mpdo, const RTensor &Hloc, index k);
 
-template <>
-inline RTensor safe_tensor_coercion<RTensor, CTensor>(CTensor data) {
-  if (std::any_of(std::begin(data), std::end(data),
-                  [](const cdouble &z) { return z.imag() != 0; })) {
-    throw std::domain_error("Cannot convert complex tensor to real.");
-  }
-  return real(data);
-}
+extern template void add_interaction(RMPO *mpdo, const RTensor &Hi, index i,
+                                     const RTensor &Hj);
 
-extern template RTensor safe_tensor_coercion<RTensor, CTensor>(CTensor);
+extern template void add_product_term(RMPO *mpdo,
+                                      const std::vector<RTensor> &Hi);
 
-/*!\addtogroup TheMPS*/
-/* @{ */
+extern template void add_interaction(RMPO *mpdo, const std::vector<RTensor> &Hi,
+                                     index i, const RTensor *sign = nullptr);
 
-/**Matrix Product Operator structure.*/
-template <typename Tensor>
-class MPO : public MP<Tensor> {
- public:
-  typedef MPS<Tensor> MPS;
-  MPO() = default;
-  MPO(const MPO &) = default;
-  MPO(MPO &&) = default;
-  MPO &operator=(const MPO &) = default;
-  MPO &operator=(MPO &&) = default;
+extern template void add_hopping_matrix(RMPO *mpdo, const RTensor &J,
+                                        const RTensor &ad, const RTensor &a,
+                                        const RTensor &sign);
 
-  MPO(index length, index physical_dimension) : parent(length) {
-    tensor::Indices dims(length);
-    std::fill(dims.begin(), dims.end(), physical_dimension);
-    clear(dims);
-  }
+extern template void add_jordan_wigner_matrix(RMPO *mpdo, const RTensor &J,
+                                              const RTensor &ad,
+                                              const RTensor &a,
+                                              const RTensor &sign);
 
-  MPO(const tensor::Indices &physical_dimensions)
-      : parent(physical_dimensions.size()) {
-    clear(physical_dimensions);
-  }
+extern template RMPO local_Hamiltonian_mpo(const std::vector<RTensor> &Hloc);
 
-  MPO(const Hamiltonian &H, double t = 0.0) : parent(H.size()) {
-    clear(H.dimensions());
-    add_Hamiltonian(*this, H, t);
-  }
+///////////////////////////////////////////////////////////////
+// REAL SPECIALIZATIONS
+//
 
- private:
-  typedef MP<Tensor> parent;
+extern template void add_local_term(CMPO *mpdo, const CTensor &Hloc, index k);
 
-  void clear(const tensor::Indices &physical_dimensions) {
-    if (physical_dimensions.size() < 2) {
-      std::cerr << "Cannot create MPO with size 0 or 1.\n";
-      abort();
-    }
-    // TODO: Simplify. We only need sizes (1,d,d,1) for the add_local/add_interaction to succeed.
-    Tensor P;
-    for (index i = 0; i < this->ssize(); i++) {
-      index d = physical_dimensions[i];
-      Tensor Id = reshape(Tensor::eye(d, d), 1, d, d, 1);
-      if (i == 0) {
-        /* first */
-        P = Tensor::zeros(1, d, d, 2);
-        P.at(range(0), _, _, range(0)) = Id;
-      } else if (i + 1 < this->ssize()) {
-        /* last */
-        P = Tensor::zeros(2, d, d, 2);
-        P.at(range(1), _, _, range(1)) = Id;
-        P.at(range(0), _, _, range(0)) = Id;
-      } else {
-        /* otherwise */
-        P = Tensor::zeros(2, d, d, 1);
-        P.at(range(1), _, _, range(0)) = Id;
-      }
-      this->at(i) = P;
-    }
-  }
-};
+extern template void add_interaction(CMPO *mpdo, const CTensor &Hi, index i,
+                                     const CTensor &Hj);
 
-extern template class MPO<RTensor>;
-extern template class MPO<CTensor>;
-#ifdef DOXYGEN_ONLY
-/**Real matrix product structure.*/
-struct RMPO : public MPS<RTensor> {};
-/**Complex matrix product structure.*/
-struct CMPO : public MPS<CTensor> {};
-#else
-typedef MPO<RTensor> RMPO;
-typedef MPO<CTensor> CMPO;
-#endif
+extern template void add_product_term(CMPO *mpdo,
+                                      const std::vector<CTensor> &Hi);
 
-/* @} */
+extern template void add_interaction(CMPO *mpdo, const std::vector<CTensor> &Hi,
+                                     index i, const CTensor *sign = nullptr);
 
-RMPO local_Hamiltonian_mpo(const std::vector<RTensor> &Hloc);
+extern template void add_hopping_matrix(CMPO *mpdo, const CTensor &J,
+                                        const CTensor &ad, const CTensor &a,
+                                        const CTensor &sign);
 
-void add_local_term(RMPO *mpdo, const RTensor &Hloc, index k);
+extern template void add_jordan_wigner_matrix(CMPO *mpdo, const CTensor &J,
+                                              const CTensor &ad,
+                                              const CTensor &a,
+                                              const CTensor &sign);
 
-void add_interaction(RMPO *mpdo, const RTensor &Hi, index i, const RTensor &Hj);
-
-void add_interaction(RMPO *mpdo, const std::vector<RTensor> &Hi, index i,
-                     const RTensor *sign = nullptr);
-
-void add_product_term(RMPO *mpdo, const std::vector<RTensor> &Hi);
-
-void add_hopping_matrix(RMPO *mpdo, const RTensor &J, const RTensor &ad,
-                        const RTensor &a);
-
-void add_jordan_wigner_matrix(RMPO *mpdo, const RTensor &J, const RTensor &ad,
-                              const RTensor &a, const RTensor &sign);
-
-CMPO local_Hamiltonian_mpo(const std::vector<CTensor> &Hloc);
-
-void add_local_term(CMPO *mpdo, const CTensor &Hloc, index i);
-
-void add_interaction(CMPO *mpdo, const CTensor &Hi, index i, const CTensor &Hj);
-
-void add_interaction(CMPO *mpdo, const std::vector<CTensor> &Hi, index i,
-                     const CTensor *sign = nullptr);
-
-void add_product_term(CMPO *mpdo, const std::vector<CTensor> &Hi);
-
-void add_hopping_matrix(CMPO *mpdo, const CTensor &J, const CTensor &ad,
-                        const CTensor &a);
-
-void add_jordan_wigner_matrix(CMPO *mpdo, const CTensor &J, const CTensor &ad,
-                              const CTensor &a, const CTensor &sign);
-
-template <typename Tensor>
-MPO<Tensor> &add_Hamiltonian(MPO<Tensor> &mpo, const Hamiltonian &H, double t) {
-  for (index i = 0; i < mpo.ssize(); i++) {
-    auto Hi = safe_tensor_coercion<Tensor, CTensor>(H.local_term(i, t));
-    add_local_term(&mpo, Hi, i);
-  }
-  for (index i = 0; i < mpo.ssize(); i++) {
-    for (index j = 0; j < H.interaction_depth(i, t); j++) {
-      auto Hi =
-          safe_tensor_coercion<Tensor, CTensor>(H.interaction_left(i, j, t));
-      if (!Hi.is_empty()) {
-        auto Hj =
-            safe_tensor_coercion<Tensor, CTensor>(H.interaction_right(i, j, t));
-        add_interaction(&mpo, Hi, i, Hj);
-      }
-    }
-  }
-  return mpo;
-}
+extern template CMPO local_Hamiltonian_mpo(const std::vector<CTensor> &Hloc);
 
 /** Apply a Matrix Product Operator onto a state. */
 const RMPS apply(const RMPO &mpdo, const RMPS &state);
@@ -242,4 +145,4 @@ const RMPS mpo_to_mps(const RMPO &A);
 const CMPS mpo_to_mps(const CMPO &A);
 }  // namespace mps
 
-#endif /* !MPO_MPO_H */
+#endif /* !MPS_MPO_H */
