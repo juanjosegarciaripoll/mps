@@ -385,6 +385,30 @@ void test_mps_product_state(int size) {
       [&](const mp_tensor_t<MPS> &t) { return all_equal(t, tensor_psi); }));
 }
 
+template <class MPS>
+void test_mps_to_vector() {
+  {
+    MPS psi;
+    auto v = psi.to_vector();
+    EXPECT_TRUE(all_equal(v.dimensions(), Dimensions{0}));
+  }
+  {
+    auto psi0 = MPS::elt_t::random(3);
+    MPS psi = MPS::product_state(2, psi0);
+    auto v = psi.to_vector();
+    auto videal = kron(psi0, psi0);
+    EXPECT_TRUE(all_equal(v, videal));
+  }
+  {
+    MPS psi = MPS::random(Dimensions{3, 2}, /*bond dim*/ 4);
+    auto v = psi.to_vector();
+    auto psi0 = reshape(psi[0], 3, 4);
+    auto psi1 = reshape(psi[1], 4, 2);
+    auto videal = reshape(mmult(psi0, psi1), 3 * 2);
+    EXPECT_TRUE(all_equal(v, videal));
+  }
+}
+
 void test_ghz_state(int size) {
   RMPS ghz = ghz_state(size);
   RTensor psi = mps_to_vector(ghz);
@@ -463,6 +487,8 @@ TEST(RMPS, GHZState) { test_over_integers(1, 10, test_ghz_state); }
 
 TEST(RMPS, ClusterState) { test_over_integers(3, 10, test_cluster_state); }
 
+TEST(RMPS, ToVector) { test_mps_to_vector<RMPS>(); }
+
 //////////////////////////////////////////////////////////////////////
 // COMPLEX SPECIALIZATIONS
 //
@@ -509,5 +535,7 @@ TEST(CMPS, AccesOperators) {
   test_mps_const_access<CMPS>();
   test_mps_access<CMPS>();
 }
+
+TEST(CMPS, ToVector) { test_mps_to_vector<CMPS>(); }
 
 }  // namespace tensor_test
