@@ -292,6 +292,82 @@ void test_mps_dimensions() {
 }
 
 template <class MPS>
+void test_mps_const_access() {
+  {
+    const MPS psi;
+    EXPECT_EQ(psi.size(), 0);
+    EXPECT_THROW(psi[0], mps_out_of_range);
+    EXPECT_THROW(psi[1], mps_out_of_range);
+  }
+  {
+    auto state = MPS::elt_t::random(3);
+    const MPS psi = MPS::product_state(1, state);
+    state = reshape(state, 1, 3, 1);
+    EXPECT_TRUE(all_equal(state, psi[0]));
+    EXPECT_THROW(psi[1], mps_out_of_range);
+    EXPECT_TRUE(all_equal(state, psi[-1]));
+    EXPECT_THROW(psi[-2], mps_out_of_range);
+  }
+  {
+    auto state = MPS::elt_t::random(3);
+    const MPS psi = MPS::product_state(2, state);
+    state = reshape(state, 1, 3, 1);
+    EXPECT_TRUE(all_equal(state, psi[0]));
+    EXPECT_TRUE(all_equal(state, psi[1]));
+    EXPECT_THROW(psi[2], mps_out_of_range);
+    EXPECT_TRUE(all_equal(state, psi[-1]));
+    EXPECT_TRUE(all_equal(state, psi[-2]));
+    EXPECT_THROW(psi[-3], mps_out_of_range);
+  }
+}
+
+template <class MPS>
+void test_mps_access() {
+  {
+    MPS psi;
+    EXPECT_EQ(psi.size(), 0);
+    EXPECT_THROW(psi.at(0), mps_out_of_range);
+    EXPECT_THROW(psi.at(1), mps_out_of_range);
+    EXPECT_THROW(psi.at(-1), mps_out_of_range);
+  }
+  {
+    auto state = MPS::elt_t::random(3);
+    MPS psi = MPS::product_state(1, state);
+    state = reshape(state, 1, 3, 1);
+    EXPECT_TRUE(all_equal(state, psi.at(0)));
+    EXPECT_THROW(psi.at(1), mps_out_of_range);
+    EXPECT_TRUE(all_equal(state, psi.at(-1)));
+    EXPECT_THROW(psi.at(-2), mps_out_of_range);
+  }
+  {
+    auto state = MPS::elt_t::random(3);
+    MPS psi = MPS::product_state(2, state);
+    state = reshape(state, 1, 3, 1);
+    EXPECT_TRUE(all_equal(state, psi.at(0)));
+    EXPECT_TRUE(all_equal(state, psi.at(1)));
+    EXPECT_THROW(psi.at(2), mps_out_of_range);
+    EXPECT_TRUE(all_equal(state, psi.at(-1)));
+    EXPECT_TRUE(all_equal(state, psi.at(-2)));
+    EXPECT_THROW(psi.at(-3), mps_out_of_range);
+  }
+  {
+    auto state0 = MPS::elt_t::random(1, 3, 1);
+    auto state1 = MPS::elt_t::random(1, 3, 1);
+    auto state2 = MPS::elt_t::random(1, 3, 1);
+    MPS psi(3);
+    psi.at(0) = state0;
+    psi.at(1) = state1;
+    psi.at(2) = state2;
+    EXPECT_TRUE(all_equal(state0, psi[0]));
+    EXPECT_TRUE(all_equal(state1, psi[1]));
+    EXPECT_TRUE(all_equal(state2, psi[2]));
+    EXPECT_TRUE(all_equal(state0, psi[-3]));
+    EXPECT_TRUE(all_equal(state1, psi[-2]));
+    EXPECT_TRUE(all_equal(state2, psi[-1]));
+  }
+}
+
+template <class MPS>
 void test_mps_product_state(int size) {
   const auto psi = MPS::elt_t::random(3);
   // Throw if we do not provide a vector as local state
@@ -378,6 +454,11 @@ TEST(RMPS, ProductState) {
 
 TEST(RMPS, Dimensions) { test_mps_dimensions<RMPS>(); }
 
+TEST(RMPS, AccesOperators) {
+  test_mps_const_access<RMPS>();
+  test_mps_access<RMPS>();
+}
+
 TEST(RMPS, GHZState) { test_over_integers(1, 10, test_ghz_state); }
 
 TEST(RMPS, ClusterState) { test_over_integers(3, 10, test_cluster_state); }
@@ -423,5 +504,10 @@ TEST(CMPS, ComplexUpgrade) {
 }
 
 TEST(CMPS, Dimensions) { test_mps_dimensions<CMPS>(); }
+
+TEST(CMPS, AccesOperators) {
+  test_mps_const_access<CMPS>();
+  test_mps_access<CMPS>();
+}
 
 }  // namespace tensor_test
