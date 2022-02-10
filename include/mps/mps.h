@@ -116,7 +116,7 @@ class MPS : public MP<Tensor> {
   /**Create a random MPS. */
   static MPS random(const tensor::Indices &physical_dimensions,
                     index bond_dimension, bool periodic = false) {
-    MPS<Tensor> output(physical_dimensions.size(), bond_dimension, periodic);
+    MPS<Tensor> output(physical_dimensions, bond_dimension, periodic);
     randomize(output);
     return output;
   }

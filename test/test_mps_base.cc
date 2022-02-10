@@ -226,6 +226,50 @@ void test_mps_random() {
 }
 
 template <class MPS>
+void test_mps_random_with_dimensions() {
+  {
+    MPS psi = MPS::random(Indices{2},
+                          /* bond dimension */ 3,
+                          /* periodic */ false);
+    EXPECT_EQ(psi.size(), 1);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 1}));
+  }
+  {
+    MPS psi = MPS::random(Indices{2},
+                          /* bond dimension */ 3,
+                          /* periodic */ true);
+    EXPECT_EQ(psi.size(), 1);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({3, 2, 3}));
+  }
+  {
+    MPS psi = MPS::random(Indices{2, 5},
+                          /* bond dimension */ 3,
+                          /* periodic */ false);
+    EXPECT_EQ(psi.size(), 2);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 5, 1}));
+  }
+  {
+    MPS psi = MPS::random(Indices{2, 5, 7},
+                          /* bond dimension */ 3,
+                          /* periodic */ false);
+    EXPECT_EQ(psi.size(), 3);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 5, 3}));
+    EXPECT_EQ(psi[2].dimensions(), Dimensions({3, 7, 1}));
+  }
+  {
+    MPS psi = MPS::random(Indices{2, 5, 7},
+                          /* bond dimension */ 3,
+                          /* periodic */ true);
+    EXPECT_EQ(psi.size(), 3);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({3, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 5, 3}));
+    EXPECT_EQ(psi[2].dimensions(), Dimensions({3, 7, 3}));
+  }
+}
+
+template <class MPS>
 void test_mps_product_state(int size) {
   const auto psi = MPS::elt_t::random(3);
   MPS state = product_state(size, psi);
@@ -284,7 +328,10 @@ TEST(RMPS, Constructor) {
   test_mps_dimensions_constructor<RMPS>();
 }
 
-TEST(RMPS, Random) { test_mps_random<RMPS>(); }
+TEST(RMPS, Random) {
+  test_mps_random<RMPS>();
+  test_mps_random_with_dimensions<RMPS>();
+}
 
 TEST(RMPS, CopySemantics) {
   test_mps_copy_constructor<RMPS>();
@@ -313,7 +360,10 @@ TEST(CMPS, Constructor) {
   test_mps_dimensions_constructor<CMPS>();
 }
 
-TEST(CMPS, Random) { test_mps_random<CMPS>(); }
+TEST(CMPS, Random) {
+  test_mps_random<CMPS>();
+  test_mps_random_with_dimensions<RMPS>();
+}
 
 TEST(CMPS, CopySemantics) {
   test_mps_copy_constructor<CMPS>();
