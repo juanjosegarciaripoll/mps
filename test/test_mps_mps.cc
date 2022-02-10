@@ -71,6 +71,45 @@ void test_mps_constructor() {
 }
 
 template <class MPS>
+void test_mps_dimensions_constructor() {
+  {
+    MPS psi(Indices{2}, /* bond dimension */ 3,
+            /* periodic */ false);
+    EXPECT_EQ(psi.size(), 1);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 1}));
+  }
+  {
+    MPS psi(Indices{2}, /* bond dimension */ 3,
+            /* periodic */ true);
+    EXPECT_EQ(psi.size(), 1);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({3, 2, 3}));
+  }
+  {
+    MPS psi(Indices{2, 5}, /* bond dimension */ 3,
+            /* periodic */ false);
+    EXPECT_EQ(psi.size(), 2);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 5, 1}));
+  }
+  {
+    MPS psi(Indices{2, 5, 7}, /* bond dimension */ 3,
+            /* periodic */ false);
+    EXPECT_EQ(psi.size(), 3);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({1, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 5, 3}));
+    EXPECT_EQ(psi[2].dimensions(), Dimensions({3, 7, 1}));
+  }
+  {
+    MPS psi(Indices{2, 5, 7}, /* bond dimension */ 3,
+            /* periodic */ true);
+    EXPECT_EQ(psi.size(), 3);
+    EXPECT_EQ(psi[0].dimensions(), Dimensions({3, 2, 3}));
+    EXPECT_EQ(psi[1].dimensions(), Dimensions({3, 5, 3}));
+    EXPECT_EQ(psi[2].dimensions(), Dimensions({3, 7, 3}));
+  }
+}
+
+template <class MPS>
 void test_mps_copy_constructor() {
   /*
    * Test that operator=(const MPS &) copies the content.
@@ -240,7 +279,10 @@ void test_cluster_state(int size) {
 // REAL SPECIALIZATIONS
 //
 
-TEST(RMPS, Constructor) { test_mps_constructor<RMPS>(); }
+TEST(RMPS, Constructor) {
+  test_mps_constructor<RMPS>();
+  test_mps_dimensions_constructor<RMPS>();
+}
 
 TEST(RMPS, Random) { test_mps_random<RMPS>(); }
 
@@ -266,7 +308,10 @@ TEST(RMPS, ClusterState) { test_over_integers(3, 10, test_cluster_state); }
 // COMPLEX SPECIALIZATIONS
 //
 
-TEST(CMPS, Constructor) { test_mps_constructor<CMPS>(); }
+TEST(CMPS, Constructor) {
+  test_mps_constructor<CMPS>();
+  test_mps_dimensions_constructor<CMPS>();
+}
 
 TEST(CMPS, Random) { test_mps_random<CMPS>(); }
 
