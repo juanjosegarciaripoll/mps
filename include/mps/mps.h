@@ -32,7 +32,7 @@ inline Indices dimensions(const MPS<Tensor> &psi) {
 
 /**Create a product state. */
 template <typename Tensor>
-MPS<Tensor> product_state(index length, const Tensor &local_state) {
+inline MPS<Tensor> product_state(index length, const Tensor &local_state) {
   return MPS<Tensor>::product_state(length, local_state);
 }
 
@@ -48,11 +48,11 @@ const RMPS apply_local_operator(const RMPS &psi, const RTensor &op, index site);
 /** Apply a local operator on the given site. */
 const CMPS apply_local_operator(const CMPS &psi, const CTensor &op, index site);
 
-/**Convert a RMPS to a complex vector, contracting all tensors.*/
-const RTensor mps_to_vector(const RMPS &mps);
-
-/**Convert a CMPS to a complex vector, contracting all tensors.*/
-const CTensor mps_to_vector(const CMPS &mps);
+/**Convert an MPS to a complex vector, contracting all tensors.*/
+template <typename Tensor>
+inline Tensor mps_to_vector(const MPS<Tensor> &mps) {
+  return mps.to_vector();
+}
 
 /**Norm of a RMPS.*/
 double norm2(const RMPS &psi);

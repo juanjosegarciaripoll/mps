@@ -21,6 +21,7 @@
 #ifndef MPS_MPS_TYPES_H
 #define MPS_MPS_TYPES_H
 
+#include <numeric>
 #include <algorithm>
 #include <mps/tools.h>
 #include <mps/mp_base.h>
@@ -140,6 +141,27 @@ class MPS : public MP<Tensor> {
     std::fill(output.begin(), output.end(),
               reshape(local_state, 1, local_state.size(), 1));
     return output;
+  }
+
+  /**Create a one-dimensional vector for this MPS's wavefunction.*/
+  Tensor to_vector() const {
+    if (this->size() == 0) {
+      return Tensor::empty(0);
+    } else {
+      auto output = std::accumulate(
+          this->begin() + 1, this->end(), (*this)[0],
+          [](const Tensor &previous, const Tensor &tn) {
+            /* previous(i, D, j) is a tensor that results from contracting (n-1)
+             * sites. D is the total physical dimension of those sites. tn(j,
+             * dn, k) is a tensor for the n-th site. The result is a tensor with
+             * dimensions  (i, D*dn, k). */
+            auto product = fold(previous, -1, tn, 0);
+            return reshape(product, product.dimension(0),
+                           product.dimension(1) * product.dimension(2),
+                           product.dimension(3));
+          });
+      return trace(output, 0, -1);
+    }
   }
 
  private:

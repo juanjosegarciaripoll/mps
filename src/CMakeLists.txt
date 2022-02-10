@@ -60,9 +60,7 @@ target_sources(mps
     mps/rmps.cc
     mps/rmps_ghz_state.cc
     mps/rmps_cluster_state.cc
-    mps/rmps_to_vector.cc
     mps/cmps.cc
-    mps/cmps_to_vector.cc
     mps/mps_prop_matrix_d.cc
     mps/mps_prop_matrix_z.cc
     mps/mps_norm_d.cc
