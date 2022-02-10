@@ -31,10 +31,10 @@ inline Indices dimensions(const MPS<Tensor> &psi) {
 }
 
 /**Create a product state. */
-const RMPS product_state(index length, const RTensor &local_state);
-
-/**Create a product state. */
-const CMPS product_state(index length, const CTensor &local_state);
+template <typename Tensor>
+MPS<Tensor> product_state(index length, const Tensor &local_state) {
+  return MPS<Tensor>::product_state(length, local_state);
+}
 
 /**Create a GHZ state.*/
 const RMPS ghz_state(index length, bool periodic = false);

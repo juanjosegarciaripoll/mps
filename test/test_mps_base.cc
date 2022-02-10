@@ -294,6 +294,13 @@ void test_mps_dimensions() {
 template <class MPS>
 void test_mps_product_state(int size) {
   const auto psi = MPS::elt_t::random(3);
+  // Throw if we do not provide a vector as local state
+  EXPECT_THROW(product_state(size, reshape(psi, 3, 1)), std::invalid_argument);
+  // Throw if we the vector has size zero
+  EXPECT_THROW(product_state(size, mp_tensor_t<MPS>::empty(0)),
+               std::invalid_argument);
+  EXPECT_THROW(product_state(size, mp_tensor_t<MPS>()), std::invalid_argument);
+
   MPS state = product_state(size, psi);
   EXPECT_EQ(state.size(), size);
   const auto tensor_psi = reshape(psi, 1, psi.size(), 1);
