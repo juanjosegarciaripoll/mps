@@ -284,4 +284,16 @@ TEST(CMPS, ProductState) {
   test_over_integers(1, 10, test_mps_product_state<CMPS>);
 }
 
+TEST(CMPS, ComplexUpgrade) {
+  RMPS rpsi =
+      RMPS::random(/*size*/ 2, /*physical_dimension*/ 3, /*bond dimension*/ 1);
+  CMPS zpsi(rpsi);
+  EXPECT_EQ(zpsi.size(), 2);
+  EXPECT_EQ(rpsi.size(), 2);
+  EXPECT_TRUE(std::equal(std::begin(zpsi), std::end(zpsi), std::begin(rpsi),
+                         [](const CTensor &z, const RTensor &r) {
+                           return all_equal(z, to_complex(r));
+                         }));
+}
+
 }  // namespace tensor_test
