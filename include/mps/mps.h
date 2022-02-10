@@ -158,6 +158,11 @@ typedef MPS<RTensor> RMPS;
 typedef MPS<CTensor> CMPS;
 #endif
 
+template <typename T>
+struct mp_tensor_t_inner<MPS<T>> {
+  typedef T type;
+};
+
 /**Physical dimensions of the state. */
 const Indices dimensions(const RMPS &psi);
 

@@ -71,6 +71,78 @@ void test_mps_constructor() {
 }
 
 template <class MPS>
+void test_mps_copy_constructor() {
+  /*
+   * Test that operator=(const MPS &) copies the content.
+   */
+  MPS state(/* size */ 2);
+  auto psi = mp_tensor_t<MPS>::random(1, 2, 1);
+  state.at(0) = state.at(1) = psi;
+  EXPECT_EQ(state.size(), 2);
+  MPS new_state(state);
+  EXPECT_EQ(new_state.size(), 2);
+  EXPECT_TRUE(all_equal(new_state[0], psi));
+  EXPECT_TRUE(all_equal(new_state[1], psi));
+  EXPECT_EQ(state.size(), 2);
+  EXPECT_TRUE(all_equal(state[0], psi));
+  EXPECT_TRUE(all_equal(state[1], psi));
+}
+
+template <class MPS>
+void test_mps_operator_eq() {
+  /*
+   * Test that operator=(const MPS &) copies the content.
+   */
+  MPS state(/* size */ 2);
+  auto psi = mp_tensor_t<MPS>::random(1, 2, 1);
+  state.at(0) = state.at(1) = psi;
+  EXPECT_EQ(state.size(), 2);
+  MPS new_state;
+  EXPECT_EQ(new_state.size(), 0);
+  new_state = state;
+  EXPECT_EQ(new_state.size(), 2);
+  EXPECT_TRUE(all_equal(new_state[0], psi));
+  EXPECT_TRUE(all_equal(new_state[1], psi));
+  EXPECT_EQ(state.size(), 2);
+  EXPECT_TRUE(all_equal(state[0], psi));
+  EXPECT_TRUE(all_equal(state[1], psi));
+}
+
+template <class MPS>
+void test_mps_move_constructor() {
+  /*
+   * Test that operator=(MPS &&) steals the content from the origin.
+   */
+  MPS state(/* size */ 2);
+  auto psi = mp_tensor_t<MPS>::random(1, 2, 1);
+  state.at(0) = state.at(1) = psi;
+  EXPECT_EQ(state.size(), 2);
+  MPS new_state(std::move(state));
+  EXPECT_EQ(new_state.size(), 2);
+  EXPECT_TRUE(all_equal(new_state[0], psi));
+  EXPECT_TRUE(all_equal(new_state[1], psi));
+  EXPECT_EQ(state.size(), 0);
+}
+
+template <class MPS>
+void test_mps_operator_eq_move() {
+  /*
+   * Test that operator=(MPS &&) steals the content from the origin.
+   */
+  MPS state(/* size */ 2);
+  auto psi = mp_tensor_t<MPS>::random(1, 2, 1);
+  state.at(0) = state.at(1) = psi;
+  EXPECT_EQ(state.size(), 2);
+  MPS new_state;
+  EXPECT_EQ(new_state.size(), 0);
+  new_state = std::move(state);
+  EXPECT_EQ(new_state.size(), 2);
+  EXPECT_TRUE(all_equal(new_state[0], psi));
+  EXPECT_TRUE(all_equal(new_state[1], psi));
+  EXPECT_EQ(state.size(), 0);
+}
+
+template <class MPS>
 void test_mps_random() {
   {
     MPS psi = MPS::random(/* size */ 1, /* physical dimension */ 2,
@@ -116,13 +188,13 @@ void test_mps_random() {
 
 template <class MPS>
 void test_mps_product_state(int size) {
-  typename MPS::elt_t psi = MPS::elt_t::random(3);
+  const auto psi = MPS::elt_t::random(3);
   MPS state = product_state(size, psi);
   EXPECT_EQ(state.size(), size);
-  psi = reshape(psi, 1, psi.size(), 1);
-  for (int i = 0; i < size; i++) {
-    EXPECT_TRUE(all_equal(state[i], psi));
-  }
+  const auto tensor_psi = reshape(psi, 1, psi.size(), 1);
+  EXPECT_TRUE(std::all_of(
+      begin(state), end(state),
+      [&](const mp_tensor_t<MPS> &t) { return all_equal(t, tensor_psi); }));
 }
 
 void test_ghz_state(int size) {
@@ -172,6 +244,16 @@ TEST(RMPS, Constructor) { test_mps_constructor<RMPS>(); }
 
 TEST(RMPS, Random) { test_mps_random<RMPS>(); }
 
+TEST(RMPS, CopySemantics) {
+  test_mps_copy_constructor<RMPS>();
+  test_mps_operator_eq<RMPS>();
+}
+
+TEST(RMPS, MoveSemantics) {
+  test_mps_move_constructor<RMPS>();
+  test_mps_operator_eq_move<RMPS>();
+}
+
 TEST(RMPS, ProductState) {
   test_over_integers(1, 4, test_mps_product_state<CMPS>);
 }
@@ -187,6 +269,16 @@ TEST(RMPS, ClusterState) { test_over_integers(3, 10, test_cluster_state); }
 TEST(CMPS, Constructor) { test_mps_constructor<CMPS>(); }
 
 TEST(CMPS, Random) { test_mps_random<CMPS>(); }
+
+TEST(CMPS, CopySemantics) {
+  test_mps_copy_constructor<CMPS>();
+  test_mps_operator_eq<CMPS>();
+}
+
+TEST(CMPS, MoveSemantics) {
+  test_mps_move_constructor<CMPS>();
+  test_mps_operator_eq_move<CMPS>();
+}
 
 TEST(CMPS, ProductState) {
   test_over_integers(1, 10, test_mps_product_state<CMPS>);

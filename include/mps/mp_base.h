@@ -103,6 +103,17 @@ class MP {
   data_type data_{};
 };
 
+template <typename T>
+struct mp_tensor_t_inner {};
+
+template <typename T>
+struct mp_tensor_t_inner<MP<T>> {
+  typedef T type;
+};
+
+template <typename T>
+using mp_tensor_t = typename mp_tensor_t_inner<T>::type;
+
 template <typename Tensor>
 inline index largest_bond_dimension(const MP<Tensor> &mp) {
   index output = 0;
