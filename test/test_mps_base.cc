@@ -270,6 +270,28 @@ void test_mps_random_with_dimensions() {
 }
 
 template <class MPS>
+void test_mps_dimensions() {
+  {
+    auto d = Indices{2};
+    auto psi = MPS(d, 3);
+    EXPECT_TRUE(all_equal(psi.dimensions(), d));
+    EXPECT_TRUE(all_equal(dimensions(psi), d));
+  }
+  {
+    auto d = Indices{2, 5};
+    auto psi = MPS(d, 3);
+    EXPECT_TRUE(all_equal(psi.dimensions(), d));
+    EXPECT_TRUE(all_equal(dimensions(psi), d));
+  }
+  {
+    auto d = Indices{2, 5, 7};
+    auto psi = MPS(d, 3);
+    EXPECT_TRUE(all_equal(psi.dimensions(), d));
+    EXPECT_TRUE(all_equal(dimensions(psi), d));
+  }
+}
+
+template <class MPS>
 void test_mps_product_state(int size) {
   const auto psi = MPS::elt_t::random(3);
   MPS state = product_state(size, psi);
@@ -347,6 +369,8 @@ TEST(RMPS, ProductState) {
   test_over_integers(1, 4, test_mps_product_state<CMPS>);
 }
 
+TEST(RMPS, Dimensions) { test_mps_dimensions<RMPS>(); }
+
 TEST(RMPS, GHZState) { test_over_integers(1, 10, test_ghz_state); }
 
 TEST(RMPS, ClusterState) { test_over_integers(3, 10, test_cluster_state); }
@@ -390,5 +414,7 @@ TEST(CMPS, ComplexUpgrade) {
                            return all_equal(z, to_complex(r));
                          }));
 }
+
+TEST(CMPS, Dimensions) { test_mps_dimensions<CMPS>(); }
 
 }  // namespace tensor_test
