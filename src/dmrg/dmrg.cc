@@ -74,11 +74,6 @@ DMRG<MPS>::DMRG(const Hamiltonian &H)
 }
 
 template <class MPS>
-DMRG<MPS>::~DMRG() {
-  delete H_;
-}
-
-template <class MPS>
 void DMRG<MPS>::clear_orthogonality() {
   P0_.clear();
 }

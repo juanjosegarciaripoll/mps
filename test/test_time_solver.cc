@@ -34,10 +34,13 @@ using namespace linalg;
 // EXACT SOLVERS
 //
 
-void split_Hamiltonian(Hamiltonian **ppHeven, Hamiltonian **ppHodd,
+void split_Hamiltonian(std::unique_ptr<const Hamiltonian> *ppHeven,
+                       std::unique_ptr<const Hamiltonian> *ppHodd,
                        const Hamiltonian &H) {
   ConstantHamiltonian *pHeven = new ConstantHamiltonian(H.size());
   ConstantHamiltonian *pHodd = new ConstantHamiltonian(H.size());
+  *ppHeven = std::unique_ptr<const Hamiltonian>(pHeven);
+  *ppHodd = std::unique_ptr<const Hamiltonian>(pHodd);
   for (int i = 0; i < H.size(); i++) {
     ConstantHamiltonian &pHok = (i & 1) ? (*pHodd) : (*pHeven);
     ConstantHamiltonian &pHno = (i & 1) ? (*pHeven) : (*pHodd);
@@ -52,8 +55,6 @@ void split_Hamiltonian(Hamiltonian **ppHeven, Hamiltonian **ppHodd,
     pHok.set_local_term(i, H.local_term(i, 0.0) * 0.5);
     pHno.set_local_term(i, H.local_term(i, 0.0) * 0.5);
   }
-  *ppHeven = pHeven;
-  *ppHodd = pHodd;
 }
 
 //////////////////////////////////////////////////////////////////////

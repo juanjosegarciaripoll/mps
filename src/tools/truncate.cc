@@ -18,6 +18,7 @@
 */
 
 #include <float.h>
+#include <memory>
 #include <mps/tools.h>
 #include <mps/flags.h>
 #include <tensor/io.h>

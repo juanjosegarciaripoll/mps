@@ -53,8 +53,8 @@ TIHamiltonian::TIHamiltonian(index N, const CTensor &H12, const CTensor &H1,
   }
 }
 
-const Hamiltonian *TIHamiltonian::duplicate() const {
-  return new TIHamiltonian(*this);
+std::unique_ptr<const Hamiltonian> TIHamiltonian::duplicate() const {
+  return std::unique_ptr<const Hamiltonian>(new TIHamiltonian(*this));
 }
 
 index TIHamiltonian::size() const { return size_; }

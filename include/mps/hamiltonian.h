@@ -22,6 +22,7 @@
 
 #include <list>
 #include <vector>
+#include <memory>
 #include <tensor/sparse.h>
 #include <mps/mps.h>
 
@@ -35,7 +36,7 @@ class Hamiltonian {
   virtual ~Hamiltonian();
 
   /**Create a copy of this object.*/
-  virtual const Hamiltonian *duplicate() const = 0;
+  virtual std::unique_ptr<const Hamiltonian> duplicate() const = 0;
 
   virtual index size() const = 0;
   /**Is there interaction between the first and the last sites?*/
@@ -73,7 +74,7 @@ class TIHamiltonian : public Hamiltonian {
   TIHamiltonian(index N, const CTensor &newH12, const CTensor &newH1,
                 bool periodic = 0);
 
-  virtual const Hamiltonian *duplicate() const;
+  virtual std::unique_ptr<const Hamiltonian> duplicate() const;
   virtual index size() const;
   virtual bool is_periodic() const;
   virtual bool is_constant() const;
@@ -100,7 +101,7 @@ class ConstantHamiltonian : public Hamiltonian {
   void add_interaction(index k, const CTensor &H1, const CTensor &H2);
   void set_local_term(index k, const CTensor &H1);
 
-  virtual const Hamiltonian *duplicate() const;
+  virtual std::unique_ptr<const Hamiltonian> duplicate() const;
   virtual index size() const;
   virtual bool is_periodic() const;
   virtual bool is_constant() const;

@@ -35,8 +35,8 @@ ConstantHamiltonian::ConstantHamiltonian(index N, bool periodic)
       dimensions_(N),
       periodic_(periodic) {}
 
-const Hamiltonian *ConstantHamiltonian::duplicate() const {
-  return new ConstantHamiltonian(*this);
+std::unique_ptr<const Hamiltonian> ConstantHamiltonian::duplicate() const {
+  return std::unique_ptr<const Hamiltonian>(new ConstantHamiltonian(*this));
 }
 
 index ConstantHamiltonian::size() const { return H12_.size(); }

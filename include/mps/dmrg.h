@@ -48,7 +48,11 @@ class DMRG {
   elt_vector_t Q_operators{};
 
   DMRG(const Hamiltonian &H);
-  virtual ~DMRG();
+
+  DMRG(const DMRG &) = delete;
+  DMRG(DMRG &&) = default;
+  DMRG &operator=(const DMRG &) = delete;
+  DMRG &operator=(DMRG &&) = delete;
 
   void clear_orthogonality();
   void orthogonal_to(const MPS &P);
@@ -61,7 +65,7 @@ class DMRG {
   bool is_periodic() const { return H_->is_periodic(); }
 
  private:
-  const Hamiltonian *H_;
+  std::unique_ptr<const Hamiltonian> H_;
 
   elt_vector_t Hl_;
   elt_vector_t &Hr_;
@@ -102,9 +106,6 @@ class DMRG {
   const elt_t reconstruct_state(const elt_t &Psimple);
 
   virtual void show_state_info(const MPS &Pk, index iter, index k, double newE);
-
- private:
-  DMRG(const DMRG &c);  // Hidden, not allowed
 };
 
 extern template class DMRG<RMPS>;

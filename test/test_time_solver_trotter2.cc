@@ -30,15 +30,13 @@
 namespace tensor_test {
 
 CTensor apply_trotter2(const Hamiltonian &H, cdouble idt, const CTensor &psi) {
-  Hamiltonian *pHeven, *pHodd;
+  std::unique_ptr<const Hamiltonian> pHeven, pHodd;
   split_Hamiltonian(&pHeven, &pHodd, H);
 
   CTensor U1 = expm(full(sparse_hamiltonian(*pHeven)) * idt);
   CTensor U2 = expm(full(sparse_hamiltonian(*pHodd)) * idt);
   CTensor new_psi = mmult(U1, mmult(U2, psi));
 
-  delete pHeven;
-  delete pHodd;
   return new_psi;
 }
 
