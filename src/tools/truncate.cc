@@ -67,7 +67,7 @@ size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
      * site. This means that if we keep (i+1) leading elements, the error will
      * be exactly cumulated[i].
      */
-  double *cumulated = new double[L];
+  auto cumulated = std::make_unique<double[]>(L);
   double total = 0;
   for (index i = L; i--;) {
     total += square(s[i]);
@@ -86,7 +86,6 @@ size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
     }
   }
 
-  delete[] cumulated;
   if (debug) {
     std::cout << "Truncated to tolerance " << limit << ", new size " << max_dim
               << " vs " << L << std::endl;

@@ -22,7 +22,7 @@
 #define MPS_MPS_H
 
 #include <mps/mps/types.h>
-#include <mps/algorithms/linalg.h>
+#include <mps/algorithms/expectation.h>
 
 namespace mps {
 
