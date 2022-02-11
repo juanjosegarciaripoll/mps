@@ -43,7 +43,7 @@ extern template void add_product_term(RMPO *mpdo,
                                       const std::vector<RTensor> &Hi);
 
 extern template void add_interaction(RMPO *mpdo, const std::vector<RTensor> &Hi,
-                                     index i, const RTensor *sign = nullptr);
+                                     index i, const RTensor *sign);
 
 extern template void add_hopping_matrix(RMPO *mpdo, const RTensor &J,
                                         const RTensor &ad, const RTensor &a,
@@ -69,7 +69,7 @@ extern template void add_product_term(CMPO *mpdo,
                                       const std::vector<CTensor> &Hi);
 
 extern template void add_interaction(CMPO *mpdo, const std::vector<CTensor> &Hi,
-                                     index i, const CTensor *sign = nullptr);
+                                     index i, const CTensor *sign);
 
 extern template void add_hopping_matrix(CMPO *mpdo, const CTensor &J,
                                         const CTensor &ad, const CTensor &a,
