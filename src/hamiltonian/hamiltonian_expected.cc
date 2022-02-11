@@ -21,8 +21,8 @@
 
 namespace mps {
 
-template <class MPS>
-static inline double do_expected(const MPS &P, const Hamiltonian &theH,
+template <class Tensor>
+static inline double do_expected(const MPS<Tensor> &P, const Hamiltonian &theH,
                                  double t) {
   CTensor O1, O2, H;
   cdouble E = number_zero<cdouble>();

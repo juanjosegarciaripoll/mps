@@ -1,4 +1,5 @@
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
+#pragma once
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
 
@@ -21,6 +22,7 @@
 #define MPS_MPS_H
 
 #include <mps/mps/types.h>
+#include <mps/algorithms/linalg.h>
 
 namespace mps {
 
@@ -55,63 +57,86 @@ inline Tensor mps_to_vector(const MPS<Tensor> &mps) {
 }
 
 /**Norm of a RMPS.*/
-double norm2(const RMPS &psi);
+extern template double norm2(const RMPS &psi);
 
 /**Norm of a CMPS.*/
-double norm2(const CMPS &psi);
+extern template double norm2(const CMPS &psi);
 
 /**Scalar product between MPS.*/
-double scprod(const RMPS &psi1, const RMPS &psi2, int sense = +1);
+extern template double scprod(const RMPS &psi1, const RMPS &psi2,
+                              int direction);
 
 /**Scalar product between MPS.*/
-cdouble scprod(const CMPS &psi1, const CMPS &psi2, int sense = +1);
+extern template cdouble scprod(const CMPS &psi1, const CMPS &psi2,
+                               int direction);
 
 /**Compute a single-site expected value.*/
-double expected(const RMPS &a, const RTensor &Op1, index k);
+extern template double expected(const RMPS &a, const RTensor &Op1, index k,
+                                int direction);
+
+/**Compute a single-site expected value.*/
+extern template double expected(const RMPS &a, const RTensor &Op1, index k,
+                                int direction);
+
+/**Compute a single-site expected value.*/
+extern template cdouble expected(const CMPS &a, const CTensor &Op1, index k,
+                                 int direction);
 
 /**Compute all expected values of a single operator over the chain.*/
-RTensor expected_vector(const RMPS &a, const RTensor &Op1);
+extern template RTensor expected_vector(const RMPS &a, const RTensor &Op1);
 
 /**Compute all expected values, with a different operator over each site of the chain.*/
-RTensor expected_vector(const RMPS &a, const std::vector<RTensor> &Op1);
-
-/**Compute a single-site expected value.*/
-cdouble expected(const RMPS &a, const CTensor &Op1, index k);
+extern template RTensor expected_vector(const RMPS &a,
+                                        const std::vector<RTensor> &Op1);
 
 /**Compute all expected values of a single operator over the chain.*/
-CTensor expected_vector(const CMPS &a, const CTensor &Op1);
+extern template CTensor expected_vector(const CMPS &a, const CTensor &Op1);
 
 /**Compute all expected values, with a different operator over each site of the chain.*/
-CTensor expected_vector(const CMPS &a, const std::vector<CTensor> &Op1);
-
-/**Compute a single-site expected value.*/
-cdouble expected(const CMPS &a, const CTensor &Op1, index k);
+extern template CTensor expected_vector(const CMPS &a,
+                                        const std::vector<CTensor> &Op1);
 
 /**Compute a two-site correlation.*/
-double expected(const RMPS &a, const RTensor &op1, index k1, const RTensor &op2,
-                index k2);
+extern template double expected(const RMPS &a, const RTensor &op1, index k1,
+                                const RTensor &op2, index k2, int direction);
 
 /**Compute a two-site correlation.*/
-cdouble expected(const RMPS &a, const CTensor &op1, index k1,
-                 const CTensor &op2, index k2);
+extern template cdouble expected(const RMPS &a, const CTensor &op1, index k1,
+                                 const CTensor &op2, index k2, int direction);
 
 /**Compute a two-site correlation.*/
-cdouble expected(const CMPS &a, const CTensor &op1, index k1,
-                 const CTensor &op2, index k2);
+extern template cdouble expected(const CMPS &a, const CTensor &op1, index k1,
+                                 const CTensor &op2, index k2, int direction);
+
+extern template RTensor all_correlations_fast(const RMPS &a,
+                                              const std::vector<RTensor> &op1,
+                                              const std::vector<RTensor> &op2,
+                                              const RMPS &b,
+                                              bool symmetric = false,
+                                              const RTensor *jordan_wigner_op);
+
+extern template CTensor all_correlations_fast(const CMPS &a,
+                                              const std::vector<CTensor> &op1,
+                                              const std::vector<CTensor> &op2,
+                                              const CMPS &b,
+                                              bool symmetric = false,
+                                              const CTensor *jordan_wigner_op);
 
 /**Compute all two-site correlations.*/
-RTensor expected(const RMPS &a, const RTensor &op1, const RTensor &op2);
+extern template RTensor expected(const RMPS &a, const RTensor &op1,
+                                 const RTensor &op2);
 
 /**Compute all two-site correlations.*/
-CTensor expected(const CMPS &a, const CTensor &op1, const CTensor &op2);
+extern template CTensor expected(const CMPS &a, const CTensor &op1,
+                                 const CTensor &op2);
 
 /**Compute all two-site correlations.*/
-RTensor expected(const RMPS &a, const std::vector<RTensor> &op1,
-                 const std::vector<RTensor> &op2);
+extern template RTensor expected(const RMPS &a, const std::vector<RTensor> &op1,
+                                 const std::vector<RTensor> &op2);
 
 /**Compute all two-site correlations.*/
-CTensor expected(const CMPS &a, const std::vector<CTensor> &op1,
-                 const std::vector<CTensor> &op2);
+extern template CTensor expected(const CMPS &a, const std::vector<CTensor> &op1,
+                                 const std::vector<CTensor> &op2);
 
 /**Store a tensor in a matrix product state in the canonical form.*/
 void set_canonical(RMPS &psi, index site, const RTensor &A, int sense,

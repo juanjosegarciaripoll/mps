@@ -196,7 +196,7 @@ inline void add_product_term(MPO<Tensor> *mpo, const std::vector<Tensor> &H) {
 }
 template <class Tensor>
 void add_interaction(MPO<Tensor> *mpo, const std::vector<Tensor> &H, index i,
-                     const Tensor *sign) {
+                     const Tensor *sign = nullptr) {
   //
   // This function add terms \sum_{j,j\neq i} H[i]*H[j] to a Hamiltonian.
   // The origin of interactions is thus marked by "i"

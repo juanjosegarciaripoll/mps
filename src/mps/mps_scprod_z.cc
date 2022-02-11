@@ -17,13 +17,35 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <mps/mps.h>
-#include "mps_expected1.cc"
+#include <mps/algorithms/linalg.h>
 
 namespace mps {
 
-cdouble scprod(const CMPS &psi1, const CMPS &psi2, int sense) {
-  return scalar_product(psi1, psi2, sense);
-}
+template double norm2(const CMPS &psi);
+
+template cdouble scprod(const CMPS &psi1, const CMPS &psi2, int direction);
+
+template cdouble expected(const CMPS &a, const CTensor &Op1, index k,
+                          int direction);
+
+template cdouble expected(const CMPS &a, const CTensor &Op1, index k1,
+                          const CTensor &Op2, index k2, int direction);
+
+template CTensor expected_vector(const CMPS &a, const CTensor &Op1);
+
+template CTensor expected_vector(const CMPS &a,
+                                 const std::vector<CTensor> &Op1);
+
+template CTensor expected(const CMPS &a, const CTensor &op1,
+                          const CTensor &op2);
+
+template CTensor expected(const CMPS &a, const std::vector<CTensor> &op1,
+                          const std::vector<CTensor> &op2);
+
+template CTensor all_correlations_fast(const CMPS &a,
+                                       const std::vector<CTensor> &op1,
+                                       const std::vector<CTensor> &op2,
+                                       const CMPS &b, bool symmetric = false,
+                                       const CTensor *jordan_wigner_op = 0);
 
 }  // namespace mps

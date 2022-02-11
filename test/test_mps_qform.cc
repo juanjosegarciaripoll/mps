@@ -84,7 +84,7 @@ void test_qform_expected(typename MPO::MPS psi) {
       for (index j = 0; j < 10; j++) {
         Tensor psik = flatten(psi[i]);
         number psikHpsik = scprod(psik, mmult(H, psik));
-        number psiHpsi = scprod(psi, apply(mpo, psi));
+        number psiHpsi = scprod(psi, mps::apply(mpo, psi));
         EXPECT_CEQ(psiHpsi, psikHpsik);
         psi.at(i).randomize();
         psi.at(i) = psi[i] / norm2(psi[i]);

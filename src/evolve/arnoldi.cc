@@ -26,7 +26,10 @@
 
 namespace mps {
 
-using namespace linalg;
+using linalg::expm;
+using linalg::solve_with_svd;
+using mps::scprod;
+using tensor::sort_indices;
 
 static CTensor ground_state(const CTensor &Heff, const CTensor &N) {
   CTensor U;

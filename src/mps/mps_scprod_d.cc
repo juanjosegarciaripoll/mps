@@ -17,13 +17,41 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <mps/mps.h>
-#include "mps_expected1.cc"
+#include <mps/algorithms/linalg.h>
 
 namespace mps {
 
-double scprod(const RMPS &psi1, const RMPS &psi2, int sense) {
-  return scalar_product(psi1, psi2, sense);
-}
+template double norm2(const RMPS &psi);
+
+template double scprod(const RMPS &psi1, const RMPS &psi2, int direction);
+
+template double expected(const RMPS &a, const RTensor &Op1, index k,
+                         int direction);
+
+template cdouble expected(const RMPS &a, const CTensor &Op1, index k,
+                          int direction);
+
+template double expected(const RMPS &a, const RTensor &Op1, index k1,
+                         const RTensor &Op2, index k2, int direction);
+
+template cdouble expected(const RMPS &a, const CTensor &Op1, index k1,
+                          const CTensor &Op2, index k2, int direction);
+
+template RTensor expected_vector(const RMPS &a, const RTensor &Op1);
+
+template RTensor expected_vector(const RMPS &a,
+                                 const std::vector<RTensor> &Op1);
+
+template RTensor expected(const RMPS &a, const RTensor &op1,
+                          const RTensor &op2);
+
+template RTensor expected(const RMPS &a, const std::vector<RTensor> &op1,
+                          const std::vector<RTensor> &op2);
+
+template RTensor all_correlations_fast(const RMPS &a,
+                                       const std::vector<RTensor> &op1,
+                                       const std::vector<RTensor> &op2,
+                                       const RMPS &b, bool symmetric = false,
+                                       const RTensor *jordan_wigner_op = 0);
 
 }  // namespace mps

@@ -63,22 +63,10 @@ target_sources(mps
     mps/cmps.cc
     mps/mps_prop_matrix_d.cc
     mps/mps_prop_matrix_z.cc
-    mps/mps_norm_d.cc
-    mps/mps_norm_z.cc
     mps/mps_scprod_d.cc
     mps/mps_scprod_z.cc
     mps/mps_dty_matrix_d.cc
     mps/mps_dty_matrix_z.cc
-    mps/mps_expected1_d.cc
-    mps/mps_expected1_dz.cc
-    mps/mps_expected1_z.cc
-    mps/mps_expected2_d.cc
-    mps/mps_expected2_dz.cc
-    mps/mps_expected2_z.cc
-    mps/mps_expected1_all_d.cc
-    mps/mps_expected1_all_z.cc
-    mps/mps_expected2_all_d.cc
-    mps/mps_expected2_all_z.cc
     mps/mps_simplify_d.cc
     mps/mps_simplify_z.cc
     mps/mps_simplify_many_d.cc
