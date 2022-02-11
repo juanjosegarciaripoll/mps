@@ -18,6 +18,7 @@
 */
 
 #include "loops.h"
+#include "test_states.h"
 #include <gtest/gtest.h>
 #include <mps/except.h>
 #include <mps/mps.h>
@@ -53,13 +54,7 @@ void test_expected1_order(int size) {
    * the k-th site is the same as that of the single-site operator on the
    * associated state.
    */
-  std::vector<mp_tensor_t<MPS>> states(size);
-
-  for (index i = 0; i < size; i++) {
-    states[i] = MPS::elt_t::random(2);
-    states[i] = states[i] / norm2(states[i]);
-  }
-
+  auto states = random_product_state<mp_tensor_t<MPS>>(size);
   MPS psi = product_state(states);
 
   for (index i = 0; i < size; i++) {

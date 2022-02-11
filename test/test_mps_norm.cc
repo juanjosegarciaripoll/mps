@@ -18,6 +18,7 @@
 */
 
 #include "loops.h"
+#include "test_states.h"
 #include <gtest/gtest.h>
 #include <mps/mps.h>
 #include <mps/quantum.h>
@@ -61,16 +62,8 @@ void test_norm_order(int size) {
      * expectation value over the k-th site is the same as
      * that of the single-site operator on the associated state.
      */
-  typedef typename MPS::elt_t Tensor;
-  Tensor *states = new Tensor[size];
-
-  for (index i = 0; i < size; i++) {
-    states[i] = Tensor::random(2);
-    states[i] = states[i] / norm2(states[i]);
-  }
-
-  MPS psi = product_state(size, states[0]);
-  for (index i = 0; i < size; i++) psi.at(i) = reshape(states[i], 1, 2, 1);
+  auto states = random_product_state<mp_tensor_t<MPS>>(size);
+  MPS psi = product_state(states);
 
   EXPECT_CEQ(norm2(psi), 1.0);
   EXPECT_CEQ(scprod(psi, psi), 1.0);
