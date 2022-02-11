@@ -124,7 +124,7 @@ inline index largest_bond_dimension(const MP<Tensor> &mp) {
 }
 
 template <typename dest, typename orig>
-inline dest tensor_cast(const MP<dest> &mp, orig t) {
+inline dest tensor_cast(const MP<dest> & /*mp*/, orig t) {
   return dest(t);
 }
 
