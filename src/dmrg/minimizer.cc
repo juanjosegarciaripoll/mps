@@ -18,6 +18,7 @@
 */
 
 #include <list>
+#include <memory>
 #include <tensor/tools.h>
 #include <tensor/io.h>
 #include <tensor/linalg.h>
@@ -77,7 +78,8 @@ struct Minimizer : public MinimizerOptions {
   typedef std::list<tensor_t> tensor_list_t;
 
   mps_t psi;
-  qform_t Hqform, *Nqform;
+  qform_t Hqform;
+  std::unique_ptr<qform_t> Nqform;
   std::list<mps_t> OrthoMPS;
   std::list<lform_t> OrthoLform;
   number_t Nvalue;
@@ -90,16 +92,12 @@ struct Minimizer : public MinimizerOptions {
       : MinimizerOptions(opt),
         psi(canonical_form(state, -1)),
         Hqform(H, psi, psi, 0),
-        Nqform(0),
+        Nqform(nullptr),
         Nvalue(0),
         Ntol(1e-6),
         site(0),
         step(+1),
         converged(true) {}
-
-  ~Minimizer() {
-    if (Nqform) delete Nqform;
-  }
 
   index size() { return psi.size(); }
 
@@ -143,8 +141,7 @@ struct Minimizer : public MinimizerOptions {
   }
 
   void add_constraint(const mpo_t &constraint, number_t value) {
-    if (Nqform) delete Nqform;
-    Nqform = new qform_t(constraint, psi, psi, 0);
+    Nqform = std::make_unique<qform_t>(constraint, psi, psi, 0);
     Nvalue = value;
   }
 
