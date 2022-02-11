@@ -38,6 +38,16 @@ inline MPS<Tensor> product_state(index length, const Tensor &local_state) {
   return MPS<Tensor>::product_state(length, local_state);
 }
 
+/**Create a product state. */
+template <typename Tensor>
+inline MPS<Tensor> product_state(const std::vector<Tensor> &local_states) {
+  MPS<Tensor> output(local_states.size());
+  std::transform(std::begin(local_states), std::end(local_states),
+                 std::begin(output),
+                 [](const Tensor &t) { return reshape(t, 1, t.size(), 1); });
+  return output;
+}
+
 /**Create a GHZ state.*/
 const RMPS ghz_state(index length, bool periodic = false);
 

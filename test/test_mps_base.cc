@@ -376,13 +376,22 @@ void test_mps_product_state(int size) {
   EXPECT_THROW(product_state(size, mp_tensor_t<MPS>::empty(0)),
                std::invalid_argument);
   EXPECT_THROW(product_state(size, mp_tensor_t<MPS>()), std::invalid_argument);
-
-  MPS state = product_state(size, psi);
-  EXPECT_EQ(state.size(), size);
-  const auto tensor_psi = reshape(psi, 1, psi.size(), 1);
-  EXPECT_TRUE(std::all_of(
-      begin(state), end(state),
-      [&](const mp_tensor_t<MPS> &t) { return all_equal(t, tensor_psi); }));
+  {
+    MPS state = product_state(size, psi);
+    EXPECT_EQ(state.size(), size);
+    const auto tensor_psi = reshape(psi, 1, psi.size(), 1);
+    EXPECT_TRUE(std::all_of(
+        begin(state), end(state),
+        [&](const mp_tensor_t<MPS> &t) { return all_equal(t, tensor_psi); }));
+  }
+  {
+    mp_tensor_t<MPS> psi0 = {0, 1}, psi1 = {1, 0, 2};
+    std::vector<mp_tensor_t<MPS>> v = {psi0, psi1};
+    MPS state = product_state(v);
+    EXPECT_EQ(state.size(), 2);
+    EXPECT_TRUE(all_equal(state[0], reshape(psi0, 1, 2, 1)));
+    EXPECT_TRUE(all_equal(state[1], reshape(psi1, 1, 3, 1)));
+  }
 }
 
 template <class MPS>
