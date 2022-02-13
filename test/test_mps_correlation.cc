@@ -71,6 +71,24 @@ void test_correlation_basic() {
   }
 }
 
+template <class Tensor>
+Tensor product_state_correlations(const std::vector<Tensor> &states,
+                                  const Tensor &op1, const Tensor &op2) {
+  index L = ssize(states);
+  auto output = Tensor::empty(L, L);
+  for (index i = 0; i < L; ++i) {
+    auto factor = scprod(states[i], mmult(op1, states[i]));
+    for (index j = 0; j < L; ++j) {
+      if (j != i) {
+        output.at(i, j) = factor * scprod(states[j], mmult(op2, states[j]));
+      } else {
+        output.at(i, i) = scprod(states[i], mmult(op1, mmult(op2, states[i])));
+      }
+    }
+  }
+  return output;
+}
+
 template <class MPS>
 void test_correlation_order(int size) {
   /*
@@ -79,26 +97,44 @@ void test_correlation_order(int size) {
      * that of the single-site operator on the associated state.
      */
   auto states = random_product_state<mp_tensor_t<MPS>>(size);
+  mp_tensor_t<MPS> op1 = mps::Pauli_z;
+  mp_tensor_t<MPS> op2 = op1 + 0.1 * op1.eye(2);
+  auto exact_correlations = product_state_correlations(states, op1, op2);
   MPS psi = product_state(states);
-
+  auto correlations = exact_correlations.zeros(size, size);
   for (index i = 0; i < size; i++)
-    for (index j = 0; j < i; j++)
-      EXPECT_CEQ(expected(psi, mps::Pauli_z, j, mps::Pauli_z, i),
-                 scprod(states[i], mmult(mps::Pauli_z, states[i])) *
-                     scprod(states[j], mmult(mps::Pauli_z, states[j])));
+    for (index j = 0; j < size; j++)
+      correlations.at(i, j) = expected(psi, op1, i, op2, j);
+  ASSERT_CEQ(correlations, exact_correlations);
+}
+
+template <class MPS>
+void test_fast_correlations(int size) {
+  /*
+     * We create a random product state and verify that the
+     * expectation value over the k-th site is the same as
+     * that of the single-site operator on the associated state.
+     */
+  auto states = random_product_state<mp_tensor_t<MPS>>(size);
+  mp_tensor_t<MPS> op1 = mps::Pauli_z;
+  mp_tensor_t<MPS> op2 = op1 + 0.1 * op1.eye(2);
+  auto exact_correlations = product_state_correlations(states, op1, op2);
+  MPS psi = product_state(states);
+  auto correlations = expected(psi, op1, op2);
+  ASSERT_CEQ(correlations, exact_correlations);
 }
 
 ////////////////////////////////////////////////////////////
 // EXPECTATION VALUES OVER RMPS
 //
 
-TEST(MPSCorrelation, RMPSBasic) { test_correlation_basic<RMPS>(); }
+TEST(RMPSCorrelation, Basic) { test_correlation_basic<RMPS>(); }
 
-TEST(MPSCorrelation, RMPSOrder) {
+TEST(RMPSCorrelation, Order) {
   test_over_integers(1, 10, test_correlation_order<RMPS>);
 }
 
-TEST(MPSCorrelation, GHZ) {
+TEST(RMPSCorrelation, GHZ) {
   for (index i = 1; i < 4; i++) {
     RMPS ghz = ghz_state(i);
     for (index j = 0; j < i; j++) {
@@ -110,14 +146,22 @@ TEST(MPSCorrelation, GHZ) {
   }
 }
 
+TEST(RMPSCorrelation, FastCorrelations) {
+  test_over_integers(1, 10, test_fast_correlations<RMPS>);
+}
+
 ////////////////////////////////////////////////////////////
 // EXPECTATION VALUES OVER CMPS
 //
 
-TEST(MPSCorrelation, CMPSBasic) { test_correlation_basic<CMPS>(); }
+TEST(CMPSCorrelation, Basic) { test_correlation_basic<CMPS>(); }
 
-TEST(MPSCorrelation, CMPSOrder) {
+TEST(CMPSCorrelation, Order) {
   test_over_integers(1, 10, test_correlation_order<CMPS>);
+}
+
+TEST(CMPSCorrelation, FastCorrelations) {
+  test_over_integers(1, 10, test_fast_correlations<CMPS>);
 }
 
 }  // namespace tensor_test
