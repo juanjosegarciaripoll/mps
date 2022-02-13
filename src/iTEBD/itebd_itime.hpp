@@ -59,14 +59,13 @@ const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
   if (!deltan) {
     deltan = 1;
   }
-  std::cout.precision(5);
-  std::cout << nsteps << ", " << dt << " x " << deltan << " = " << dt * deltan
-            << std::endl;
-  std::cout << "t=" << time << ";\tE=" << E << "; dE=" << 0.0 << ";\tS=" << S
+  std::cerr.precision(5);
+  std::cerr << nsteps << ", " << dt << " x " << deltan << " = " << dt * deltan
+            << '\n';
+  std::cerr << "t=" << time << ";\tE=" << E << "; dE=" << 0.0 << ";\tS=" << S
             << "; dS=" << 0.0 << ";\tl="
-            << std::max(psi.left_dimension(0), psi.right_dimension(0))
-            << std::endl
-            << "l = " << matrix_form(real(psi.left_vector(0))) << std::endl;
+            << std::max(psi.left_dimension(0), psi.right_dimension(0)) << '\n'
+            << "l = " << matrix_form(real(psi.left_vector(0))) << '\n';
   for (index phases = (nsteps + deltan - 1) / deltan; phases; phases--) {
     for (index i = 0; (i < deltan); i++) {
       switch (method) {
@@ -95,11 +94,10 @@ const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
     double newS = psi.entropy();
     if (energies) energies->push_back(newE);
     if (entropies) entropies->push_back(newS);
-    std::cout << "t=" << time << ";\tE=" << newE << "; dE=" << newE - E
+    std::cerr << "t=" << time << ";\tE=" << newE << "; dE=" << newE - E
               << ";\tS=" << newS << "; dS=" << newS - S << ";\tl="
-              << std::max(psi.left_dimension(0), psi.right_dimension(0))
-              << std::endl
-              << "l = " << matrix_form(real(psi.left_vector(0))) << std::endl;
+              << std::max(psi.left_dimension(0), psi.right_dimension(0)) << '\n'
+              << "l = " << matrix_form(real(psi.left_vector(0))) << '\n';
     E = newE;
     S = newS;
   }

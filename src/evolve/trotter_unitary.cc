@@ -56,28 +56,28 @@ TrotterSolver::Unitary::Unitary(const Hamiltonian &H, index k, cdouble dt,
     // No sites!
     kN = k0;
   }
-  if (debug) std::cout << "computing: ";
+  if (debug) std::cerr << "computing: ";
   dt = to_complex(-tensor::abs(imag(dt)), -real(dt));
   for (int di, i = 0; i < (int)H.size(); i += di) {
     CTensor Hi;
     if (i < k0 || i >= kN) {
       // Local operator
       Hi = H.local_term(i, 0.0) / 2.0;
-      if (debug) std::cout << "[" << i << "]";
+      if (debug) std::cerr << "[" << i << "]";
       di = 1;
     } else {
       CTensor i1 = CTensor::eye(H.dimension(i));
       CTensor i2 = CTensor::eye(H.dimension(i + 1));
       Hi = H.interaction(i, 0.0) + kron2(0.5 * H.local_term(i, 0.0), i2) +
            kron2(i1, 0.5 * H.local_term(i + 1, 0.0));
-      if (debug) std::cout << "[" << i << "," << i + 1 << "]";
+      if (debug) std::cerr << "[" << i << "," << i + 1 << "]";
       di = 2;
     }
     U.at(i) = linalg::expm(Hi * dt);
   }
   if (debug) {
-    std::cout << std::endl;
-    std::cout << "Unitaries running from " << k0 << " to " << kN << std::endl;
+    std::cerr << '\n';
+    std::cerr << "Unitaries running from " << k0 << " to " << kN << '\n';
   }
 }
 
@@ -111,9 +111,9 @@ double TrotterSolver::Unitary::apply_onto_two_sites(CMPS &P, const CTensor &U12,
   double err = 0.0;
 
   if (debug > 1) {
-    std::cout << "Applying two-site unitary on (" << k1 << "," << k2 << ")"
+    std::cerr << "Applying two-site unitary on (" << k1 << "," << k2 << ")"
               << ", max bond dimension " << max_a2 << ", tolerance "
-              << tolerance << std::endl
+              << tolerance << '\n'
               << "From dimensions " << P1.dimensions() << ","
               << P2.dimensions();
   }
@@ -161,8 +161,8 @@ double TrotterSolver::Unitary::apply_onto_two_sites(CMPS &P, const CTensor &U12,
     P.at(k2) = reshape(P2, a2, i2, a3);
   }
   if (debug > 1) {
-    std::cout << " to " << P1.dimensions() << "," << P2.dimensions()
-              << " error " << err << std::endl;
+    std::cerr << " to " << P1.dimensions() << "," << P2.dimensions()
+              << " error " << err << '\n';
   }
 
   return err;
@@ -225,7 +225,7 @@ double TrotterSolver::Unitary::apply(CMPS *psi, int *sense, double tolerance,
     }
   }
   if (debug) {
-    std::cout << "Unitary: bond dimension = " << largest_bond_dimension(*psi)
+    std::cerr << "Unitary: bond dimension = " << largest_bond_dimension(*psi)
               << "\t[" << toc() << "s]\n";
   }
   if (normalize) {

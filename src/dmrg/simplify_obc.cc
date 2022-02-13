@@ -53,10 +53,10 @@ double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
   LinearForm<MPS> lf(w, Q, P, s.site());
   double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2 = 0.0;
   if (debug) {
-    std::cout << "simplify_obc: " << (single_site ? "single_site" : "two-sites")
+    std::cerr << "simplify_obc: " << (single_site ? "single_site" : "two-sites")
               << ", dmax=" << Dmax << ", truncate_tol=" << tol
-              << ", stop_tol=" << tolerance << std::endl
-              << "\tweights=" << w << std::endl;
+              << ", stop_tol=" << tolerance << '\n'
+              << "\tweights=" << w << '\n';
   }
   while (sweeps--) {
     if (single_site) {
@@ -76,7 +76,7 @@ double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
     olderr = err;
     err = sqrt(abs(1 - normP2 / normQ2));
     if (debug) {
-      std::cout << "\terr=" << err << ", sense=" << s.sense() << std::endl;
+      std::cerr << "\terr=" << err << ", sense=" << s.sense() << '\n';
     }
     s.flip();
     if ((olderr - err) < 1e-5 * abs(olderr) || (err < tolerance)) {

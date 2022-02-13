@@ -162,7 +162,7 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
   if (Q.size() == 1) {
     std::cerr << "The mps::simplify() function is designed to "
                  "work with states that have more than one site."
-              << std::endl;
+              << '\n';
     abort();
   }
 
@@ -200,7 +200,7 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
     Tensor Pk;
     if (debug) {
       tic();
-      std::cout << "Simplify: sweep #" << sweep << std::flush;
+      std::cerr << "Simplify: sweep #" << sweep << std::flush;
     }
     if (*sense > 0) {
       Tensor Ml, Nl;
@@ -258,7 +258,7 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
     olderr = err;
     err = 1 - scp / sqrt(normQ2 * normP2);
     if (debug) {
-      std::cout << ", truncation error = " << err << "\t[" << toc() << "s]\n";
+      std::cerr << ", truncation error = " << err << "\t[" << toc() << "s]\n";
     }
     if ((olderr - err) < 1e-5 * tensor::abs(olderr) || (err < tolerance)) {
       if (normalize) {

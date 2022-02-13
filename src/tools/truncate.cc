@@ -42,7 +42,7 @@ size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
   }
   if (tol >= 1.0 /* MPS_DO_NOT_TRUNCATE */) {
     if (debug) {
-      std::cout << "Truncation disabled" << std::endl;
+      std::cerr << "Truncation disabled" << '\n';
     }
     return max_dim;
   }
@@ -52,14 +52,14 @@ size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
     for (index i = L; i--;) {
       if (s[i]) {
         if (debug) {
-          std::cout << "Truncated only zeros, new size " << i << " vs " << L
-                    << std::endl;
+          std::cerr << "Truncated only zeros, new size " << i << " vs " << L
+                    << '\n';
         }
         return (i < max_dim) ? (i + 1) : max_dim;
       }
     }
     if (debug) {
-      std::cout << "Not truncated vector of size " << L << std::endl;
+      std::cerr << "Not truncated vector of size " << L << '\n';
     }
     return 0;
   }
@@ -88,8 +88,8 @@ size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
   }
 
   if (debug) {
-    std::cout << "Truncated to tolerance " << limit << ", new size " << max_dim
-              << " vs " << L << std::endl;
+    std::cerr << "Truncated to tolerance " << limit << ", new size " << max_dim
+              << " vs " << L << '\n';
   }
   return max_dim;
 }

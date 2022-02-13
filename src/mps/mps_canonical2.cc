@@ -45,8 +45,8 @@ static void set_canonical_2_sites_inner(MPS &P, const Tensor &Pij, index site,
       file.dump(reshape(Pij, a1*i1, j1*c1), "Pij");
       file.close();
 #endif
-    std::cerr << "NaN found when doing canonical form" << std::endl;
-    std::cerr << "s=" << s << std::endl;
+    std::cerr << "NaN found when doing canonical form" << '\n';
+    std::cerr << "s=" << s << '\n';
     abort();
   }
   index b1 = where_to_truncate(s, tol, Dmax);

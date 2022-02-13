@@ -46,39 +46,39 @@ double Trotter2Solver::one_step(CMPS *P, index Dmax) {
     case TRUNCATE_EACH_UNITARY: {
       double err;
       if (debug)
-        std::cout << "Trotter2 method: truncate unitaries\n"
+        std::cerr << "Trotter2 method: truncate unitaries\n"
                   << "Trotter2 Layer 1/2\n";
       err = Ueven.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter2 Layer 2/2\n";
+      if (debug) std::cerr << "Trotter2 Layer 2/2\n";
       err += Uodd.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax, normalize);
       return err;
     }
     case TRUNCATE_EACH_LAYER: {
       double err;
       if (debug)
-        std::cout << "Trotter2 method: truncate layers\n"
+        std::cerr << "Trotter2 method: truncate layers\n"
                   << "Trotter2 Layer 1/2\n";
       err = Ueven.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax);
-      if (debug) std::cout << "Trotter2 Layer 2/2\n";
+      if (debug) std::cerr << "Trotter2 Layer 2/2\n";
       err += Uodd.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax,
                                      normalize);
       return err;
     }
     case DO_NOT_TRUNCATE: {
       if (debug)
-        std::cout << "Trotter2 method: no truncation\n"
+        std::cerr << "Trotter2 method: no truncation\n"
                   << "Trotter2 Layer 1/2\n";
       Ueven.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
-      if (debug) std::cout << "Trotter2 Layer 2/2\n";
+      if (debug) std::cerr << "Trotter2 Layer 2/2\n";
       Uodd.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
       return 0.0;
     }
     default: {
       if (debug)
-        std::cout << "Trotter2 method: truncate group:\n"
+        std::cerr << "Trotter2 method: truncate group:\n"
                   << "Trotter2 Layer 1/2\n";
       Ueven.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
-      if (debug) std::cout << "Trotter2 Layer 2/2\n";
+      if (debug) std::cerr << "Trotter2 Layer 2/2\n";
       return Uodd.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax,
                                      normalize);
     }

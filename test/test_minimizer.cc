@@ -28,7 +28,7 @@ using namespace parallel;
 #define COUT Context::my_cout()
 #else
 #define HAVE_TTY 1
-#define COUT std::cout
+#define COUT std::cerr
 #endif
 
 //**********************************************************************
@@ -58,7 +58,7 @@ void test_minimizer_gap() {
   P[0].at(0, 0, 0) = 1.0;
   P[1].at(0, 2, 0) = 1.0;
 
-  std::cout << "Computing energy gaps for s=1\n"
+  std::cerr << "Computing energy gaps for s=1\n"
             << "=============================\n";
 
   // Exact energies for Sz=1 subspace
@@ -92,7 +92,7 @@ void test_minimizer_gap() {
   for (int model = 0; model < 2; model++) {
     size_t Dmax = 80;
     double err = 0.0;
-    std::cout << (model ? "Heisenberg " : "AKLT       ");
+    std::cerr << (model ? "Heisenberg " : "AKLT       ");
     for (size_t L = 3; L <= 8 /*11*/; L++) {
       // 1) Create the Hamiltonian (translationally invariant, OBC)
       TIHamiltonian H(L, model ? H12 : (H12 + mmult(H12, H12) / 3.0), H1);
@@ -123,15 +123,15 @@ void test_minimizer_gap() {
           abs(Exact(0, L - 3, model) - E0) + abs(Exact(1, L - 3, model) - E1);
       err = max(err, diff);
       if (diff < 3e-9) {
-        std::cout << '.';
+        std::cerr << '.';
       } else {
-        std::cout << '!';
+        std::cerr << '!';
       }
-      std::cout.flush();
+      std::cerr.flush();
     }
-    std::cout << " Max. err. = " << err << std::endl;
+    std::cerr << " Max. err. = " << err << '\n';
   }
-  std::cout << std::endl;
+  std::cerr << '\n';
 }
 
 //**********************************************************************

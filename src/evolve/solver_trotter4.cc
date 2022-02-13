@@ -52,20 +52,20 @@ double ForestRuthSolver::one_step(CMPS *P, index Dmax) {
     case TRUNCATE_EACH_UNITARY: {
       double err = 0.0;
       if (debug)
-        std::cout << "Trotter4 method: truncate unitaries:\n"
+        std::cerr << "Trotter4 method: truncate unitaries:\n"
                   << "Trotter4 Layer 1/7\n";
       err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 2/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 2/7\n";
       err += U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 3/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 3/7\n";
       err += U3.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 4/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 4/7\n";
       err += U4.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 5/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 5/7\n";
       err += U3.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 6/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 6/7\n";
       err += U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 7/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 7/7\n";
       err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax, normalize);
       return err;
     }
@@ -83,20 +83,20 @@ double ForestRuthSolver::one_step(CMPS *P, index Dmax) {
     case TRUNCATE_EACH_LAYER: {
       double err = 0.0;
       if (debug)
-        std::cout << "Trotter4 method: truncate layers:\n"
+        std::cerr << "Trotter4 method: truncate layers:\n"
                   << "Trotter4 Layer 1/7\n";
       err += U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 2/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 2/7\n";
       err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 3/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 3/7\n";
       err += U3.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 4/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 4/7\n";
       err += U4.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 5/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 5/7\n";
       err += U3.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 6/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 6/7\n";
       err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      if (debug) std::cout << "Trotter3 Layer 7/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 7/7\n";
       err +=
           U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, 0, normalize);
       return err;
@@ -104,20 +104,20 @@ double ForestRuthSolver::one_step(CMPS *P, index Dmax) {
     default: {
       double err = 0.0;
       if (debug)
-        std::cout << "Trotter4 method: truncate groups:\n"
+        std::cerr << "Trotter4 method: truncate groups:\n"
                   << "Trotter4 Layer 1/7\n";
       err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      if (debug) std::cout << "Trotter3 Layer 2/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 2/7\n";
       err += U2.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 3/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 3/7\n";
       err += U3.apply(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      if (debug) std::cout << "Trotter3 Layer 4/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 4/7\n";
       err += U4.apply(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      if (debug) std::cout << "Trotter3 Layer 5/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 5/7\n";
       err += U3.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 6/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 6/7\n";
       err += U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, 0);
-      if (debug) std::cout << "Trotter3 Layer 7/7\n";
+      if (debug) std::cerr << "Trotter3 Layer 7/7\n";
       err += U1.apply_and_simplify(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax,
                                    normalize);
       return err;

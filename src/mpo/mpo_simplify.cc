@@ -33,8 +33,8 @@ MPO do_simplify(const MPO &old_mpo, int sense, bool debug) {
     mpo.at(i) = reshape(m2, m2.dimension(0), m1.dimension(1), m1.dimension(2),
                         m2.dimension(2));
     if (debug) {
-      std::cout << old_mpo[i].dimensions() << " -> " << mpo[i].dimensions()
-                << std::endl;
+      std::cerr << old_mpo[i].dimensions() << " -> " << mpo[i].dimensions()
+                << '\n';
     }
   }
   return mpo;

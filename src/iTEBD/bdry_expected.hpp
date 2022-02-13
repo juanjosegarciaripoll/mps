@@ -55,7 +55,7 @@ static inline typename t::elt_t bdry_string_order(const t &Op1, int i,
                                                   const t &lB) {
   if (i > j) return bdry_string_order(Op2, j, Opmid, Op1, i, A, lA, B, lB);
 
-  std::cout << "bdry_string_order\n";
+  std::cerr << "bdry_string_order\n";
   t AlA = scale(A, -1, lA);
   t BlB = scale(B, -1, lB);
   t R0 = left_boundary(AlA, BlB);
@@ -86,9 +86,9 @@ static inline typename t::elt_t bdry_string_order(const t &Op1, int i,
     R0 /= n;
     R1 /= n;
   }
-  std::cout << "* " << prop_matrix_close(R1)[0] << " "
+  std::cerr << "* " << prop_matrix_close(R1)[0] << " "
             << prop_matrix_close(R0)[0] << " "
-            << prop_matrix_close(R1)[0] / prop_matrix_close(R0)[0] << std::endl;
+            << prop_matrix_close(R1)[0] / prop_matrix_close(R0)[0] << '\n';
   return prop_matrix_close(R1)[0] / prop_matrix_close(R0)[0];
 }
 

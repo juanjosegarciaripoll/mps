@@ -134,8 +134,8 @@ void test_Arnoldi_truncated(const Hamiltonian &H, double dt, const CMPS &psi) {
   CTensor psi2 = arnoldi_expm(Hm, psiv, idt, nvectors);
   CTensor psi3 = mps_to_vector(truncated_psi_t);
 
-  std::cout << "|psi1 - psi2| = " << norm2(psi1 - psi2) << "\t"
-            << "|psi1 - psi3| = " << norm2(psi3 - psi1) << std::endl;
+  std::cerr << "|psi1 - psi2| = " << norm2(psi1 - psi2) << "\t"
+            << "|psi1 - psi3| = " << norm2(psi3 - psi1) << '\n';
   EXPECT_TRUE(norm2(psi3 - psi1) <
               std::max(ARNOLDI_EPSILON, 10 * norm2(psi1 - psi2)));
 }

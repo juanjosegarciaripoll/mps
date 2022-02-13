@@ -62,11 +62,10 @@ QuadraticForm<MPO>::make_matrix_database(const MPO &mpo) {
 template <class MPO>
 void QuadraticForm<MPO>::dump_matrices() {
   // We only support open boundary condition problems
-  std::cout << "All matrices around " << here() << std::endl;
+  std::cerr << "All matrices around " << here() << '\n';
   for (index i = 0; i < ssize(matrix_); i++) {
     for (index j = 0; j < ssize(matrix_[i]); j++) {
-      std::cout << " matrix(" << i << "," << j << ")=" << matrix_[i][j]
-                << std::endl;
+      std::cerr << " matrix(" << i << "," << j << ")=" << matrix_[i][j] << '\n';
     }
   }
 }
@@ -111,9 +110,9 @@ void QuadraticForm<MPO>::propagate_left(const elt_t &braP, const elt_t &ketP) {
   if (here() == 0) return;
   const matrix_array_t &mr = right_matrices(here());
   matrix_array_t &new_mr = right_matrices(here() - 1);
-  // std::cout << "Original right matrices\n";
+  // std::cerr << "Original right matrices\n";
   // for (int i = 0; i < mr.size(); i++) {
-  //   std::cout << " mr[" << i << "]=" << mr[i] << std::endl;
+  //   std::cerr << " mr[" << i << "]=" << mr[i] << '\n';
   // }
   std::fill(new_mr.begin(), new_mr.end(), elt_t());
   for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
@@ -123,9 +122,9 @@ void QuadraticForm<MPO>::propagate_left(const elt_t &braP, const elt_t &ketP) {
                        prop_matrix(mr[it->right_ndx], -1, braP, ketP, &it->op));
     }
   }
-  // std::cout << "New matrix right locations\n";
+  // std::cerr << "New matrix right locations\n";
   // for (int i = 0; i < new_mr.size(); i++) {
-  //   std::cout << " mr'[" << i << "]=" << new_mr[i] << std::endl;
+  //   std::cerr << " mr'[" << i << "]=" << new_mr[i] << '\n';
   // }
   --current_site_;
 }
@@ -135,9 +134,9 @@ void QuadraticForm<MPO>::propagate_right(const elt_t &braP, const elt_t &ketP) {
   if (here() == last_site()) return;
   const matrix_array_t &ml = left_matrices(here());
   matrix_array_t &new_ml = left_matrices(here() + 1);
-  // std::cout << "Original left matrices\n";
+  // std::cerr << "Original left matrices\n";
   // for (int i = 0; i < ml.size(); i++) {
-  //   std::cout << " ml[" << i << "]=" << ml[i] << std::endl;
+  //   std::cerr << " ml[" << i << "]=" << ml[i] << '\n';
   // }
   std::fill(new_ml.begin(), new_ml.end(), elt_t());
   for (pair_iterator_t it = pairs_[here()].begin(), end = pairs_[here()].end();
@@ -146,19 +145,19 @@ void QuadraticForm<MPO>::propagate_right(const elt_t &braP, const elt_t &ketP) {
       maybe_add<elt_t>(&new_ml.at(it->right_ndx),
                        prop_matrix(ml[it->left_ndx], +1, braP, ketP, &it->op));
     }
-  // std::cout << "New matrix left locations\n";
+  // std::cerr << "New matrix left locations\n";
   // for (int i = 0; i < new_ml.size(); i++) {
-  //   std::cout << " ml'[" << i << "]=" << new_ml[i] << std::endl;
+  //   std::cerr << " ml'[" << i << "]=" << new_ml[i] << '\n';
   // }
   ++current_site_;
 }
 
 template <class elt_t>
 static elt_t compose(const elt_t &L, const elt_t &op, const elt_t &R) {
-  // std::cout << "Compose\n"
-  //           << " L=" << L << std::endl
-  //           << " R=" << R << std::endl
-  //           << " op=" << op << std::endl;
+  // std::cerr << "Compose\n"
+  //           << " L=" << L << '\n'
+  //           << " R=" << R << '\n'
+  //           << " op=" << op << '\n';
   index a1, a2, b1, b2, a3, b3;
   // L(a1,b1,a2,b2) op(i,j) R(a3,b3,a1,b1) -> H([a2,i,a3],[b2,j,b3])
   L.get_dimensions(&a1, &b1, &a2, &b2);
@@ -171,11 +170,11 @@ static elt_t compose(const elt_t &L, const elt_t &op, const elt_t &R) {
 template <class elt_t>
 static elt_t compose(const elt_t &L, const elt_t &op1, const elt_t &op2,
                      const elt_t &R) {
-  // std::cout << "Compose\n"
-  //           << " L=" << L << std::endl
-  //           << " R=" << R << std::endl
-  //           << " op1=" << op1 << std::endl
-  //           << " op2=" << op2 << std::endl;
+  // std::cerr << "Compose\n"
+  //           << " L=" << L << '\n'
+  //           << " R=" << R << '\n'
+  //           << " op1=" << op1 << '\n'
+  //           << " op2=" << op2 << '\n';
   index a1, a2, b1, b2, a3, b3;
   // L(a1,b1,a2,b2) op(i,j) R(a3,b3,a1,b1) -> H([a2,i,a3],[b2,j,b3])
   L.get_dimensions(&a1, &b1, &a2, &b2);
@@ -357,15 +356,15 @@ QuadraticForm<MPO>::take_two_site_matrix_diag(int sense) const {
           elt_t Q12 =
               kron2(kron2(take_diag(reshape(L, a2, b2)), take_diag(it1->op)),
                     kron2(take_diag(it2->op), take_diag(reshape(R, a3, b3))));
-          // std::cout << "L= " << matrix_form(take_diag(reshape(L, a2,b2)))
-          //           << std::endl
+          // std::cerr << "L= " << matrix_form(take_diag(reshape(L, a2,b2)))
+          //           << '\n'
           //           << "o1=" << matrix_form(take_diag(it1->op))
-          //           << std::endl
+          //           << '\n'
           //           << "o2=" << matrix_form(take_diag(it2->op))
-          //           << std::endl
+          //           << '\n'
           //           << "R= " << matrix_form(take_diag(reshape(R, a3,b3)))
-          //           << std::endl;
-          // std::cout << "Q= " << matrix_form(Q12) << std::endl;
+          //           << '\n';
+          // std::cerr << "Q= " << matrix_form(Q12) << '\n';
           maybe_add(&output, Q12);
         }
       }

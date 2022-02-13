@@ -45,48 +45,48 @@ double Trotter3Solver::one_step(CMPS *P, index Dmax) {
     case TRUNCATE_EACH_UNITARY: {
       double err;
       if (debug)
-        std::cout << "Trotter3 method: truncate unitaries:\n"
+        std::cerr << "Trotter3 method: truncate unitaries:\n"
                   << "Trotter3 Layer 1/3\n";
       err = U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 2/3\n";
+      if (debug) std::cerr << "Trotter3 Layer 2/3\n";
       err += U1.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 3/3\n";
+      if (debug) std::cerr << "Trotter3 Layer 3/3\n";
       err += U2.apply(P, &sense, MPS_DEFAULT_TOLERANCE, Dmax, normalize);
       return err;
     }
     case TRUNCATE_EACH_LAYER: {
       double err = 0.0;
       if (debug)
-        std::cout << "Trotter3 method: truncate layers:\n"
+        std::cerr << "Trotter3 method: truncate layers:\n"
                   << "Trotter3 Layer 1/3\n";
       err = U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 2/3\n";
+      if (debug) std::cerr << "Trotter3 Layer 2/3\n";
       err += U1.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax);
-      if (debug) std::cout << "Trotter3 Layer 3/3\n";
+      if (debug) std::cerr << "Trotter3 Layer 3/3\n";
       err += U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax,
                                    normalize);
       return err;
     }
     case DO_NOT_TRUNCATE: {
       if (debug)
-        std::cout << "Trotter3 method: do not truncate:\n"
+        std::cerr << "Trotter3 method: do not truncate:\n"
                   << "Trotter3 Layer 1/3\n";
       U2.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
-      if (debug) std::cout << "Trotter3 Layer 2/3\n";
+      if (debug) std::cerr << "Trotter3 Layer 2/3\n";
       U1.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
-      if (debug) std::cout << "Trotter3 Layer 3/3\n";
+      if (debug) std::cerr << "Trotter3 Layer 3/3\n";
       U2.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0, normalize);
       return 0.0;
     }
     default: {
       CMPS Pfull = *P;
       if (debug)
-        std::cout << "Trotter3 method: truncate group:\n"
+        std::cerr << "Trotter3 method: truncate group:\n"
                   << "Trotter3 Layer 1/3\n";
       U2.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
-      if (debug) std::cout << "Trotter3 Layer 2/3\n";
+      if (debug) std::cerr << "Trotter3 Layer 2/3\n";
       U1.apply(P, &sense, MPS_TRUNCATE_EPSILON, 0);
-      if (debug) std::cout << "Trotter3 Layer 3/3\n";
+      if (debug) std::cerr << "Trotter3 Layer 3/3\n";
       return U2.apply_and_simplify(P, &sense, MPS_TRUNCATE_EPSILON, Dmax,
                                    normalize);
     }

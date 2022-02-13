@@ -91,7 +91,7 @@ void test_over_H(bool test(const mps::Hamiltonian &H, double &err),
     for (unsigned model = 0; model <= TestHamiltonian::last_model(); model++) {
       for (int ti = 1; ti >= 0; ti--) {
         double err = 0.0;
-        std::cout << TestHamiltonian::model_name(model)
+        std::cerr << TestHamiltonian::model_name(model)
                   << (periodic ? ",pbc" : ",obc") << (ti ? ",t.i " : ",inh ");
         tic();
         for (unsigned nspins = 2; nspins < max_spins; nspins++) {
@@ -99,19 +99,19 @@ void test_over_H(bool test(const mps::Hamiltonian &H, double &err),
             TestHamiltonian H(model, 0.5, nspins, ti, periodic);
             double e = 0.0;
             if (test(H, e)) {
-              std::cout << '.';
+              std::cerr << '.';
             } else {
-              std::cout << '!';
+              std::cerr << '!';
             }
-            std::cout.flush();
+            std::cerr.flush();
             err = std::max(e, err);
           }
         }
-        std::cout << "\n\t\tMax. Err: " << err << ", Time: " << toc() << '\n';
+        std::cerr << "\n\t\tMax. Err: " << err << ", Time: " << toc() << '\n';
       }
     }
   }
-  std::cout << std::endl;
+  std::cerr << '\n';
 }
 
 }  // namespace tensor_test

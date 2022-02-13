@@ -284,7 +284,7 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
   index neig = std::max(index(1), neigenvalues);
   if (Q_values.size()) {
     if (smallL <= 10) {
-      //cout << "Heff=\n"; show_matrix(std::cout, kron2(Opli, elt_t::eye(j1*c1)) + kron2(elt_t::eye(a1*i1), Opjr));
+      //cout << "Heff=\n"; show_matrix(std::cerr, kron2(Opli, elt_t::eye(j1*c1)) + kron2(elt_t::eye(a1*i1), Opjr));
       elt_t Heff_full =
           simplify_operator(kron2(elt_t::eye(a1), kron2(Opij, elt_t::eye(c1))) +
                             direct_sum(Opli, Opjr));
@@ -315,13 +315,13 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
       }
       if (eigs.get_status() != eigs.Finished &&
           eigs.get_status() != eigs.TooManyIterations) {
-        std::cout << "DMRG: Diagonalization routine did not converge.\n"
+        std::cerr << "DMRG: Diagonalization routine did not converge.\n"
                   << eigs.error_message();
         error = true;
         return 0.0;
       }
       aux = eigs.get_data(&Pi);
-      //std::cout << "E4=" << aux[0] << '\n';
+      //std::cerr << "E4=" << aux[0] << '\n';
     }
   } else {
     if (smallL <= 10) {
@@ -351,7 +351,7 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
       }
       if (eigs.get_status() != eigs.Finished &&
           eigs.get_status() != eigs.TooManyIterations) {
-        std::cout << "DMRG: Diagonalization routine did not converge.\n"
+        std::cerr << "DMRG: Diagonalization routine did not converge.\n"
                   << eigs.error_message();
         error = true;
         return 0.0;
@@ -388,7 +388,7 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
 template <class MPS>
 void DMRG<MPS>::show_state_info(const MPS &P, index iter, index k,
                                 double newE) {
-  std::cout << "k=" << k << "; iteration=" << iter << "; E=" << newE
+  std::cerr << "k=" << k << "; iteration=" << iter << "; E=" << newE
             << "; E'=" << expected(P, *H_, 0);
 }
 
@@ -456,10 +456,10 @@ double DMRG<MPS>::minimize(MPS *Pptr, index Dmax, double E) {
       if (debug > 1) {
         show_state_info(P, iter, 0, newE);
       } else {
-        std::cout << "k=" << 0 << "; iteration=" << iter << "; E=" << newE
+        std::cerr << "k=" << 0 << "; iteration=" << iter << "; E=" << newE
                   << "; ";
       }
-      std::cout << "dE=" << newE - E << '\n' << std::flush;
+      std::cerr << "dE=" << newE - E << '\n' << std::flush;
     }
     /*
        * Check the convergence by seeing how much the energy changed between
@@ -468,7 +468,7 @@ double DMRG<MPS>::minimize(MPS *Pptr, index Dmax, double E) {
     if (iter) {
       if (tensor::abs(newE - E) < tolerance) {
         if (debug) {
-          std::cout << "Reached tolerance dE=" << newE - E << "<=" << tolerance
+          std::cerr << "Reached tolerance dE=" << newE - E << "<=" << tolerance
                     << '\n'
                     << std::flush;
         }
@@ -477,7 +477,7 @@ double DMRG<MPS>::minimize(MPS *Pptr, index Dmax, double E) {
       }
       if ((newE - E) > 1e-14 * tensor::abs(newE)) {
         if (debug) {
-          std::cout << "Energy does not decrease!\n" << std::flush;
+          std::cerr << "Energy does not decrease!\n" << std::flush;
         }
         if (failures >= allow_E_growth) {
           E = newE;
@@ -489,7 +489,7 @@ double DMRG<MPS>::minimize(MPS *Pptr, index Dmax, double E) {
     E = newE;
   }
   if (debug) {
-    std::cout << "Time used: " << toc() << "s\n";
+    std::cerr << "Time used: " << toc() << "s\n";
   }
   return E;
 }
@@ -725,8 +725,8 @@ void DMRG<MPS>::update_matrices_right(const MPS &P, index k) {
     prev_Q = direct_sum(elt_t(take_diag(Q_operators[n])), prev_Q);
     prev_Q = foldc(Pk, -1, scale(Pk, -1, prev_Q), -1);
     Qr_.at(n).at(k) = round(tensor::real(take_diag(prev_Q)));
-    //std::cout << "Qr_(" << n << ',' << k  << ")=\n";
-    //show_matrix(std::cout, Qr_[n][k]);
+    //std::cerr << "Qr_(" << n << ',' << k  << ")=\n";
+    //show_matrix(std::cerr, Qr_[n][k]);
   }
 }
 
@@ -758,8 +758,8 @@ void DMRG<MPS>::update_matrices_left(const MPS &P, index k) {
     prev_Q = direct_sum(prev_Q, elt_t(take_diag(Q_operators[n])));
     prev_Q = foldc(Pk, 0, scale(Pk, 0, prev_Q), 0);
     Ql_[n].at(k) = round(tensor::real(take_diag(prev_Q)));
-    //std::cout << "Ql_(" << n << ',' << k << ")=\n";
-    //show_matrix(std::cout, Ql_[n][k]);
+    //std::cerr << "Ql_(" << n << ',' << k << ")=\n";
+    //show_matrix(std::cerr, Ql_[n][k]);
   }
 }
 

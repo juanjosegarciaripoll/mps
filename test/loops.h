@@ -58,7 +58,7 @@ template <typename elt_t1, typename elt_t2>
 bool simeq(elt_t1 a, elt_t2 b, double epsilon = 2 * EPSILON) {
   double x = tensor::abs(a - b);
   if (x > epsilon) {
-    std::cout << x << std::endl;
+    std::cerr << x << '\n';
     return false;
   }
   return true;
@@ -71,7 +71,7 @@ bool simeq(const Tensor<elt_t> &a, const Tensor<elt_t> &b,
        ia != a.end(); ia++, ib++) {
     double x = tensor::abs(*ia - *ib);
     if (x > epsilon) {
-      std::cout << x << std::endl;
+      std::cerr << x << '\n';
       return false;
     }
   }
@@ -91,7 +91,7 @@ bool approx_eq(const Tensor &A, const Tensor &B, double epsilon = 2 * EPSILON) {
     if (all_equal(A.dimensions(), B.dimensions())) {
       double x = norm0(A - B);
       if (x > epsilon) {
-        std::cout << "Deviation: " << x << std::endl;
+        std::cerr << "Deviation: " << x << '\n';
         return false;
       }
       return true;

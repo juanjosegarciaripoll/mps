@@ -30,10 +30,10 @@ LinearForm<MPS>::LinearForm(const MPS &bra, const MPS &ket, int start)
       matrix_(make_matrix_array()) {
   initialize_matrices(start, ket);
   // for (int i = 0; i < ket.size(); i++)
-  //   std::cout << "\nL[" << i << "]=" << left_matrix(0,i) << std::endl
-  //             << "Q[" << i << "]=" << bra[i] << std::endl
-  //             << "P[" << i << "]=" << ket[i] << std::endl
-  //             << "R[" << i << "]=" << right_matrix(0,i) << std::endl;
+  //   std::cerr << "\nL[" << i << "]=" << left_matrix(0,i) << '\n'
+  //             << "Q[" << i << "]=" << bra[i] << '\n'
+  //             << "P[" << i << "]=" << ket[i] << '\n'
+  //             << "R[" << i << "]=" << right_matrix(0,i) << '\n';
 }
 
 template <class MPS>
@@ -81,11 +81,11 @@ template <class MPS>
 void LinearForm<MPS>::propagate_left(const tensor_t &ketP) {
   if (here() == 0) return;
   for (int i = 0; i < number_of_bras(); i++) {
-    // std::cout << "PL @ " << i << std::endl
-    //           << "Q=" << bra_[i][here()] << std::endl
-    //           << "P=" << ketP << std::endl
+    // std::cerr << "PL @ " << i << '\n'
+    //           << "Q=" << bra_[i][here()] << '\n'
+    //           << "P=" << ketP << '\n'
     //           << "R=" << right_matrix(i,here())
-    //           << std::endl;
+    //           << '\n';
     right_matrix(i, here() - 1) =
         prop_matrix(right_matrix(i, here()), -1, bra_[i][here()], ketP);
   }
@@ -96,10 +96,10 @@ template <class MPS>
 void LinearForm<MPS>::propagate_right(const tensor_t &ketP) {
   if (here() + 1 == size()) return;
   for (int i = 0; i < number_of_bras(); i++) {
-    // std::cout << "PR @ " << i << std::endl
-    //           << "L=" << left_matrix(i,here()) << std::endl
-    //           << "Q=" << bra_[i][here()] << std::endl
-    //           << "P=" << ketP << std::endl;
+    // std::cerr << "PR @ " << i << '\n'
+    //           << "L=" << left_matrix(i,here()) << '\n'
+    //           << "Q=" << bra_[i][here()] << '\n'
+    //           << "P=" << ketP << '\n';
     left_matrix(i, here() + 1) =
         prop_matrix(left_matrix(i, here()), +1, bra_[i][here()], ketP);
   }
@@ -115,9 +115,9 @@ static tensor_t compose(const tensor_t &L, const tensor_t &P,
   if (R.is_empty()) {
     return compose(L, P, tensor_t::ones(1, 1, 1, 1));
   }
-  // std::cout << " L=" << L << std::endl
-  //           << " P=" << P << std::endl
-  //           << " R=" << R << std::endl;
+  // std::cerr << " L=" << L << '\n'
+  //           << " P=" << P << '\n'
+  //           << " R=" << R << '\n';
   index a1, a2, b1, b2, a3, b3, i;
   L.get_dimensions(&a1, &b1, &a2, &b2);
   R.get_dimensions(&a3, &b3, &a1, &b1);

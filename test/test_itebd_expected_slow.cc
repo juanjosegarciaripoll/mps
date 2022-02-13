@@ -75,10 +75,10 @@ void test_small_canonical_iTEBD() {
   EXPECT_TRUE(simeq(expected12(psic, H12), bdry_exp, 2e-6));
 
   /*
-    std::cout << expected12(psi, H12) << std::endl
-	      << expected12(psic, H12) << std::endl
-	      << slow_expected12(psic, H12) << std::endl
-	      << slow_expected12(psi, H12) << std::endl;
+    std::cerr << expected12(psi, H12) << '\n'
+	      << expected12(psic, H12) << '\n'
+	      << slow_expected12(psic, H12) << '\n'
+	      << slow_expected12(psi, H12) << '\n';
     */
 
   mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_SLOW_EXPECTED);

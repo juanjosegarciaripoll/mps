@@ -28,14 +28,13 @@ const Indices Lattice::states_in_particle_range(index sites, index nmin,
     if (sites >= 32) {
       std::cerr << "In this architecture with 32-bit words, Lattice can only "
                    "handle up to 31 sites"
-                << std::endl;
+                << '\n';
       abort();
     }
   } else {
     if (sites > 34) {
       std::cerr << "In this architecture with " << sizeof(word) * 8
-                << "bit words, Lattice can only handle up to 34 sites"
-                << std::endl;
+                << "bit words, Lattice can only handle up to 34 sites" << '\n';
       abort();
     }
   }
@@ -80,9 +79,9 @@ void Lattice::bipartition(index sites_left, Indices *left_states,
   if (sites_left <= 0 || sites_right <= 0) {
     std::cerr << "In Lattice::bipartition(), the number of sites "
                  "in any bipartition cannot be less than one."
-              << std::endl
-              << "sites_left = " << sites_left << std::endl
-              << "total sites = " << size() << std::endl;
+              << '\n'
+              << "sites_left = " << sites_left << '\n'
+              << "total sites = " << size() << '\n';
     abort();
   }
 
@@ -112,7 +111,7 @@ void Lattice::bipartition(index sites_left, Indices *left_states,
     // it corresponds to the 'rows' (i.e. the first index in a tensor)
     //
     word ndx = ir + il * right_states->size();
-    // std::cout << "(w,wl,wr,ndx)=" << w << ',' << wl << ',' << wr << ',' << ndx << std::endl;
+    // std::cerr << "(w,wl,wr,ndx)=" << w << ',' << wl << ',' << wr << ',' << ndx << '\n';
     matrix_indices->at(i) = ndx;
   }
 }

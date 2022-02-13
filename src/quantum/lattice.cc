@@ -50,21 +50,19 @@ const Indices Lattice::states_with_n_particles(index sites, index filling) {
     if (sites >= 32) {
       std::cerr << "In this architecture with 32-bit words, Lattice can only "
                    "handle up to 31 sites"
-                << std::endl;
+                << '\n';
       abort();
     }
   } else {
     if (sites > 34) {
       std::cerr << "In this architecture with " << sizeof(word) * 8
-                << "bit words, Lattice can only handle up to 34 sites"
-                << std::endl;
+                << "bit words, Lattice can only handle up to 34 sites" << '\n';
       abort();
     }
   }
   if (filling > sites) {
     std::cerr << "In Lattice, the number of particles, " << filling
-              << ", exceeds the number of lattice sites, " << sites
-              << std::endl;
+              << ", exceeds the number of lattice sites, " << sites << '\n';
     abort();
   }
   word n = 0;
@@ -152,10 +150,7 @@ const RSparse Lattice::hopping_operator(index to_site, index from_site,
   hopping_inner(&values, &rows, to_site, from_site, kind);
   rows = sort_indices(rows);
   Indices cols = iota(0, rows.size() - 1);
-  if (0)
-    std::cout << cols << std::endl
-              << configurations << std::endl
-              << rows << std::endl;
+  if (0) std::cerr << cols << '\n' << configurations << '\n' << rows << '\n';
   return RSparse(rows, cols, values, rows.size(), rows.size());
 }
 

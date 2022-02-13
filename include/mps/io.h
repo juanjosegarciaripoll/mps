@@ -51,7 +51,7 @@ inline std::ostream &text_dump(std::ostream &s, const MPO<Tensor> &mpo,
       for (index j = 0; j < P.dimension(3); j++) {
         s << name << '[' << n << "](" << i << ",:,:," << j << ")=\n"
           << matrix_form(reshape(P(range(i), _, _, range(j)).copy(), r, c))
-          << std::endl;
+          << '\n';
       }
     }
   }

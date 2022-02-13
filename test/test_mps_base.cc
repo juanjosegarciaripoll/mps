@@ -449,9 +449,9 @@ void test_cluster_state(int size) {
     RTensor psi2 = mps_to_vector(apply_cluster_state_stabilizer(cluster, i));
     if (!simeq(psi, psi2)) {
       RMPS aux = apply_cluster_state_stabilizer(cluster, i);
-      std::cout << "site=" << i << std::endl;
-      std::cout << "psi2=" << psi2 << std::endl;
-      std::cout << "psi1=" << psi << std::endl;
+      std::cerr << "site=" << i << '\n';
+      std::cerr << "psi2=" << psi2 << '\n';
+      std::cerr << "psi1=" << psi << '\n';
     }
     EXPECT_CEQ(psi, psi2);
   }

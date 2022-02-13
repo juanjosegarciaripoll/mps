@@ -116,8 +116,8 @@ struct Minimizer : public MinimizerOptions {
     for (typename std::list<lform_t>::iterator it = OrthoLform.begin();
          it != OrthoLform.end(); ++it) {
       if (current_site != it->here()) {
-        std::cout << "DMRG algorithm place at " << current_site
-                  << " while projectors at " << it->here() << std::endl;
+        std::cerr << "DMRG algorithm place at " << current_site
+                  << " while projectors at " << it->here() << '\n';
         abort();
       }
       tensor_t other =
@@ -163,15 +163,15 @@ struct Minimizer : public MinimizerOptions {
           newP.size(), linalg::SmallestAlgebraic, 2, &newP, &converged);
       constrained_gap = gap = real(Egap[1] - Egap[0]);
       if (debug) {
-        std::cout << "\thalf-size gap " << constrained_gap << std::endl;
+        std::cerr << "\thalf-size gap " << constrained_gap << '\n';
       }
     }
     if (converged) {
       set_canonical(psi, site, reshape(P, d), step, false);
       propagate(psi[site], site, step);
       if (debug > 1) {
-        std::cout << "\tsite=" << site << ", E=" << real(E[0]) << ", P.d"
-                  << psi[site].dimensions() << std::endl;
+        std::cerr << "\tsite=" << site << ", E=" << real(E[0]) << ", P.d"
+                  << psi[site].dimensions() << '\n';
       }
     }
     return real(E[0]);
@@ -199,13 +199,13 @@ struct Minimizer : public MinimizerOptions {
     tensor_t E;
     if (debug > 1) {
       if (step > 0) {
-        std::cout << "\tsite=" << site
+        std::cerr << "\tsite=" << site
                   << ", dimensions=" << psi[site].dimensions() << ","
-                  << psi[site + 1].dimensions() << std::endl;
+                  << psi[site + 1].dimensions() << '\n';
       } else {
-        std::cout << "\tsite=" << site
+        std::cerr << "\tsite=" << site
                   << ", dimensions=" << psi[site - 1].dimensions() << ","
-                  << psi[site].dimensions() << std::endl;
+                  << psi[site].dimensions() << '\n';
       }
     }
     tensor_t P12 = (step > 0) ? fold(psi[site], -1, psi[site + 1], 0)
@@ -221,7 +221,7 @@ struct Minimizer : public MinimizerOptions {
                                    2, &newP12);
       constrained_gap = gap = real(Egap[1] - Egap[0]);
       if (debug) {
-        std::cout << "\thalf-size gap " << constrained_gap << std::endl;
+        std::cerr << "\thalf-size gap " << constrained_gap << '\n';
       }
     }
     if (Nqform) {
@@ -230,15 +230,15 @@ struct Minimizer : public MinimizerOptions {
         tensor_t aux = Nqform->take_two_site_matrix_diag(step);
         subspace = which(abs(aux - Nvalue) < Ntol);
         if (debug > 1) {
-          std::cout << "\tsite=" << site << ", constraints=" << subspace.size()
-                    << "/" << aux.size() << std::endl;
+          std::cerr << "\tsite=" << site << ", constraints=" << subspace.size()
+                    << "/" << aux.size() << '\n';
         }
         if (subspace.size() == 0) {
-          std::cout << "Unable to satisfy constraint " << Nvalue
-                    << " with tolerance " << Ntol << std::endl;
-          std::cout << "Values:\n" << matrix_form(aux) << std::endl;
-          std::cout << abs(aux - Nvalue) << std::endl;
-          std::cout << (abs(aux - Nvalue) < Ntol) << std::endl;
+          std::cerr << "Unable to satisfy constraint " << Nvalue
+                    << " with tolerance " << Ntol << '\n';
+          std::cerr << "Values:\n" << matrix_form(aux) << '\n';
+          std::cerr << abs(aux - Nvalue) << '\n';
+          std::cerr << (abs(aux - Nvalue) < Ntol) << '\n';
           converged = false;
           return 0.0;
         }
@@ -262,8 +262,8 @@ struct Minimizer : public MinimizerOptions {
                          &newP12, &converged);
         constrained_gap = real(Egap[1] - Egap[0]);
         if (debug) {
-          std::cout << "\tconstrained half-size gap " << constrained_gap
-                    << std::endl;
+          std::cerr << "\tconstrained half-size gap " << constrained_gap
+                    << '\n';
         }
       }
       P12.fill_with_zeros();
@@ -283,10 +283,10 @@ struct Minimizer : public MinimizerOptions {
     }
     propagate(psi[site], site, step);
     if (debug > 1) {
-      std::cout << "\tsite=" << site << ", E=" << real(E[0])
+      std::cerr << "\tsite=" << site << ", E=" << real(E[0])
                 << ", P1.d=" << psi[site].dimensions()
                 << ", P2.d=" << psi[site + step].dimensions()
-                << ", converged=" << converged << std::endl;
+                << ", converged=" << converged << '\n';
     }
     return real(E[0]);
   }
@@ -313,17 +313,17 @@ struct Minimizer : public MinimizerOptions {
     double E = 1e28;
     if (debug) {
       tic();
-      std::cout << "***\n*** Algorithm with " << size() << " sites, "
+      std::cerr << "***\n*** Algorithm with " << size() << " sites, "
                 << "two-sites = " << !single_site()
-                << (Nqform ? ", constrained" : ", unconstrained") << std::endl;
+                << (Nqform ? ", constrained" : ", unconstrained") << '\n';
     }
     for (index failures = 0, i = 0; i < sweeps; i++) {
       double newE = single_site() ? single_site_sweep() : two_site_sweep();
       if (debug) {
-        std::cout << "iteration=" << i << "; E=" << newE << "; dE=" << newE - E
+        std::cerr << "iteration=" << i << "; E=" << newE << "; dE=" << newE - E
                   << "; tol=" << tolerance
                   << (converged ? "" : "; did not converge!") << "; t=" << toc()
-                  << "s" << std::endl;
+                  << "s" << '\n';
       }
       if (!converged) {
         *psi_out = mps_t();
@@ -332,7 +332,7 @@ struct Minimizer : public MinimizerOptions {
       if (i) {
         if (tensor::abs(newE - E) < tolerance) {
           if (debug) {
-            std::cout << "Reached tolerance dE=" << newE - E
+            std::cerr << "Reached tolerance dE=" << newE - E
                       << "<=" << tolerance << '\n'
                       << std::flush;
           }
@@ -341,7 +341,7 @@ struct Minimizer : public MinimizerOptions {
         }
         if ((newE - E) > 1e-14 * tensor::abs(newE)) {
           if (debug) {
-            std::cout << "Energy does not decrease!\n" << std::flush;
+            std::cerr << "Energy does not decrease!\n" << std::flush;
           }
           if (failures >= allow_E_growth) {
             E = newE;

@@ -37,8 +37,8 @@ static CTensor ground_state(const CTensor &Heff, const CTensor &N) {
   Indices ndx = sort_indices(real(E));
   E = E(range(ndx));
   U = U(_, range(ndx));
-  std::cout << "Energy = " << E[0] << std::endl;
-  std::cout << E << std::endl;
+  std::cerr << "Energy = " << E[0] << '\n';
+  std::cerr << E << '\n';
   return reshape(U(_, range(0)).copy(), U.rows());
 }
 
@@ -47,7 +47,7 @@ ArnoldiSolver::ArnoldiSolver(const Hamiltonian &H, cdouble dt, int nvectors)
   if (max_states_ <= 0 || max_states_ >= 30) {
     std::cerr << "In ArnoldiSolver(...), the number of states exceeds the "
                  "limits [1,30]"
-              << std::endl;
+              << '\n';
     abort();
   }
 }
@@ -57,7 +57,7 @@ ArnoldiSolver::ArnoldiSolver(const CMPO &H, cdouble dt, int nvectors)
   if (max_states_ <= 0 || max_states_ >= 30) {
     std::cerr << "In ArnoldiSolver(...), the number of states exceeds the "
                  "limits [1,30]"
-              << std::endl;
+              << '\n';
     abort();
   }
 }
@@ -90,7 +90,7 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
   std::vector<cdouble> coeffs(3);
   std::vector<double> errors;
   if (debug) {
-    std::cout << "Arnoldi step\n";
+    std::cerr << "Arnoldi step\n";
   }
   for (index ndx = 1; ndx < max_states_; ndx++) {
     // TODO: why unused?
@@ -129,21 +129,21 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
          * improves stability and speed in the SVDs. */
       if (sense * mps_sense < 0) {
         if (debug) {
-          std::cout << "\tspurious canonical form\n";
+          std::cerr << "\tspurious canonical form\n";
         }
         current = canonical_form(current, mps_sense);
       }
       if (debug) {
-        std::cout << "\tndx=" << ndx << ", err=" << err
+        std::cerr << "\tndx=" << ndx << ", err=" << err
                   << ", tol=" << tolerance_ << ", sense=" << sense
                   << ", n=" << nrm;
-        if (debug >= 2) std::cout << "=" << norm2(current);
-        std::cout << std::endl;
+        if (debug >= 2) std::cerr << "=" << norm2(current);
+        std::cerr << '\n';
       }
       if (nrm < 1e-15 ||
           (tolerance_ && (nrm < tolerance_ * std::max(norm2(Hcurrent), 1.0)))) {
         if (debug) {
-          std::cout << "Arnoldi method converged before tolerance\n";
+          std::cerr << "Arnoldi method converged before tolerance\n";
         }
         N = N(range(0, ndx - 1), range(0, ndx - 1));
         Heff = Heff(range(0, ndx - 1), range(0, ndx - 1));
@@ -184,15 +184,15 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
     coef.at(0) = to_complex(1.0);
     coef = mmult(expm(idt * solve_with_svd(N, Heff)), coef);
     if (debug >= 2) {
-      std::cout << "N=" << matrix_form(tensor::abs(N)) << std::endl
-                << "H=" << matrix_form(tensor::abs(Heff)) << std::endl
+      std::cerr << "N=" << matrix_form(tensor::abs(N)) << '\n'
+                << "H=" << matrix_form(tensor::abs(Heff)) << '\n'
                 << "U=" << matrix_form(expm(idt * solve_with_svd(N, Heff)))
-                << std::endl
-                << "H/N=" << matrix_form(solve_with_svd(N, Heff)) << std::endl
-                << "v=" << matrix_form(coef) << std::endl
-                << "|v|=" << norm2(coef) << std::endl
-                << "|v|=" << scprod(coef, mmult(N, coef)) << std::endl
-                << "idt=" << idt << std::endl;
+                << '\n'
+                << "H/N=" << matrix_form(solve_with_svd(N, Heff)) << '\n'
+                << "v=" << matrix_form(coef) << '\n'
+                << "|v|=" << norm2(coef) << '\n'
+                << "|v|=" << scprod(coef, mmult(N, coef)) << '\n'
+                << "idt=" << idt << '\n';
     }
   }
 
@@ -205,13 +205,13 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
                               true, Dmax, MPS_DEFAULT_TOLERANCE);
     if (sense * mps_sense < 0) {
       if (debug) {
-        std::cout << "\tspurious canonical form\n";
+        std::cerr << "\tspurious canonical form\n";
       }
       current = canonical_form(current, mps_sense);
     }
     err += scprod(RTensor(errors), square(abs(coef)));
     if (debug) {
-      std::cout << "Arnoldi final truncation error " << err << std::endl;
+      std::cerr << "Arnoldi final truncation error " << err << '\n';
     }
     return err;
   }

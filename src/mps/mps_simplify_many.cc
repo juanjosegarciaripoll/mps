@@ -95,14 +95,14 @@ struct MPSManySimplifier {
       : nvectors(aQ.size()), Q(aQ), weights(aweights) {
     if (nvectors == 0) {
       std::cerr << "In mps::simplify(), at least one vector has to be provided."
-                << std::endl;
+                << '\n';
       abort();
     }
     L = Q[0].size();
     if (L == 1) {
       std::cerr << "The mps::simplify() function is designed to "
                    "work with states that have more than one site."
-                << std::endl;
+                << '\n';
       abort();
     }
 
@@ -126,11 +126,11 @@ struct MPSManySimplifier {
 
 #if 0
   void dump_matrices(const char *context = "foo") {
-      std::cout << context << std::endl;
+      std::cerr << context << '\n';
       for (int j = 0; j < A.size(); j++) {
         for (int i = 0; i < A[j].size(); i++) {
-          std::cout << "A[" << j << "][" << i << "] = " << A[j][i].dimensions()
-                    << std::endl;
+          std::cerr << "A[" << j << "][" << i << "] = " << A[j][i].dimensions()
+                    << '\n';
         }
       }
   }
@@ -224,7 +224,7 @@ struct MPSManySimplifier {
   void dump_state(const MPS &P) {
 #if 0
       for (int i = 0; i < P.size(); i++)
-        std::cout << "dP[" << i << "]=" << P[i].dimensions() << std::endl;
+        std::cerr << "dP[" << i << "]=" << P[i].dimensions() << '\n';
 #endif
   }
 
@@ -275,8 +275,8 @@ struct MPSManySimplifier {
     initialize_matrices(P, *sense);
 
     if (debug) {
-      std::cout << "----------\nSimplifying " << Q.size()
-                << " states with norm " << normQ2 << std::endl;
+      std::cerr << "----------\nSimplifying " << Q.size()
+                << " states with norm " << normQ2 << '\n';
     }
     double err = normQ2 * 10, scp, normP2;
     for (index sweep = 0; sweep < sweeps; sweep++) {
@@ -303,7 +303,7 @@ struct MPSManySimplifier {
       double olderr = err;
       err = tensor::abs(normQ2 + normP2 - 2 * scp);
       if (debug) {
-        std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
+        std::cerr << "error = " << err << ",\tnorm2(P)=" << normP2 << '\n';
       }
       if (tensor::abs(olderr - err) < 1e-5 * tensor::abs(normQ2) ||
           (err < tolerance * normQ2) || (err < 1e-14)) {
@@ -371,8 +371,8 @@ struct MPSManySimplifier {
     initialize_matrices(P, *sense);
 
     if (debug) {
-      std::cout << "----------\nSimplifying " << Q.size()
-                << " states with norm " << normQ2 << std::endl;
+      std::cerr << "----------\nSimplifying " << Q.size()
+                << " states with norm " << normQ2 << '\n';
     }
 
     double err = normQ2 * 10, scp, normP2;
@@ -400,7 +400,7 @@ struct MPSManySimplifier {
       double olderr = err;
       err = tensor::abs(normQ2 + normP2 - 2 * scp);
       if (debug) {
-        std::cout << "error = " << err << ",\tnorm2(P)=" << normP2 << std::endl;
+        std::cerr << "error = " << err << ",\tnorm2(P)=" << normP2 << '\n';
       }
       if (tensor::abs(olderr - err) < 1e-5 * tensor::abs(normQ2) ||
           (err < tolerance * normQ2) || (err < 1e-14)) {

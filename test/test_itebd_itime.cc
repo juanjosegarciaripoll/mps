@@ -80,9 +80,9 @@ void test_itime_ising_roman() {
   Tensor A = Tensor::random(2);
   iTEBD<Tensor> psi(A, A);
   for (int j = 0; j < 5; j++) {
-    std::cout
+    std::cerr
         << "============================================================\n"
-        << "Bfield = " << tests[j].hfield << std::endl;
+        << "Bfield = " << tests[j].hfield << '\n';
     RTensor spectrum = tests[j].spectrum;
     index max_chi = spectrum.size() + 8;
     index nsteps = 1000;
@@ -98,8 +98,8 @@ void test_itime_ising_roman() {
     index d = std::min(schmidt.size(), spectrum.size());
     Tensor v1 = schmidt(range(0, d - 1));
     Tensor v2 = spectrum(range(0, d - 1));
-    std::cout << "v1=" << v1 << std::endl << "v2=" << v2 << std::endl;
-    std::cout << "n=" << norm2(v1 - v2) << std::endl;
+    std::cerr << "v1=" << v1 << '\n' << "v2=" << v2 << '\n';
+    std::cerr << "n=" << norm2(v1 - v2) << '\n';
     EXPECT_TRUE(norm2(v1 - v2) < 5e-4);
   }
 }
@@ -109,7 +109,7 @@ void test_itime_ising() {
   index max_chi = 30;
   double tolerance = -1;
 
-  std::cout << "==============================================================="
+  std::cerr << "==============================================================="
                "=======\n"
             << "UNIFORM MAGNETIC FIELD\n\n";
   {
@@ -119,7 +119,7 @@ void test_itime_ising() {
     evolve_itime(psi, H12, 0.1, 100, tolerance, max_chi);
   }
 
-  std::cout << "==============================================================="
+  std::cerr << "==============================================================="
                "=======\n"
             << "ANTIFERROMAGNETIC ISING\n\n";
   {
@@ -129,7 +129,7 @@ void test_itime_ising() {
     evolve_itime(psi, H12, 0.1, 100, tolerance, max_chi);
   }
 
-  std::cout << "==============================================================="
+  std::cerr << "==============================================================="
                "=======\n"
             << "FERROMAGNETIC ISING\n\n";
   {
@@ -139,7 +139,7 @@ void test_itime_ising() {
     evolve_itime(psi, H12, 0.2, 100, tolerance, max_chi);
   }
 
-  std::cout << "==============================================================="
+  std::cerr << "==============================================================="
                "=======\n"
             << "FERROMAGNETIC HEISENBERG\n\n";
   {
@@ -150,7 +150,7 @@ void test_itime_ising() {
     evolve_itime(psi, H12, 0.2, 100, tolerance, max_chi);
   }
 
-  std::cout << "==============================================================="
+  std::cerr << "==============================================================="
                "=======\n"
             << "FERROMAGNETIC ISING + TRANSVERSE FIELD\n\n";
   RTensor h(linspace(0.0001, 1.2, 25));
@@ -161,19 +161,19 @@ void test_itime_ising() {
   iTEBD<Tensor> psi(A, A);
   for (size_t i = 0; i < h.size(); i++) {
     Tensor H12 = -4.0 * kron(Pauli_z, Pauli_z) + h[i] * Sx;
-    std::cout << "............................................................."
+    std::cerr << "............................................................."
                  ".........\n";
     size_t nsteps = 1000;
     for (double dt = 0.1; dt > 0.01; dt /= 2) {
       psi = evolve_itime(psi, H12, dt, nsteps, tolerance, max_chi, 20);
-      std::cout << "...\n";
+      std::cerr << "...\n";
       nsteps *= 2;
     }
     S.at(i) = real(expected(psi, Pauli_z, Pauli_z));
-    std::cout << "Sz=" << S.at(i) << std::endl;
+    std::cerr << "Sz=" << S.at(i) << '\n';
   }
-  std::cout << "h=" << h;
-  std::cout << "S=" << h;
+  std::cerr << "h=" << h;
+  std::cerr << "S=" << h;
 }
 
 ////////////////////////////////////////////////////////////

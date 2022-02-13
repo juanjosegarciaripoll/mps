@@ -55,7 +55,7 @@ void test_dmrg_gap() {
   P[0] = reshape(rgen << 1.0 << 0.0 << 0.0, 1, 3, 1);
   P[1] = reshape(rgen << 0.0 << 0.0 << 1.0, 1, 3, 1);
 
-  std::cout << "Computing energy gaps for s=1\n"
+  std::cerr << "Computing energy gaps for s=1\n"
             << "=============================\n";
 
   // Exact energies for Sz=1 subspace
@@ -88,7 +88,7 @@ void test_dmrg_gap() {
   for (int model = 0; model < 2; model++) {
     size_t Dmax = 80;
     double err = 0.0;
-    std::cout << (model ? "Heisenberg " : "AKLT       ");
+    std::cerr << (model ? "Heisenberg " : "AKLT       ");
     for (size_t L = 3; L <= 8 /*11*/; L++) {
       // 1) Create the Hamiltonian (translationally invariant, OBC)
       TIHamiltonian H(L, model ? H12 : (H12 + mmult(H12, H12) / 3.0), H1);
@@ -121,15 +121,15 @@ void test_dmrg_gap() {
                     tensor::abs(Exact(1, L - 3, model) - E1);
       err = std::max(err, diff);
       if (diff < 3e-9) {
-        std::cout << '.';
+        std::cerr << '.';
       } else {
-        std::cout << '!';
+        std::cerr << '!';
       }
-      std::cout.flush();
+      std::cerr.flush();
     }
-    std::cout << " Max. err. = " << err << std::endl;
+    std::cerr << " Max. err. = " << err << '\n';
   }
-  std::cout << std::endl;
+  std::cerr << '\n';
 }
 
 bool test_dmrg_inner(const mps::Hamiltonian &H, double &err) {
@@ -191,7 +191,7 @@ bool test_dmrg_inner(const mps::Hamiltonian &H, double &err) {
 int main(int argc, char **argv) {
   test_dmrg_gap();
 
-  std::cout << "Testing DMRG algorithm\n"
+  std::cerr << "Testing DMRG algorithm\n"
             << "======================\n";
 
   test_over_H(test_dmrg_inner, 14);

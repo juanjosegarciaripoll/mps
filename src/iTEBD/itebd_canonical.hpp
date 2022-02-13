@@ -33,7 +33,7 @@ static const Tensor ensure_3_indices(const Tensor &G) {
     G.get_dimensions(&a, &i, &j, &b);
     return reshape(G, a, i * j, b);
   } else {
-    std::cerr << "Tensor with wrong dimensions in iTEBD" << std::endl;
+    std::cerr << "Tensor with wrong dimensions in iTEBD" << '\n';
     abort();
     return Tensor();
   }

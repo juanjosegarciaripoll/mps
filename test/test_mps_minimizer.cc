@@ -67,8 +67,8 @@ void test_minimizer_model(index L) {
   // the expectation value (we are using QuadraticForm, which
   // fulfills this)
   psi = canonical_form(psi, 0);
-  //std::cout << "psi=" << mps_to_vector(psi) << std::endl;
-  //std::cout << "H=" << matrix_form(sparse_hamiltonian(H)) << std::endl;
+  //std::cerr << "psi=" << mps_to_vector(psi) << '\n';
+  //std::cerr << "H=" << matrix_form(sparse_hamiltonian(H)) << '\n';
   double expectedE = expected(psi, H, 0.0);
   EXPECT_CEQ(minE, expectedE);
 

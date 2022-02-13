@@ -143,8 +143,8 @@ double do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense,
     olderr = err;
     err = normHP + normQ2 - 2 * real(scp);
     if (debug) {
-      std::cout << "[mps::solve] sweeps=" << sweeps << ", err=" << err
-                << ", derr=" << olderr - err << std::endl;
+      std::cerr << "[mps::solve] sweeps=" << sweeps << ", err=" << err
+                << ", derr=" << olderr - err << '\n';
     }
     if (olderr) {
       if ((olderr - err) < 1e-5 * tensor::abs(olderr) || (err < tolerance)) {

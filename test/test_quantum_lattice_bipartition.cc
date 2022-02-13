@@ -49,9 +49,9 @@ void test_lattice_partition(int sites_left, int sites_right, int N,
   if (!all_equal(left_states, expected_left) ||
       !all_equal(right_states, expected_right) ||
       !all_equal(matrix_indices, expected_indices))
-    std::cout << left_states << std::endl
-              << right_states << std::endl
-              << matrix_indices << std::endl;
+    std::cerr << left_states << '\n'
+              << right_states << '\n'
+              << matrix_indices << '\n';
 }
 
 //
