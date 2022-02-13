@@ -17,8 +17,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef MPS_ALGORITHMS_LINALG_H
-#define MPS_ALGORITHMS_LINALG_H
+#ifndef MPS_ALGORITHMS_EXPECTATION_H
+#define MPS_ALGORITHMS_EXPECTATION_H
 
 #include <mps/algorithms/environments.h>
 #include <tensor/io.h>
@@ -45,11 +45,11 @@ inline tensor_scalar_t<tensor_common_t<T1, T2>> scprod(
   }
   if (direction == DIR_RIGHT) {
     for (index k = 0; k < a.ssize(); k++) {
-      env.propagate(a[k], b[k]);
+      env = env.propagate(a[k], b[k]);
     }
   } else {
     for (index k = a.ssize(); k--;) {
-      env.propagate(a[k], b[k]);
+      env = env.propagate(a[k], b[k]);
     }
   }
   return env.close();
@@ -66,9 +66,9 @@ inline tensor_scalar_t<tensor_common_t<T1, T2>> expected(
   for (index k = 0, target = a.normal_index(k1); k < a.ssize(); k++) {
     auto Pk = a[k];
     if (k == target) {
-      env.propagate(Pk, Pk, op);
+      env = env.propagate(Pk, Pk, op);
     } else {
-      env.propagate(Pk, Pk);
+      env = env.propagate(Pk, Pk);
     }
   }
   return env.close();
@@ -91,11 +91,11 @@ inline tensor_scalar_t<tensor_common_t<T1, T2>> expected(
   for (index k = 0; k < a.ssize(); k++) {
     auto Pk = a[k];
     if (k == target1) {
-      env.propagate(Pk, Pk, op1);
+      env = env.propagate(Pk, Pk, op1);
     } else if (k == target2) {
-      env.propagate(Pk, Pk, op2);
+      env = env.propagate(Pk, Pk, op2);
     } else {
-      env.propagate(Pk, Pk);
+      env = env.propagate(Pk, Pk);
     }
   }
   return env.close();
@@ -129,7 +129,7 @@ Tensor expected_vector(const MPS<Tensor> &a, const std::vector<Tensor> &op,
   {
     Environment<Tensor> left(DIR_RIGHT);
     for (index i = 1; i < L; i++) {
-      auxLeft[i] = left.propagate(a[i - 1], b[i - 1]);
+      auxLeft[i] = left = left.propagate(a[i - 1], b[i - 1]);
     }
   }
 
@@ -137,7 +137,7 @@ Tensor expected_vector(const MPS<Tensor> &a, const std::vector<Tensor> &op,
   auto output = Tensor::empty(L);
   for (index i = L; i--;) {
     output.at(i) = auxLeft[i].propagate(a[i], b[i], op[i]) * right;
-    right.propagate(a[i], b[i]);
+    right = right.propagate(a[i], b[i]);
   }
   return output;
 }
@@ -175,12 +175,12 @@ Tensor all_correlations_fast(const MPS<Tensor> &a,
   Environment<Tensor> aux(DIR_RIGHT);
   std::vector<Environment<Tensor>> auxLeft(L, aux);
   for (index i = 1; i < L; i++) {
-    auxLeft[i] = aux.propagate(a[i - 1], b[i - 1]);
+    auxLeft[i] = aux = aux.propagate(a[i - 1], b[i - 1]);
   }
   aux = Environment<Tensor>(DIR_LEFT);
   std::vector<Environment<Tensor>> auxRight(L, aux);
   for (index i = L - 1; i; --i) {
-    auxRight[i - 1] = aux.propagate(a[i], b[i]);
+    auxRight[i - 1] = aux = aux.propagate(a[i], b[i]);
   }
   Tensor output = Tensor::zeros(L, L);
   for (index i = 0; i < L; i++) {
@@ -191,14 +191,14 @@ Tensor all_correlations_fast(const MPS<Tensor> &a,
     {
       aux = auxLeft[i].propagate(a[i], b[i], op1[i]);
       for (index j = i + 1; j < L; j++) {
-        auto aux2 = aux;
-        output.at(i, j) = aux.propagate(a[j], b[j], op2[j]) * auxRight[j];
+        auto correlator = aux.propagate(a[j], b[j], op2[j]) * auxRight[j];
+        output.at(i, j) = correlator;
+        output.at(j, i) = tensor::conj(correlator);
         if (jordan_wigner_op) {
-          aux.propagate(a[j], b[j], *jordan_wigner_op);
+          aux = aux.propagate(a[j], b[j], *jordan_wigner_op);
         } else {
-          aux.propagate(a[j], b[j]);
+          aux = aux.propagate(a[j], b[j]);
         }
-        output.at(j, i) = tensor::conj(output.at(i, j));
       }
     }
   }
@@ -206,12 +206,11 @@ Tensor all_correlations_fast(const MPS<Tensor> &a,
     for (index i = 0; i < L; i++) {
       aux = auxLeft[i].propagate(a[i], b[i], op2[i]);
       for (index j = i + 1; j < L; j++) {
-        auto aux2 = aux;
-        output.at(j, i) = aux2.propagate(a[j], b[j], op1[j]) * auxRight[j];
+        output.at(j, i) = aux.propagate(a[j], b[j], op1[j]) * auxRight[j];
         if (jordan_wigner_op) {
-          aux.propagate(a[j], b[j], *jordan_wigner_op);
+          aux = aux.propagate(a[j], b[j], *jordan_wigner_op);
         } else {
-          aux.propagate(a[j], b[j]);
+          aux = aux.propagate(a[j], b[j]);
         }
       }
     }
@@ -237,4 +236,4 @@ Tensor expected(const MPS<Tensor> &a, const Tensor &op1, const Tensor &op2) {
 
 }  // namespace mps
 
-#endif  // MPS_ALGORITHMS_LINALG_H
+#endif  // MPS_ALGORITHMS_EXPECTATION_H

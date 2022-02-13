@@ -41,23 +41,28 @@ class Environment {
  public:
   typedef typename Tensor::elt_t scalar_t;
 
-  Environment(Dir direction) : direction_{direction} {}
-
-  Environment &propagate(const Tensor &bra, const Tensor &ket) {
-    if (direction_ == DIR_RIGHT) {
-      env_ = propagate_right(env_, bra, ket, nullptr);
-    } else {
-      env_ = propagate_left(env_, bra, ket, nullptr);
+  Environment(Dir direction, Tensor t = Tensor())
+      : env_{std::move(t)}, direction_{direction} {
+    if (direction != DIR_RIGHT && direction != DIR_LEFT) {
+      throw std::invalid_argument(
+          "Invalid direction supplied to Environment()");
     }
-    return *this;
   }
 
-  Environment &propagate(const Tensor &bra, const Tensor &ket,
-                         const Tensor &op) {
+  Environment propagate(const Tensor &bra, const Tensor &ket) const {
     if (direction_ == DIR_RIGHT) {
-      env_ = propagate_right(env_, bra, ket, &op);
+      return Environment(direction(), propagate_right(env_, bra, ket, nullptr));
     } else {
-      env_ = propagate_left(env_, bra, ket, &op);
+      return Environment(direction(), propagate_left(env_, bra, ket, nullptr));
+    }
+  }
+
+  Environment propagate(const Tensor &bra, const Tensor &ket,
+                        const Tensor &op) const {
+    if (direction_ == DIR_RIGHT) {
+      return Environment(direction(), propagate_right(env_, bra, ket, &op));
+    } else {
+      return Environment(direction(), propagate_left(env_, bra, ket, &op));
     }
     return *this;
   }
@@ -73,6 +78,8 @@ class Environment {
   }
 
   const Tensor &tensor() const { return env_; }
+
+  constexpr Dir direction() const { return direction_; }
 
  private:
   Tensor env_;
