@@ -18,6 +18,7 @@
 */
 
 #include <mps/mpo.h>
+#include <mps/io.h>
 
 namespace mps {
 
@@ -42,5 +43,8 @@ template void add_jordan_wigner_matrix(RMPO *mpdo, const RTensor &J,
                                        const RTensor &sign);
 
 template RMPO local_Hamiltonian_mpo(const std::vector<RTensor> &Hloc);
+
+template std::ostream &impl::text_dump(std::ostream &s, const RMPO &mpo,
+                                       const char *name);
 
 }  // namespace mps

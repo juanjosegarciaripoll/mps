@@ -33,10 +33,6 @@ target_sources(mps
     tools/propagate_mps_z.cc
     tools/truncate_rmps.cc
     tools/truncate_cmps.cc
-    tools/dump_rmps.cc
-    tools/dump_cmps.cc
-    tools/load_rmps.cc
-    tools/load_cmps.cc
     tools/sweeper.cc
     iTEBD/itebd_d.cc
     iTEBD/itebd_z.cc
@@ -89,8 +85,6 @@ target_sources(mps
     mpo/mpo_expected_z.cc
     mpo/mpo_fidelity_d.cc
     mpo/mpo_fidelity_z.cc
-    mpo/mpo_dump_d.cc
-    mpo/mpo_dump_z.cc
     mpo/mpo_adjoint_d.cc
     mpo/mpo_adjoint_z.cc
     mpo/mpo_mmult_d.cc

@@ -18,6 +18,7 @@
 */
 
 #include <mps/mpo.h>
+#include <mps/io.h>
 
 namespace mps {
 
@@ -42,5 +43,8 @@ template void add_jordan_wigner_matrix(CMPO *mpdo, const CTensor &J,
                                        const CTensor &sign);
 
 template CMPO local_Hamiltonian_mpo(const std::vector<CTensor> &Hloc);
+
+template std::ostream &impl::text_dump(std::ostream &s, const CMPO &mpo,
+                                       const char *name);
 
 }

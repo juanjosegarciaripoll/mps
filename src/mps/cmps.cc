@@ -18,5 +18,13 @@
 */
 
 #include <mps/mps.h>
+#include <mps/io.h>
 
-template class mps::MPS<tensor::CTensor>;
+namespace mps {
+
+template class MPS<CTensor>;
+
+template std::ostream &impl::text_dump(std::ostream &s, const MP<CTensor> &mpo,
+                                       const char *name);
+
+}  // namespace mps

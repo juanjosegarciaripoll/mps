@@ -18,6 +18,7 @@
 */
 
 #include <mps/mps.h>
+#include <mps/io.h>
 
 namespace mps {
 
@@ -25,4 +26,6 @@ template class MPS<RTensor>;
 
 template RTensor tensor_cast(const MP<RTensor> &mp, CTensor t);
 
-}
+template std::ostream &impl::text_dump(std::ostream &s, const MP<RTensor> &mpo,
+                                       const char *name);
+}  // namespace mps

@@ -1,4 +1,5 @@
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
+#pragma once
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
 
@@ -27,14 +28,85 @@
 
 namespace mps {
 
-std::ostream &operator<<(std::ostream &s, const RMPO &mpo);
+namespace impl {
 
-std::ostream &operator<<(std::ostream &s, const CMPO &mpo);
+template <class Tensor>
+inline std::ostream &text_dump(std::ostream &s, const MP<Tensor> &mp,
+                               const char *name) {
+  index n = 0;
+  for (const auto &P : mp) {
+    s << name << '[' << n++ << "]=" << P << '\n';
+  }
+  return s;
+}
 
-void dump(sdf::OutDataFile &d, const RMPS &mps, const std::string &name);
-void dump(sdf::OutDataFile &d, const CMPS &mps, const std::string &name);
-const RMPS load_rmps(sdf::InDataFile &d, const std::string &name);
-const CMPS load_cmps(sdf::InDataFile &d, const std::string &name);
+template <class Tensor>
+inline std::ostream &text_dump(std::ostream &s, const MPO<Tensor> &mpo,
+                               const char *name) {
+  index n = 0;
+  for (const auto &P : mpo) {
+    index r = P.dimension(1);
+    index c = P.dimension(2);
+    for (index i = 0; i < P.dimension(0); i++) {
+      for (index j = 0; j < P.dimension(3); j++) {
+        s << name << '[' << n << "](" << i << ",:,:," << j << ")=\n"
+          << matrix_form(reshape(P(range(i), _, _, range(j)).copy(), r, c))
+          << std::endl;
+      }
+    }
+  }
+  return s;
+}
+
+extern template std::ostream &text_dump(std::ostream &s, const MP<RTensor> &mpo,
+                                        const char *name);
+extern template std::ostream &text_dump(std::ostream &s, const MP<CTensor> &mpo,
+                                        const char *name);
+extern template std::ostream &text_dump(std::ostream &s,
+                                        const MPO<RTensor> &mpo,
+                                        const char *name);
+extern template std::ostream &text_dump(std::ostream &s,
+                                        const MPO<CTensor> &mpo,
+                                        const char *name);
+
+template <class Tensor>
+std::vector<Tensor> load_tensors(sdf::InDataFile &d, const std::string &name) {
+  std::vector<Tensor> aux;
+  d.load(&aux, name);
+  return aux;
+}
+
+}  // namespace impl
+
+inline std::ostream &operator<<(std::ostream &s, const RMPS &mpo) {
+  return impl::text_dump(s, mpo, "RMPS");
+}
+
+inline std::ostream &operator<<(std::ostream &s, const CMPS &mpo) {
+  return impl::text_dump(s, mpo, "CMPS");
+}
+
+inline std::ostream &operator<<(std::ostream &s, const RMPO &mpo) {
+  return impl::text_dump(s, mpo, "RMPO");
+}
+
+inline std::ostream &operator<<(std::ostream &s, const CMPO &mpo) {
+  return impl::text_dump(s, mpo, "CMPO");
+}
+
+template <class Tensor>
+inline void dump(sdf::OutDataFile &d, const MPS<Tensor> &mps,
+                 const std::string &name) {
+  d.dump(mps.to_vector(), name);
+}
+
+inline RMPS load_rmps(sdf::InDataFile &d, const std::string &name) {
+  return RMPS(impl::load_tensors<RTensor>(d, name));
+}
+
+inline CMPS load_cmps(sdf::InDataFile &d, const std::string &name) {
+  return CMPS(impl::load_tensors<CTensor>(d, name));
+}
 
 }  // namespace mps
 
