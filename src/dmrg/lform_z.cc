@@ -21,6 +21,6 @@
 
 namespace mps {
 
-template class LinearForm<CMPS>;
+template class LinearForm<CTensor>;
 
 }  // namespace mps

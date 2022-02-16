@@ -50,7 +50,7 @@ double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
   // and the relative error
   //	    err^2 = 1 - (norm(Pk)^2/normQ2)
   Sweeper s = P.sweeper(-*sense);
-  LinearForm<MPS> lf(w, Q, P, s.site());
+  LinearForm<mp_tensor_t<MPS>> lf(w, Q, P, s.site());
   double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2 = 0.0;
   if (debug) {
     std::cerr << "simplify_obc: " << (single_site ? "single_site" : "two-sites")

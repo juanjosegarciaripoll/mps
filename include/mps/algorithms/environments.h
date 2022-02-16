@@ -51,18 +51,20 @@ class Environment {
 
   Environment propagate(const Tensor &bra, const Tensor &ket) const {
     if (direction_ == DIR_RIGHT) {
-      return Environment(direction(), propagate_right(env_, bra, ket, nullptr));
+      return Environment(direction(),
+                         propagate_right(tensor(), bra, ket, nullptr));
     } else {
-      return Environment(direction(), propagate_left(env_, bra, ket, nullptr));
+      return Environment(direction(),
+                         propagate_left(tensor(), bra, ket, nullptr));
     }
   }
 
   Environment propagate(const Tensor &bra, const Tensor &ket,
                         const Tensor &op) const {
     if (direction_ == DIR_RIGHT) {
-      return Environment(direction(), propagate_right(env_, bra, ket, &op));
+      return Environment(direction(), propagate_right(tensor(), bra, ket, &op));
     } else {
-      return Environment(direction(), propagate_left(env_, bra, ket, &op));
+      return Environment(direction(), propagate_left(tensor(), bra, ket, &op));
     }
     return *this;
   }
@@ -74,12 +76,35 @@ class Environment {
       throw std::invalid_argument(
           "Incompatible directions when contracting mps::Environment's");
     }
-    return combine_environments(this->env_, other.env_);
+    return combine_environments(this->tensor(), other.tensor());
   }
 
-  const Tensor &tensor() const { return env_; }
+  Environment operator+(const Environment &other) const {
+    assert(direction() == other.direction());
+    return Environment(direction(), tensor() + other.tensor());
+  }
+
+  Environment &operator+=(const Environment &other) {
+    assert(direction() == other.direction());
+    if (this->is_empty()) {
+      env_ = other.tensor();
+    } else {
+      env_ += other.tensor();
+    }
+    return *this;
+  }
+
+  Tensor tensor() const {
+    if (this->is_empty()) {
+      return Tensor::ones(1, 1, 1, 1);
+    } else {
+      return env_;
+    }
+  }
 
   constexpr Dir direction() const { return direction_; }
+
+  bool is_empty() const { return env_.size() == 0; }
 
  private:
   Tensor env_;
@@ -104,15 +129,10 @@ class Environment {
     if (env.is_empty()) {
       return init_environment(Q, P, op);
     }
-    if (env.rank() == 2) {
-      return propagate_right(
-          reshape(env, 1, 1, env.dimension(0), env.dimension(1)), Q, P, op);
-    }
     index a1, b1, a2, b2, i2, a3, b3;
     env.get_dimensions(&a1, &b1, &a2, &b2);
     Q.get_dimensions(&a2, &i2, &a3);
     P.get_dimensions(&b2, &i2, &b3);
-
     Tensor M = op ?
                   // M(a1,b1,a2,b2) Op(j2,i2) Q'(a2,j2,a3) -> M(a1,b1,b2,i2,a3)
                    fold(env, 2, fold(*op, 0, tensor::conj(Q), 1), 1)
@@ -127,10 +147,6 @@ class Environment {
                                       const Tensor &P, const Tensor *op) {
     if (env.is_empty()) {
       return init_environment(Q, P, op);
-    }
-    if (env.rank() == 2) {
-      return propagate_left(
-          reshape(env, env.dimension(0), env.dimension(1), 1, 1), Q, P, op);
     }
     index a1, b1, a2, b2, a0, b0, i0;
     env.get_dimensions(&a1, &b1, &a2, &b2);
@@ -211,6 +227,56 @@ inline Tensor qform_matrix(const Environment<Tensor> &Lenv,
     // Q(a1,b1,a2,b2) -> Q(a1,a2,b1,b2)
     Q = reshape(permute(Q, 1, 2), a1 * a2, b1 * b2);
   }
+}
+
+template <class Tensor>
+Tensor compose(const Environment<Tensor> &Lenv, const Tensor &op,
+               const Environment<Tensor> &Renv) {
+  // std::cerr << "Compose\n"
+  //           << " L=" << L << '\n'
+  //           << " R=" << R << '\n'
+  //           << " op=" << op << '\n';
+  auto L = Lenv.tensor();
+  auto R = Renv.tensor();
+  index a1, a2, b1, b2, a3, b3;
+  // L(a1,b1,a2,b2) op(i,j) R(a3,b3,a1,b1) -> H([a2,i,a3],[b2,j,b3])
+  L.get_dimensions(&a1, &b1, &a2, &b2);
+  R.get_dimensions(&a3, &b3, &a1, &b1);
+  assert(a1 == 1 && b1 == 1);
+  // Remember that kron(A(i,j),B(k,l)) -> C([k,i],[l,j])
+  return kron(kron(reshape(R, a3, b3), op), reshape(L, a2, b2));
+}
+
+template <class Tensor>
+Tensor compose(const Environment<Tensor> &Lenv, const Tensor &op1,
+               const Tensor &op2, const Environment<Tensor> &Renv) {
+  // std::cerr << "Compose\n"
+  //           << " L=" << L << '\n'
+  //           << " R=" << R << '\n'
+  //           << " op1=" << op1 << '\n'
+  //           << " op2=" << op2 << '\n';
+  auto L = Lenv.tensor();
+  auto R = Renv.tensor();
+  index a1, a2, b1, b2, a3, b3;
+  // L(a1,b1,a2,b2) op(i,j) R(a3,b3,a1,b1) -> H([a2,i,a3],[b2,j,b3])
+  L.get_dimensions(&a1, &b1, &a2, &b2);
+  R.get_dimensions(&a3, &b3, &a1, &b1);
+  assert(a1 == 1 && b1 == 1);
+  // Remember that kron(A(i,j),B(k,l)) -> C([k,i],[l,j])
+  return kron(kron(kron(reshape(R, a3, b3), op2), op1), reshape(L, a2, b2));
+}
+
+template <class Tensor>
+Tensor apply_environments(const Environment<Tensor> &Lenv,
+                          const Environment<Tensor> &Renv, const Tensor &P) {
+  const auto &Ltensor = Lenv.tensor();
+  const auto &Rtensor = Renv.tensor();
+  index a2 = Ltensor.dimension(2);
+  index b2 = Ltensor.dimension(3);
+  index a3 = Rtensor.dimension(0);
+  index b3 = Rtensor.dimension(1);
+  return fold(fold(reshape(Ltensor, a2, b2), 1, P, 0), -1,
+              reshape(Rtensor, a3, b3), 1);
 }
 
 }  // namespace mps

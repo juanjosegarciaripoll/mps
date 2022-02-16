@@ -23,10 +23,10 @@
 
 namespace mps {
 
-template <class MPS>
-LinearForm<MPS>::LinearForm(const MPS &bra, const MPS &ket, int start)
+template <class Tensor>
+LinearForm<Tensor>::LinearForm(const mps_t &bra, const mps_t &ket, int start)
     : weight_(tensor_t::ones(igen << 1)),
-      bra_(std::vector<MPS>(1, bra)),
+      bra_(std::vector<mps_t>(1, bra)),
       matrix_(make_matrix_array()) {
   initialize_matrices(start, ket);
   // for (int i = 0; i < ket.size(); i++)
@@ -36,16 +36,16 @@ LinearForm<MPS>::LinearForm(const MPS &bra, const MPS &ket, int start)
   //             << "R[" << i << "]=" << right_matrix(0,i) << '\n';
 }
 
-template <class MPS>
-LinearForm<MPS>::LinearForm(const tensor_t &weight,
-                            const std::vector<MPS> &bras, const MPS &ket,
-                            int start)
+template <class Tensor>
+LinearForm<Tensor>::LinearForm(const tensor_t &weight,
+                               const std::vector<mps_t> &bras, const mps_t &ket,
+                               int start)
     : weight_(weight), bra_(bras), matrix_(make_matrix_array()) {
   initialize_matrices(start, ket);
 }
 
-template <class MPS>
-void LinearForm<MPS>::initialize_matrices(int start, const MPS &ket) {
+template <class Tensor>
+void LinearForm<Tensor>::initialize_matrices(int start, const mps_t &ket) {
   for (current_site_ = 0; here() < start;) {
     propagate_right(ket[here()]);
   }
@@ -54,9 +54,9 @@ void LinearForm<MPS>::initialize_matrices(int start, const MPS &ket) {
   }
 }
 
-template <class MPS>
-typename LinearForm<MPS>::matrix_database_t
-LinearForm<MPS>::make_matrix_array() {
+template <class Tensor>
+typename LinearForm<Tensor>::matrix_database_t
+LinearForm<Tensor>::make_matrix_array() {
   return matrix_database_t(number_of_bras(),
                            matrix_array_t(size() + 1, tensor_t()));
 }
@@ -69,16 +69,16 @@ static void maybe_add(tensor *a, const tensor &b) {
     *a += b;
 }
 
-template <class MPS>
-void LinearForm<MPS>::propagate(const tensor_t &ketP, int sense) {
+template <class Tensor>
+void LinearForm<Tensor>::propagate(const tensor_t &ketP, int sense) {
   if (sense > 0)
     propagate_right(ketP);
   else
     propagate_left(ketP);
 }
 
-template <class MPS>
-void LinearForm<MPS>::propagate_left(const tensor_t &ketP) {
+template <class Tensor>
+void LinearForm<Tensor>::propagate_left(const tensor_t &ketP) {
   if (here() == 0) return;
   for (int i = 0; i < number_of_bras(); i++) {
     // std::cerr << "PL @ " << i << '\n'
@@ -92,8 +92,8 @@ void LinearForm<MPS>::propagate_left(const tensor_t &ketP) {
   --current_site_;
 }
 
-template <class MPS>
-void LinearForm<MPS>::propagate_right(const tensor_t &ketP) {
+template <class Tensor>
+void LinearForm<Tensor>::propagate_right(const tensor_t &ketP) {
   if (here() + 1 == size()) return;
   for (int i = 0; i < number_of_bras(); i++) {
     // std::cerr << "PR @ " << i << '\n'
@@ -128,9 +128,9 @@ static tensor_t compose(const tensor_t &L, const tensor_t &P,
   return fold(fold(reshape(L, a2, b2), 0, P, 0), -1, reshape(R, a3, b3), 0);
 }
 
-template <class MPS>
-const typename LinearForm<MPS>::tensor_t LinearForm<MPS>::single_site_vector()
-    const {
+template <class Tensor>
+const typename LinearForm<Tensor>::tensor_t
+LinearForm<Tensor>::single_site_vector() const {
   tensor_t output;
   for (int i = 0; i < number_of_bras(); i++) {
     maybe_add(&output,
@@ -163,8 +163,8 @@ static tensor_t compose4(const tensor_t L, const tensor_t &P1,
   return fold(fold(reshape(L, a2, b2), 0, P, 0), -1, reshape(R, a4, b4), 0);
 }
 
-template <class MPS>
-const typename LinearForm<MPS>::tensor_t LinearForm<MPS>::two_site_vector(
+template <class Tensor>
+const typename LinearForm<Tensor>::tensor_t LinearForm<Tensor>::two_site_vector(
     int sense) const {
   tensor_t output;
   index i, j;
@@ -186,8 +186,8 @@ const typename LinearForm<MPS>::tensor_t LinearForm<MPS>::two_site_vector(
   return output;
 }
 
-template <class MPS>
-double LinearForm<MPS>::norm2() const {
+template <class Tensor>
+double LinearForm<Tensor>::norm2() const {
   number_t x, v = number_zero<number_t>();
   for (int i = 0; i < number_of_bras(); i++) {
     for (int j = 0; j <= i; j++) {

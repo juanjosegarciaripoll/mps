@@ -21,6 +21,6 @@
 
 namespace mps {
 
-template class LinearForm<RMPS>;
+template class LinearForm<RTensor>;
 
 }  // namespace mps

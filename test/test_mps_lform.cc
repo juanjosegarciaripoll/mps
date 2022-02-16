@@ -34,7 +34,7 @@ void test_lform_norm(MPS psi) {
   w.randomize();
   std::vector<MPS> v(1);
   v.at(0) = normal_form(psi);
-  LinearForm<MPS> f(w, v, psi, 0);
+  LinearForm<mp_tensor_t<MPS>> f(w, v, psi, 0);
   EXPECT_CEQ(f.norm2(), norm2(w));
 }
 
@@ -46,7 +46,7 @@ void test_lform_norm2(MPS psi) {
   w.randomize();
   std::vector<MPS> v(2);
   v.at(0) = v.at(1) = normal_form(psi);
-  LinearForm<MPS> f(w, v, psi, 0);
+  LinearForm<mp_tensor_t<MPS>> f(w, v, psi, 0);
   double n = sqrt(tensor::abs(sum(kron(conj(w), w))));
   EXPECT_CEQ(f.norm2(), n);
 }
@@ -58,7 +58,7 @@ template <class MPS>
 void test_lform_canonical(MPS psi) {
   for (index i = 0; i < psi.size(); i++) {
     MPS aux = canonical_form_at(psi, i);
-    LinearForm<MPS> f(aux, aux, i);
+    LinearForm<mp_tensor_t<MPS>> f(aux, aux, i);
     EXPECT_CEQ(aux[i], conj(f.single_site_vector()));
   }
 }
@@ -73,7 +73,7 @@ void test_lform_canonical2(MPS psi) {
     vs.at(0) = vs.at(1) = canonical_form_at(psi, i);
     w.at(0) = 0.13;
     w.at(1) = -1.57;
-    LinearForm<MPS> f(w, vs, vs[0], i);
+    LinearForm<mp_tensor_t<MPS>> f(w, vs, vs[0], i);
     EXPECT_CEQ((w.at(0) + w.at(1)) * vs[0][i], conj(f.single_site_vector()));
   }
 }
@@ -85,7 +85,7 @@ template <class MPS>
 void test_lform_canonical_2_sites(MPS psi) {
   for (index i = 0; i < (psi.size() - 1); i++) {
     MPS aux = canonical_form_at(psi, i);
-    LinearForm<MPS> f(aux, aux, i);
+    LinearForm<mp_tensor_t<MPS>> f(aux, aux, i);
     auto P12 = fold(aux[i], -1, aux[i + 1], 0);
     EXPECT_CEQ(P12, conj(f.two_site_vector(+1)));
   }
@@ -104,25 +104,24 @@ void try_over_states(int size) {
 //
 
 TEST(RLForm, Norm1State) {
-  test_over_integers(2, 10, try_over_states<RMPS, test_lform_norm<RMPS> >);
+  test_over_integers(2, 10, try_over_states<RMPS, test_lform_norm<RMPS>>);
 }
 
 TEST(RLForm, Norm2States) {
-  test_over_integers(2, 10, try_over_states<RMPS, test_lform_norm2<RMPS> >);
+  test_over_integers(2, 10, try_over_states<RMPS, test_lform_norm2<RMPS>>);
 }
 
 TEST(RLForm, Canonical1State) {
-  test_over_integers(2, 10, try_over_states<RMPS, test_lform_canonical<RMPS> >);
+  test_over_integers(2, 10, try_over_states<RMPS, test_lform_canonical<RMPS>>);
 }
 
 TEST(RLForm, Canonical2States) {
-  test_over_integers(2, 10,
-                     try_over_states<RMPS, test_lform_canonical2<RMPS> >);
+  test_over_integers(2, 10, try_over_states<RMPS, test_lform_canonical2<RMPS>>);
 }
 
 TEST(RLForm, Canonical1State2sites) {
-  test_over_integers(
-      2, 10, try_over_states<RMPS, test_lform_canonical_2_sites<RMPS> >);
+  test_over_integers(2, 10,
+                     try_over_states<RMPS, test_lform_canonical_2_sites<RMPS>>);
 }
 
 ////////////////////////////////////////////////////////////
@@ -130,25 +129,24 @@ TEST(RLForm, Canonical1State2sites) {
 //
 
 TEST(CLForm, Norm1State) {
-  test_over_integers(2, 10, try_over_states<CMPS, test_lform_norm<CMPS> >);
+  test_over_integers(2, 10, try_over_states<CMPS, test_lform_norm<CMPS>>);
 }
 
 TEST(CLForm, Norm2States) {
-  test_over_integers(2, 10, try_over_states<CMPS, test_lform_norm2<CMPS> >);
+  test_over_integers(2, 10, try_over_states<CMPS, test_lform_norm2<CMPS>>);
 }
 
 TEST(CLForm, Canonical1State) {
-  test_over_integers(2, 10, try_over_states<CMPS, test_lform_canonical<CMPS> >);
+  test_over_integers(2, 10, try_over_states<CMPS, test_lform_canonical<CMPS>>);
 }
 
 TEST(CLForm, Canonical2States) {
-  test_over_integers(2, 10,
-                     try_over_states<CMPS, test_lform_canonical2<CMPS> >);
+  test_over_integers(2, 10, try_over_states<CMPS, test_lform_canonical2<CMPS>>);
 }
 
 TEST(CLForm, Canonical1State2sites) {
-  test_over_integers(
-      2, 10, try_over_states<CMPS, test_lform_canonical_2_sites<CMPS> >);
+  test_over_integers(2, 10,
+                     try_over_states<CMPS, test_lform_canonical_2_sites<CMPS>>);
 }
 
 }  // namespace tensor_test

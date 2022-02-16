@@ -30,7 +30,7 @@ namespace mps {
 
 template <class Tensor>
 Tensor orthogonalize(Tensor Psi, const std::list<Tensor> &ortho) {
-  for (auto other : ortho) {
+  for (const auto &other : ortho) {
     Psi -= scprod(other, Psi) * (other);
   }
   return Psi;
@@ -73,8 +73,8 @@ struct Minimizer : public MinimizerOptions {
   typedef typename MPO::MPS mps_t;
   typedef typename mps_t::elt_t tensor_t;
   typedef typename tensor_t::elt_t number_t;
-  typedef QuadraticForm<mpo_t> qform_t;
-  typedef LinearForm<mps_t> lform_t;
+  typedef QuadraticForm<tensor_t> qform_t;
+  typedef LinearForm<tensor_t> lform_t;
   typedef std::list<tensor_t> tensor_list_t;
 
   mps_t psi;

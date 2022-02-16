@@ -24,6 +24,7 @@
 #include <list>
 #include <mps/mpo.h>
 #include <mps/hamiltonian.h>
+#include <mps/algorithms/mpo_environments.h>
 
 namespace mps {
 
@@ -35,87 +36,181 @@ namespace mps {
       are the elements of the tensors $\psi$[k] and $\phi$[k] of the MPS
       on that given site.
   */
-template <class MPO>
+template <class Tensor>
 class QuadraticForm {
  public:
-  typedef MPO mpo_t;
-  typedef typename MPO::MPS mps_t;
-  typedef typename mps_t::elt_t elt_t;
+  typedef MPO<Tensor> mpo_t;
+  typedef MPS<Tensor> mps_t;
+  typedef Tensor tensor_t;
 
   /** Initialize with the given MPO and bra and ket states. This function
 	assumes that we are inspecting site 'start', which may be at the
 	beginning or the end of the chain.*/
   QuadraticForm(const mpo_t &mpo, const mps_t &bra, const mps_t &ket,
-                int start = 0);
+                int start = 0)
+      : current_site_{0}, mpo_(mpo), envs_(mpo.size() + 1, env_t(DIR_LEFT)) {
+    initialize_environments(bra, ket, start);
+  }
   /** Update the form changing the tensors of the bra and ket states. The
 	function updates the $\psi$ and $\phi$ states in $\langle\psi|O|\phi\rangle$
 	changing the tensor of those states at the site here(), and moving to
-	the next site, here()+1.*/
-  void propagate_right(const elt_t &braP, const elt_t &ketP);
-  /** Update the form changing the tensors of the bra and ket states. The
-	function updates the $\psi$ and $\phi$ states in $\langle\psi|O|\phi\rangle$
-	changing the tensor of those states at the site here(), and moving to
-	the next site, here()-1.*/
-  void propagate_left(const elt_t &braP, const elt_t &ketP);
-  /** Implement propagate_right (sense>0) or propagate_left (sense<0). */
-  void propagate(const elt_t &braP, const elt_t &ketP, int sense);
+	the next site, here()+/-1 depending on the direction.*/
+  void propagate(const tensor_t &braP, const tensor_t &ketP, Dir sense) {
+    if (sense == DIR_RIGHT) {
+      propagate_right(braP, ketP);
+    } else if (sense == DIR_LEFT) {
+      propagate_left(braP, ketP);
+    } else {
+      throw std::invalid_argument(
+          "QuadraticForm(), received an invalid direction");
+    }
+  }
   /** The site at which the quadratic form is defined. */
-  int here() const { return current_site_; }
+  index here() const { return current_site_; }
   /** Number of sites in the lattice. */
-  index size() const { return size_; }
+  index ssize() const { return mpo_.ssize(); }
+  /** Number of sites in the lattice. */
+  size_t size() const { return mpo_.size(); }
   /** Last site in the lattice. */
-  index last_site() const { return size_ - 1; }
+  index last_site() const { return size() - 1; }
 
   /** Matrix representation of the quadratic form with respect to site here().*/
-  elt_t single_site_matrix() const;
+  tensor_t single_site_matrix() const {
+    index n = here();
+    return compose(left_environment(n), mpo_[n], right_environment(n));
+  }
+
   /** Matrix representation of the quadratic form with respect to 
      * sites here() and here()+1.*/
-  elt_t two_site_matrix(int sense = +1) const;
+  tensor_t two_site_matrix(mps::Dir sense) const {
+    index i, j;
+    get_index_pair(sense, i, j);
+    return compose(left_environment(i), mpo_[i], mpo_[j], right_environment(j));
+  }
+
   /** Apply the two_site_matrix() onto a tensor representing one site. */
-  elt_t apply_one_site_matrix(const elt_t &P) const;
+  linalg::LinearMap<Tensor> single_site_map() const {
+    index n = here();
+    return single_site_linear_map(left_environment(n), mpo_[n],
+                                  right_environment(n));
+  }
+
   /** Apply the two_site_matrix() onto a tensor representing two sites. */
-  elt_t apply_two_site_matrix(const elt_t &P12, int sense = +1) const;
-  /** Efficiently take the diagonal part of the single_site_matrix(). */
-  elt_t take_single_site_matrix_diag() const;
-  /** Efficiently take the diagonal part of the two_site_matrix(). */
-  elt_t take_two_site_matrix_diag(int sense = +1) const;
+  linalg::LinearMap<Tensor> two_site_map(int sense = +1) const {
+    index i, j;
+    get_index_pair(sense, i, j);
+    return two_site_linear_map(left_environment(i), mpo_[i], mpo_[j],
+                               right_environment(j));
+  }
+
+  Tensor apply_one_site_matrix(const Tensor &P) const {
+    return single_site_map()(P);
+  }
+
+  Tensor apply_two_site_matrix(const Tensor &P, Dir direction) const {
+    return two_site_map(direction)(P);
+  }
+
+  Tensor take_two_site_matrix_diag(mps::Dir sense) const {
+    Tensor output;
+    index i, j;
+    get_index_pair(sense, i, j);
+    const auto &Lenv = left_environment(i);
+    const auto &Renv = right_environment(j);
+    for (const auto &op1 : mpo_[i]) {
+      for (const auto &op2 : mpo_[j]) {
+        if (op1.right_index == op2.left_index) {
+          // L(a1,b1,a2,b2)
+          const auto &L = Lenv[op1.left_index].tensor();
+          // R(a3,b3,a1,b1)
+          const auto &R = Renv[op2.right_index].tensor();
+          if (!L.is_empty() && !R.is_empty()) {
+            index a2 = L.dimension(2);
+            index b2 = L.dimension(3);
+            index a3 = R.dimension(0);
+            index b3 = R.dimension(1);
+            // We implement this
+            // Q12(a2,i,j,a3) = L(a1,a1,a2,a2) O1(i,i) O2(j,j) R(a3,a3,a1,a1)
+            // where a1 = 1, because of periodic boundary conditions
+            Tensor Q12 = kron2(
+                kron2(take_diag(reshape(L, a2, b2)), take_diag(op1.matrix)),
+                kron2(take_diag(op2.matrix), take_diag(reshape(R, a3, b3))));
+            output = maybe_add(output, Q12);
+          }
+        }
+      }
+    }
+    return output;
+  }
 
  private:
-  struct Pair {
-    int left_ndx, right_ndx;  // inner dimensions in the MPO
-    elt_t op;                 // operator
+  typedef MPOEnvironment<Tensor> env_t;
+  typedef std::vector<MPOEnvironment<Tensor>> env_list_t;
+  typedef SparseMPO<Tensor> sparse_mpo_t;
 
-    Pair(int i, int j, const elt_t &tensor)
-        : left_ndx(i),
-          right_ndx(j),
-          op(reshape(tensor(range(i), _, _, range(j)).copy(),
-                     tensor.dimension(1), tensor.dimension(2))) {}
+  index current_site_;
+  sparse_mpo_t mpo_;
+  env_list_t envs_;
 
-    bool is_empty() const { return norm2(op) == 0; }
-  };
+  env_t &left_environment(index site) { return envs_[site]; }
+  env_t &right_environment(index site) { return envs_[site + 1]; }
 
-  typedef typename std::vector<elt_t> matrix_array_t;
-  typedef typename std::vector<matrix_array_t> matrix_database_t;
-  typedef typename std::list<Pair> pair_list_t;
-  typedef typename std::vector<pair_list_t> pair_tree_t;
-  typedef typename pair_list_t::const_iterator pair_iterator_t;
+  const env_t &left_environment(index site) const { return envs_[site]; }
+  const env_t &right_environment(index site) const { return envs_[site + 1]; }
 
-  int current_site_, size_;
-  matrix_database_t matrix_;
-  pair_tree_t pairs_;
-
-  elt_t &left_matrix(index site, int n) { return matrix_[site][n]; }
-  elt_t &right_matrix(index site, int n) { return matrix_[site + 1][n]; }
-  const elt_t &left_matrix(index site, int n) const { return matrix_[site][n]; }
-  const elt_t &right_matrix(index site, int n) const {
-    return matrix_[site + 1][n];
+  void get_index_pair(Dir sense, index &i, index &j) const {
+    index n = here();
+    if (sense == DIR_RIGHT) {
+      if (n == last_site()) {
+        throw std::out_of_range(
+            "Out of range index in QuadraticForm::two_site_matrix");
+      }
+      i = n;
+      j = n + 1;
+    } else if (sense == DIR_LEFT) {
+      if (n == 0) {
+        throw std::out_of_range(
+            "Out of range index in QuadraticForm::two_site_matrix");
+      }
+      i = n - 1;
+      j = n;
+    } else {
+      throw std::invalid_argument("Not a valid direction (Dir type)");
+    }
   }
-  matrix_array_t &left_matrices(index site) { return matrix_[site]; }
-  matrix_array_t &right_matrices(index site) { return matrix_[site + 1]; }
-  void dump_matrices();
 
-  static matrix_database_t make_matrix_database(const mpo_t &mpo);
-  static pair_tree_t make_pairs(const mpo_t &mpo);
+  void initialize_environments(const mps_t &bra, const mps_t &ket, int start) {
+    if (bra.size() != size() || ket.size() != size()) {
+      throw std::invalid_argument("Wrong sizes of MPS in QForm");
+    }
+    // Prepare the right matrices from site start to size()-1 to 0
+    current_site_ = last_site();
+    right_environment(current_site_) = env_t(DIR_LEFT);
+    while (here() > start) {
+      propagate_left(bra[here()], ket[here()]);
+    }
+    current_site_ = 0;
+    left_environment(current_site_) = env_t(DIR_RIGHT);
+    while (here() != start) {
+      propagate_right(bra[here()], ket[here()]);
+    }
+  }
+
+  void propagate_left(const tensor_t &bra, const tensor_t &ket) {
+    if (here() > 0) {
+      right_environment(here() - 1) =
+          right_environment(here()).propagate(bra, ket, mpo_[here()]);
+      --current_site_;
+    }
+  }
+
+  void propagate_right(const tensor_t &bra, const tensor_t &ket) {
+    if (here() < last_site()) {
+      left_environment(here() + 1) =
+          left_environment(here()).propagate(bra, ket, mpo_[here()]);
+      ++current_site_;
+    }
+  }
 };
 
 extern template class QuadraticForm<RMPO>;

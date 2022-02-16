@@ -30,39 +30,33 @@
 
 namespace mps {
 
-template <class QuadraticForm>
-auto apply(const typename QuadraticForm::elt_t &x, QuadraticForm &qf,
-           int sense) {
-  return qf.apply_two_site_matrix(x, sense);
-}
-
 /*
    * We solve the problem
    *	H * P = Q
    * by minimizing
    *	|H*P - Q|^2 = <P|H^+ H|P> + <Q|Q> - 2 * Re<Q|H^+ |P>
    */
-template <class MPO, class MPS>
-double do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense,
-                index sweeps, bool normalize, index Dmax, double tol) {
+template <class Tensor>
+double do_solve(const MPO<Tensor> &H, MPS<Tensor> *ptrP, const MPS<Tensor> &oQ,
+                int *sense, index sweeps, bool normalize, index Dmax,
+                double tol) {
   bool single_site =
       FLAGS.get(MPS_SOLVE_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM;
   double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
   bool debug = FLAGS.get(MPS_DEBUG_SOLVE);
-  typedef typename MPS::elt_t Tensor;
 
   if (tol <= 0) {
     tol = mps::FLAGS.get(MPS_SOLVE_TOLERANCE);
   }
 
   // We set Q in canonical form to "stabilize" all the transfer matrices.
-  MPS Q = canonical_form(oQ, -1);
+  auto Q = canonical_form(oQ, -1);
 
   // We need an initial state. We assume that if P is an empty matrix product state
   // we can start directly with 'Q'. Note that in this single-site algorithm that
   // leads to poor results.
   assert(ptrP);
-  MPS &P = *ptrP;
+  auto &P = *ptrP;
   if (!P.size()) P = Q;
 
   // 'sense' can be nullptr.
@@ -83,10 +77,10 @@ double do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense,
   Sweeper s = P.sweeper(-*sense);
 
   // LinearForm object implementing <Q|H|P>
-  LinearForm<MPS> lf(canonical_form(apply(H, Q), -1), P, s.site());
+  LinearForm<Tensor> lf(canonical_form(apply(H, Q), -1), P, s.site());
 
   // QuadraticForm object implementing <P|H^2|P>
-  QuadraticForm<MPO> qf(mmult(adjoint(H), H), P, P, s.site());
+  QuadraticForm<Tensor> qf(mmult(adjoint(H), H), P, P, s.site());
 
   Tensor Heff, vHQ, vP;
   while (sweeps--) {
@@ -121,11 +115,8 @@ double do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense,
         } else {
           vP = fold(P[s.site() - 1], -1, P[s.site()], 0);
         }
-        vP = linalg::cgs(
-            [&](const Tensor &v) -> Tensor {
-              return apply<QuadraticForm<MPO>>(v, qf, s.sense());
-            },
-            vHQ, &vP, 2 * vHQ.size(), tol);
+        vP = linalg::cgs(qf.two_site_map(s.sense()), vHQ, &vP, 2 * vHQ.size(),
+                         tol);
         set_canonical_2_sites(P, vP, s.site(), s.sense(), Dmax, tol);
 
         // Update quadratic and linear form with the new site
@@ -135,7 +126,7 @@ double do_solve(const MPO &H, MPS *ptrP, const MPS &oQ, int *sense,
         --s;
       } while (!s.is_last());
       s.flip();
-      normHP = real(scprod(vP, qf.apply_two_site_matrix(vP, s.sense())));
+      normHP = real(scprod(vP, qf.two_site_map(s.sense())(vP)));
     }
 
     // Compute stop criteria.

@@ -17,10 +17,12 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "qform.cc"
+#include <mps/algorithms/mpo_environments.h>
+#include <mps/qform.h>
 
 namespace mps {
 
-template class QuadraticForm<RMPO>;
+template class MPOEnvironment<RTensor>;
+template class QuadraticForm<RTensor>;
 
 }  // namespace mps

@@ -32,16 +32,16 @@ namespace mps {
       as a linear form $w^{T} v$, where $w$ and $v$ are the k-th
       elements of MPS associated to $\sum_ic_i\psi$ and $\phi$[k].
   */
-template <class MPS>
+template <class Tensor>
 class LinearForm {
  public:
-  typedef MPS mps_t;
-  typedef typename MPS::elt_t tensor_t;
-  typedef typename tensor_t::elt_t number_t;
+  typedef MPS<Tensor> mps_t;
+  typedef Tensor tensor_t;
+  typedef tensor_scalar_t<Tensor> number_t;
 
-  LinearForm(const MPS &bra, const MPS &ket, int start = 0);
-  LinearForm(const tensor_t &weights, const std::vector<MPS> &bra,
-             const MPS &ket, int start = 0);
+  LinearForm(const mps_t &bra, const mps_t &ket, int start = 0);
+  LinearForm(const tensor_t &weights, const std::vector<mps_t> &bra,
+             const mps_t &ket, int start = 0);
 
   /** Update the linear form, with a new value of the state it is applied on. */
   void propagate_right(const tensor_t &ketP);
@@ -71,7 +71,7 @@ class LinearForm {
   typedef typename std::vector<matrix_array_t> matrix_database_t;
 
   const tensor_t weight_;
-  const std::vector<MPS> bra_;
+  const std::vector<mps_t> bra_;
   index size_, current_site_;
   matrix_database_t matrix_;
 
@@ -84,15 +84,15 @@ class LinearForm {
     return matrix_[i][site + 1];
   }
 
-  void initialize_matrices(int start, const MPS &ket);
+  void initialize_matrices(int start, const mps_t &ket);
   matrix_database_t make_matrix_array();
 };
 
-extern template class LinearForm<RMPS>;
-typedef LinearForm<RMPS> RLForm;
+extern template class LinearForm<RTensor>;
+typedef LinearForm<RTensor> RLForm;
 
-extern template class LinearForm<CMPS>;
-typedef LinearForm<CMPS> CLForm;
+extern template class LinearForm<CTensor>;
+typedef LinearForm<CTensor> CLForm;
 
 }  // namespace mps
 
