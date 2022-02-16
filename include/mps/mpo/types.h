@@ -21,6 +21,8 @@
 #ifndef MPS_MPO_TYPES_H
 #define MPS_MPO_TYPES_H
 
+#include <mps/hamiltonian.h>
+
 namespace mps {
 
 /*!\addtogroup TheMPS*/
@@ -83,6 +85,11 @@ class MPO : public MP<Tensor> {
       this->at(i) = P;
     }
   }
+};
+
+template <typename T>
+struct mp_tensor_t_inner<MPO<T>> {
+  typedef T type;
 };
 
 extern template class MPO<RTensor>;
