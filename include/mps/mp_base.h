@@ -29,11 +29,6 @@ namespace mps {
 
 using namespace tensor;
 
-template <class sequence>
-index ssize(const sequence &s) {
-  return static_cast<index>(s.size());
-}
-
 class Sweeper {
  public:
   Sweeper(index L, index sense);
