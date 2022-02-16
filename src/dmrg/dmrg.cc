@@ -721,7 +721,7 @@ void DMRG<MPS>::update_matrices_right(const MPS &P, index k) {
   // Conserved quantities:
   index n_Q = Q_values.size();
   for (index n = 0; n < n_Q; n++) {
-    elt_t prev_Q = (k + 1 < size()) ? Qr_[n][k + 1] : elt_t::zeros(1);
+    elt_t prev_Q = (k + 1 < size()) ? Qr_[n][k + 1] : elt_t::zeros(1, 1);
     prev_Q = direct_sum(elt_t(take_diag(Q_operators[n])), prev_Q);
     prev_Q = foldc(Pk, -1, scale(Pk, -1, prev_Q), -1);
     Qr_.at(n).at(k) = round(tensor::real(take_diag(prev_Q)));
@@ -754,7 +754,7 @@ void DMRG<MPS>::update_matrices_left(const MPS &P, index k) {
 
   // Conserved quantities:
   for (index n = 0; n < ssize(Q_values); n++) {
-    elt_t prev_Q = (k > 0) ? Ql_[n][k - 1] : elt_t::zeros(1);
+    elt_t prev_Q = (k > 0) ? Ql_[n][k - 1] : elt_t::zeros(1, 1);
     prev_Q = direct_sum(prev_Q, elt_t(take_diag(Q_operators[n])));
     prev_Q = foldc(Pk, 0, scale(Pk, 0, prev_Q), 0);
     Ql_[n].at(k) = round(tensor::real(take_diag(prev_Q)));

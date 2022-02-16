@@ -86,7 +86,7 @@ Lattice::Lattice(index sites, index N)
 void Lattice::hopping_inner(RTensor *values, Indices *ndx, index to_site,
                             index from_site, particle_kind_t kind) const {
   word L = configurations.size();
-  *values = RTensor::zeros(igen << L);
+  *values = RTensor::zeros(L);
 
   word from_mask = (word)1 << from_site;
   word to_mask = (word)1 << to_site;

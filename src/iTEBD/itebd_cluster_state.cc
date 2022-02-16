@@ -23,10 +23,10 @@ namespace mps {
 
 const RiTEBD infinite_cluster_state() {
   double v = 1.0 / sqrt(2.0);
-  RTensor A = RTensor::zeros(igen << 2 << 2 << 2);
+  RTensor A = RTensor::zeros(2, 2, 2);
   A.at(0, 0, 0) = A.at(0, 0, 1) = A.at(0, 1, 0) = v;
   A.at(1, 1, 1) = -(v);
-  RTensor lA = RTensor::ones(igen << 2);
+  RTensor lA = RTensor::ones(2);
   return RiTEBD(A, lA, A, lA);
 }
 

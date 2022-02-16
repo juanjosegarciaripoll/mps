@@ -101,7 +101,7 @@ CTensor arnoldi_expm(const Ham &H, const Tensor &psi, cdouble idt,
   //    compute the exponential and finally move on to the original basis and build
   //    the approximate vector.
   //
-  CTensor coef = CTensor::zeros(igen << Heff.rows());
+  CTensor coef = CTensor::zeros(Heff.rows());
   coef.at(0) = to_complex(1.0);
   coef = mmult(expm(idt * solve_with_svd(N, Heff)), coef);
   //

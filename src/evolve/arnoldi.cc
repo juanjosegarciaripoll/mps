@@ -179,7 +179,7 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
   if (abs(time_step()) == 0) {
     coef = ground_state(Heff, N);
   } else {
-    coef = CTensor::zeros(igen << Heff.rows());
+    coef = CTensor::zeros(Heff.rows());
     cdouble idt = to_complex(0, -1) * time_step();
     coef.at(0) = to_complex(1.0);
     coef = mmult(expm(idt * solve_with_svd(N, Heff)), coef);
