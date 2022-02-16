@@ -38,36 +38,40 @@ const Indices Lattice::states_in_particle_range(index sites, index nmin,
       abort();
     }
   }
-  word n = 0;
-  for (word c = 0, l = (word)1 << sites; c < l; c++) {
-    index b = count_bits(c);
-    if (b >= nmin && b <= nmax) n++;
+  word problem_size = 0;
+  const word end = word(1) << sites;
+  for (word configuration = 0; configuration < end; ++configuration) {
+    const index particles = count_bits(configuration);
+    if (particles >= nmin && particles <= nmax) {
+      ++problem_size;
+    }
   }
-  Indices output(n);
-  n = 0;
-  for (word c = 0, l = (word)1 << sites; c < l; c++) {
-    index b = count_bits(c);
-    if (b >= nmin && b <= nmax) output.at(n++) = c;
+  Indices output(problem_size);
+  for (word n = 0, configuration = 0; configuration < end; ++configuration) {
+    const index particles = count_bits(configuration);
+    if (particles >= nmin && particles <= nmax) {
+      output.at(n++) = configuration;
+    }
   }
   return output;
 }
 
 static Lattice::word find_configuration(Lattice::word w,
                                         const Indices &configurations) {
-  Indices::const_iterator it = configurations.begin();
   Lattice::word j = configurations.size() - 1;
   Lattice::word i = 0;
-  if (w == it[i]) return i;
-  if (w == it[j]) return j;
+  if (w == configurations[i]) return i;
+  if (w == configurations[j]) return j;
   while (i != j) {
     Lattice::word k = (i + j) / 2;
-    Lattice::word neww = it[k];
-    if (neww > w)
+    Lattice::word neww = configurations[k];
+    if (neww > w) {
       j = k;
-    else if (neww == w)
+    } else if (neww == w) {
       return k;
-    else
+    } else {
       i = k;
+    }
   }
   return i;
 }

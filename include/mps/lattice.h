@@ -27,6 +27,7 @@ namespace mps {
 
 using namespace tensor;
 using linalg::EigType;
+using linalg::LinearMap;
 
 /** Class representing fermionic or hard-core-bosons particles hopping in a
    * finite lattice. The lattice constructs operators representing the motion of
@@ -47,6 +48,9 @@ class Lattice {
   /** Construct the internal representation for a lattice with N particles in
         those 'sites'*/
   Lattice(index sites, index N);
+
+  /** Maximum number of sites that a lattice can have */
+  static constexpr index max_sites() { return (sizeof(word) == 4) ? 31 : 34; }
 
   /** Hopping operator for a particle between two sites. Returns the
         equivalent of \$a^\dagger_{to}a_{from}\$. */
@@ -89,19 +93,61 @@ class Lattice {
   /** Dimensionality of the constrained Hilbert space. */
   index dimension() const;
 
-  RTensor apply(const RTensor &psi, const RTensor &J, const RTensor &U,
-                particle_kind_t kind = FERMIONS) const;
-  CTensor apply(const CTensor &psi, const CTensor &J, const CTensor &U,
-                particle_kind_t kind = FERMIONS) const;
+  template <class Tensor>
+  Tensor apply(const Tensor &psi, const Tensor &J, const Tensor &U,
+               particle_kind_t kind = FERMIONS) const {
+    if (psi.rank() > 1) {
+      index M = psi.dimension(0);
+      index L = psi.size() / M;
+      Tensor output = reshape(psi, M, L);
+      for (index i = 0; i < L; ++i) {
+        output.at(_, range(i)) = apply(Tensor(output(_, range(i))), J, U, kind);
+      }
+      return reshape(output, psi.dimensions());
+    } else {
+      Tensor output = Tensor::zeros(psi.dimensions());
+      RTensor values;
+      Indices ndx;
+      for (index i = 0; i < J.rows(); ++i) {
+        for (index j = 0; j < J.columns(); ++j) {
+          if (abs(J(i, j))) {
+            /* TODO: Avoid sort_indices() by doing the adjoint of the hopping */
+            hopping_inner(&values, &ndx, i, j, kind);
+            output += J(i, j) * values * psi(range(sort_indices(ndx)));
+          }
+          if (j >= i && abs(U(i, j))) {
+            values = interaction_inner(i, j);
+            output += (U(i, j) + U(j, i)) * values * psi;
+          }
+        }
+      }
+      return output;
+    }
+  }
+
+  template <class Tensor>
+  LinearMap<Tensor> map(const Tensor &J, const Tensor &U,
+                        particle_kind_t kind = FERMIONS) const {
+    return [J, U, L = *this, kind](const Tensor &psi) {
+      return L.apply(psi, J, U, kind);
+    };
+  }
 
   RTensor eigs(const RTensor &J, const RTensor &U, EigType eig_type,
                size_t neig, RTensor *vectors = nullptr,
                bool *converged = nullptr,
-               particle_kind_t kind = FERMIONS) const;
+               particle_kind_t kind = FERMIONS) const {
+    return linalg::eigs(this->map(J, U, kind), dimension(), eig_type, neig,
+                        vectors, converged);
+  }
+
   CTensor eigs(const CTensor &J, const CTensor &U, EigType eig_type,
                size_t neig, CTensor *vectors = nullptr,
                bool *converged = nullptr,
-               particle_kind_t kind = FERMIONS) const;
+               particle_kind_t kind = FERMIONS) const {
+    return linalg::eigs(this->map(J, U, kind), dimension(), eig_type, neig,
+                        vectors, converged);
+  }
 
   void hopping_inner(RTensor *values, Indices *ndx, index to_site,
                      index from_site, particle_kind_t kind) const;

@@ -9,8 +9,6 @@ target_sources(mps
     quantum/sparse_1d_hamiltonian_many_d.cc
     quantum/sparse_1d_hamiltonian_many_z.cc
     quantum/lattice.cc
-    quantum/lattice_apply_d.cc
-    quantum/lattice_apply_z.cc
     quantum/lattice_bipartition.cc
     hamiltonian/hamiltonian.cc
     hamiltonian/hamiltonian_expected_d.cc

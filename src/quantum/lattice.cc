@@ -22,6 +22,7 @@
 
 namespace mps {
 
+/* Number of nonzero bits in a word */
 static const index byte[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4,
     2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
@@ -46,33 +47,29 @@ index Lattice::count_bits(Lattice::word w) {
 }
 
 const Indices Lattice::states_with_n_particles(index sites, index filling) {
-  if (sizeof(word) == 4) {
-    if (sites >= 32) {
-      std::cerr << "In this architecture with 32-bit words, Lattice can only "
-                   "handle up to 31 sites"
-                << '\n';
-      abort();
-    }
-  } else {
-    if (sites > 34) {
-      std::cerr << "In this architecture with " << sizeof(word) * 8
-                << "bit words, Lattice can only handle up to 34 sites" << '\n';
-      abort();
-    }
+  if (sites >= max_sites()) {
+    throw std::invalid_argument(
+        "Number of sites exceeds what Lattice supports in this architecture");
+  }
+  if (sites <= 0 || filling < 0) {
+    throw std::invalid_argument("Negative number of sistes or filling");
   }
   if (filling > sites) {
-    std::cerr << "In Lattice, the number of particles, " << filling
-              << ", exceeds the number of lattice sites, " << sites << '\n';
-    abort();
+    throw std::invalid_argument(
+        "In Lattice, number of particles exceeds number of sites");
   }
-  word n = 0;
-  for (word c = 0, l = (word)1 << sites; c < l; c++) {
-    if (count_bits(c) == filling) n++;
+  word problem_size = 0;
+  word end = word(1) << sites;
+  for (word configuration = 0; configuration < end; ++configuration) {
+    if (count_bits(configuration) == filling) {
+      ++problem_size;
+    }
   }
-  Indices output(n);
-  n = 0;
-  for (word c = 0, l = (word)1 << sites; c < l; c++) {
-    if (count_bits(c) == filling) output.at(n++) = c;
+  Indices output(problem_size);
+  for (word n = 0, configuration = 0; configuration < end; ++configuration) {
+    if (count_bits(configuration) == filling) {
+      output.at(n++) = configuration;
+    }
   }
   return output;
 }
@@ -150,7 +147,6 @@ const RSparse Lattice::hopping_operator(index to_site, index from_site,
   hopping_inner(&values, &rows, to_site, from_site, kind);
   rows = sort_indices(rows);
   Indices cols = iota(0, rows.size() - 1);
-  if (0) std::cerr << cols << '\n' << configurations << '\n' << rows << '\n';
   return RSparse(rows, cols, values, rows.size(), rows.size());
 }
 
@@ -182,11 +178,11 @@ const RTensor Lattice::interaction_inner(index site1, index site2) const {
 }
 
 template <class Sparse>
-void maybe_add(Sparse *H, const Sparse &Op) {
-  if (H->rows())
-    *H = *H + Op;
+static Sparse maybe_add(const Sparse &H, Sparse &&Op) {
+  if (H.rows())
+    return H + Op;
   else
-    *H = Op;
+    return std::move(Op);
 }
 
 const RSparse Lattice::Hamiltonian(const RTensor &J, const RTensor &U,
@@ -196,11 +192,11 @@ const RSparse Lattice::Hamiltonian(const RTensor &J, const RTensor &U,
     for (index j = 0; j < J.columns(); j++) {
       double Jij = J(i, j) - (i == j) * mu;
       if (Jij) {
-        maybe_add<RSparse>(&H, Jij * hopping_operator(i, j, kind));
+        maybe_add<RSparse>(H, Jij * hopping_operator(i, j, kind));
       }
       double Uij = U(i, j);
       if (Uij) {
-        maybe_add<RSparse>(&H, Uij * interaction_operator(i, j));
+        maybe_add<RSparse>(H, Uij * interaction_operator(i, j));
       }
     }
   }
@@ -214,11 +210,11 @@ const CSparse Lattice::Hamiltonian(const CTensor &J, const CTensor &U,
     for (index j = 0; j < J.columns(); j++) {
       cdouble Jij = J(i, j) - (i == j) * mu;
       if (real(Jij) || imag(Jij)) {
-        maybe_add<CSparse>(&H, Jij * hopping_operator(i, j, kind));
+        H = maybe_add<CSparse>(H, Jij * hopping_operator(i, j, kind));
       }
       cdouble Uij = U(i, j);
       if (abs(Uij)) {
-        maybe_add<CSparse>(&H, Uij * interaction_operator(i, j));
+        H = maybe_add<CSparse>(H, Uij * interaction_operator(i, j));
       }
     }
   }
