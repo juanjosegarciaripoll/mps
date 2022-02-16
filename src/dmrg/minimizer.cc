@@ -40,7 +40,7 @@ template <class Tensor, class QForm>
 Tensor apply_qform1(const Tensor &P, const Indices &d, const QForm &qform,
                     const std::list<Tensor> &ortho) {
   Tensor v = orthogonalize(reshape(P, d), ortho);
-  v = qform.apply_one_site_matrix(v);
+  v = qform.apply_single_site_matrix(v);
   return reshape(orthogonalize(v, ortho), P.size());
 }
 

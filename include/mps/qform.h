@@ -96,25 +96,25 @@ class QuadraticForm {
   }
 
   /** Apply the two_site_matrix() onto a tensor representing two sites. */
-  linalg::LinearMap<Tensor> two_site_map(int sense = +1) const {
+  linalg::LinearMap<Tensor> two_site_map(mps::Dir direction) const {
     index i, j;
-    get_index_pair(sense, i, j);
+    get_index_pair(direction, i, j);
     return two_site_linear_map(left_environment(i), mpo_[i], mpo_[j],
                                right_environment(j));
   }
 
-  Tensor apply_one_site_matrix(const Tensor &P) const {
+  Tensor apply_single_site_matrix(const Tensor &P) const {
     return single_site_map()(P);
   }
 
-  Tensor apply_two_site_matrix(const Tensor &P, Dir direction) const {
+  Tensor apply_two_site_matrix(const Tensor &P, mps::Dir direction) const {
     return two_site_map(direction)(P);
   }
 
-  Tensor take_two_site_matrix_diag(mps::Dir sense) const {
+  Tensor take_two_site_matrix_diag(mps::Dir direction) const {
     Tensor output;
     index i, j;
-    get_index_pair(sense, i, j);
+    get_index_pair(direction, i, j);
     const auto &Lenv = left_environment(i);
     const auto &Renv = right_environment(j);
     for (const auto &op1 : mpo_[i]) {

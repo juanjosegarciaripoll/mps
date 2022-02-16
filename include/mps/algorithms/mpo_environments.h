@@ -241,7 +241,8 @@ Tensor compose(const MPOEnvironment<Tensor> &Lenv,
   Tensor output;
   for (const auto &op1n : op1) {
     for (const auto &op2n : op2) {
-      if (Lenv.has_environment_at(op1n.left_index) &&
+      if (op1n.right_index == op2n.left_index &&
+          Lenv.has_environment_at(op1n.left_index) &&
           Renv.has_environment_at(op2n.right_index)) {
         output =
             maybe_add(output, compose(Lenv[op1n.left_index], op1n.matrix,
@@ -263,8 +264,10 @@ linalg::LinearMap<Tensor> single_site_linear_map(
   // We implement this
   // Q(a2,i,a3) = L(a1,b1,a2,b2) O1(i,k) P(b2,k,b3) R(a3,b3,a1,b1)
   // where a1=b1 = 1, because of open boundary conditions
-  return [&](const Tensor &P) {
+  return [&](const Tensor &Pflat) {
     Tensor output;
+    const Tensor P = reshape(Pflat, Lenv.dimensions()[3], op.dimension(2),
+                             Renv.dimensions()[1]);
     for (const auto &opn : op) {
       if (Lenv.has_environment_at(opn.left_index) &&
           Renv.has_environment_at(opn.right_index)) {
@@ -275,10 +278,11 @@ linalg::LinearMap<Tensor> single_site_linear_map(
       }
     }
     if (output.is_empty()) {
-      return Tensor::zeros(Lenv.dimensions()[2], P.dimension(1),
-                           Renv.dimensions()[1]);
+      output =
+          apply_environments(Lenv.zero_environment(), Renv.zero_environment(),
+                             foldin(op.zero_matrix(), -1, P, 1));
     }
-    return output;
+    return flatten(output);
   };
 }
 
@@ -289,8 +293,10 @@ linalg::LinearMap<Tensor> two_site_linear_map(
   // We implement this
   // Q(a2,i,a3) = L(a1,b1,a2,b2) O1(i,k) O2(j,l) P(b2,k,l,b3) R(a3,b3,a1,b1)
   // where a1=b1 = 1, because of open boundary conditions
-  return [&](const Tensor &P12) {
+  return [&](const Tensor &P12flat) {
     Tensor output;
+    const Tensor P12 = reshape(P12flat, Lenv.dimensions()[3], op1.dimension(2),
+                               op2.dimension(2), Renv.dimensions()[1]);
     for (const auto &op1n : op1) {
       for (const auto &op2n : op2) {
         if (op1n.right_index == op2n.left_index &&
@@ -305,10 +311,12 @@ linalg::LinearMap<Tensor> two_site_linear_map(
       }
     }
     if (output.is_empty()) {
-      return Tensor::zeros(Lenv.dimensions()[2], P12.dimension(1),
-                           P12.dimension(2), Renv.dimensions()[1]);
+      output =
+          apply_environments(Lenv.zero_environment(), Renv.zero_environment(),
+                             foldin(op1.zero_matrix(), -1,
+                                    foldin(op2.zero_matrix(), -1, P12, 2), 1));
     }
-    return output;
+    return flatten(output);
   };
 }
 

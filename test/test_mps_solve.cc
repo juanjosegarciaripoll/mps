@@ -72,7 +72,7 @@ void xx_H(ConstantHamiltonian &H, const Indices &d) {
   index size = H.size();
   RTensor phases = linspace(0, 1.0, size + 2);
   for (index i = 0; i < size; i++) {
-    H.set_local_term(i, CTensor::zeros(d[i]));
+    H.set_local_term(i, CTensor::zeros(d[i], d[i]));
   }
   for (index i = 1; i < size; i++) {
     RTensor op = RTensor::zeros(d[i], d[i]);
@@ -91,7 +91,7 @@ void zz_H(ConstantHamiltonian &H, const Indices &d) {
   index size = H.size();
   RTensor phases = linspace(0, 1.0, size + 2);
   for (index i = 0; i < size; i++) {
-    H.set_local_term(i, CTensor::zeros(d[i]));
+    H.set_local_term(i, CTensor::zeros(d[i], d[i]));
   }
   for (index i = 1; i < size; i++) {
     RTensor op = diag(linspace(0.1, 0.8, d[i]));
