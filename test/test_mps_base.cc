@@ -418,45 +418,6 @@ void test_mps_to_vector() {
   }
 }
 
-void test_ghz_state(int size) {
-  RMPS ghz = ghz_state(size);
-  RTensor psi = mps_to_vector(ghz);
-  double v = 1 / sqrt((double)2.0);
-  EXPECT_EQ(ghz.size(), size);
-  EXPECT_EQ(psi.size(), 2 << (size - 1));
-  for (index i = 0; i < psi.size(); i++) {
-    double psi_i = ((i == 0) || (i == psi.size() - 1)) ? v : 0.0;
-    EXPECT_DOUBLE_EQ(psi[i], psi_i);
-  }
-  EXPECT_DOUBLE_EQ(norm2(psi), 1.0);
-}
-
-const RMPS apply_cluster_state_stabilizer(RMPS state, int site) {
-  state = apply_local_operator(state, mps::Pauli_x, site);
-  if (site >= 0) state = apply_local_operator(state, mps::Pauli_z, site - 1);
-  if (site < state.last())
-    state = apply_local_operator(state, mps::Pauli_z, site + 1);
-  return state;
-}
-
-void test_cluster_state(int size) {
-  RMPS cluster = cluster_state(size);
-  RTensor psi = mps_to_vector(cluster);
-  EXPECT_EQ(cluster.size(), size);
-  EXPECT_EQ(psi.size(), 2 << (size - 1));
-  EXPECT_DOUBLE_EQ(norm2(psi), 1.0);
-  for (index i = 1; i < cluster.size(); i++) {
-    RTensor psi2 = mps_to_vector(apply_cluster_state_stabilizer(cluster, i));
-    if (!simeq(psi, psi2)) {
-      RMPS aux = apply_cluster_state_stabilizer(cluster, i);
-      std::cerr << "site=" << i << '\n';
-      std::cerr << "psi2=" << psi2 << '\n';
-      std::cerr << "psi1=" << psi << '\n';
-    }
-    EXPECT_CEQ(psi, psi2);
-  }
-}
-
 //////////////////////////////////////////////////////////////////////
 // REAL SPECIALIZATIONS
 //
@@ -491,10 +452,6 @@ TEST(RMPS, AccesOperators) {
   test_mps_const_access<RMPS>();
   test_mps_access<RMPS>();
 }
-
-TEST(RMPS, GHZState) { test_over_integers(1, 10, test_ghz_state); }
-
-TEST(RMPS, ClusterState) { test_over_integers(3, 10, test_cluster_state); }
 
 TEST(RMPS, ToVector) { test_mps_to_vector<RMPS>(); }
 
