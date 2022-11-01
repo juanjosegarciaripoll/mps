@@ -54,6 +54,8 @@ class DMRG {
   DMRG &operator=(const DMRG &) = delete;
   DMRG &operator=(DMRG &&) = delete;
 
+  virtual ~DMRG() = default;
+
   void clear_orthogonality();
   void orthogonal_to(const MPS &P);
   void clear_conserved_quantities();
