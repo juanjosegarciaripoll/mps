@@ -184,8 +184,8 @@ static Tensor itebd_power_eig(const Tensor &A, const Tensor &lA,
   }
   linalg::eigs(
       [&](const Tensor &x) {
-        return reshape(prop_matrix(prop_matrix(reshape(x, a, a), sense, A, A),
-                                   sense, B, B),
+        return reshape(prop_matrix(prop_matrix(reshape(x, a, a), sense, A1, A1),
+                                   sense, A2, A2),
                        a * a);
       },
       v.size(), linalg::LargestMagnitude, 1, &v);
@@ -240,7 +240,7 @@ const iTEBD<Tensor> iTEBD<Tensor>::canonical_form(double, index) const {
   newA = fold(V, -1, newA, 0);
   newB = fold(newB, -1, U, 0);
 
-  return iTEBD<Tensor>(newA, lA_, newB, newlB, true);
+  return iTEBD<Tensor>(newA, lA_, newB, newlB / norm2(newlB), true);
 }
 
 template <class Tensor>
@@ -248,11 +248,10 @@ const iTEBD<Tensor> iTEBD<Tensor>::apply_operator(const Tensor &U, int site,
                                                   double tolerance,
                                                   index max_dim) const {
   Tensor A, lA, B, lB;
-#if 1
   if (site & 1) {
-    iTEBD<Tensor> aux(B_, lB_, A_, lA_, false);
-    aux = aux.canonical_form().apply_operator(U, 0, tolerance, max_dim);
-    return iTEBD<Tensor>(aux.B_, aux.lB_, aux.A_, aux.lA_, false);
+    return iTEBD<Tensor>(B_, lB_, A_, lA_, false)
+        .canonical_form()
+        .apply_operator(U, 0, tolerance, max_dim);
   } else if (!is_canonical()) {
     return canonical_form().apply_operator(U, 0, tolerance, max_dim);
   } else {
@@ -264,23 +263,6 @@ const iTEBD<Tensor> iTEBD<Tensor>::apply_operator(const Tensor &U, int site,
                  is_canonical());
     return iTEBD<Tensor>(A, lA, B, lB, false);
   }
-#else
-  if (site & 1) {
-    Tensor GBA = fold(BlB_, -1, A_, 0);
-    index a, i, j, b;
-    GBA.get_dimensions(&a, &i, &j, &b);
-    GBA = reshape(foldin(U, -1, reshape(GBA, a, i * j, b), 1), a, i, j, b);
-    split_tensor(GBA, lA_, &B, &lB, &A, &lA, tolerance, max_dim);
-    return iTEBD<Tensor>(A, lA, B, lB, false);
-  } else {
-    Tensor GAB = fold(AlA_, -1, B_, 0);
-    index a, i, j, b;
-    GAB.get_dimensions(&a, &i, &j, &b);
-    GAB = reshape(foldin(U, -1, reshape(GAB, a, i * j, b), 1), a, i, j, b);
-    split_tensor(GAB, lB_, &A, &lA, &B, &lB, tolerance, max_dim);
-    return iTEBD<Tensor>(A, lA, B, lB, false);
-  }
-#endif
 }
 
 }  // namespace mps
