@@ -6,6 +6,7 @@
 #ifndef TENSOR_TEST_LOOPS_H
 #define TENSOR_TEST_LOOPS_H
 
+#include <limits>
 #include <algorithm>
 #include <iostream>
 #include <gtest/gtest.h>
@@ -17,6 +18,7 @@
 #include <mps/hamiltonian.h>
 
 #define EPSILON 1e-12
+#define STRICT_EPSILON std::numeric_limits<double>::epsilon()
 
 #ifdef NDEBUG
 #define ONLY_IN_DEBUG(x)

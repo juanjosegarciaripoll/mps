@@ -52,7 +52,7 @@ TEST_P(TestOverSizes, cluster_state) {
   RTensor psi = mps_to_vector(cluster);
   EXPECT_EQ(cluster.size(), size());
   EXPECT_EQ(psi.size(), 2 << (size() - 1));
-  EXPECT_DOUBLE_EQ(norm2(psi), 1.0);
+  EXPECT_NEAR(norm2(psi), 1.0, STRICT_EPSILON);
   for (index i = 1; i < cluster.size(); i++) {
     RTensor psi2 = mps_to_vector(apply_cluster_state_stabilizer(cluster, i));
     if (!simeq(psi, psi2)) {

@@ -29,25 +29,28 @@ const RMPS cluster_state(index length) {
     return ghz_state(length);
   } else {
     RMPS output(length, 2, 2);
-    double v = 1.0 / sqrt(2.0);
+    // We choose to normalize the cluster state by modifying the first tensor to
+    // contain the normalization factor. This has the advantage that the tensor
+    // contraction is more precise. This factor is 1.0/sqrt(2 ** length)
+    double normalization = pow(2.0, -static_cast<double>(length) / 2);
 
     RTensor &P0 = output.at(0);
     P0.fill_with_zeros();
-    P0.at(0, 0, 0) = P0.at(0, 1, 1) = v;
+    P0.at(0, 0, 0) = P0.at(0, 1, 1) = normalization;
 
     RTensor &PL = output.at(length - 1);
-    PL.at(0, 0, 0) = v;
-    PL.at(0, 1, 0) = v;
-    PL.at(1, 0, 0) = v;
-    PL.at(1, 1, 0) = -v;
+    PL.at(0, 0, 0) = 1;
+    PL.at(0, 1, 0) = 1;
+    PL.at(1, 0, 0) = 1;
+    PL.at(1, 1, 0) = -1;
 
     for (index i = 1; i < (length - 1); i++) {
       RTensor &P = output.at(i);
       P.fill_with_zeros();
-      P.at(0, 0, 0) = v;
-      P.at(1, 0, 0) = v;
-      P.at(0, 1, 1) = v;
-      P.at(1, 1, 1) = -(v);
+      P.at(0, 0, 0) = 1;
+      P.at(1, 0, 0) = 1;
+      P.at(0, 1, 1) = 1;
+      P.at(1, 1, 1) = -(1);
     }
     return output;
   }
