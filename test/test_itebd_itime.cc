@@ -87,14 +87,20 @@ void test_itime_ising_roman() {
         << "Bfield = " << tests[j].hfield << '\n';
     RTensor spectrum = tests[j].spectrum;
     index max_chi = spectrum.size() + 8;
-    index nsteps = 1000;
+    index nsteps = 100;
     double tolerance = -1;
     Tensor H = -H12 + tests[j].hfield * Hmag;
     double dt;
+    int method = 1;  // Second order Trotter
     int delta;
-    for (delta = 20, dt = 0.1; dt > 0.001; dt /= 2, delta *= 2) {
-      psi = evolve_itime(psi, H, dt, nsteps, tolerance, max_chi, delta);
-      nsteps *= 2;
+    for (delta = 20, dt = 0.1; dt > 0.001; dt /= 2, delta *= 2, nsteps *= 2) {
+      psi = evolve_itime(psi, H, dt, nsteps, tolerance, max_chi, delta, method);
+      Tensor v1 = psi.schmidt(0);
+      Tensor v2 = spectrum;
+      std::cerr << "v1 = " << v1 << '\n';
+      std::cerr << "sum(v1)=" << sum(v1) << '\n';
+      std::cerr << "v2 = " << v2 << '\n';
+      std::cerr << "sum(v2)=" << sum(v2) << '\n';
     }
     Tensor schmidt = psi.schmidt(0);
     index d = std::min(schmidt.size(), spectrum.size());
@@ -184,6 +190,8 @@ void test_itime_ising() {
 
 TEST(RiTEBDTest, RiTEBDItimeIsing) { test_itime_ising<RTensor>(); }
 
+#ifdef TEST_MPS_EXPENSIVE_SIMULATIONS
 TEST(RiTEBDTest, RiTEBDItimeIsingRoman) { test_itime_ising_roman<RTensor>(); }
+#endif
 
 }  // namespace tensor_test
