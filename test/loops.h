@@ -141,6 +141,7 @@ class TestOverSizes : public testing::TestWithParam<size_t> {
 template <typename F>
 inline void test_over_integers(int min, int max, F test) {
   for (; min <= max; min++) {
+    SCOPED_TRACE("size = " + std::to_string(min));
     test(min);
   }
 }
@@ -148,6 +149,7 @@ inline void test_over_integers(int min, int max, F test) {
 template <typename F, typename A>
 inline void test_over_integers(int min, int max, F test, A args) {
   for (; min <= max; min++) {
+    SCOPED_TRACE("size = " + std::to_string(min));
     test(min, args);
   }
 }
