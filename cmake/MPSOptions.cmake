@@ -10,7 +10,7 @@ function(make_mps_options)
                   <memory> <iostream> <string> <vector>)
 
     if (MPS_OPTIMIZED_BUILD)
-        if (NOT CMAKE_BUILD_TYPE MATCHES "Rel")
+        if (CMAKE_BUILD_TYPE MATCHES "Rel")
             mps_add_optimizations()
         endif()
     endif()
