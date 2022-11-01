@@ -117,6 +117,16 @@ bool unitaryp(const Tensor<elt_t> &U, double epsilon = EPSILON) {
 /*
    * Test over integers.
    */
+class TestOverSizes : public testing::TestWithParam<size_t> {
+ public:
+  size_t size() { return GetParam(); }
+};
+
+#define INSTANTIATE_TEST_SUITE_OVER_SIZES(Group, min, max)         \
+  INSTANTIATE_TEST_SUITE_P(Group, TestOverSizes,                   \
+                           ::testing::Range<size_t>(min, max + 1), \
+                           ::testing::PrintToStringParamName())
+
 template <typename F>
 inline void test_over_integers(int min, int max, F test) {
   for (; min <= max; min++) {
