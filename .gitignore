@@ -12,3 +12,4 @@ test/google*
 config_aux
 build*/
 .vscode
+.cache
