@@ -31,7 +31,7 @@ TrotterSolver::Unitary::Unitary(const Hamiltonian &H, index k, cdouble dt,
     : debug(do_debug),
       k0(tensor::narrow_cast<int>(k)),
       kN(tensor::narrow_cast<int>(ssize(H))),
-      U(ssize(U)) {
+      U(ssize(H)) {
   /*
      * When we do 'Trotter' evolution, the Hamiltonian is split into
      * 'even' and 'odd' contributions made of mutually commuting terms.
