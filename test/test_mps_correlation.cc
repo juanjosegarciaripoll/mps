@@ -31,8 +31,8 @@ using namespace mps;
 
 template <class MPS>
 void test_correlation_basic() {
-  typename MPS::elt_t e0 = RTensor(igen << 2, rgen << 1.0 << 0.0);
-  typename MPS::elt_t e1 = RTensor(igen << 2, rgen << 0.0 << 1.0);
+  typename MPS::elt_t e0 = RTensor({2}, {1.0, 0.0});
+  typename MPS::elt_t e1 = RTensor({2}, {0.0, 1.0});
   {
     // A product state with two vectors
     MPS psi = product_state(3, e0);

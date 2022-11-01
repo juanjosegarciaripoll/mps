@@ -36,7 +36,7 @@ namespace mps {
   */
 const CSparse sparse_1d_hamiltonian(const CSparse &H12, const CSparse &H1,
                                     index N, bool periodic) {
-  assert(N > 0);
+  tensor_assert(N > 0);
   return do_pair_Hamiltonian<CSparse, CTensor>(H12, H1, N, periodic);
 }
 

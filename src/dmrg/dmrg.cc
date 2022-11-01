@@ -562,7 +562,7 @@ void DMRG<MPS>::init_matrices(const MPS &P, index k0, bool also_Q) {
 template <class MPS>
 const typename DMRG<MPS>::elt_vector_t DMRG<MPS>::compute_interactions_right(
     const MPS &P, index k) const {
-  assert(k + 1 < size());
+  tensor_assert(k + 1 < size());
 
   elt_t Pk = P[k + 1];
   index a1, j1, b1;
@@ -582,7 +582,7 @@ const typename DMRG<MPS>::elt_vector_t DMRG<MPS>::compute_interactions_right(
 template <class MPS>
 const typename DMRG<MPS>::elt_vector_t DMRG<MPS>::compute_interactions_left(
     const MPS &P, index k) const {
-  assert(k >= 1);
+  tensor_assert(k >= 1);
 
   elt_t Pk = P[k - 1];
   index a1, j1, b1;

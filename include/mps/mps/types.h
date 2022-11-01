@@ -169,12 +169,12 @@ class MPS : public MP<Tensor> {
 
   inline void presize(const tensor::Indices &physical_dimensions,
                       index bond_dimension, bool periodic) {
-    assert(bond_dimension > 0);
-    assert(this->size() == physical_dimensions.size());
+    tensor_assert(bond_dimension > 0);
+    tensor_assert(this->size() == physical_dimensions.size());
     index l = physical_dimensions.size();
     tensor::Indices dimensions = {bond_dimension, index(0), bond_dimension};
     for (index i = 0; i < l; i++) {
-      assert(physical_dimensions[i] > 0);
+      tensor_assert(physical_dimensions[i] > 0);
       dimensions.at(1) = physical_dimensions[i];
       dimensions.at(0) = (periodic || (i > 0)) ? bond_dimension : 1;
       dimensions.at(2) = (periodic || (i < (l - 1))) ? bond_dimension : 1;

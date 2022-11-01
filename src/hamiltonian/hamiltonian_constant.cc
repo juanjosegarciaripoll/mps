@@ -78,7 +78,7 @@ index ConstantHamiltonian::dimension(index k) const { return dimensions_[k]; }
 
 /** Add a local term on the k-th site.*/
 void ConstantHamiltonian::set_local_term(index k, const CTensor &H1) {
-  assert((k >= 0) && (k <= ssize(H1_)));
+  tensor_assert((k >= 0) && (k <= ssize(H1_)));
   H1_.at(k) = H1;
   dimensions_.at(k) = H1.rows();
 }
@@ -86,7 +86,7 @@ void ConstantHamiltonian::set_local_term(index k, const CTensor &H1) {
 /** Add a nearest-neighbor interaction between sites 'k' and 'k+1'.*/
 void ConstantHamiltonian::set_interaction(index k, const CTensor &H1,
                                           const CTensor &H2) {
-  assert((k >= 0) && (k <= ssize(H12_)));
+  tensor_assert((k >= 0) && (k <= ssize(H12_)));
   H12_left_[k].clear();
   H12_right_[k].clear();
   add_interaction(k, H1, H2);
@@ -95,7 +95,7 @@ void ConstantHamiltonian::set_interaction(index k, const CTensor &H1,
 /** Add a nearest-neighbor interaction between sites 'k' and 'k+1'.*/
 void ConstantHamiltonian::add_interaction(index k, const CTensor &H1,
                                           const CTensor &H2) {
-  assert((k >= 0) && (k + 1 < ssize(H12_)));
+  tensor_assert((k >= 0) && (k + 1 < ssize(H12_)));
   H12_left_[k].push_back(H1);
   H12_right_[k].push_back(H2);
   H12_.at(k) = compute_interaction(k);
@@ -104,7 +104,7 @@ void ConstantHamiltonian::add_interaction(index k, const CTensor &H1,
 }
 
 const CTensor ConstantHamiltonian::compute_interaction(index k) const {
-  assert((k >= 0) && (k + 1 < ssize(H12_)));
+  tensor_assert((k >= 0) && (k + 1 < ssize(H12_)));
   CTensor H;
   for (index i = 0; i < ssize(H12_left_[k]); i++) {
     CTensor op = kron2(H12_left_[k][i], H12_right_[k][i]);

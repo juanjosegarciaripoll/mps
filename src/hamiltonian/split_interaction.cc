@@ -29,7 +29,7 @@ using mps::imath::isqrt;
 
 void split_interaction(const CTensor &H12, std::vector<CTensor> *v1,
                        std::vector<CTensor> *v2) {
-  assert(H12.rank() == 2);
+  tensor_assert(H12.rank() == 2);
   /*
      * Notice the funny reordering of indices in O1 and O2, which is due to the
      * following statement and which simplifies the application of O1 and O2 on a
@@ -48,9 +48,9 @@ void split_interaction(const CTensor &H12, std::vector<CTensor> *v1,
   v2->resize(n_op);
   for (index i = 0; i < n_op; i++) {
     double sqrts = sqrt(s[i]);
-    v1->at(i) = sqrts * tensor::reshape(O1(_, range(i)).copy(), d1, d1);
+    v1->at(i) = sqrts * tensor::reshape(CTensor{O1(_, range(i))}, d1, d1);
     v2->at(i) =
-        tensor::conj(sqrts * tensor::reshape(O2(range(i), _).copy(), d2, d2));
+        tensor::conj(sqrts * tensor::reshape(CTensor{O2(range(i), _)}, d2, d2));
   }
 }
 

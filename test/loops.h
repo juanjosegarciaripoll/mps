@@ -190,7 +190,7 @@ class fixed_rank_iterator {
         max_dimension_(max_dimension),
         indices_(rank),
         finished_(false) {
-    assert((rank >= 0) && (max_dimension >= 0));
+    tensor_assert((rank >= 0) && (max_dimension >= 0));
     reset();
   }
   int rank() const { return rank_; }

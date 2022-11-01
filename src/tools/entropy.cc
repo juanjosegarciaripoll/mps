@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <tensor/exceptions.h>
 #include <tensor/linalg.h>
 #include <mps/quantum.h>
 
@@ -40,7 +41,7 @@ double entropy(const RTensor &t) {
   } else if (t.rank() == 2) {
     return entropy(linalg::eig_sym(t));
   } else {
-    assert(t.rank() == 1 || t.rank() == 2);
+    tensor_assert(t.rank() == 1 || t.rank() == 2);
     abort();
   }
 }

@@ -33,37 +33,37 @@ template <class Tensor>
 iTEBD<Tensor>::iTEBD(index dimension)
     : A_(normalize<Tensor>(Tensor::random(1, dimension, 1))),
       B_(normalize<Tensor>(Tensor::random(1, dimension, 1))),
-      lA_(igen << 1, gen<elt_t>(1)),
-      lB_(igen << 1, gen<elt_t>(1)),
+      lA_{1},
+      lB_{1},
       AlA_(A_),
       BlB_(B_),
       canonical_(true) {
-  assert(dimension > 0);
+  tensor_assert(dimension > 0);
 }
 
 template <class Tensor>
 iTEBD<Tensor>::iTEBD(const Tensor &A)
-    : A_(reshape(normalize<Tensor>(A), igen << 1 << A.dimension(0) << 1)),
+    : A_(reshape(normalize<Tensor>(A), 1, A.dimension(0), 1)),
       B_(A_),
-      lA_(igen << 1, gen<elt_t>(1.0)),
-      lB_(igen << 1, gen<elt_t>(1.0)),
+      lA_{1.0},
+      lB_{1.0},
       AlA_(A_),
       BlB_(B_),
       canonical_(true) {
-  assert(A.rank() == 1);
+  tensor_assert(A.rank() == 1);
 }
 
 template <class Tensor>
 iTEBD<Tensor>::iTEBD(const Tensor &A, const Tensor &B)
-    : A_(reshape(normalize<Tensor>(A), igen << 1 << A.dimension(0) << 1)),
-      B_(reshape(normalize<Tensor>(B), igen << 1 << B.dimension(0) << 1)),
-      lA_(igen << 1, gen<elt_t>(1.0)),
-      lB_(igen << 1, gen<elt_t>(1.0)),
+    : A_(reshape(normalize<Tensor>(A), 1, A.dimension(0), 1)),
+      B_(reshape(normalize<Tensor>(B), 1, B.dimension(0), 1)),
+      lA_{1.0},
+      lB_{1.0},
       AlA_(A_),
       BlB_(B_),
       canonical_(true) {
-  assert(A.rank() == 1);
-  assert(B.rank() == 1);
+  tensor_assert(A.rank() == 1);
+  tensor_assert(B.rank() == 1);
 }
 
 template <class Tensor>
@@ -76,11 +76,11 @@ iTEBD<Tensor>::iTEBD(const Tensor &A, const Tensor &lA, const Tensor &B,
       AlA_(scale(A, -1, lA)),
       BlB_(scale(B, -1, lB)),
       canonical_(canonical) {
-  assert(A_.rank() == 3);
-  assert(A_.dimension(0) == lB.dimension(0));
-  assert(A_.dimension(2) == lA.dimension(0));
-  assert(B_.dimension(0) == lA.dimension(0));
-  assert(B_.dimension(2) == lB.dimension(0));
+  tensor_assert(A_.rank() == 3);
+  tensor_assert(A_.dimension(0) == lB.dimension(0));
+  tensor_assert(A_.dimension(2) == lA.dimension(0));
+  tensor_assert(B_.dimension(0) == lA.dimension(0));
+  tensor_assert(B_.dimension(2) == lB.dimension(0));
 }
 
 template <class Tensor>

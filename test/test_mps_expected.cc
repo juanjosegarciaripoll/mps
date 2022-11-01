@@ -91,8 +91,8 @@ TEST(MPSExpected, GHZ) {
       EXPECT_DOUBLE_EQ(v, expected(ghz, P0, j));
       EXPECT_DOUBLE_EQ(v, expected(ghz, P1, j));
     }
-    EXPECT_CEQ(v * RTensor::ones(igen << i), expected_vector(ghz, P0));
-    EXPECT_CEQ(v * RTensor::ones(igen << i), expected_vector(ghz, P1));
+    EXPECT_CEQ(v * RTensor::ones(i), expected_vector(ghz, P0));
+    EXPECT_CEQ(v * RTensor::ones(i), expected_vector(ghz, P1));
   }
 }
 

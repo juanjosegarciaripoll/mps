@@ -55,14 +55,14 @@ double do_solve(const MPO<Tensor> &H, MPS<Tensor> *ptrP, const MPS<Tensor> &oQ,
   // We need an initial state. We assume that if P is an empty matrix product state
   // we can start directly with 'Q'. Note that in this single-site algorithm that
   // leads to poor results.
-  assert(ptrP);
+  tensor_assert(ptrP);
   auto &P = *ptrP;
   if (!P.size()) P = Q;
 
   // 'sense' can be nullptr.
   int aux = -1;
   if (!sense) sense = &aux;
-  assert(sweeps > 0);
+  tensor_assert(sweeps > 0);
 
   double olderr = 0.0, err = 0.0;  // err = <P|H^2|P> + <Q|Q> - 2re<Q|H|P>
   double normHP;                   // <P|H^2|P>

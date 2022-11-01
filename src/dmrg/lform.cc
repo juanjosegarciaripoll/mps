@@ -25,7 +25,7 @@ namespace mps {
 
 template <class Tensor>
 LinearForm<Tensor>::LinearForm(const mps_t &bra, const mps_t &ket, int start)
-    : weight_(tensor_t::ones(igen << 1)),
+    : weight_(tensor_t::ones(1)),
       bra_(std::vector<mps_t>(1, bra)),
       matrix_(make_matrix_array()) {
   initialize_matrices(start, ket);
@@ -122,7 +122,7 @@ static tensor_t compose(const tensor_t &L, const tensor_t &P,
   L.get_dimensions(&a1, &b1, &a2, &b2);
   R.get_dimensions(&a3, &b3, &a1, &b1);
   P.get_dimensions(&a2, &i, &a3);
-  assert(a1 == 1 && b1 == 1);
+  tensor_assert(a1 == 1 && b1 == 1);
   // Reshape L -> L(a2,b2), R -> R(a3,b3)
   // and return L(a2,b2) P(a2,i,a3) R(a3,b3)
   return fold(fold(reshape(L, a2, b2), 0, P, 0), -1, reshape(R, a3, b3), 0);
@@ -153,7 +153,7 @@ static tensor_t compose4(const tensor_t L, const tensor_t &P1,
   index a1, a2, b1, b2, a3, /*b3,*/ a4, b4, i, j;
   L.get_dimensions(&a1, &b1, &a2, &b2);
   R.get_dimensions(&a4, &b4, &a1, &b1);
-  assert(a1 == 1 && b1 == 1);
+  tensor_assert(a1 == 1 && b1 == 1);
   P1.get_dimensions(&a2, &i, &a3);
   P2.get_dimensions(&a3, &j, &a4);
   // P(a2,i,j,a4) = P1(a2,i,a3)P2(a3,j,a4)
@@ -171,10 +171,10 @@ const typename LinearForm<Tensor>::tensor_t LinearForm<Tensor>::two_site_vector(
   if (sense > 0) {
     i = here();
     j = i + 1;
-    assert(j < size());
+    tensor_assert(j < size());
   } else {
     j = here();
-    assert(j > 0);
+    tensor_assert(j > 0);
     i = j - 1;
   }
   for (int n = 0; n < number_of_bras(); n++) {

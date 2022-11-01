@@ -33,7 +33,7 @@ const RiTEBD infinite_aklt_state() {
   A.at(1, 1, 1) = sqrt(1.0 / 3.0);
   // A(,2,) = sqrt(2/3) \sigma^-
   A.at(1, 2, 0) = -sqrt(2.0 / 3.0);
-  RTensor lA = RTensor::ones(igen << 2);
+  RTensor lA = RTensor::ones(2);
   return RiTEBD(A, lA, A, lA);
 }
 

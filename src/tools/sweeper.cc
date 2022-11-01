@@ -23,7 +23,7 @@
 namespace mps {
 
 Sweeper::Sweeper(index L, index sense) {
-  assert(L > 0);
+  tensor_assert(L > 0);
   if (sense > 0) {
     k_ = k0_ = 0;
     kN_ = L - 1;

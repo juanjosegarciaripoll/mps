@@ -121,15 +121,13 @@ extern template cdouble expected(const CMPS &a, const CTensor &op1, index k1,
 extern template RTensor all_correlations_fast(const RMPS &a,
                                               const std::vector<RTensor> &op1,
                                               const std::vector<RTensor> &op2,
-                                              const RMPS &b,
-                                              bool symmetric = false,
+                                              const RMPS &b, bool symmetric,
                                               const RTensor *jordan_wigner_op);
 
 extern template CTensor all_correlations_fast(const CMPS &a,
                                               const std::vector<CTensor> &op1,
                                               const std::vector<CTensor> &op2,
-                                              const CMPS &b,
-                                              bool symmetric = false,
+                                              const CMPS &b, bool symmetric,
                                               const CTensor *jordan_wigner_op);
 
 /**Compute all two-site correlations.*/

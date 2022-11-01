@@ -24,7 +24,7 @@ namespace mps {
 template <class MPS, class MPO>
 static const MPS do_apply(const MPO &mpdo, const MPS &psi) {
   typedef typename MPS::elt_t Tensor;
-  assert(mpdo.size() == psi.size());
+  tensor_assert(mpdo.size() == psi.size());
 
   index a1, c1, j, c2, a2;
   index L = mpdo.size();

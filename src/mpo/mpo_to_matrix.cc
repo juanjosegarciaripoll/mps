@@ -27,7 +27,6 @@ template <class MPO, class Tensor>
 static const Tensor to_matrix(const MPO &A) {
   Tensor B = Tensor::ones(1, 1, 1);
   index D = 1;
-  index a = 1;
 
   for (int i = 0; i < A.ssize(); ++i) {
     Tensor Ai = A[i];
@@ -37,7 +36,6 @@ static const Tensor to_matrix(const MPO &A) {
     B = fold(B, 2, Ai, 0);
     /* B(D,D',a)*A(a,d,d',b) -> B(D,d,D',d',,b) */
     B = reshape(permute(B, 1, 2), D * d, D * d, b);
-    a = b;
     D = D * d;
   }
   return reshape(B, D, D);

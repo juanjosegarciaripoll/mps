@@ -19,7 +19,6 @@
 
 #include <gtest/gtest.h>
 #include "loops.h"
-#include <tensor/gen.h>
 #include <mps/lattice.h>
 
 namespace tensor_test {

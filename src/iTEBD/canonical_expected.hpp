@@ -107,9 +107,9 @@ static inline const Tensor do_string_order_many(const iTEBD<Tensor> &psi,
         v2 = propagate_right(v2, aux);
       }
       if (!(site & 1)) {
-        const Tensor &aux = psi.combined_matrix(site + 1);
-        nextv2 = propagate_right(v2, aux);
-        v = propagate_right(v, aux);
+        const Tensor &tmp = psi.combined_matrix(site + 1);
+        nextv2 = propagate_right(v2, tmp);
+        v = propagate_right(v, tmp);
         output.at(site) = trace(v) / trace(nextv2);
       } else {
         nextv2 = Tensor();

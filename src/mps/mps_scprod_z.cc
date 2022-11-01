@@ -45,7 +45,7 @@ template CTensor expected(const CMPS &a, const std::vector<CTensor> &op1,
 template CTensor all_correlations_fast(const CMPS &a,
                                        const std::vector<CTensor> &op1,
                                        const std::vector<CTensor> &op2,
-                                       const CMPS &b, bool symmetric = false,
-                                       const CTensor *jordan_wigner_op = 0);
+                                       const CMPS &b, bool symmetric,
+                                       const CTensor *jordan_wigner_op);
 
 }  // namespace mps

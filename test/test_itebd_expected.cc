@@ -184,15 +184,11 @@ template <class Tensor>
 void test_aklt_string_order(int i) {
   mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
   iTEBD<Tensor> psi = infinite_aklt_state();
-  Tensor Sz = RTensor(igen << 3 << 3,
-                      rgen << 1 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << -1);
-  Tensor ExpSz = RTensor(igen << 3 << 3,
-                         rgen << -1 << 0 << 0 << 0 << 1 << 0 << 0 << 0 << -1);
+  Tensor Sz{{1, 0, 0}, {0, 0, 0}, {0, 0, -1}};
+  Tensor ExpSz{{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}};
   double v = 1 / sqrt(2.0);
-  Tensor Sx = RTensor(igen << 3 << 3,
-                      rgen << 0 << v << 0 << v << 0 << v << 0 << v << 0);
-  Tensor ExpSx = RTensor(igen << 3 << 3,
-                         rgen << 0 << 0 << -1 << 0 << -1 << 0 << -1 << 0 << 0);
+  Tensor Sx = RTensor{{0, v, 0}, {v, 0, v}, {0, v, 0}};
+  Tensor ExpSx = RTensor{{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}};
   tensor_scalar_t<Tensor> vz = string_order(psi, Sz, 0, ExpSz, Sz, i);
   EXPECT_CEQ(vz, -4.0 / 9.0);
   tensor_scalar_t<Tensor> vx = string_order(psi, Sx, 0, ExpSx, Sx, i);

@@ -80,12 +80,12 @@ class Environment {
   }
 
   Environment operator+(const Environment &other) const {
-    assert(direction() == other.direction());
+    tensor_assert(direction() == other.direction());
     return Environment(direction(), tensor() + other.tensor());
   }
 
   Environment &operator+=(const Environment &other) {
-    assert(direction() == other.direction());
+    tensor_assert(direction() == other.direction());
     if (this->is_empty()) {
       env_ = other.tensor();
     } else {
@@ -242,7 +242,7 @@ Tensor compose(const Environment<Tensor> &Lenv, const Tensor &op,
   // L(a1,b1,a2,b2) op(i,j) R(a3,b3,a1,b1) -> H([a2,i,a3],[b2,j,b3])
   L.get_dimensions(&a1, &b1, &a2, &b2);
   R.get_dimensions(&a3, &b3, &a1, &b1);
-  assert(a1 == 1 && b1 == 1);
+  tensor_assert(a1 == 1 && b1 == 1);
   // Remember that kron(A(i,j),B(k,l)) -> C([k,i],[l,j])
   return kron(kron(reshape(R, a3, b3), op), reshape(L, a2, b2));
 }
@@ -261,7 +261,7 @@ Tensor compose(const Environment<Tensor> &Lenv, const Tensor &op1,
   // L(a1,b1,a2,b2) op(i,j) R(a3,b3,a1,b1) -> H([a2,i,a3],[b2,j,b3])
   L.get_dimensions(&a1, &b1, &a2, &b2);
   R.get_dimensions(&a3, &b3, &a1, &b1);
-  assert(a1 == 1 && b1 == 1);
+  tensor_assert(a1 == 1 && b1 == 1);
   // Remember that kron(A(i,j),B(k,l)) -> C([k,i],[l,j])
   return kron(kron(kron(reshape(R, a3, b3), op2), op1), reshape(L, a2, b2));
 }

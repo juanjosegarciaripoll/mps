@@ -42,7 +42,7 @@ tensor_scalar_t<Tensor> string_order(const Tensor &Opi, int i,
                                      const Tensor &Opmiddle, const Tensor &Opj,
                                      int j) const {
   if (i > j) return string_order(Opj, j, Opmiddle, Opi, i);
-  assert(is_canonical());
+  tensor_assert(is_canonical());
   int site = i;
   Tensor v1 = left_boundary(site);
   Tensor v2 = v1;

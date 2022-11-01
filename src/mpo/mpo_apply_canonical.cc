@@ -85,7 +85,7 @@ static void do_apply_leftwards(MPS &chi, const MPO &mpdo, const MPS &psi,
 template <class MPS, class MPO>
 static const MPS do_apply(const MPO &mpdo, const MPS &psi, int sense,
                           bool truncate) {
-  assert(mpdo.size() == psi.size());
+  tensor_assert(mpdo.size() == psi.size());
 
   MPS chi(psi.ssize());
   if (sense > 0) {

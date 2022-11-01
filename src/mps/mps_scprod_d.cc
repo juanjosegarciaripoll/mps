@@ -51,7 +51,7 @@ template RTensor expected(const RMPS &a, const std::vector<RTensor> &op1,
 template RTensor all_correlations_fast(const RMPS &a,
                                        const std::vector<RTensor> &op1,
                                        const std::vector<RTensor> &op2,
-                                       const RMPS &b, bool symmetric = false,
-                                       const RTensor *jordan_wigner_op = 0);
+                                       const RMPS &b, bool symmetric,
+                                       const RTensor *jordan_wigner_op);
 
 }  // namespace mps

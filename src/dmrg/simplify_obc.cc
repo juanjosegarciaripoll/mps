@@ -32,7 +32,7 @@ template <class MPS>
 double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
                    const std::vector<MPS> &Q, int *sense, index sweeps,
                    bool normalize, index Dmax, double tol, double *norm) {
-  assert(sweeps > 0);
+  tensor_assert(sweeps > 0);
   bool single_site =
       !Dmax && (FLAGS.get(MPS_SIMPLIFY_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM);
   double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
