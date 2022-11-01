@@ -30,12 +30,10 @@ using namespace tensor;
 //
 
 TEST(RMPSTest, SpinSafetyTest) {
-#ifndef NDEBUG
   CTensor s[3];
-  ASSERT_DEATH(mps::spin_operators(0, s, s + 1, s + 2), ".*");
-  ASSERT_DEATH(mps::spin_operators(-1, s, s + 1, s + 2), ".*");
-  ASSERT_DEATH(mps::spin_operators(0.1, s, s + 1, s + 2), ".*");
-#endif
+  ASSERT_ERROR_DETECTED(mps::spin_operators(0, s, s + 1, s + 2));
+  ASSERT_ERROR_DETECTED(mps::spin_operators(-1, s, s + 1, s + 2));
+  ASSERT_ERROR_DETECTED(mps::spin_operators(0.1, s, s + 1, s + 2));
 }
 
 TEST(RMPSTest, SpinCommutations) {

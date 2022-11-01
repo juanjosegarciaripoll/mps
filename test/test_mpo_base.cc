@@ -55,6 +55,8 @@ void test_zero_mpo(int size) {
       target = last;
     else
       target = middle;
+    std::cerr << "mpo[" << i << "]=" << mpo[i] << '\n'
+              << "target=" << target << '\n';
     EXPECT_ALL_EQUAL(mpo[i], target);
   }
 

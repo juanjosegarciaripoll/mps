@@ -28,9 +28,7 @@ using namespace tensor;
 
 template <class t>
 void test_random_iTEBD() {
-#ifndef NDEBUG
-  ASSERT_DEATH(iTEBD<t>(0), ".*");
-#endif
+  ASSERT_ERROR_DETECTED(iTEBD<t>(0));
   for (int d = 1; d <= 3; d++) {
     iTEBD<t> psi(d);
     t A = psi.matrix(0);
@@ -46,10 +44,8 @@ void test_random_iTEBD() {
 
 template <class t>
 void test_product_iTEBD() {
-#ifndef NDEBUG
   /* Die if not a vector */
-  ASSERT_DEATH(iTEBD<t>(t({1, 1})), ".*");
-#endif
+  ASSERT_ERROR_DETECTED(iTEBD<t>(t({1, 1})));
   for (int d = 1; d < 3; d++) {
     auto A = t::random(d);
     A = A / norm2(A);
@@ -67,11 +63,9 @@ void test_product_iTEBD() {
 
 template <class t>
 void test_product_alternated_iTEBD() {
-#ifndef NDEBUG
   /* Die if not a vector */
-  ASSERT_DEATH(iTEBD<t>(t::empty(1, 1), t::empty(2)), ".*");
-  ASSERT_DEATH(iTEBD<t>(t::empty(2), t::empty(1, 1)), ".*");
-#endif
+  ASSERT_ERROR_DETECTED(iTEBD<t>(t::empty(1, 1), t::empty(2)));
+  ASSERT_ERROR_DETECTED(iTEBD<t>(t::empty(2), t::empty(1, 1)));
   for (int d = 1; d < 3; d++) {
     auto A = t::random(d);
     A = A / norm2(A);

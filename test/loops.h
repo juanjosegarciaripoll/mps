@@ -20,10 +20,10 @@
 #define EPSILON 1e-12
 #define STRICT_EPSILON std::numeric_limits<double>::epsilon()
 
-#ifdef NDEBUG
-#define ONLY_IN_DEBUG(x)
+#ifdef TENSOR_DEBUG
+#define ASSERT_ERROR_DETECTED(x) ASSERT_DEATH(x, ".*")
 #else
-#define ONLY_IN_DEBUG(x) x
+#define ASSERT_ERROR_DETECTED(x) (void)0
 #endif
 
 namespace tensor_test {
