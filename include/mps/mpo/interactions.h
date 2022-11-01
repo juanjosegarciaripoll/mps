@@ -116,11 +116,11 @@ inline void add_interaction(MPO<Tensor> *mpo, const Tensor &Hi, index i,
     abort();
   }
 
-  Pi.at(range(0), _, _, range(b - 1)) = reshape(Hi, 1, di, di, 1);
+  Pi.at(range(0), _, _, range(b - 1)) = Hi;
   if (i + 2 == mpo->ssize()) {
-    Pj.at(range(b - 1), _, _, range(0)) = reshape(Hj, 1, dj, dj, 1);
+    Pj.at(range(b - 1), _, _, range(0)) = Hj;
   } else {
-    Pj.at(range(b - 1), _, _, range(1)) = reshape(Hj, 1, dj, dj, 1);
+    Pj.at(range(b - 1), _, _, range(1)) = Hj;
   }
 
   mpo->at(i) = Pi;

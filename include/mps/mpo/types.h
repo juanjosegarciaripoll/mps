@@ -67,7 +67,7 @@ class MPO : public MP<Tensor> {
     Tensor P;
     for (index i = 0; i < this->ssize(); i++) {
       index d = physical_dimensions[i];
-      Tensor Id = reshape(Tensor::eye(d, d), 1, d, d, 1);
+      Tensor Id = Tensor::eye(d, d);
       if (i == 0) {
         /* first */
         P = Tensor::zeros(1, d, d, 2);
