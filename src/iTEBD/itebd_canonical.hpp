@@ -28,15 +28,14 @@ template <class Tensor>
 static const Tensor ensure_3_indices(const Tensor &G) {
   if (G.rank() == 3) {
     return G;
-  } else if (G.rank() == 4) {
-    index a, i, j, b;
-    G.get_dimensions(&a, &i, &j, &b);
-    return reshape(G, a, i * j, b);
-  } else {
+  }
+  if (G.rank() != 4) {
     std::cerr << "Tensor with wrong dimensions in iTEBD" << '\n';
     abort();
-    return Tensor();
   }
+  index a, i, j, b;
+  G.get_dimensions(&a, &i, &j, &b);
+  return reshape(G, a, i * j, b);
 }
 
 template <class Tensor>

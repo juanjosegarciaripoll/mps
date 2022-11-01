@@ -43,7 +43,7 @@ class Sparse4Tensor {
   };
 
   Sparse4Tensor(const Tensor &t)
-      : dimensions_{t.dimensions()}, subtensors_{make_subtensors(t)} {}
+      : dimensions_(t.dimensions()), subtensors_{make_subtensors(t)} {}
 
   const Dimensions &dimensions() const { return dimensions_; }
 
@@ -110,8 +110,7 @@ class MPOEnvironment {
   typedef Environment<Tensor> single_env_t;
   typedef std::unordered_map<index, single_env_t> env_t;
 
-  explicit MPOEnvironment(Dir direction)
-      : envs_{}, direction_{direction}, dimensions_{1, 1, 1, 1} {
+  explicit MPOEnvironment(Dir direction) : direction_{direction} {
     if (direction != DIR_RIGHT && direction != DIR_LEFT) {
       throw std::invalid_argument(
           "Invalid direction supplied to MPOEnvironment()");
@@ -120,7 +119,9 @@ class MPOEnvironment {
   }
 
   MPOEnvironment(Dir direction, env_t env, Dimensions dims)
-      : envs_{std::move(env)}, direction_{direction}, dimensions_{dims} {
+      : envs_{std::move(env)},
+        direction_{direction},
+        dimensions_(std::move(dims)) {
     if (direction != DIR_RIGHT && direction != DIR_LEFT) {
       throw std::invalid_argument(
           "Invalid direction supplied to MPOEnvironment()");
@@ -166,9 +167,9 @@ class MPOEnvironment {
   const Dimensions &dimensions() const { return dimensions_; }
 
  private:
-  env_t envs_;
-  Dir direction_;
-  Dimensions dimensions_;
+  env_t envs_{};
+  Dir direction_{DIR_RIGHT};
+  Dimensions dimensions_{1, 1, 1, 1};
 
   static bool has_environment_at(const env_t &env, index n) {
     return env.find(n) != env.end();

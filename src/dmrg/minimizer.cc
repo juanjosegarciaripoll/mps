@@ -154,7 +154,7 @@ struct Minimizer : public MinimizerOptions {
           return apply_qform1<tensor_t, qform_t>(v, d, Hqform, orthogonal_to);
         },
         P.size(), linalg::SmallestAlgebraic, 1, &P, &converged);
-    if (site == psi.size() / 2 && compute_gap) {
+    if (site == ssize(psi) / 2 && compute_gap) {
       tensor_t newP = P;
       tensor_t Egap = linalg::eigs(
           [&](const tensor_t &v) -> tensor_t {
@@ -211,7 +211,7 @@ struct Minimizer : public MinimizerOptions {
     tensor_t P12 = (step > 0) ? fold(psi[site], -1, psi[site + 1], 0)
                               : fold(psi[site - 1], -1, psi[site], 0);
     tensor_list_t orthogonal_to = orthogonal_projectors(site, step);
-    if (site == psi.size() / 2 && compute_gap) {
+    if (site == ssize(psi) / 2 && compute_gap) {
       tensor_t newP12 = P12;
       auto fn = [&](const tensor_t &v) {
         return apply_qform2<tensor_t, qform_t>(v, step, newP12.dimensions(),
@@ -251,7 +251,7 @@ struct Minimizer : public MinimizerOptions {
                                               orthogonal_to);
           },
           subP12.size(), linalg::SmallestAlgebraic, 1, &subP12, &converged);
-      if (site == psi.size() / 2 && compute_gap) {
+      if (site == ssize(psi) / 2 && compute_gap) {
         tensor_t newP12 = subP12;
         auto fn = [&](const tensor_t &v) -> tensor_t {
           return apply_qform2_with_subspace(v, step, P12, Hqform, subspace,

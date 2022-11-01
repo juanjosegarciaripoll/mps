@@ -66,7 +66,6 @@ class Environment {
     } else {
       return Environment(direction(), propagate_left(tensor(), bra, ket, &op));
     }
-    return *this;
   }
 
   scalar_t close() const { return close_tensor(env_); }

@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <tensor/exceptions.h>
 #include <mps/time_evolve.h>
 #include <mps/mps_algorithms.h>
 
@@ -33,7 +34,7 @@ Trotter2Solver::Trotter2Solver(const Hamiltonian &H, cdouble dt)
     : TrotterSolver(dt), Ueven(H, 0, dt), Uodd(H, 1, dt), sense(0) {}
 
 double Trotter2Solver::one_step(CMPS *P, index Dmax) {
-  int debug = FLAGS.get(MPS_DEBUG_TROTTER);
+  int debug = tensor::narrow_cast<int>(FLAGS.get(MPS_DEBUG_TROTTER));
   if (!Dmax) {
     if (strategy != DO_NOT_TRUNCATE) {
       std::cerr

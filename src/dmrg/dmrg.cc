@@ -365,7 +365,7 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
      * Since the projector that we obtained spans two sites, we have to split
      * it, ensuring that we remain below the desired dimension Dmax.
      */
-  set_canonical_2_sites(P, Pi, k, dk, svd_tolerance, Dmax,
+  set_canonical_2_sites(P, Pi, k, dk, Dmax, svd_tolerance,
                         false /* Do not canonicalize the tensor, since we
                                  * are going to change it soon */
   );
@@ -406,7 +406,7 @@ double DMRG<MPS>::minimize(MPS *Pptr, index Dmax, double E) {
 
   int failures = 0;
   for (index L = size(), iter = 0; iter < sweeps; iter++, dk = -dk) {
-    double newE;
+    double newE = E;
     /*
        * We sweep from the left to the right or viceversa. We also try to
        * avoid minimizing twice the same site, and for that reason the backward
@@ -440,9 +440,9 @@ double DMRG<MPS>::minimize(MPS *Pptr, index Dmax, double E) {
     for (index k = k0; k != kN; k += dk) {
       error = false;
       if (Dmax) {
-        newE = DMRG::minimize_two_sites(P, k, dk, Dmax);
+        newE = DMRG::minimize_two_sites(P, k, narrow_cast<int>(dk), Dmax);
       } else {
-        newE = DMRG::minimize_single_site(P, k, dk);
+        newE = DMRG::minimize_single_site(P, k, narrow_cast<int>(dk));
       }
       if (error) {
         P = canonical_form(P);

@@ -47,7 +47,7 @@ class QuadraticForm {
 	assumes that we are inspecting site 'start', which may be at the
 	beginning or the end of the chain.*/
   QuadraticForm(const mpo_t &mpo, const mps_t &bra, const mps_t &ket,
-                int start = 0)
+                index start = 0)
       : current_site_{0}, mpo_(mpo), envs_(mpo.size() + 1, env_t(DIR_LEFT)) {
     initialize_environments(bra, ket, start);
   }
@@ -179,7 +179,8 @@ class QuadraticForm {
     }
   }
 
-  void initialize_environments(const mps_t &bra, const mps_t &ket, int start) {
+  void initialize_environments(const mps_t &bra, const mps_t &ket,
+                               index start) {
     if (bra.size() != size() || ket.size() != size()) {
       throw std::invalid_argument("Wrong sizes of MPS in QForm");
     }

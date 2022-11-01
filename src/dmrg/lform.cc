@@ -24,7 +24,7 @@
 namespace mps {
 
 template <class Tensor>
-LinearForm<Tensor>::LinearForm(const mps_t &bra, const mps_t &ket, int start)
+LinearForm<Tensor>::LinearForm(const mps_t &bra, const mps_t &ket, index start)
     : weight_(tensor_t::ones(1)),
       bra_(std::vector<mps_t>(1, bra)),
       matrix_(make_matrix_array()) {
@@ -39,13 +39,13 @@ LinearForm<Tensor>::LinearForm(const mps_t &bra, const mps_t &ket, int start)
 template <class Tensor>
 LinearForm<Tensor>::LinearForm(const tensor_t &weight,
                                const std::vector<mps_t> &bras, const mps_t &ket,
-                               int start)
+                               index start)
     : weight_(weight), bra_(bras), matrix_(make_matrix_array()) {
   initialize_matrices(start, ket);
 }
 
 template <class Tensor>
-void LinearForm<Tensor>::initialize_matrices(int start, const mps_t &ket) {
+void LinearForm<Tensor>::initialize_matrices(index start, const mps_t &ket) {
   for (current_site_ = 0; here() < start;) {
     propagate_right(ket[here()]);
   }

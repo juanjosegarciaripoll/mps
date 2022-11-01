@@ -17,6 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <tensor/exceptions.h>
 #include <tensor/linalg.h>
 #include <tensor/io.h>
 #include <tensor/tools.h>
@@ -188,8 +189,9 @@ double TrotterSolver::Unitary::apply_and_simplify(CMPS *psi, int *sense,
   int simplify_sense = -1;
   *psi = canonical_form(*psi, simplify_sense);
   if (largest_bond_dimension(*psi) > Dmax) {
-    index sweeps = 12;
-    err += simplify_obc(psi, *psi, &simplify_sense, sweeps, normalize, Dmax);
+    index override_sweeps = 12;
+    err += simplify_obc(psi, *psi, &simplify_sense, override_sweeps, normalize,
+                        Dmax);
   }
   return err;
 }

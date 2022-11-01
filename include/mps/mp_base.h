@@ -35,7 +35,7 @@ class Sweeper {
   index operator*() const { return k_; };
   bool operator--();
   bool is_last() const { return k_ == kN_; };
-  index sense() const { return dk_; };
+  int sense() const { return tensor::narrow_cast<int>(dk_); };
   index site() const { return k_; };
   void flip();
 

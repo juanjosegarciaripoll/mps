@@ -39,9 +39,9 @@ class LinearForm {
   typedef Tensor tensor_t;
   typedef tensor_scalar_t<Tensor> number_t;
 
-  LinearForm(const mps_t &bra, const mps_t &ket, int start = 0);
+  LinearForm(const mps_t &bra, const mps_t &ket, index start = 0);
   LinearForm(const tensor_t &weights, const std::vector<mps_t> &bra,
-             const mps_t &ket, int start = 0);
+             const mps_t &ket, index start = 0);
 
   /** Update the linear form, with a new value of the state it is applied on. */
   void propagate_right(const tensor_t &ketP);
@@ -84,7 +84,7 @@ class LinearForm {
     return matrix_[i][site + 1];
   }
 
-  void initialize_matrices(int start, const mps_t &ket);
+  void initialize_matrices(index start, const mps_t &ket);
   matrix_database_t make_matrix_array();
 };
 
