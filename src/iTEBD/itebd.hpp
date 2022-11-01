@@ -96,7 +96,7 @@ double iTEBD<Tensor>::entropy(int) const {
 
 template <class Tensor>
 const Tensor iTEBD<Tensor>::schmidt(int site) const {
-  return tensor::abs(left_vector(site)) * tensor::abs(left_vector(site));
+  return tensor::square(tensor::abs(left_vector(site)));
 }
 
 }  // namespace mps
