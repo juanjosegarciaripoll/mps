@@ -48,8 +48,8 @@ void test_expected_product_norm(int d) {
     iTEBD<Tensor> psiAA = random_product<Tensor>(d, true);
     iTEBD<Tensor> psiAB = random_product<Tensor>(d, false);
     /* The expected value of the identity is the norm */
-    EXPECT_TRUE(simeq(one, expected(psiAA, id)));
-    EXPECT_TRUE(simeq(one, expected(psiAB, id)));
+    EXPECT_CEQ(one, expected(psiAA, id));
+    EXPECT_CEQ(one, expected(psiAB, id));
     /* Test translational invariance */
     EXPECT_CEQ(expected(psiAA, id, 0), expected(psiAA, id, 1));
     EXPECT_CEQ(expected(psiAA, id, 0), expected(psiAA, id, 2));

@@ -88,10 +88,29 @@ testing::AssertionResult all_equal(const t1 &a, const t2 &b) {
     return testing::AssertionFailure() << a << " is not " << b;
 }
 
+template <typename t1, typename t2>
+testing::AssertionResult simeq_assertion(const t1 &a, const t2 &b) {
+  if (simeq(a, b))
+    return testing::AssertionSuccess() << "approximately equal";
+  else
+    return testing::AssertionFailure() << a << " is not ~ " << b;
+}
+
+template <typename t1, typename t2>
+testing::AssertionResult simeq_assertion(const t1 &a, const t2 &b,
+                                         double tolerance) {
+  if (simeq(a, b, tolerance))
+    return testing::AssertionSuccess() << "approximately equal";
+  else
+    return testing::AssertionFailure()
+           << a << " is not ~ " << b << " within " << tolerance;
+}
+
 #define EXPECT_ALL_EQUAL(a, b) EXPECT_TRUE(::tensor_test::all_equal(a, b))
-#define EXPECT_CEQ(a, b) EXPECT_TRUE(simeq(a, b))
-#define EXPECT_CEQ3(a, b, c) EXPECT_TRUE(simeq(a, b, c))
-#define ASSERT_CEQ(a, b) ASSERT_TRUE(simeq(a, b))
+#define EXPECT_CEQ(a, b) EXPECT_TRUE(::tensor_test::simeq_assertion(a, b))
+#define EXPECT_CEQ3(a, b, c) \
+  EXPECT_TRUE(::tensor_test::simeq_assertion(a, b, c))
+#define ASSERT_CEQ(a, b) ASSERT_TRUE(::tensor_test::simeq_assertion(a, b))
 
 /*
    * Approximately equal tensors.

@@ -104,7 +104,7 @@ void test_small_canonical_iTEBD() {
 
   iTEBD<t> psi(A, lA, B, lB);
   iTEBD<t> psic = psi.canonical_form();
-  EXPECT_TRUE(simeq(expected12(psi, H12), expected12(psic, H12), 2e-6));
+  EXPECT_CEQ3(expected12(psi, H12), expected12(psic, H12), 2e-6);
 }
 
 ////////////////////////////////////////////////////////////

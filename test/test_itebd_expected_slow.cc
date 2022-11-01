@@ -62,11 +62,11 @@ void test_small_canonical_iTEBD() {
   typename t::elt_t bdry_exp = expected12(psi, H12);
 
   mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
-  EXPECT_TRUE(simeq(expected12(psi, H12), expected12(psic, H12), 2e-6));
-  EXPECT_TRUE(simeq(expected12(psi, H12), slow_exp, 2e-6));
-  EXPECT_TRUE(simeq(expected12(psic, H12), slow_exp, 2e-6));
-  EXPECT_TRUE(simeq(expected12(psi, H12), bdry_exp, 2e-6));
-  EXPECT_TRUE(simeq(expected12(psic, H12), bdry_exp, 2e-6));
+  EXPECT_CEQ3(expected12(psi, H12), expected12(psic, H12), 2e-6);
+  EXPECT_CEQ3(expected12(psi, H12), slow_exp, 2e-6);
+  EXPECT_CEQ3(expected12(psic, H12), slow_exp, 2e-6);
+  EXPECT_CEQ3(expected12(psi, H12), bdry_exp, 2e-6);
+  EXPECT_CEQ3(expected12(psic, H12), bdry_exp, 2e-6);
 
   /*
     std::cerr, expected12(psi, H12), '\n'
@@ -82,11 +82,11 @@ void test_small_canonical_iTEBD() {
   typename t::elt_t bdry_E = energy(psi, H12);
 
   mps::FLAGS.set(MPS_ITEBD_EXPECTED_METHOD, MPS_ITEBD_CANONICAL_EXPECTED);
-  EXPECT_TRUE(simeq(energy(psi, H12), energy(psic, H12), 2e-6));
-  EXPECT_TRUE(simeq(energy(psi, H12), slow_E, 2e-6));
-  EXPECT_TRUE(simeq(energy(psic, H12), slow_E, 2e-6));
-  EXPECT_TRUE(simeq(energy(psi, H12), bdry_E, 2e-6));
-  EXPECT_TRUE(simeq(energy(psic, H12), bdry_E, 2e-6));
+  EXPECT_CEQ3(energy(psi, H12), energy(psic, H12), 2e-6);
+  EXPECT_CEQ3(energy(psi, H12), slow_E, 2e-6);
+  EXPECT_CEQ3(energy(psic, H12), slow_E, 2e-6);
+  EXPECT_CEQ3(energy(psi, H12), bdry_E, 2e-6);
+  EXPECT_CEQ3(energy(psic, H12), bdry_E, 2e-6);
 }
 
 ////////////////////////////////////////////////////////////
