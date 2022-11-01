@@ -44,16 +44,16 @@ TEST(AnyLatticeTest, EmptyLattice) {
     RTensor zero = RTensor::zeros(1, 1);
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
-        EXPECT_TRUE(all_equal(
-            zero, L.hopping_operator(j, i, Lattice::HARD_CORE_BOSONS)));
+        EXPECT_ALL_EQUAL(
+            zero, L.hopping_operator(j, i, Lattice::HARD_CORE_BOSONS));
         EXPECT_TRUE(
             all_equal(zero, L.hopping_operator(j, i, Lattice::FERMIONS)));
-        EXPECT_TRUE(all_equal(zero, L.interaction_operator(j, i)));
+        EXPECT_ALL_EQUAL(zero, L.interaction_operator(j, i));
       }
     }
 
     for (int i = 0; i < size; i++) {
-      EXPECT_TRUE(all_equal(zero, L.number_operator(i)));
+      EXPECT_ALL_EQUAL(zero, L.number_operator(i));
     }
   }
 }
@@ -67,22 +67,22 @@ TEST(AnyLatticeTest, FullLattice) {
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
         if (i == j) {
-          EXPECT_TRUE(all_equal(
-              one, L.hopping_operator(j, i, Lattice::HARD_CORE_BOSONS)));
+          EXPECT_ALL_EQUAL(
+              one, L.hopping_operator(j, i, Lattice::HARD_CORE_BOSONS));
           EXPECT_TRUE(
               all_equal(one, L.hopping_operator(j, i, Lattice::FERMIONS)));
         } else {
-          EXPECT_TRUE(all_equal(
-              zero, L.hopping_operator(j, i, Lattice::HARD_CORE_BOSONS)));
+          EXPECT_ALL_EQUAL(
+              zero, L.hopping_operator(j, i, Lattice::HARD_CORE_BOSONS));
           EXPECT_TRUE(
               all_equal(zero, L.hopping_operator(j, i, Lattice::FERMIONS)));
         }
-        EXPECT_TRUE(all_equal(one, L.interaction_operator(j, i)));
+        EXPECT_ALL_EQUAL(one, L.interaction_operator(j, i));
       }
     }
 
     for (int i = 0; i < size; i++) {
-      EXPECT_TRUE(all_equal(one, L.number_operator(i)));
+      EXPECT_ALL_EQUAL(one, L.number_operator(i));
     }
   }
 }
@@ -96,20 +96,20 @@ TEST(AnyLatticeTest, OneParticleLattice) {
       for (int j = 0; j < size; j++) {
         RTensor hop = zero;
         hop.at(j, i) = 1.0;
-        EXPECT_TRUE(all_equal(
-            hop, L.hopping_operator(j, i, Lattice::HARD_CORE_BOSONS)));
+        EXPECT_ALL_EQUAL(
+            hop, L.hopping_operator(j, i, Lattice::HARD_CORE_BOSONS));
         EXPECT_TRUE(
             all_equal(hop, L.hopping_operator(j, i, Lattice::FERMIONS)));
         RTensor inter = zero;
         inter.at(j, i) = (i == j);
-        EXPECT_TRUE(all_equal(inter, L.interaction_operator(j, i)));
+        EXPECT_ALL_EQUAL(inter, L.interaction_operator(j, i));
       }
     }
 
     for (int i = 0; i < size; i++) {
       RTensor n = zero;
       n.at(i, i) = 1.0;
-      EXPECT_TRUE(all_equal(n, L.number_operator(i)));
+      EXPECT_ALL_EQUAL(n, L.number_operator(i));
     }
   }
 }
@@ -120,8 +120,8 @@ TEST(AnyLatticeTest, AdjointHopping) {
       Lattice L(size, N);
       for (int i = 0; i < size; i++) {
         for (int j = i; j < size; j++) {
-          EXPECT_TRUE(all_equal(L.interaction_operator(i, j),
-                                adjoint(L.interaction_operator(j, i))));
+          EXPECT_ALL_EQUAL(L.interaction_operator(i, j),
+                                adjoint(L.interaction_operator(j, i)));
         }
       }
     }
@@ -146,8 +146,8 @@ TEST(AnyLatticeTest, PermutationInvariantInteraction) {
       Lattice L(size, N);
       for (int i = 0; i < size; i++) {
         for (int j = i; j < size; j++) {
-          EXPECT_TRUE(all_equal(L.interaction_operator(i, j),
-                                L.interaction_operator(j, i)));
+          EXPECT_ALL_EQUAL(L.interaction_operator(i, j),
+                                L.interaction_operator(j, i));
         }
       }
     }
@@ -166,27 +166,27 @@ TEST(HCBLatticeTest, OneInTwo) {
 
     RTensor hop0to1 = RTensor::zeros(2, 2);
     hop0to1.at(1, 0) = 1.0;
-    EXPECT_TRUE(all_equal(hop0to1,
-                          L.hopping_operator(1, 0, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop0to1,
+                          L.hopping_operator(1, 0, Lattice::HARD_CORE_BOSONS));
     EXPECT_TRUE(
         all_equal(hop0to1, L.hopping_operator(1, 0, Lattice::FERMIONS)));
 
     RTensor hop1to0 = adjoint(hop0to1);
-    EXPECT_TRUE(all_equal(hop1to0,
-                          L.hopping_operator(0, 1, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop1to0,
+                          L.hopping_operator(0, 1, Lattice::HARD_CORE_BOSONS));
     EXPECT_TRUE(
         all_equal(hop1to0, L.hopping_operator(0, 1, Lattice::FERMIONS)));
 
     RTensor number0 = RTensor::zeros(2, 2);
     number0.at(0, 0) = 1.0;
-    EXPECT_TRUE(all_equal(number0, L.number_operator(0)));
+    EXPECT_ALL_EQUAL(number0, L.number_operator(0));
 
     RTensor number1 = RTensor::zeros(2, 2);
     number1.at(1, 1) = 1.0;
-    EXPECT_TRUE(all_equal(number1, L.number_operator(1)));
+    EXPECT_ALL_EQUAL(number1, L.number_operator(1));
 
     RTensor int01 = RTensor::zeros(2, 2);
-    EXPECT_TRUE(all_equal(int01, L.interaction_operator(0, 1)));
+    EXPECT_ALL_EQUAL(int01, L.interaction_operator(0, 1));
   }
 }
 
@@ -201,49 +201,49 @@ TEST(HCBLatticeTest, OneInThree) {
   {
     RTensor hop0to1 = RTensor::zeros(3, 3);
     hop0to1.at(1, 0) = 1.0;
-    EXPECT_TRUE(all_equal(hop0to1,
-                          L.hopping_operator(1, 0, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop0to1,
+                          L.hopping_operator(1, 0, Lattice::HARD_CORE_BOSONS));
     RTensor hop1to0 = adjoint(hop0to1);
-    EXPECT_TRUE(all_equal(hop1to0,
-                          L.hopping_operator(0, 1, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop1to0,
+                          L.hopping_operator(0, 1, Lattice::HARD_CORE_BOSONS));
   }
   {
     RTensor hop0to2 = RTensor::zeros(3, 3);
     hop0to2.at(2, 0) = 1.0;
-    EXPECT_TRUE(all_equal(hop0to2,
-                          L.hopping_operator(2, 0, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop0to2,
+                          L.hopping_operator(2, 0, Lattice::HARD_CORE_BOSONS));
     RTensor hop2to0 = adjoint(hop0to2);
-    EXPECT_TRUE(all_equal(hop2to0,
-                          L.hopping_operator(0, 2, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop2to0,
+                          L.hopping_operator(0, 2, Lattice::HARD_CORE_BOSONS));
   }
   {
     RTensor hop1to2 = RTensor::zeros(3, 3);
     hop1to2.at(2, 1) = 1.0;
-    EXPECT_TRUE(all_equal(hop1to2,
-                          L.hopping_operator(2, 1, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop1to2,
+                          L.hopping_operator(2, 1, Lattice::HARD_CORE_BOSONS));
     RTensor hop2to1 = adjoint(hop1to2);
-    EXPECT_TRUE(all_equal(hop2to1,
-                          L.hopping_operator(1, 2, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop2to1,
+                          L.hopping_operator(1, 2, Lattice::HARD_CORE_BOSONS));
   }
   {
     RTensor number0 = RTensor::zeros(3, 3);
     number0.at(0, 0) = 1.0;
-    EXPECT_TRUE(all_equal(number0, L.number_operator(0)));
+    EXPECT_ALL_EQUAL(number0, L.number_operator(0));
 
     RTensor number1 = RTensor::zeros(3, 3);
     number1.at(1, 1) = 1.0;
-    EXPECT_TRUE(all_equal(number1, L.number_operator(1)));
+    EXPECT_ALL_EQUAL(number1, L.number_operator(1));
 
     RTensor number2 = RTensor::zeros(3, 3);
     number2.at(2, 2) = 1.0;
-    EXPECT_TRUE(all_equal(number2, L.number_operator(2)));
+    EXPECT_ALL_EQUAL(number2, L.number_operator(2));
 
     RTensor int01 = RTensor::zeros(3, 3);
-    EXPECT_TRUE(all_equal(int01, L.interaction_operator(0, 1)));
+    EXPECT_ALL_EQUAL(int01, L.interaction_operator(0, 1));
     RTensor int02 = RTensor::zeros(3, 3);
-    EXPECT_TRUE(all_equal(int02, L.interaction_operator(0, 2)));
+    EXPECT_ALL_EQUAL(int02, L.interaction_operator(0, 2));
     RTensor int12 = RTensor::zeros(3, 3);
-    EXPECT_TRUE(all_equal(int12, L.interaction_operator(1, 2)));
+    EXPECT_ALL_EQUAL(int12, L.interaction_operator(1, 2));
   }
 }
 
@@ -255,29 +255,29 @@ TEST(FermionLatticeTest, OneInThree) {
   {
     RTensor hop0to1 = RTensor::zeros(3, 3);
     hop0to1.at(1, 0) = 1.0;
-    EXPECT_TRUE(all_equal(hop0to1,
-                          L.hopping_operator(1, 0, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop0to1,
+                          L.hopping_operator(1, 0, Lattice::HARD_CORE_BOSONS));
     RTensor hop1to0 = adjoint(hop0to1);
-    EXPECT_TRUE(all_equal(hop1to0,
-                          L.hopping_operator(0, 1, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop1to0,
+                          L.hopping_operator(0, 1, Lattice::HARD_CORE_BOSONS));
   }
   {
     RTensor hop0to2 = RTensor::zeros(3, 3);
     hop0to2.at(2, 0) = 1.0;
-    EXPECT_TRUE(all_equal(hop0to2,
-                          L.hopping_operator(2, 0, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop0to2,
+                          L.hopping_operator(2, 0, Lattice::HARD_CORE_BOSONS));
     RTensor hop2to0 = adjoint(hop0to2);
-    EXPECT_TRUE(all_equal(hop2to0,
-                          L.hopping_operator(0, 2, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop2to0,
+                          L.hopping_operator(0, 2, Lattice::HARD_CORE_BOSONS));
   }
   {
     RTensor hop1to2 = RTensor::zeros(3, 3);
     hop1to2.at(2, 1) = 1.0;
-    EXPECT_TRUE(all_equal(hop1to2,
-                          L.hopping_operator(2, 1, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop1to2,
+                          L.hopping_operator(2, 1, Lattice::HARD_CORE_BOSONS));
     RTensor hop2to1 = adjoint(hop1to2);
-    EXPECT_TRUE(all_equal(hop2to1,
-                          L.hopping_operator(1, 2, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop2to1,
+                          L.hopping_operator(1, 2, Lattice::HARD_CORE_BOSONS));
   }
 }
 
@@ -288,54 +288,54 @@ TEST(HCBLatticeTest, TwoInThree) {
   {
     RTensor hop0to1 = RTensor::zeros(3, 3);
     hop0to1.at(2, 1) = 1.0;
-    EXPECT_TRUE(all_equal(hop0to1,
-                          L.hopping_operator(1, 0, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop0to1,
+                          L.hopping_operator(1, 0, Lattice::HARD_CORE_BOSONS));
     RTensor hop1to0 = adjoint(hop0to1);
-    EXPECT_TRUE(all_equal(hop1to0,
-                          L.hopping_operator(0, 1, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop1to0,
+                          L.hopping_operator(0, 1, Lattice::HARD_CORE_BOSONS));
   }
   {
     RTensor hop0to2 = RTensor::zeros(3, 3);
     hop0to2.at(2, 0) = 1.0;
-    EXPECT_TRUE(all_equal(hop0to2,
-                          L.hopping_operator(2, 0, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop0to2,
+                          L.hopping_operator(2, 0, Lattice::HARD_CORE_BOSONS));
     RTensor hop2to0 = adjoint(hop0to2);
-    EXPECT_TRUE(all_equal(hop2to0,
-                          L.hopping_operator(0, 2, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop2to0,
+                          L.hopping_operator(0, 2, Lattice::HARD_CORE_BOSONS));
   }
   {
     RTensor hop1to2 = RTensor::zeros(3, 3);
     hop1to2.at(1, 0) = 1.0;
-    EXPECT_TRUE(all_equal(hop1to2,
-                          L.hopping_operator(2, 1, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop1to2,
+                          L.hopping_operator(2, 1, Lattice::HARD_CORE_BOSONS));
     RTensor hop2to1 = adjoint(hop1to2);
-    EXPECT_TRUE(all_equal(hop2to1,
-                          L.hopping_operator(1, 2, Lattice::HARD_CORE_BOSONS)));
+    EXPECT_ALL_EQUAL(hop2to1,
+                          L.hopping_operator(1, 2, Lattice::HARD_CORE_BOSONS));
   }
   {
     RTensor number0 = RTensor::zeros(3, 3);
     number0.at(0, 0) = 1.0;
     number0.at(1, 1) = 1.0;
-    EXPECT_TRUE(all_equal(number0, L.number_operator(0)));
+    EXPECT_ALL_EQUAL(number0, L.number_operator(0));
 
     RTensor number1 = RTensor::zeros(3, 3);
     number1.at(0, 0) = 1.0;
     number1.at(2, 2) = 1.0;
-    EXPECT_TRUE(all_equal(number1, L.number_operator(1)));
+    EXPECT_ALL_EQUAL(number1, L.number_operator(1));
 
     RTensor number2 = RTensor::zeros(3, 3);
     number2.at(1, 1) = 1.0;
     number2.at(2, 2) = 1.0;
-    EXPECT_TRUE(all_equal(number2, L.number_operator(2)));
+    EXPECT_ALL_EQUAL(number2, L.number_operator(2));
 
     RTensor int01 = RTensor::zeros(3, 3);
     int01.at(0, 0) = 1.0;
-    EXPECT_TRUE(all_equal(int01, L.interaction_operator(0, 1)));
+    EXPECT_ALL_EQUAL(int01, L.interaction_operator(0, 1));
     RTensor int02 = RTensor::zeros(3, 3);
     int02.at(1, 1) = 1.0;
     RTensor int12 = RTensor::zeros(3, 3);
     int12.at(2, 2) = 1.0;
-    EXPECT_TRUE(all_equal(int12, L.interaction_operator(1, 2)));
+    EXPECT_ALL_EQUAL(int12, L.interaction_operator(1, 2));
   }
 }
 

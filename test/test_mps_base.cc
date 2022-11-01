@@ -120,11 +120,11 @@ void test_mps_copy_constructor() {
   EXPECT_EQ(state.size(), 2);
   MPS new_state(state);
   EXPECT_EQ(new_state.size(), 2);
-  EXPECT_TRUE(all_equal(new_state[0], psi));
-  EXPECT_TRUE(all_equal(new_state[1], psi));
+  EXPECT_ALL_EQUAL(new_state[0], psi);
+  EXPECT_ALL_EQUAL(new_state[1], psi);
   EXPECT_EQ(state.size(), 2);
-  EXPECT_TRUE(all_equal(state[0], psi));
-  EXPECT_TRUE(all_equal(state[1], psi));
+  EXPECT_ALL_EQUAL(state[0], psi);
+  EXPECT_ALL_EQUAL(state[1], psi);
 }
 
 template <class MPS>
@@ -140,11 +140,11 @@ void test_mps_operator_eq() {
   EXPECT_EQ(new_state.size(), 0);
   new_state = state;
   EXPECT_EQ(new_state.size(), 2);
-  EXPECT_TRUE(all_equal(new_state[0], psi));
-  EXPECT_TRUE(all_equal(new_state[1], psi));
+  EXPECT_ALL_EQUAL(new_state[0], psi);
+  EXPECT_ALL_EQUAL(new_state[1], psi);
   EXPECT_EQ(state.size(), 2);
-  EXPECT_TRUE(all_equal(state[0], psi));
-  EXPECT_TRUE(all_equal(state[1], psi));
+  EXPECT_ALL_EQUAL(state[0], psi);
+  EXPECT_ALL_EQUAL(state[1], psi);
 }
 
 template <class MPS>
@@ -158,8 +158,8 @@ void test_mps_move_constructor() {
   EXPECT_EQ(state.size(), 2);
   MPS new_state(std::move(state));
   EXPECT_EQ(new_state.size(), 2);
-  EXPECT_TRUE(all_equal(new_state[0], psi));
-  EXPECT_TRUE(all_equal(new_state[1], psi));
+  EXPECT_ALL_EQUAL(new_state[0], psi);
+  EXPECT_ALL_EQUAL(new_state[1], psi);
   EXPECT_EQ(state.size(), 0);
 }
 
@@ -176,8 +176,8 @@ void test_mps_operator_eq_move() {
   EXPECT_EQ(new_state.size(), 0);
   new_state = std::move(state);
   EXPECT_EQ(new_state.size(), 2);
-  EXPECT_TRUE(all_equal(new_state[0], psi));
-  EXPECT_TRUE(all_equal(new_state[1], psi));
+  EXPECT_ALL_EQUAL(new_state[0], psi);
+  EXPECT_ALL_EQUAL(new_state[1], psi);
   EXPECT_EQ(state.size(), 0);
 }
 
@@ -274,20 +274,20 @@ void test_mps_dimensions() {
   {
     auto d = Indices{2};
     auto psi = MPS(d, 3);
-    EXPECT_TRUE(all_equal(psi.dimensions(), d));
-    EXPECT_TRUE(all_equal(dimensions(psi), d));
+    EXPECT_ALL_EQUAL(psi.dimensions(), d);
+    EXPECT_ALL_EQUAL(dimensions(psi), d);
   }
   {
     auto d = Indices{2, 5};
     auto psi = MPS(d, 3);
-    EXPECT_TRUE(all_equal(psi.dimensions(), d));
-    EXPECT_TRUE(all_equal(dimensions(psi), d));
+    EXPECT_ALL_EQUAL(psi.dimensions(), d);
+    EXPECT_ALL_EQUAL(dimensions(psi), d);
   }
   {
     auto d = Indices{2, 5, 7};
     auto psi = MPS(d, 3);
-    EXPECT_TRUE(all_equal(psi.dimensions(), d));
-    EXPECT_TRUE(all_equal(dimensions(psi), d));
+    EXPECT_ALL_EQUAL(psi.dimensions(), d);
+    EXPECT_ALL_EQUAL(dimensions(psi), d);
   }
 }
 
@@ -303,20 +303,20 @@ void test_mps_const_access() {
     auto state = MPS::elt_t::random(3);
     const MPS psi = MPS::product_state(1, state);
     state = reshape(state, 1, 3, 1);
-    EXPECT_TRUE(all_equal(state, psi[0]));
+    EXPECT_ALL_EQUAL(state, psi[0]);
     EXPECT_THROW(psi[1], mps_out_of_range);
-    EXPECT_TRUE(all_equal(state, psi[-1]));
+    EXPECT_ALL_EQUAL(state, psi[-1]);
     EXPECT_THROW(psi[-2], mps_out_of_range);
   }
   {
     auto state = MPS::elt_t::random(3);
     const MPS psi = MPS::product_state(2, state);
     state = reshape(state, 1, 3, 1);
-    EXPECT_TRUE(all_equal(state, psi[0]));
-    EXPECT_TRUE(all_equal(state, psi[1]));
+    EXPECT_ALL_EQUAL(state, psi[0]);
+    EXPECT_ALL_EQUAL(state, psi[1]);
     EXPECT_THROW(psi[2], mps_out_of_range);
-    EXPECT_TRUE(all_equal(state, psi[-1]));
-    EXPECT_TRUE(all_equal(state, psi[-2]));
+    EXPECT_ALL_EQUAL(state, psi[-1]);
+    EXPECT_ALL_EQUAL(state, psi[-2]);
     EXPECT_THROW(psi[-3], mps_out_of_range);
   }
 }
@@ -334,20 +334,20 @@ void test_mps_access() {
     auto state = MPS::elt_t::random(3);
     MPS psi = MPS::product_state(1, state);
     state = reshape(state, 1, 3, 1);
-    EXPECT_TRUE(all_equal(state, psi.at(0)));
+    EXPECT_ALL_EQUAL(state, psi.at(0));
     EXPECT_THROW(psi.at(1), mps_out_of_range);
-    EXPECT_TRUE(all_equal(state, psi.at(-1)));
+    EXPECT_ALL_EQUAL(state, psi.at(-1));
     EXPECT_THROW(psi.at(-2), mps_out_of_range);
   }
   {
     auto state = MPS::elt_t::random(3);
     MPS psi = MPS::product_state(2, state);
     state = reshape(state, 1, 3, 1);
-    EXPECT_TRUE(all_equal(state, psi.at(0)));
-    EXPECT_TRUE(all_equal(state, psi.at(1)));
+    EXPECT_ALL_EQUAL(state, psi.at(0));
+    EXPECT_ALL_EQUAL(state, psi.at(1));
     EXPECT_THROW(psi.at(2), mps_out_of_range);
-    EXPECT_TRUE(all_equal(state, psi.at(-1)));
-    EXPECT_TRUE(all_equal(state, psi.at(-2)));
+    EXPECT_ALL_EQUAL(state, psi.at(-1));
+    EXPECT_ALL_EQUAL(state, psi.at(-2));
     EXPECT_THROW(psi.at(-3), mps_out_of_range);
   }
   {
@@ -358,12 +358,12 @@ void test_mps_access() {
     psi.at(0) = state0;
     psi.at(1) = state1;
     psi.at(2) = state2;
-    EXPECT_TRUE(all_equal(state0, psi[0]));
-    EXPECT_TRUE(all_equal(state1, psi[1]));
-    EXPECT_TRUE(all_equal(state2, psi[2]));
-    EXPECT_TRUE(all_equal(state0, psi[-3]));
-    EXPECT_TRUE(all_equal(state1, psi[-2]));
-    EXPECT_TRUE(all_equal(state2, psi[-1]));
+    EXPECT_ALL_EQUAL(state0, psi[0]);
+    EXPECT_ALL_EQUAL(state1, psi[1]);
+    EXPECT_ALL_EQUAL(state2, psi[2]);
+    EXPECT_ALL_EQUAL(state0, psi[-3]);
+    EXPECT_ALL_EQUAL(state1, psi[-2]);
+    EXPECT_ALL_EQUAL(state2, psi[-1]);
   }
 }
 
@@ -389,8 +389,8 @@ void test_mps_product_state(int size) {
     std::vector<mp_tensor_t<MPS>> v = {psi0, psi1};
     MPS state = product_state(v);
     EXPECT_EQ(state.size(), 2);
-    EXPECT_TRUE(all_equal(state[0], reshape(psi0, 1, 2, 1)));
-    EXPECT_TRUE(all_equal(state[1], reshape(psi1, 1, 3, 1)));
+    EXPECT_ALL_EQUAL(state[0], reshape(psi0, 1, 2, 1));
+    EXPECT_ALL_EQUAL(state[1], reshape(psi1, 1, 3, 1));
   }
 }
 
@@ -399,14 +399,14 @@ void test_mps_to_vector() {
   {
     MPS psi;
     auto v = psi.to_vector();
-    EXPECT_TRUE(all_equal(v.dimensions(), Dimensions{0}));
+    EXPECT_ALL_EQUAL(v.dimensions(), Dimensions{0});
   }
   {
     auto psi0 = MPS::elt_t::random(3);
     MPS psi = MPS::product_state(2, psi0);
     auto v = psi.to_vector();
     auto videal = kron(psi0, psi0);
-    EXPECT_TRUE(all_equal(v, videal));
+    EXPECT_ALL_EQUAL(v, videal);
   }
   {
     MPS psi = MPS::random(Dimensions{3, 2}, /*bond dim*/ 4);
@@ -414,7 +414,7 @@ void test_mps_to_vector() {
     auto psi0 = reshape(psi[0], 3, 4);
     auto psi1 = reshape(psi[1], 4, 2);
     auto videal = reshape(mmult(psi0, psi1), 3 * 2);
-    EXPECT_TRUE(all_equal(v, videal));
+    EXPECT_ALL_EQUAL(v, videal);
   }
 }
 

@@ -80,6 +80,15 @@ bool simeq(const Tensor<elt_t> &a, const Tensor<elt_t> &b,
   return true;
 }
 
+template <typename t1, typename t2>
+testing::AssertionResult all_equal(const t1 &a, const t2 &b) {
+  if (::tensor::all_equal(a, b))
+    return testing::AssertionSuccess() << "same elements and size";
+  else
+    return testing::AssertionFailure() << a << " is not " << b;
+}
+
+#define EXPECT_ALL_EQUAL(a, b) EXPECT_TRUE(::tensor_test::all_equal(a, b))
 #define EXPECT_CEQ(a, b) EXPECT_TRUE(simeq(a, b))
 #define EXPECT_CEQ3(a, b, c) EXPECT_TRUE(simeq(a, b, c))
 #define ASSERT_CEQ(a, b) ASSERT_TRUE(simeq(a, b))

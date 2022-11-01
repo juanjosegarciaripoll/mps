@@ -37,10 +37,10 @@ void test_random_iTEBD() {
     t B = psi.matrix(1);
     t lA = psi.right_vector(0);
     t lB = psi.right_vector(1);
-    EXPECT_TRUE(all_equal(A.dimensions(), Dimensions{1, d, 1}));
-    EXPECT_TRUE(all_equal(B.dimensions(), Dimensions{1, d, 1}));
-    EXPECT_TRUE(all_equal(lA, t({1}, {1})));
-    EXPECT_TRUE(all_equal(lB, lA));
+    EXPECT_ALL_EQUAL(A.dimensions(), Dimensions({1, d, 1}));
+    EXPECT_ALL_EQUAL(B.dimensions(), Dimensions({1, d, 1}));
+    EXPECT_ALL_EQUAL(lA, t({1}, {1}));
+    EXPECT_ALL_EQUAL(lB, lA);
   }
 }
 
@@ -59,9 +59,9 @@ void test_product_iTEBD() {
     t lB = psi.right_vector(1);
     EXPECT_TRUE(approx_eq(psi.matrix(0), reshape(A, 1, d, 1)));
     EXPECT_TRUE(approx_eq(psi.matrix(1), reshape(A, 1, d, 1)));
-    EXPECT_TRUE(all_equal(lA, t({1}, {1})));
-    EXPECT_TRUE(all_equal(lB, lA));
-    EXPECT_TRUE(all_equal(psi.matrix(0), psi.matrix(1)));
+    EXPECT_ALL_EQUAL(lA, t({1}, {1}));
+    EXPECT_ALL_EQUAL(lB, lA);
+    EXPECT_ALL_EQUAL(psi.matrix(0), psi.matrix(1));
   }
 }
 
@@ -83,12 +83,12 @@ void test_product_alternated_iTEBD() {
     t lB = psi.right_vector(1);
     EXPECT_TRUE(approx_eq(psi.matrix(0), reshape(A, 1, d, 1)));
     EXPECT_TRUE(approx_eq(psi.matrix(1), reshape(B, 1, d, 1)));
-    EXPECT_TRUE(all_equal(lA, t({1}, {1})));
-    EXPECT_TRUE(all_equal(lB, lA));
-    EXPECT_TRUE(all_equal(psi.matrix(0), psi.matrix(2)));
-    EXPECT_TRUE(all_equal(psi.matrix(0), psi.matrix(-2)));
-    EXPECT_TRUE(all_equal(psi.matrix(1), psi.matrix(3)));
-    EXPECT_TRUE(all_equal(psi.matrix(1), psi.matrix(-1)));
+    EXPECT_ALL_EQUAL(lA, t({1}, {1}));
+    EXPECT_ALL_EQUAL(lB, lA);
+    EXPECT_ALL_EQUAL(psi.matrix(0), psi.matrix(2));
+    EXPECT_ALL_EQUAL(psi.matrix(0), psi.matrix(-2));
+    EXPECT_ALL_EQUAL(psi.matrix(1), psi.matrix(3));
+    EXPECT_ALL_EQUAL(psi.matrix(1), psi.matrix(-1));
   }
 }
 

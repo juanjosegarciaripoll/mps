@@ -55,7 +55,7 @@ void test_zero_mpo(int size) {
       target = last;
     else
       target = middle;
-    EXPECT_TRUE(all_equal(mpo[i], target));
+    EXPECT_ALL_EQUAL(mpo[i], target);
   }
 
   auto psi = typename MPO::MPS(cluster_state(size));

@@ -59,7 +59,7 @@ void test_zero_mpo(int size) {
       target = last;
     else
       target = middle;
-    EXPECT_TRUE(all_equal(mpo[i], target));
+    EXPECT_ALL_EQUAL(mpo[i], target);
   }
   EXPECT_CEQ(mpo_to_matrix(mpo), Tensor::zeros(1 << size, 1 << size));
 }
