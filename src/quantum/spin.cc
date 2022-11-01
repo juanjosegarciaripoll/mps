@@ -29,8 +29,8 @@ namespace mps {
 extern const RTensor Pauli_id{{1.0, 0.0}, {0.0, 1.0}};
 extern const RTensor Pauli_x{{0.0, 1.0}, {1.0, 0.0}};
 extern const RTensor Pauli_z{{1.0, 0.0}, {0.0, -1.0}};
-extern const CTensor Pauli_y{{0.0, to_complex(0.0, 1.0)},
-                             {to_complex(0.0, -1.0), 0.0}};
+extern const CTensor Pauli_y{{0.0, to_complex(0.0, -1.0)},
+                             {to_complex(0.0, 1.0), 0.0}};
 
 /**Compute the angular momentum operators for a given total spin.
      \ingroup QM
