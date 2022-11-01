@@ -45,7 +45,7 @@ void test_random_iTEBD() {
 template <class t>
 void test_product_iTEBD() {
   /* Die if not a vector */
-  ASSERT_ERROR_DETECTED(iTEBD<t>(t({1, 1})));
+  ASSERT_ERROR_DETECTED(iTEBD<t>(t::empty(1, 1)));
   for (int d = 1; d < 3; d++) {
     auto A = t::random(d);
     A = A / norm2(A);
