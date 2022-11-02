@@ -43,10 +43,9 @@ class Environment {
 
   Environment(Dir direction, Tensor t = Tensor())
       : env_{std::move(t)}, direction_{direction} {
-    if (direction != DIR_RIGHT && direction != DIR_LEFT) {
-      throw std::invalid_argument(
-          "Invalid direction supplied to Environment()");
-    }
+    tensor_assert2(
+        direction == DIR_RIGHT || direction == DIR_LEFT,
+        std::invalid_argument("Invalid direction supplied to Environment()"));
   }
 
   Environment propagate(const Tensor &bra, const Tensor &ket) const {
@@ -71,10 +70,10 @@ class Environment {
   scalar_t close() const { return close_tensor(env_); }
 
   scalar_t operator*(Environment &other) {
-    if (this->direction_ != DIR_RIGHT || other.direction_ != DIR_LEFT) {
-      throw std::invalid_argument(
-          "Incompatible directions when contracting mps::Environment's");
-    }
+    tensor_assert2(
+        this->direction_ == DIR_RIGHT && other.direction_ == DIR_LEFT,
+        std::invalid_argument(
+            "Incompatible directions when contracting mps::Environment's"));
     return combine_environments(this->tensor(), other.tensor());
   }
 

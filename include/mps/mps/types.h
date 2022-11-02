@@ -133,10 +133,9 @@ class MPS : public MP<Tensor> {
 
   /**Create a product state with all sites sharing the same vector.*/
   static MPS<Tensor> product_state(index length, const Tensor &local_state) {
-    if ((local_state.rank() != 1) || (local_state.size() == 0)) {
-      throw std::invalid_argument(
-          "Not a valid quantum state in MPS::product_state().");
-    }
+    tensor_assert2((local_state.rank() == 1) && (local_state.size() != 0),
+                   std::invalid_argument(
+                       "Not a valid local_state in MPS::product_state()."));
     MPS<Tensor> output(length);
     std::fill(output.begin(), output.end(),
               reshape(local_state, 1, local_state.size(), 1));

@@ -82,14 +82,11 @@ class MP {
     index mps_size = ssize();
     if (mps_index < 0) {
       mps_index += mps_size;
-      if (mps_index < 0 || mps_index >= mps_size) {
-        throw mps_out_of_range();
-      }
+      tensor_assert2(mps_index >= 0 && mps_index < mps_size,
+                     mps_out_of_range());
       return mps_index;
     } else {
-      if (mps_index >= mps_size) {
-        throw mps_out_of_range();
-      }
+      tensor_assert2(mps_index < mps_size, mps_out_of_range());
       return mps_index;
     }
   }
@@ -125,10 +122,9 @@ inline dest tensor_cast(const MP<dest> & /*mp*/, orig t) {
 
 template <>
 inline RTensor tensor_cast(const MP<RTensor> & /*mp*/, CTensor data) {
-  if (std::any_of(std::begin(data), std::end(data),
-                  [](const cdouble &z) { return z.imag() != 0; })) {
-    throw std::domain_error("Cannot convert complex tensor to real.");
-  }
+  tensor_assert2(std::all_of(std::begin(data), std::end(data),
+                             [](const cdouble &z) { return z.imag() == 0; }),
+                 std::domain_error("Cannot convert complex tensor to real."));
   return real(data);
 }
 

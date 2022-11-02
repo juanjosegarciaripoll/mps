@@ -21,7 +21,7 @@
 #define MPS_IMATH_H
 
 #include <type_traits>
-#include <stdexcept>
+#include <tensor/exceptions.h>
 
 namespace mps {
 
@@ -38,9 +38,8 @@ static inline base ipow(base b, power p) {
     while (p) {
       if (p & 1) {
         base new_output = output * x;
-        if (new_output / x != output) {
-          throw std::overflow_error("Integer overflow in ipow()");
-        }
+        tensor_assert2(new_output / x == output,
+                       std::overflow_error("Integer overflow in ipow()"));
       }
       p >>= 1;
       x *= x;
@@ -52,9 +51,7 @@ static inline base ipow(base b, power p) {
 template <typename base,
           typename = std::enable_if<std::is_integral<base>::value>>
 static inline base isqrt(base b) {
-  if (b < 0) {
-    throw std::invalid_argument("Negative argument to isqrt()");
-  }
+  tensor_assert2(b >= 0, std::invalid_argument("Negative argument to isqrt()"));
   if (b < 2) {
     return b;
   }

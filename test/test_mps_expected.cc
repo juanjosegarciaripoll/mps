@@ -38,8 +38,8 @@ void test_expected1_basic() {
     MPS psi = product_state(2, e0);
     psi.at(1) = reshape(e1, 1, 2, 1);
 
-    EXPECT_THROW(expected(psi, mps::Pauli_id, 2), mps_out_of_range);
-    EXPECT_THROW(expected(psi, mps::Pauli_id, -3), mps_out_of_range);
+    EXPECT_ERROR_DETECTED(expected(psi, mps::Pauli_id, 2), mps_out_of_range);
+    EXPECT_ERROR_DETECTED(expected(psi, mps::Pauli_id, -3), mps_out_of_range);
     EXPECT_CEQ(expected(psi, mps::Pauli_z, 0), 1.0);
     EXPECT_CEQ(expected(psi, mps::Pauli_z, 1), -1.0);
     EXPECT_CEQ(expected(psi, mps::Pauli_z, -1), -1.0);

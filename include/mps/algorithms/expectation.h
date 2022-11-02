@@ -39,10 +39,9 @@ template <class T1, class T2>
 inline tensor_scalar_t<tensor_common_t<T1, T2>> scprod(
     const MPS<T1> &a, const MPS<T2> &b, int direction = DIR_RIGHT) {
   Environment<tensor_common_t<T1, T2>> env(direction);
-  if (a.size() != b.size()) {
-    throw std::invalid_argument(
-        "In scprod(), mismatch in the sizes of both MPS");
-  }
+  tensor_assert2(
+      a.size() == b.size(),
+      std::invalid_argument("In scprod(), mismatch in the sizes of both MPS"));
   if (direction == DIR_RIGHT) {
     for (index k = 0; k < a.ssize(); k++) {
       env = env.propagate(a[k], b[k]);
@@ -59,9 +58,8 @@ inline tensor_scalar_t<tensor_common_t<T1, T2>> scprod(
 template <class T1, class T2>
 inline tensor_scalar_t<tensor_common_t<T1, T2>> expected(
     const MPS<T1> &a, const T2 &op, index k1, int direction = DIR_RIGHT) {
-  if (direction != DIR_RIGHT) {
-    throw std::domain_error("DIM_LEFT not implemented in expected()");
-  }
+  tensor_assert2(direction == DIR_RIGHT,
+                 std::domain_error("DIR_LEFT not implemented in expected()"));
   Environment<tensor_common_t<T1, T2>> env(DIR_RIGHT);
   for (index k = 0, target = a.normal_index(k1); k < a.ssize(); k++) {
     auto Pk = a[k];
@@ -82,9 +80,8 @@ inline tensor_scalar_t<tensor_common_t<T1, T2>> expected(
   if (k1 == k2) {
     return expected(a, mmult(op1, op2), k1, direction);
   }
-  if (direction != DIR_RIGHT) {
-    throw std::domain_error("DIM_LEFT not implemented in expected()");
-  }
+  tensor_assert2(direction == DIR_RIGHT,
+                 std::domain_error("DIR_LEFT not implemented in expected()"));
   Environment<tensor_common_t<T1, T2>> env(DIR_RIGHT);
   auto target1 = a.normal_index(k1);
   auto target2 = a.normal_index(k2);
@@ -117,14 +114,13 @@ template <class Tensor>
 Tensor expected_vector(const MPS<Tensor> &a, const std::vector<Tensor> &op,
                        const MPS<Tensor> &b) {
   index L = a.ssize();
-  if (b.ssize() != L) {
-    throw std::invalid_argument(
-        "In expected_vector(), MPS have different sizes");
-  }
-  if (ssize(op) != L) {
-    throw std::invalid_argument(
-        "In expected_vector(), number of operators does not match MPS size");
-  }
+  tensor_assert2(
+      b.ssize() == L,
+      std::invalid_argument("In expected_vector(), MPS have different sizes"));
+  tensor_assert2(
+      ssize(op) == L,
+      std::invalid_argument(
+          "In expected_vector(), number of operators does not match MPS size"));
   std::vector<Environment<Tensor>> auxLeft(L, Environment<Tensor>(DIR_RIGHT));
   {
     Environment<Tensor> left(DIR_RIGHT);
@@ -161,16 +157,13 @@ Tensor all_correlations_fast(const MPS<Tensor> &a,
                              const MPS<Tensor> &b, bool symmetric = false,
                              const Tensor *jordan_wigner_op = 0) {
   index L = a.ssize();
-  if (b.ssize() != L) {
-    throw std::invalid_argument(
-        "In expected(MPS, Tensor, Tensor, MPS), two MPS of different size were "
-        "passed");
-  }
-  if (ssize(op1) != L || ssize(op2) != L) {
-    throw std::invalid_argument(
-        "In expected(MPS, Tensor, Tensor, MPS), the list of operators differs "
-        "from the MPS size");
-  }
+  tensor_assert2(
+      b.ssize() == L,
+      std::invalid_argument("In expected_vector(), MPS have different sizes"));
+  tensor_assert2(
+      ssize(op1) == L && ssize(op2) == L,
+      std::invalid_argument(
+          "In expected_vector(), number of operators does not match MPS size"));
 
   Environment<Tensor> aux(DIR_RIGHT);
   std::vector<Environment<Tensor>> auxLeft(L, aux);

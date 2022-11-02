@@ -47,17 +47,10 @@ index Lattice::count_bits(Lattice::word w) {
 }
 
 const Indices Lattice::states_with_n_particles(index sites, index filling) {
-  if (sites >= max_sites()) {
-    throw std::invalid_argument(
-        "Number of sites exceeds what Lattice supports in this architecture");
-  }
-  if (sites <= 0 || filling < 0) {
-    throw std::invalid_argument("Negative number of sistes or filling");
-  }
-  if (filling > sites) {
-    throw std::invalid_argument(
-        "In Lattice, number of particles exceeds number of sites");
-  }
+  tensor_assert(sites < max_sites());
+  tensor_assert(sites > 0);
+  tensor_assert(filling >= 0 && filling <= sites);
+  tensor_assert(filling <= sites);
   word problem_size = 0;
   word end = word(1) << sites;
   for (word configuration = 0; configuration < end; ++configuration) {

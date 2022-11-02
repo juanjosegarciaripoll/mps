@@ -61,8 +61,8 @@ class QuadraticForm {
     } else if (sense == DIR_LEFT) {
       propagate_left(braP, ketP);
     } else {
-      throw std::invalid_argument(
-          "QuadraticForm(), received an invalid direction");
+      tensor_terminate(std::invalid_argument(
+          "QuadraticForm(), received an invalid direction"));
     }
   }
   /** The site at which the quadratic form is defined. */
@@ -161,29 +161,28 @@ class QuadraticForm {
   void get_index_pair(Dir sense, index &i, index &j) const {
     index n = here();
     if (sense == DIR_RIGHT) {
-      if (n == last_site()) {
-        throw std::out_of_range(
-            "Out of range index in QuadraticForm::two_site_matrix");
-      }
+      tensor_assert2(
+          n < last_site(),
+          std::out_of_range(
+              "Out of range index in QuadraticForm::two_site_matrix"));
       i = n;
       j = n + 1;
     } else if (sense == DIR_LEFT) {
-      if (n == 0) {
-        throw std::out_of_range(
-            "Out of range index in QuadraticForm::two_site_matrix");
-      }
+      tensor_assert2(
+          n > 0, std::out_of_range(
+                     "Out of range index in QuadraticForm::two_site_matrix"));
       i = n - 1;
       j = n;
     } else {
-      throw std::invalid_argument("Not a valid direction (Dir type)");
+      tensor_terminate(
+          std::invalid_argument("Not a valid direction (Dir type)"));
     }
   }
 
   void initialize_environments(const mps_t &bra, const mps_t &ket,
                                index start) {
-    if (bra.size() != size() || ket.size() != size()) {
-      throw std::invalid_argument("Wrong sizes of MPS in QForm");
-    }
+    tensor_assert2(bra.size() == size() && ket.size() == size(),
+                   std::invalid_argument("Wrong sizes of MPS in QForm"));
     // Prepare the right matrices from site start to size()-1 to 0
     current_site_ = last_site();
     right_environment(current_site_) = env_t(DIR_LEFT);

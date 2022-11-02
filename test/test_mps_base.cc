@@ -296,17 +296,17 @@ void test_mps_const_access() {
   {
     const MPS psi;
     EXPECT_EQ(psi.size(), 0);
-    EXPECT_THROW(psi[0], mps_out_of_range);
-    EXPECT_THROW(psi[1], mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi[0], mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi[1], mps_out_of_range);
   }
   {
     auto state = MPS::elt_t::random(3);
     const MPS psi = MPS::product_state(1, state);
     state = reshape(state, 1, 3, 1);
     EXPECT_ALL_EQUAL(state, psi[0]);
-    EXPECT_THROW(psi[1], mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi[1], mps_out_of_range);
     EXPECT_ALL_EQUAL(state, psi[-1]);
-    EXPECT_THROW(psi[-2], mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi[-2], mps_out_of_range);
   }
   {
     auto state = MPS::elt_t::random(3);
@@ -314,10 +314,10 @@ void test_mps_const_access() {
     state = reshape(state, 1, 3, 1);
     EXPECT_ALL_EQUAL(state, psi[0]);
     EXPECT_ALL_EQUAL(state, psi[1]);
-    EXPECT_THROW(psi[2], mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi[2], mps_out_of_range);
     EXPECT_ALL_EQUAL(state, psi[-1]);
     EXPECT_ALL_EQUAL(state, psi[-2]);
-    EXPECT_THROW(psi[-3], mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi[-3], mps_out_of_range);
   }
 }
 
@@ -326,18 +326,18 @@ void test_mps_access() {
   {
     MPS psi;
     EXPECT_EQ(psi.size(), 0);
-    EXPECT_THROW(psi.at(0), mps_out_of_range);
-    EXPECT_THROW(psi.at(1), mps_out_of_range);
-    EXPECT_THROW(psi.at(-1), mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi.at(0), mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi.at(1), mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi.at(-1), mps_out_of_range);
   }
   {
     auto state = MPS::elt_t::random(3);
     MPS psi = MPS::product_state(1, state);
     state = reshape(state, 1, 3, 1);
     EXPECT_ALL_EQUAL(state, psi.at(0));
-    EXPECT_THROW(psi.at(1), mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi.at(1), mps_out_of_range);
     EXPECT_ALL_EQUAL(state, psi.at(-1));
-    EXPECT_THROW(psi.at(-2), mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi.at(-2), mps_out_of_range);
   }
   {
     auto state = MPS::elt_t::random(3);
@@ -345,10 +345,10 @@ void test_mps_access() {
     state = reshape(state, 1, 3, 1);
     EXPECT_ALL_EQUAL(state, psi.at(0));
     EXPECT_ALL_EQUAL(state, psi.at(1));
-    EXPECT_THROW(psi.at(2), mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi.at(2), mps_out_of_range);
     EXPECT_ALL_EQUAL(state, psi.at(-1));
     EXPECT_ALL_EQUAL(state, psi.at(-2));
-    EXPECT_THROW(psi.at(-3), mps_out_of_range);
+    EXPECT_ERROR_DETECTED(psi.at(-3), mps_out_of_range);
   }
   {
     auto state0 = MPS::elt_t::random(1, 3, 1);
@@ -371,11 +371,13 @@ template <class MPS>
 void test_mps_product_state(int size) {
   const auto psi = MPS::elt_t::random(3);
   // Throw if we do not provide a vector as local state
-  EXPECT_THROW(product_state(size, reshape(psi, 3, 1)), std::invalid_argument);
+  EXPECT_ERROR_DETECTED(product_state(size, reshape(psi, 3, 1)),
+                        std::invalid_argument);
   // Throw if we the vector has size zero
-  EXPECT_THROW(product_state(size, mp_tensor_t<MPS>::empty(0)),
-               std::invalid_argument);
-  EXPECT_THROW(product_state(size, mp_tensor_t<MPS>()), std::invalid_argument);
+  EXPECT_ERROR_DETECTED(product_state(size, mp_tensor_t<MPS>::empty(0)),
+                        std::invalid_argument);
+  EXPECT_ERROR_DETECTED(product_state(size, mp_tensor_t<MPS>()),
+                        std::invalid_argument);
   {
     MPS state = product_state(size, psi);
     EXPECT_EQ(state.size(), size);

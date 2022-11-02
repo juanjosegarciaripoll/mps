@@ -111,10 +111,9 @@ class MPOEnvironment {
   typedef std::unordered_map<index, single_env_t> env_t;
 
   explicit MPOEnvironment(Dir direction) : direction_{direction} {
-    if (direction != DIR_RIGHT && direction != DIR_LEFT) {
-      throw std::invalid_argument(
-          "Invalid direction supplied to MPOEnvironment()");
-    }
+    tensor_assert2(direction == DIR_RIGHT || direction == DIR_LEFT,
+                   std::invalid_argument(
+                       "Invalid direction supplied to MPOEnvironment()"));
     envs_.emplace(0, single_env_t(direction));
   }
 
@@ -122,10 +121,9 @@ class MPOEnvironment {
       : envs_{std::move(env)},
         direction_{direction},
         dimensions_(std::move(dims)) {
-    if (direction != DIR_RIGHT && direction != DIR_LEFT) {
-      throw std::invalid_argument(
-          "Invalid direction supplied to MPOEnvironment()");
-    }
+    tensor_assert2(direction == DIR_RIGHT || direction == DIR_LEFT,
+                   std::invalid_argument(
+                       "Invalid direction supplied to MPOEnvironment()"));
   }
 
   MPOEnvironment propagate(const Tensor &bra, const Tensor &ket,

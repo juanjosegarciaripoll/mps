@@ -22,8 +22,10 @@
 
 #ifdef TENSOR_DEBUG
 #define ASSERT_ERROR_DETECTED(x) ASSERT_DEATH(x, ".*")
+#define EXPECT_ERROR_DETECTED(x, condition) ASSERT_DEATH(x, ".*")
 #else
 #define ASSERT_ERROR_DETECTED(x) (void)0
+#define EXPECT_ERROR_DETECTED(x, condition) (void)0
 #endif
 
 namespace tensor_test {
