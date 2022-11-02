@@ -55,7 +55,7 @@ size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
           std::cerr << "Truncated only zeros, new size " << i << " vs " << L
                     << '\n';
         }
-        return (i < max_dim) ? (i + 1) : max_dim;
+        return std::min(i + 1, max_dim);
       }
     }
     if (debug) {
@@ -82,7 +82,7 @@ size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
   double limit = std::max(tol, DBL_EPSILON) * total;
   for (index i = 0; i < max_dim; i++) {
     if (cumulated[i] <= limit) {
-      max_dim = i + 1;
+      max_dim = i;
       break;
     }
   }
