@@ -19,6 +19,7 @@
 
 #include <tensor/linalg.h>
 #include <tensor/io.h>
+#include <mps/tools.h>
 #include <mps/itebd.h>
 #include <mps/mps_algorithms.h>
 
@@ -39,7 +40,8 @@ static const Tensor ensure_3_indices(const Tensor &G) {
 }
 
 template <class Tensor>
-static void ortho_basis(const Tensor V, Tensor *U, Tensor *Uinv) {
+static void ortho_basis(const Tensor V, Tensor *U, Tensor *Uinv,
+                        double tolerance) {
   /*
      * We have a basis |b> such that
      *		V(b,b') = <b'|b>
@@ -55,6 +57,11 @@ static void ortho_basis(const Tensor V, Tensor *U, Tensor *Uinv) {
   Tensor R;
   Tensor s = abs(linalg::eig_sym(V, &R));
   s = sqrt(s);
+  auto ndx = where_to_truncate(abs(s), tolerance, ssize(s));
+  if (ndx < s.size()) {
+    s = s(range(0, ndx - 1));
+    R = R(_, range(0, ndx - 1));
+  }
   *U = scale(R, -1, s);
   *Uinv = scale(adjoint(R), 0, 1.0 / s);
 }
@@ -83,16 +90,16 @@ static Tensor itebd_power_eig(const Tensor &G, int sense) {
 
 template <class Tensor>
 static void ortho_right(const Tensor &G, const Tensor &l, Tensor *X,
-                        Tensor *Xinv) {
+                        Tensor *Xinv, double tolerance) {
   Tensor v = itebd_power_eig(scale(ensure_3_indices<Tensor>(G), -1, l), -1);
-  ortho_basis<Tensor>(v, X, Xinv);
+  ortho_basis<Tensor>(v, X, Xinv, tolerance);
 }
 
 template <class Tensor>
 static void ortho_left(const Tensor &G, const Tensor &l, Tensor *Y,
-                       Tensor *Yinv) {
+                       Tensor *Yinv, double tolerance) {
   Tensor v = itebd_power_eig(scale(ensure_3_indices<Tensor>(G), 0, l), +1);
-  ortho_basis<Tensor>(v, Y, Yinv);
+  ortho_basis<Tensor>(v, Y, Yinv, tolerance);
 }
 
 template <class Tensor>
@@ -100,11 +107,11 @@ static void canonical_form(Tensor G, Tensor l, Tensor *pGout, Tensor *plout,
                            double tolerance, index max_dim) {
   Tensor X;    /* X(b,c) */
   Tensor Xinv; /* Xinv(c,b) */
-  ortho_right<Tensor>(G, l, &X, &Xinv);
+  ortho_right<Tensor>(G, l, &X, &Xinv, tolerance);
 
   Tensor Y;    /* Y(a,d) */
   Tensor Yinv; /* Yinv(d,a) */
-  ortho_left<Tensor>(G, l, &Y, &Yinv);
+  ortho_left<Tensor>(G, l, &Y, &Yinv, tolerance);
 
   /* We implement http://arxiv.org/pdf/0711.3960v4.pdf */
 
@@ -199,27 +206,30 @@ static Tensor itebd_power_eig(const Tensor &A, const Tensor &lA,
 
 template <class Tensor>
 static void ortho_right(const Tensor &A, const Tensor &lA, const Tensor &B,
-                        const Tensor &lB, Tensor *X, Tensor *Xinv) {
+                        const Tensor &lB, Tensor *X, Tensor *Xinv,
+                        double tolerance) {
   Tensor v = itebd_power_eig(A, lA, B, lB, -1);
-  ortho_basis<Tensor>(v, X, Xinv);
+  ortho_basis<Tensor>(v, X, Xinv, tolerance);
 }
 
 template <class Tensor>
 static void ortho_left(const Tensor &A, const Tensor &lA, const Tensor &B,
-                       const Tensor &lB, Tensor *Y, Tensor *Yinv) {
+                       const Tensor &lB, Tensor *Y, Tensor *Yinv,
+                       double tolerance) {
   Tensor v = itebd_power_eig(A, lA, B, lB, +1);
-  ortho_basis<Tensor>(v, Y, Yinv);
+  ortho_basis<Tensor>(v, Y, Yinv, tolerance);
 }
 
 template <class Tensor>
-const iTEBD<Tensor> iTEBD<Tensor>::canonical_form(double, index) const {
+const iTEBD<Tensor> iTEBD<Tensor>::canonical_form(double tolerance,
+                                                  index) const {
   Tensor X;    /* X(b,c) */
   Tensor Xinv; /* Xinv(c,b) */
-  ortho_right<Tensor>(A_, lA_, B_, lB_, &X, &Xinv);
+  ortho_right<Tensor>(A_, lA_, B_, lB_, &X, &Xinv, tolerance);
 
   Tensor Y;    /* Y(a,d) */
   Tensor Yinv; /* Yinv(d,a) */
-  ortho_left<Tensor>(A_, lA_, B_, lB_, &Y, &Yinv);
+  ortho_left<Tensor>(A_, lA_, B_, lB_, &Y, &Yinv, tolerance);
 
   /* We implement http://arxiv.org/pdf/0711.3960v4.pdf */
 
@@ -240,7 +250,7 @@ const iTEBD<Tensor> iTEBD<Tensor>::canonical_form(double, index) const {
   newA = fold(V, -1, newA, 0);
   newB = fold(newB, -1, U, 0);
 
-  return iTEBD<Tensor>(newA, lA_, newB, newlB / norm2(newlB), true);
+  return iTEBD<Tensor>(newA, lA_, newB, newlB, true);
 }
 
 template <class Tensor>
