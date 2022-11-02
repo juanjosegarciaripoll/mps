@@ -50,17 +50,17 @@ static void ortho_basis(const Tensor V, Tensor *U, Tensor *Uinv,
      * where R is a unitary matrix R' R = R R' = identity.
      * These matrices give us a new orthogonal basis. Given
      *		|b> = U(b,c) |c>
-     * we obtain, given <c|c'>=delta(c,c')
+     * we obtain, for <c|c'>=delta(c,c')
      *		V(b,b') = U(b,c) * U*(b',c') <c|c'> = U * U'
      * so that U = R * sqrt(s) and V = U * U';
      */
   Tensor R;
-  Tensor s = abs(linalg::eig_sym(V, &R));
-  s = sqrt(s);
-  auto ndx = where_to_truncate(abs(s), tolerance, ssize(s));
-  if (ndx < s.size()) {
-    s = s(range(0, ndx - 1));
-    R = R(_, range(0, ndx - 1));
+  auto s = sqrt(abs(linalg::eig_sym(V, &R)));
+  // Keep only eigenvalues within the relative tolerance
+  auto ndx = weights_to_keep(s, tolerance, ssize(s));
+  if (ndx.size() < s.size()) {
+    s = s(ndx);
+    R = R(_, ndx);
   }
   *U = scale(R, -1, s);
   *Uinv = scale(adjoint(R), 0, 1.0 / s);

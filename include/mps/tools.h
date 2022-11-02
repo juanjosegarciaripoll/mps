@@ -32,6 +32,8 @@ extern int debug_flags;
 
 size_t where_to_truncate(const RTensor &s, double tol, index max_dim);
 
+Indices weights_to_keep(const RTensor &s, double tol, index max_dim);
+
 const RTensor limited_svd(RTensor A, RTensor *U, RTensor *V, double tolerance,
                           index max_dim = 0);
 

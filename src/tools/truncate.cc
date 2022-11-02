@@ -25,6 +25,16 @@
 
 namespace mps {
 
+Indices weights_to_keep(const RTensor &s, double tol, index max_dim) {
+  const Indices ndx = sort_indices(abs(s), true /* reversed */);
+  auto sorted_s = s(ndx);
+  auto stop = where_to_truncate(sorted_s, tol, max_dim);
+  if (stop == ndx.size()) return ndx;
+  Indices output(stop);
+  std::copy(ndx.begin(), ndx.begin() + stop, output.begin());
+  return output;
+}
+
 size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
   /* S is a vector of positive numbers arranged in decreasing order.  This
      * routine looks for a point to truncate S such that the norm-2 error made
