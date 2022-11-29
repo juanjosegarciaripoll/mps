@@ -10,9 +10,7 @@ function(make_mps_options)
                   <memory> <iostream> <string> <vector>)
 
     if (MPS_OPTIMIZED_BUILD)
-        if (CMAKE_BUILD_TYPE MATCHES "Rel")
-            mps_add_optimizations()
-        endif()
+        mps_add_optimizations()
     endif()
 
     if (MPS_DEFAULT_WARNINGS)
@@ -36,7 +34,8 @@ function(mps_add_optimizations)
     endif()
 
     message(STATUS "Compiler optimizations ${PROJECT_OPTIMIZATIONS}")
-    target_compile_options(mps_options INTERFACE "${PROJECT_OPTIMIZATIONS}")
+    target_compile_options(mps_options INTERFACE
+        $<$<CONFIG:Release,RelWithDebInfo>:${PROJECT_OPTIMIZATIONS}>)
 endfunction()
 
 # Warnings collected from here:
