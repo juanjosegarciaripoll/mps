@@ -29,8 +29,10 @@ namespace mps {
 using index_t = tensor::index_t;
 using index = tensor::index_t;
 
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
 
 template <class elt>
 class vector : public std::vector<elt> {
@@ -71,7 +73,9 @@ class vector : public std::vector<elt> {
   }
 };
 
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 
 }  // namespace mps
 
