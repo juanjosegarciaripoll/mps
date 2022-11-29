@@ -139,8 +139,10 @@ TEST(RMPSCorrelation, GHZ) {
     RMPS ghz = ghz_state(i);
     for (index j = 0; j < i; j++) {
       for (index k = 0; k < i; k++) {
-        EXPECT_DOUBLE_EQ(expected(ghz, mps::Pauli_z, j, mps::Pauli_z, k), 1.0);
-        EXPECT_DOUBLE_EQ(expected(ghz, mps::Pauli_x, j, mps::Pauli_z, k), 0.0);
+        EXPECT_NEAR(expected(ghz, mps::Pauli_z, j, mps::Pauli_z, k), 1.0,
+                    i * STRICT_EPSILON);
+        EXPECT_NEAR(expected(ghz, mps::Pauli_x, j, mps::Pauli_z, k), 0.0,
+                    i * STRICT_EPSILON);
       }
     }
   }
