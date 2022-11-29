@@ -408,7 +408,7 @@ void test_mps_to_vector() {
     MPS psi = MPS::product_state(2, psi0);
     auto v = psi.to_vector();
     auto videal = kron(psi0, psi0);
-    EXPECT_ALL_EQUAL(v, videal);
+    EXPECT_CEQ3(v, videal, STRICT_EPSILON);
   }
   {
     MPS psi = MPS::random(Dimensions{3, 2}, /*bond dim*/ 4);
@@ -416,7 +416,7 @@ void test_mps_to_vector() {
     auto psi0 = reshape(psi[0], 3, 4);
     auto psi1 = reshape(psi[1], 4, 2);
     auto videal = reshape(mmult(psi0, psi1), 3 * 2);
-    EXPECT_ALL_EQUAL(v, videal);
+    EXPECT_CEQ3(v, videal, STRICT_EPSILON);
   }
 }
 
