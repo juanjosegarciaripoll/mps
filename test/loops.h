@@ -62,26 +62,16 @@ void unique(const Tensor &t) {
    */
 template <typename elt_t1, typename elt_t2>
 bool simeq(elt_t1 a, elt_t2 b, double epsilon = 2 * EPSILON) {
-  double x = tensor::abs(a - b);
-  if (x > epsilon) {
-    std::cerr << x << '\n';
-    return false;
-  }
-  return true;
+  return tensor::abs(a - b) <= epsilon;
 }
 
 template <typename elt_t>
 bool simeq(const Tensor<elt_t> &a, const Tensor<elt_t> &b,
            double epsilon = 2 * EPSILON) {
-  for (typename Tensor<elt_t>::const_iterator ia = a.begin(), ib = b.begin();
-       ia != a.end(); ia++, ib++) {
-    double x = tensor::abs(*ia - *ib);
-    if (x > epsilon) {
-      std::cerr << x << '\n';
-      return false;
-    }
-  }
-  return true;
+  return std::equal(a.begin(), a.end(), b.begin(),
+                    [=](elt_t elt_a, elt_t elt_b) {
+                      return tensor::abs(elt_a - elt_b) <= epsilon;
+                    });
 }
 
 template <typename t1, typename t2>

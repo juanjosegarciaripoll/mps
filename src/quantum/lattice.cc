@@ -85,12 +85,11 @@ void Lattice::hopping_inner(RTensor *values, Indices *ndx, index to_site,
   word mask01 = from_mask;
   word mask10 = to_mask;
 
-  RTensor::iterator v = values->begin();
   *ndx = configurations;
   if (kind == HARD_CORE_BOSONS) {
-    for (Indices::iterator it = ndx->begin(), end = ndx->end(); it != end;
-         ++it, ++v) {
-      word other = *it;
+    auto v = values->begin();
+    for (auto &it : *ndx) {
+      word other = it;
       word aux = other & mask11;
       if (aux == mask01) {
         *v = 1.0;
@@ -101,7 +100,8 @@ void Lattice::hopping_inner(RTensor *values, Indices *ndx, index to_site,
       } else {
         *v = 0.0;
       }
-      *it = other;
+      it = other;
+      ++v;
     }
   } else {
     word sign_mask, sign_value;
@@ -112,9 +112,9 @@ void Lattice::hopping_inner(RTensor *values, Indices *ndx, index to_site,
       sign_mask = (from_mask - 1) & (~(to_mask - 1));
       sign_value = 1;
     }
-    for (Indices::iterator it = ndx->begin(), end = ndx->end(); it != end;
-         ++it, ++v) {
-      word other = *it;
+    auto v = values->begin();
+    for (auto &it : *ndx) {
+      word other = it;
       word aux = other & mask11;
       if (aux == mask01) {
         if ((count_bits(other & sign_mask) & 1) == sign_value)
@@ -128,7 +128,8 @@ void Lattice::hopping_inner(RTensor *values, Indices *ndx, index to_site,
       } else {
         *v = 0.0;
       }
-      *it = other;
+      it = other;
+      ++v;
     }
   }
 }
@@ -160,15 +161,9 @@ const RTensor Lattice::interaction_inner(index site1, index site2) const {
   RTensor values = RTensor::empty(L);
 
   constexpr word one = 1;
-  word mask1 = one << site1;
-  word mask2 = one << site2;
-  word target = mask1 | mask2;
-  RTensor::iterator v = values.begin();
-  for (Indices::const_iterator it = configurations.begin(),
-                               end = configurations.end();
-       it != end; ++it, ++v) {
-    *v = (*it & target) == target;
-  }
+  word mask = (one << site1) | (one << site2);
+  std::transform(configurations.begin(), configurations.end(), values.begin(),
+                 [mask](word bits) -> double { return (bits & mask) == mask; });
   return values;
 }
 

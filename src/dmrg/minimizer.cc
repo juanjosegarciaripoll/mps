@@ -104,24 +104,22 @@ struct Minimizer : public MinimizerOptions {
   const mps_t &state() { return psi; }
 
   void add_states(const std::list<mps_t> &psi_orthogonal) {
-    for (typename std::list<mps_t>::const_iterator it = psi_orthogonal.begin();
-         it != psi_orthogonal.end(); ++it) {
-      OrthoMPS.push_front(*it);
-      OrthoLform.push_front(lform_t(*it, psi, 0));
+    for (const auto &orthogonal_state : psi_orthogonal) {
+      OrthoMPS.push_front(orthogonal_state);
+      OrthoLform.push_front(lform_t(orthogonal_state, psi, 0));
     }
   }
 
   tensor_list_t orthogonal_projectors(index current_site, int sense) {
     tensor_list_t output;
-    for (typename std::list<lform_t>::iterator it = OrthoLform.begin();
-         it != OrthoLform.end(); ++it) {
-      if (current_site != it->here()) {
+    for (const auto &lform : OrthoLform) {
+      if (current_site != lform.here()) {
         std::cerr << "DMRG algorithm place at " << current_site
-                  << " while projectors at " << it->here() << '\n';
+                  << " while projectors at " << lform.here() << '\n';
         abort();
       }
       tensor_t other =
-          sense ? it->two_site_vector(sense) : it->single_site_vector();
+          sense ? lform.two_site_vector(sense) : lform.single_site_vector();
       output.push_front(other / sqrt(norm2(other)));
     }
     return output;
@@ -134,9 +132,8 @@ struct Minimizer : public MinimizerOptions {
     // 'psi'.
     Hqform.propagate(psi[this_site], psi[this_site], this_step);
     if (Nqform) Nqform->propagate(psi[this_site], psi[this_site], this_step);
-    for (typename std::list<lform_t>::iterator it = OrthoLform.begin();
-         it != OrthoLform.end(); ++it) {
-      it->propagate(psi[this_site], this_step);
+    for (auto &lform : OrthoLform) {
+      lform.propagate(psi[this_site], this_step);
     }
   }
 
