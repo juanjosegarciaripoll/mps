@@ -1,5 +1,5 @@
-// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 #pragma once
+// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
 
@@ -111,7 +111,7 @@ inline tensor_scalar_t<tensor_common_t<T1, T2>> expected(const MPS<T1> &a,
 }
 
 template <class Tensor>
-Tensor expected_vector(const MPS<Tensor> &a, const std::vector<Tensor> &op,
+Tensor expected_vector(const MPS<Tensor> &a, const vector<Tensor> &op,
                        const MPS<Tensor> &b) {
   index L = a.ssize();
   tensor_assert2(
@@ -121,7 +121,7 @@ Tensor expected_vector(const MPS<Tensor> &a, const std::vector<Tensor> &op,
       ssize(op) == L,
       std::invalid_argument(
           "In expected_vector(), number of operators does not match MPS size"));
-  std::vector<Environment<Tensor>> auxLeft(L, Environment<Tensor>(DIR_RIGHT));
+  vector<Environment<Tensor>> auxLeft(L, Environment<Tensor>(DIR_RIGHT));
   {
     Environment<Tensor> left(DIR_RIGHT);
     for (index i = 1; i < L; i++) {
@@ -140,21 +140,20 @@ Tensor expected_vector(const MPS<Tensor> &a, const std::vector<Tensor> &op,
 
 /**Compute a vector of single-site expected values, reusing environments.*/
 template <class Tensor>
-Tensor expected_vector(const MPS<Tensor> &a, const std::vector<Tensor> &op) {
+Tensor expected_vector(const MPS<Tensor> &a, const vector<Tensor> &op) {
   return expected_vector(a, op, a);
 }
 
 /**Compute a vector of single-site expected values, reusing environments.*/
 template <class Tensor>
 Tensor expected_vector(const MPS<Tensor> &a, const Tensor &op) {
-  return expected_vector(a, std::vector<Tensor>(a.size(), op), a);
+  return expected_vector(a, vector<Tensor>(a.ssize(), op), a);
 }
 
 template <class Tensor>
-Tensor all_correlations_fast(const MPS<Tensor> &a,
-                             const std::vector<Tensor> &op1,
-                             const std::vector<Tensor> &op2,
-                             const MPS<Tensor> &b, bool symmetric = false,
+Tensor all_correlations_fast(const MPS<Tensor> &a, const vector<Tensor> &op1,
+                             const vector<Tensor> &op2, const MPS<Tensor> &b,
+                             bool symmetric = false,
                              const Tensor *jordan_wigner_op = 0) {
   index L = a.ssize();
   tensor_assert2(
@@ -166,12 +165,12 @@ Tensor all_correlations_fast(const MPS<Tensor> &a,
           "In expected_vector(), number of operators does not match MPS size"));
 
   Environment<Tensor> aux(DIR_RIGHT);
-  std::vector<Environment<Tensor>> auxLeft(L, aux);
+  vector<Environment<Tensor>> auxLeft(L, aux);
   for (index i = 1; i < L; i++) {
     auxLeft[i] = aux = aux.propagate(a[i - 1], b[i - 1]);
   }
   aux = Environment<Tensor>(DIR_LEFT);
-  std::vector<Environment<Tensor>> auxRight(L, aux);
+  vector<Environment<Tensor>> auxRight(L, aux);
   for (index i = L - 1; i; --i) {
     auxRight[i - 1] = aux = aux.propagate(a[i], b[i]);
   }
@@ -213,17 +212,17 @@ Tensor all_correlations_fast(const MPS<Tensor> &a,
 
 /**Compute all two-site correlations.*/
 template <class Tensor>
-Tensor expected(const MPS<Tensor> &a, const std::vector<Tensor> &op1,
-                const std::vector<Tensor> &op2) {
+Tensor expected(const MPS<Tensor> &a, const vector<Tensor> &op1,
+                const vector<Tensor> &op2) {
   return all_correlations_fast(a, op1, op2, a);
 }
 
 /**Compute all two-site correlations.*/
 template <class Tensor>
 Tensor expected(const MPS<Tensor> &a, const Tensor &op1, const Tensor &op2) {
-  index L = a.size();
-  std::vector<Tensor> vec1(L, op1);
-  std::vector<Tensor> vec2(L, op2);
+  index L = a.ssize();
+  vector<Tensor> vec1(L, op1);
+  vector<Tensor> vec2(L, op2);
   return all_correlations_fast(a, vec1, vec2, a);
 }
 

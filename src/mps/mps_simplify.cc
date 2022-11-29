@@ -166,7 +166,7 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
     abort();
   }
 
-  index N = P.size();
+  index N = P.ssize();
   MPS A(N), B(N);
 
   if (*sense > 0) {

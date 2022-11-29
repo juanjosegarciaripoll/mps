@@ -32,7 +32,7 @@ template <class MPS>
 void test_lform_norm(MPS psi) {
   auto w = MPS::elt_t::empty(1);
   w.randomize();
-  std::vector<MPS> v(1);
+  vector<MPS> v(1);
   v.at(0) = normal_form(psi);
   LinearForm<mp_tensor_t<MPS>> f(w, v, psi, 0);
   EXPECT_CEQ(f.norm2(), norm2(w));
@@ -44,7 +44,7 @@ template <class MPS>
 void test_lform_norm2(MPS psi) {
   auto w = MPS::elt_t::empty(2);
   w.randomize();
-  std::vector<MPS> v(2);
+  vector<MPS> v(2);
   v.at(0) = v.at(1) = normal_form(psi);
   LinearForm<mp_tensor_t<MPS>> f(w, v, psi, 0);
   double n = sqrt(tensor::abs(sum(kron(conj(w), w))));
@@ -67,7 +67,7 @@ void test_lform_canonical(MPS psi) {
 // them weights.
 template <class MPS>
 void test_lform_canonical2(MPS psi) {
-  std::vector<MPS> vs(2);
+  vector<MPS> vs(2);
   auto w = MPS::elt_t::empty(2);
   for (index i = 0; i < psi.size(); i++) {
     vs.at(0) = vs.at(1) = canonical_form_at(psi, i);

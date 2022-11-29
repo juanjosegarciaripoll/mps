@@ -75,11 +75,12 @@ Lattice::Lattice(index sites, index N)
 
 void Lattice::hopping_inner(RTensor *values, Indices *ndx, index to_site,
                             index from_site, particle_kind_t kind) const {
-  word L = configurations.size();
+  word L = configurations.ssize();
   *values = RTensor::zeros(L);
 
-  word from_mask = (word)1 << from_site;
-  word to_mask = (word)1 << to_site;
+  constexpr word one = 1;
+  word from_mask = one << from_site;
+  word to_mask = one << to_site;
   word mask11 = from_mask | to_mask;
   word mask01 = from_mask;
   word mask10 = to_mask;
@@ -139,8 +140,8 @@ const RSparse Lattice::hopping_operator(index to_site, index from_site,
   RTensor values;
   hopping_inner(&values, &rows, to_site, from_site, kind);
   rows = sort_indices(rows);
-  Indices cols = iota(0, rows.size() - 1);
-  return RSparse(rows, cols, values, rows.size(), rows.size());
+  Indices cols = iota(0, rows.ssize() - 1);
+  return RSparse(rows, cols, values, rows.ssize(), rows.ssize());
 }
 
 const RSparse Lattice::number_operator(index site) const {
@@ -148,18 +149,19 @@ const RSparse Lattice::number_operator(index site) const {
 }
 
 const RSparse Lattice::interaction_operator(index site1, index site2) const {
-  word L = configurations.size();
+  auto L = configurations.ssize();
   RTensor values = interaction_inner(site1, site2);
   Indices n = iota(0, L - 1);
   return RSparse(n, n, values, L, L);
 }
 
 const RTensor Lattice::interaction_inner(index site1, index site2) const {
-  word L = configurations.size();
+  auto L = configurations.ssize();
   RTensor values = RTensor::empty(L);
 
-  word mask1 = (word)1 << site1;
-  word mask2 = (word)1 << site2;
+  constexpr word one = 1;
+  word mask1 = one << site1;
+  word mask2 = one << site2;
   word target = mask1 | mask2;
   RTensor::iterator v = values.begin();
   for (Indices::const_iterator it = configurations.begin(),
@@ -218,6 +220,6 @@ index Lattice::size() const { return number_of_sites; }
 
 index Lattice::particles() const { return number_of_particles; }
 
-index Lattice::dimension() const { return configurations.size(); }
+index Lattice::dimension() const { return configurations.ssize(); }
 
 }  // namespace mps

@@ -80,15 +80,15 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
   CMPS Hcurrent = apply_canonical(H_, current, mps_sense, truncate_mpo_on_mps);
   int debug = mps::FLAGS.get_int(MPS_DEBUG_ARNOLDI);
 
-  std::vector<CMPS> states;
+  vector<CMPS> states;
   states.reserve(max_states_);
   states.push_back(normal_form(current, -1));
   N.at(0, 0) = to_complex(1.0);
   Heff.at(0, 0) = real(scprod(current, Hcurrent, mps_sense));
 
-  std::vector<CMPS> vectors(3);
-  std::vector<cdouble> coeffs(3);
-  std::vector<double> errors;
+  vector<CMPS> vectors(3);
+  vector<cdouble> coeffs(3);
+  vector<double> errors;
   if (debug) {
     std::cerr << "Arnoldi step\n";
   }

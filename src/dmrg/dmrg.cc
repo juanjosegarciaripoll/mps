@@ -166,7 +166,7 @@ double DMRG<MPS>::minimize_single_site(MPS &P, index k, int dk) {
 
 template <class MPS>
 index DMRG<MPS>::n_constants() const {
-  return Q_operators.size();
+  return Q_operators.ssize();
 }
 
 template <class MPS>
@@ -181,7 +181,7 @@ void DMRG<MPS>::commutes_with(const elt_t &Q) {
 
 template <class MPS>
 void DMRG<MPS>::prepare_simplifier(index k, const elt_t &Pij) {
-  index n_Q = Q_values.size();
+  index n_Q = Q_values.ssize();
   if (n_Q) {
     RTensor Z = RTensor::zeros(1, 1);
     Booleans flag;
@@ -198,7 +198,7 @@ void DMRG<MPS>::prepare_simplifier(index k, const elt_t &Pij) {
       }
     }
     valid_cells_ = which(flag);
-    full_size_ = Pij.size();
+    full_size_ = Pij.ssize();
   }
 }
 
@@ -206,7 +206,7 @@ template <class MPS>
 const typename DMRG<MPS>::elt_t DMRG<MPS>::simplify_state(
     const typename DMRG<MPS>::elt_t &Pk) {
   if (Q_values.is_empty()) {
-    return reshape(Pk, Pk.size());
+    return reshape(Pk, Pk.ssize());
   } else {
     return reshape(Pk, full_size_)(range(valid_cells_));
   }
@@ -280,7 +280,7 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
      * and we have to resort to a full diagonalization.
      */
   elt_t aux;
-  index smallL = Pi.size();
+  index smallL = Pi.ssize();
   index neig = std::max(index(1), neigenvalues);
   if (Q_values.size()) {
     if (smallL <= 10) {
@@ -542,7 +542,7 @@ index DMRG<MPS>::interaction_depth(index k) const {
 template <class MPS>
 void DMRG<MPS>::init_matrices(const MPS &P, index k0, bool also_Q) {
   if (also_Q) {
-    Ql_ = mps_vector_t(Q_values.size(), MPS(size()));
+    Ql_ = mps_vector_t(Q_values.ssize(), MPS(size()));
     Qr_ = Ql_;
   } else {
     Ql_ = mps_vector_t();
@@ -637,7 +637,7 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::block_site_interaction_left(
 
 template <class MPS>
 index DMRG<MPS>::n_orth_states() const {
-  return P0_.size();
+  return P0_.ssize();
 }
 
 /* TODO: Why Pk is not used */
@@ -719,7 +719,7 @@ void DMRG<MPS>::update_matrices_right(const MPS &P, index k) {
       fold(foldc(Pk, -1, reshape(Hblock, i1 * b1, i1 * b1), 0), -1, Pk, -1);
 
   // Conserved quantities:
-  index n_Q = Q_values.size();
+  index n_Q = Q_values.ssize();
   for (index n = 0; n < n_Q; n++) {
     elt_t prev_Q = (k + 1 < size()) ? Qr_[n][k + 1] : elt_t::zeros(1, 1);
     prev_Q = direct_sum(elt_t(take_diag(Q_operators[n])), prev_Q);

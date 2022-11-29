@@ -39,18 +39,17 @@ template cdouble expected(const RMPS &a, const CTensor &Op1, index k1,
 
 template RTensor expected_vector(const RMPS &a, const RTensor &Op1);
 
-template RTensor expected_vector(const RMPS &a,
-                                 const std::vector<RTensor> &Op1);
+template RTensor expected_vector(const RMPS &a, const vector<RTensor> &Op1);
 
 template RTensor expected(const RMPS &a, const RTensor &op1,
                           const RTensor &op2);
 
-template RTensor expected(const RMPS &a, const std::vector<RTensor> &op1,
-                          const std::vector<RTensor> &op2);
+template RTensor expected(const RMPS &a, const vector<RTensor> &op1,
+                          const vector<RTensor> &op2);
 
 template RTensor all_correlations_fast(const RMPS &a,
-                                       const std::vector<RTensor> &op1,
-                                       const std::vector<RTensor> &op2,
+                                       const vector<RTensor> &op1,
+                                       const vector<RTensor> &op2,
                                        const RMPS &b, bool symmetric,
                                        const RTensor *jordan_wigner_op);
 

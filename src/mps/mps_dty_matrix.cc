@@ -26,7 +26,7 @@ static inline const t do_density_matrix(const mps &psi, index site) {
   t ML, MR;
   tensor_assert(site < psi.ssize());
   for (index i = 0; i < site; i++) ML = prop_matrix(ML, +1, psi[i], psi[i]);
-  for (index i = psi.size() - 1; i > site; i--)
+  for (index i = psi.ssize() - 1; i > site; i--)
     MR = prop_matrix(MR, -1, psi[i], psi[i]);
   /* Dimensions:
      *	ML(a1,b1,a2,b2)

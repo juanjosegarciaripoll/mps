@@ -30,8 +30,8 @@ namespace mps {
 ConstantHamiltonian::ConstantHamiltonian(index N, bool periodic)
     : H12_(N),
       H1_(N),
-      H12_left_(N, std::vector<CTensor>()),
-      H12_right_(N, std::vector<CTensor>()),
+      H12_left_(N, vector<CTensor>()),
+      H12_right_(N, vector<CTensor>()),
       dimensions_(N),
       periodic_(periodic) {}
 
@@ -39,7 +39,7 @@ std::unique_ptr<const Hamiltonian> ConstantHamiltonian::duplicate() const {
   return std::unique_ptr<const Hamiltonian>(new ConstantHamiltonian(*this));
 }
 
-index ConstantHamiltonian::size() const { return H12_.size(); }
+index ConstantHamiltonian::size() const { return H12_.ssize(); }
 
 bool ConstantHamiltonian::is_constant() const { return 1; }
 
@@ -67,7 +67,7 @@ const CTensor ConstantHamiltonian::interaction_right(index k, index ndx,
 }
 
 index ConstantHamiltonian::interaction_depth(index k, double /*t*/) const {
-  return H12_left_[k].size();
+  return H12_left_[k].ssize();
 }
 
 const CTensor ConstantHamiltonian::local_term(index k, double /*t*/) const {

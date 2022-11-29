@@ -29,13 +29,13 @@ Indices weights_to_keep(const RTensor &s, double tol, index max_dim) {
   const Indices ndx = sort_indices(abs(s), true /* reversed */);
   auto sorted_s = s(ndx);
   auto stop = where_to_truncate(sorted_s, tol, max_dim);
-  if (stop == ndx.size()) return ndx;
+  if (stop == ndx.ssize()) return ndx;
   Indices output(stop);
   std::copy(ndx.begin(), ndx.begin() + stop, output.begin());
   return output;
 }
 
-size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
+index_t where_to_truncate(const RTensor &s, double tol, index_t max_dim) {
   /* S is a vector of positive numbers arranged in decreasing order.  This
      * routine looks for a point to truncate S such that the norm-2 error made
      * is smaller than the relative tolerance (TOL) or the length of the output
@@ -59,8 +59,8 @@ size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
   if (tol == 0 /* MPS_TRUNCATE_ZEROS */) {
     /* If the tolerance is zero, we only drop the trailing zero elements. There
        * is no need to accumulate values. */
-    for (index i = L; i--;) {
-      if (s[i]) {
+    for (index_t i = L; i--;) {
+      if (s[i] != 0) {
         if (debug) {
           std::cerr << "Truncated only zeros, new size " << i << " vs " << L
                     << '\n';
@@ -80,7 +80,7 @@ size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
      */
   auto cumulated = std::make_unique<double[]>(L);
   double total = 0;
-  for (index i = L; i--;) {
+  for (index_t i = L; i--;) {
     total += square(s[i]);
     cumulated[i] = total;
   }
@@ -90,7 +90,7 @@ size_t where_to_truncate(const RTensor &s, double tol, index max_dim) {
      * DBL_EPSILON is irrelevant for all purposes.
      */
   double limit = std::max(tol, DBL_EPSILON) * total;
-  for (index i = 0; i < max_dim; i++) {
+  for (index_t i = 0; i < max_dim; i++) {
     if (cumulated[i] <= limit) {
       max_dim = i;
       break;

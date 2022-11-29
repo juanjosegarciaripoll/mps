@@ -1,4 +1,5 @@
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
+#pragma once
 /*
     Copyright (c) 2012 Juan Jose Garcia Ripoll
 
@@ -20,8 +21,8 @@
 #ifndef MPS_ITEBD_H
 #define MPS_ITEBD_H
 
-#include <vector>
 #include <tensor/tensor.h>
+#include <mps/vector.h>
 
 /*!\addtogroup MPS*/
 /** Namespace for classes and algorithms related to Matrix Product States, DMRG and similar methods. */
@@ -198,9 +199,8 @@ template <class Tensor>
 const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
                                  double dt, index nsteps, double tolerance = -1,
                                  index max_dim = 0, index deltan = 1,
-                                 int method = 1,
-                                 std::vector<double> *energies = 0,
-                                 std::vector<double> *entropies = 0);
+                                 int method = 1, vector<double> *energies = 0,
+                                 vector<double> *entropies = 0);
 
 /* @} */
 

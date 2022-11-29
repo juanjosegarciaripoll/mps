@@ -27,8 +27,8 @@ static const MPS do_apply(const MPO &mpdo, const MPS &psi) {
   tensor_assert(mpdo.size() == psi.size());
 
   index a1, c1, j, c2, a2;
-  index L = mpdo.size();
-  MPS chi(psi.size());
+  index L = mpdo.ssize();
+  MPS chi(psi.ssize());
 
   for (index i = 0; i < L; i++) {
     const Tensor &A = psi[i];  /* A(a1,i,a2) */

@@ -72,7 +72,7 @@ void test_correlation_basic() {
 }
 
 template <class Tensor>
-Tensor product_state_correlations(const std::vector<Tensor> &states,
+Tensor product_state_correlations(const vector<Tensor> &states,
                                   const Tensor &op1, const Tensor &op2) {
   index L = ssize(states);
   auto output = Tensor::empty(L, L);

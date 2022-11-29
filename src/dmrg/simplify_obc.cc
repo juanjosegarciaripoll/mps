@@ -30,7 +30,7 @@ namespace mps {
 
 template <class MPS>
 double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
-                   const std::vector<MPS> &Q, int *sense, index sweeps,
+                   const vector<MPS> &Q, int *sense, index sweeps,
                    bool normalize, index Dmax, double tol, double *norm) {
   tensor_assert(sweeps > 0);
   bool single_site =

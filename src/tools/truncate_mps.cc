@@ -25,7 +25,7 @@ namespace mps {
 template <class MPS>
 static const Indices expected_dimensions(const MPS &P, index Dmax,
                                          bool periodic) {
-  index l = P.size();
+  index l = P.ssize();
   Indices d(l + 1);
   if (periodic) {
     for (index i = 0; i <= l; i++) d.at(i) = Dmax;
@@ -55,7 +55,7 @@ bool truncate_inner(MPS *Q, const MPS &P, index Dmax, bool periodic,
   }
   Indices d = expected_dimensions<MPS>(P, Dmax, periodic);
   bool truncated = 0;
-  index L = P.size();
+  index L = P.ssize();
   *Q = MPS(L);
   for (index k = 0; k < L; k++) {
     typename MPS::elt_t Qk = P[k];

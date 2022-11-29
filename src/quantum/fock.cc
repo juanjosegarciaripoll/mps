@@ -63,7 +63,7 @@ RTensor coherent_state(double alpha, int nmax) {
   double c = exp(-alpha * alpha / 2.0);
   for (int i = 0; i <= nmax;) {
     output.at(i) = c;
-    c = c * alpha / sqrt((double)(++i));
+    c = c * alpha / sqrt(static_cast<double>(++i));
   }
   return output;
 }
@@ -77,7 +77,7 @@ CTensor coherent_state(cdouble alpha, int nmax) {
   cdouble c = exp(-a2 * a2 / 2.0);
   for (int i = 0; i <= nmax;) {
     output.at(i) = c;
-    c = c * alpha / sqrt((double)(++i));
+    c = c * alpha / sqrt(static_cast<double>(++i));
   }
   return output;
 }

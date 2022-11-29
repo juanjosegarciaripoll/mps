@@ -86,17 +86,17 @@ class SparseMPO {
 
   auto begin() const { return tensors_.begin(); }
   auto end() const { return tensors_.end(); }
-  index size() const { return tensors_.size(); }
-  index ssize() const { return tensor::ssize(tensors_); }
+  size_t size() const { return tensors_.size(); }
+  index ssize() const { return tensors_.ssize(); }
   const value_type &operator[](index i) const { return tensors_[i]; }
 
  private:
-  typedef std::vector<Sparse4Tensor<Tensor>> tensor_list_t;
+  typedef vector<Sparse4Tensor<Tensor>> tensor_list_t;
   tensor_list_t tensors_;
 
   static tensor_list_t make_sparse_tensors(const MPO<Tensor> &mpo) {
     tensor_list_t output;
-    output.reserve(mpo.size());
+    output.reserve(mpo.ssize());
     for (const auto &P : mpo) {
       output.emplace_back(P);
     }
@@ -179,7 +179,7 @@ class MPOEnvironment {
     env_t new_env;
     for (auto &subtensor : op) {
       if (has_environment_at(env, subtensor.left_index)) {
-        new_env.try_emplace(subtensor.right_index, DIR_RIGHT);
+        new_env.emplace(subtensor.right_index, DIR_RIGHT);
         new_env.at(subtensor.right_index) +=
             env.at(subtensor.left_index).propagate(Q, P, subtensor.matrix);
       }
@@ -193,7 +193,7 @@ class MPOEnvironment {
     env_t new_env;
     for (auto &subtensor : op) {
       if (has_environment_at(env, subtensor.right_index)) {
-        new_env.try_emplace(subtensor.left_index, DIR_LEFT);
+        new_env.emplace(subtensor.left_index, DIR_LEFT);
         new_env.at(subtensor.left_index) +=
             env.at(subtensor.right_index).propagate(Q, P, subtensor.matrix);
       }

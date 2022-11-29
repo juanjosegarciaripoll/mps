@@ -1,3 +1,4 @@
+#pragma once
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
@@ -20,7 +21,7 @@
 #ifndef MPS_TIME_EVOLVE_H
 #define MPS_TIME_EVOLVE_H
 
-#include <vector>
+#include <mps/vector.h>
 #include <mps/hamiltonian.h>
 #include <mps/mps.h>
 #include <mps/mpo.h>
@@ -96,7 +97,7 @@ class TrotterSolver : public TimeSolver {
 
    private:
     int k0, kN;
-    std::vector<CTensor> U;
+    vector<CTensor> U;
     void apply_onto_one_site(CMPS &P, const CTensor &Uloc, index k, int dk,
                              index max_a2) const;
     double apply_onto_two_sites(CMPS &P, const CTensor &U12, index k1, index k2,

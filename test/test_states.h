@@ -7,14 +7,16 @@
 #ifndef TENSOR_TEST_STATES_H
 #define TENSOR_TEST_STATES_H
 
-#include <vector>
+#include <mps/vector.h>
 #include <tensor/tensor.h>
 
 namespace tensor_test {
 
+using mps::vector;
+
 template <typename Tensor>
-inline std::vector<Tensor> random_product_state(index size, index dim = 2) {
-  std::vector<Tensor> states(size);
+inline vector<Tensor> random_product_state(index size, index dim = 2) {
+  vector<Tensor> states(size);
 
   for (index i = 0; i < size; i++) {
     states[i] = Tensor::random(2);

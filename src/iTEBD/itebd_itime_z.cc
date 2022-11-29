@@ -21,9 +21,11 @@
 
 namespace mps {
 
-template const iTEBD<CTensor> evolve_itime(
-    iTEBD<CTensor> psi, const CTensor &H12, double dt, index nsteps,
-    double tolerance, index max_dim, index deltan, int method,
-    std::vector<double> *energy, std::vector<double> *entropy);
+template const iTEBD<CTensor> evolve_itime(iTEBD<CTensor> psi,
+                                           const CTensor &H12, double dt,
+                                           index nsteps, double tolerance,
+                                           index max_dim, index deltan,
+                                           int method, vector<double> *energy,
+                                           vector<double> *entropy);
 
 }

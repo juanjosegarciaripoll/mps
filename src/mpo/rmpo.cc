@@ -29,10 +29,10 @@ template void add_local_term(RMPO *mpdo, const RTensor &Hloc, index k);
 template void add_interaction(RMPO *mpdo, const RTensor &Hi, index i,
                               const RTensor &Hj);
 
-template void add_product_term(RMPO *mpdo, const std::vector<RTensor> &Hi);
+template void add_product_term(RMPO *mpdo, const vector<RTensor> &Hi);
 
-template void add_interaction(RMPO *mpdo, const std::vector<RTensor> &Hi,
-                              index i, const RTensor *sign = nullptr);
+template void add_interaction(RMPO *mpdo, const vector<RTensor> &Hi, index i,
+                              const RTensor *sign = nullptr);
 
 template void add_hopping_matrix(RMPO *mpdo, const RTensor &J,
                                  const RTensor &ad, const RTensor &a,
@@ -42,7 +42,7 @@ template void add_jordan_wigner_matrix(RMPO *mpdo, const RTensor &J,
                                        const RTensor &ad, const RTensor &a,
                                        const RTensor &sign);
 
-template RMPO local_Hamiltonian_mpo(const std::vector<RTensor> &Hloc);
+template RMPO local_Hamiltonian_mpo(const vector<RTensor> &Hloc);
 
 template std::ostream &impl::text_dump(std::ostream &s, const RMPO &mpo,
                                        const char *name);

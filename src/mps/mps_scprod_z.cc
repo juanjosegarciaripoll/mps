@@ -33,18 +33,17 @@ template cdouble expected(const CMPS &a, const CTensor &Op1, index k1,
 
 template CTensor expected_vector(const CMPS &a, const CTensor &Op1);
 
-template CTensor expected_vector(const CMPS &a,
-                                 const std::vector<CTensor> &Op1);
+template CTensor expected_vector(const CMPS &a, const vector<CTensor> &Op1);
 
 template CTensor expected(const CMPS &a, const CTensor &op1,
                           const CTensor &op2);
 
-template CTensor expected(const CMPS &a, const std::vector<CTensor> &op1,
-                          const std::vector<CTensor> &op2);
+template CTensor expected(const CMPS &a, const vector<CTensor> &op1,
+                          const vector<CTensor> &op2);
 
 template CTensor all_correlations_fast(const CMPS &a,
-                                       const std::vector<CTensor> &op1,
-                                       const std::vector<CTensor> &op2,
+                                       const vector<CTensor> &op1,
+                                       const vector<CTensor> &op2,
                                        const CMPS &b, bool symmetric,
                                        const CTensor *jordan_wigner_op);
 

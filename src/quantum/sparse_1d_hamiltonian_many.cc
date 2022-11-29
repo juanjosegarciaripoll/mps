@@ -25,10 +25,10 @@ namespace mps {
 using namespace imath;
 
 template <class sparse, class tensor>
-static sparse do_sparse_1d_hamiltonian(const std::vector<sparse> &H12,
-                                       const std::vector<sparse> &H1,
+static sparse do_sparse_1d_hamiltonian(const vector<sparse> &H12,
+                                       const vector<sparse> &H1,
                                        bool periodic) {
-  index N = std::max(H12.size(), H1.size());
+  index N = std::max(H12.ssize(), H1.ssize());
   Indices d(N), Dleft(N), Dright(N);
   //
   // We guess the dimension of the physical system from the size of the interaction
@@ -75,7 +75,7 @@ static sparse do_sparse_1d_hamiltonian(const std::vector<sparse> &H12,
   if (periodic && (N > 1)) {
     tensor O1, O2;
     decompose_operator(full(H12[N - 1]), &O1, &O2);
-    sparse aux = sparse::eye((index)Dleft[N - 1] / d[0]);
+    sparse aux = sparse::eye(Dleft[N - 1] / d[0]);
     for (index i = 0; i < O1.dimension(-1); i++) {
       sparse sO1 = sparse(squeeze(O1(_, _, range(i))));
       sparse sO2 = sparse(squeeze(O2(_, _, range(i))));

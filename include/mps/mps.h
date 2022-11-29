@@ -21,6 +21,7 @@
 #ifndef MPS_MPS_H
 #define MPS_MPS_H
 
+#include <mps/vector.h>
 #include <mps/mps/types.h>
 #include <mps/algorithms/expectation.h>
 
@@ -40,7 +41,7 @@ inline MPS<Tensor> product_state(index length, const Tensor &local_state) {
 
 /**Create a product state. */
 template <typename Tensor>
-inline MPS<Tensor> product_state(const std::vector<Tensor> &local_states) {
+inline MPS<Tensor> product_state(const vector<Tensor> &local_states) {
   MPS<Tensor> output(local_states.size());
   std::transform(std::begin(local_states), std::end(local_states),
                  std::begin(output),
@@ -97,14 +98,14 @@ extern template RTensor expected_vector(const RMPS &a, const RTensor &Op1);
 
 /**Compute all expected values, with a different operator over each site of the chain.*/
 extern template RTensor expected_vector(const RMPS &a,
-                                        const std::vector<RTensor> &Op1);
+                                        const vector<RTensor> &Op1);
 
 /**Compute all expected values of a single operator over the chain.*/
 extern template CTensor expected_vector(const CMPS &a, const CTensor &Op1);
 
 /**Compute all expected values, with a different operator over each site of the chain.*/
 extern template CTensor expected_vector(const CMPS &a,
-                                        const std::vector<CTensor> &Op1);
+                                        const vector<CTensor> &Op1);
 
 /**Compute a two-site correlation.*/
 extern template double expected(const RMPS &a, const RTensor &op1, index k1,
@@ -119,14 +120,14 @@ extern template cdouble expected(const CMPS &a, const CTensor &op1, index k1,
                                  const CTensor &op2, index k2, int direction);
 
 extern template RTensor all_correlations_fast(const RMPS &a,
-                                              const std::vector<RTensor> &op1,
-                                              const std::vector<RTensor> &op2,
+                                              const vector<RTensor> &op1,
+                                              const vector<RTensor> &op2,
                                               const RMPS &b, bool symmetric,
                                               const RTensor *jordan_wigner_op);
 
 extern template CTensor all_correlations_fast(const CMPS &a,
-                                              const std::vector<CTensor> &op1,
-                                              const std::vector<CTensor> &op2,
+                                              const vector<CTensor> &op1,
+                                              const vector<CTensor> &op2,
                                               const CMPS &b, bool symmetric,
                                               const CTensor *jordan_wigner_op);
 
@@ -139,12 +140,12 @@ extern template CTensor expected(const CMPS &a, const CTensor &op1,
                                  const CTensor &op2);
 
 /**Compute all two-site correlations.*/
-extern template RTensor expected(const RMPS &a, const std::vector<RTensor> &op1,
-                                 const std::vector<RTensor> &op2);
+extern template RTensor expected(const RMPS &a, const vector<RTensor> &op1,
+                                 const vector<RTensor> &op2);
 
 /**Compute all two-site correlations.*/
-extern template CTensor expected(const CMPS &a, const std::vector<CTensor> &op1,
-                                 const std::vector<CTensor> &op2);
+extern template CTensor expected(const CMPS &a, const vector<CTensor> &op1,
+                                 const vector<CTensor> &op2);
 
 /**Store a tensor in a matrix product state in the canonical form.*/
 void set_canonical(RMPS &psi, index site, const RTensor &A, int sense,

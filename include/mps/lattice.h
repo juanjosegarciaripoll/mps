@@ -98,7 +98,7 @@ class Lattice {
                particle_kind_t kind = FERMIONS) const {
     if (psi.rank() > 1) {
       index M = psi.dimension(0);
-      index L = psi.size() / M;
+      index L = psi.ssize() / M;
       Tensor output = reshape(psi, M, L);
       for (index i = 0; i < L; ++i) {
         output.at(_, range(i)) = apply(Tensor(output(_, range(i))), J, U, kind);
@@ -110,12 +110,12 @@ class Lattice {
       Indices ndx;
       for (index i = 0; i < J.rows(); ++i) {
         for (index j = 0; j < J.columns(); ++j) {
-          if (abs(J(i, j))) {
+          if (abs(J(i, j)) != 0) {
             /* TODO: Avoid sort_indices() by doing the adjoint of the hopping */
             hopping_inner(&values, &ndx, i, j, kind);
             output += J(i, j) * values * psi(range(sort_indices(ndx)));
           }
-          if (j >= i && abs(U(i, j))) {
+          if (j >= i && abs(U(i, j)) != 0) {
             values = interaction_inner(i, j);
             output += (U(i, j) + U(j, i)) * values * psi;
           }

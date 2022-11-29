@@ -32,6 +32,8 @@ namespace tensor_test {
 
 using namespace tensor;
 
+using index = tensor::index;
+
 /*
    * Verifies that the tensor that has been passed to the routine has
    * not been reallocated.

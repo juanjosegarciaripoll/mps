@@ -36,11 +36,13 @@ static inline base ipow(base b, power p) {
   } else {
     base x = b, output = 1;
     while (p) {
+#ifdef TENSOR_DEBUG
       if (p & 1) {
         base new_output = output * x;
         tensor_assert2(new_output / x == output,
                        std::overflow_error("Integer overflow in ipow()"));
       }
+#endif
       p >>= 1;
       x *= x;
     }

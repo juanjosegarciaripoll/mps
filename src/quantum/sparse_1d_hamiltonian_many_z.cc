@@ -22,9 +22,8 @@
 
 namespace mps {
 
-const CSparse sparse_1d_hamiltonian(const std::vector<CSparse> &H12,
-                                    const std::vector<CSparse> &H1,
-                                    bool periodic) {
+const CSparse sparse_1d_hamiltonian(const vector<CSparse> &H12,
+                                    const vector<CSparse> &H1, bool periodic) {
   return do_sparse_1d_hamiltonian<CSparse, CTensor>(H12, H1, periodic);
 }
 

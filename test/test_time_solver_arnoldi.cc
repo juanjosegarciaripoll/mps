@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <vector>
+#include <mps/vector.h>
 #include "loops.h"
 #include <gtest/gtest.h>
 #include <mps/mps.h>
@@ -47,7 +47,7 @@ CTensor arnoldi_expm(const Ham &H, const Tensor &psi, cdouble idt,
   Tensor N = CTensor::zeros(max_states, max_states);
   Tensor Heff = N;
 
-  std::vector<Tensor> states;
+  vector<Tensor> states;
   states.reserve(max_states);
   states.push_back(psi / norm2(psi));
   N.at(0, 0) = to_complex(1.0);

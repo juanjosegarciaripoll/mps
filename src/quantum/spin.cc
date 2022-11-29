@@ -41,15 +41,15 @@ void spin_operators(double s, CTensor *sx, CTensor *sy, CTensor *sz) {
     std::cerr << "spin_operators(): the spin value " << s << " is not valid\n";
     abort();
   }
-  index d = (index)floor(2 * s + 1);
+  int d = static_cast<int>(floor(2 * s + 1));
 
   auto aux1 = RTensor::empty(d);
-  for (index i = 0; i < d; i++) {
+  for (int i = 0; i < d; i++) {
     double m = s - i;
     aux1.at(i) = m;
   }
   auto aux2 = RTensor::empty(d - 1);
-  for (index i = 0; i < (d - 1); i++) {
+  for (int i = 0; i < (d - 1); i++) {
     double m = s - i;
     aux2.at(i) = sqrt(s * (s + 1) - (m - 1) * m);
   }

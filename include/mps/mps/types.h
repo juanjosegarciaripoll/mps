@@ -91,15 +91,15 @@ class MPS : public MP<Tensor> {
 
   MPS(const tensor::Indices &physical_dimensions, index bond_dimension = 1,
       bool periodic = false)
-      : parent(physical_dimensions.size()) {
+      : parent(physical_dimensions.ssize()) {
     presize(physical_dimensions, bond_dimension, periodic);
   }
 
-  explicit MPS(const std::vector<Tensor> &data) : parent(data){};
+  explicit MPS(const vector<Tensor> &data) : parent(data){};
 
   /**Return the physical dimensions of the state. */
   Indices dimensions() const {
-    Indices d(this->size());
+    Indices d(this->ssize());
     std::transform(this->begin(), this->end(), std::begin(d),
                    [](const Tensor &t) { return t.dimension(1); });
     return d;
@@ -170,7 +170,7 @@ class MPS : public MP<Tensor> {
                       index bond_dimension, bool periodic) {
     tensor_assert(bond_dimension > 0);
     tensor_assert(this->size() == physical_dimensions.size());
-    index l = physical_dimensions.size();
+    index l = physical_dimensions.ssize();
     tensor::Indices dimensions = {bond_dimension, index(0), bond_dimension};
     for (index i = 0; i < l; i++) {
       tensor_assert(physical_dimensions[i] > 0);

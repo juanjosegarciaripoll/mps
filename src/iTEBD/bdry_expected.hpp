@@ -30,8 +30,11 @@ template <class Tensor>
 static Tensor left_boundary(const Tensor &A) {
   Tensor v = prop_matrix(Tensor(), +1, A, A);
   v /= norm2(v);
-  linalg::eig_power([&](const Tensor &v) { return prop_matrix(v, +1, A, A); },
-                    v.size(), &v);
+  linalg::eig_power(
+      [&A](const Tensor &left_vector) {
+        return prop_matrix(left_vector, +1, A, A);
+      },
+      v.size(), &v);
   return v;
 }
 
@@ -40,8 +43,8 @@ static Tensor left_boundary(const Tensor &A, const Tensor &B) {
   Tensor v = prop_matrix(prop_matrix(Tensor(), +1, A, A), +1, B, B);
   v /= norm2(v);
   linalg::eig_power(
-      [&](const Tensor &v) {
-        return prop_matrix(prop_matrix(v, +1, A, A), +1, B, B);
+      [&A, &B](const Tensor &left_vector) {
+        return prop_matrix(prop_matrix(left_vector, +1, A, A), +1, B, B);
       },
       v.size(), &v);
   return v;

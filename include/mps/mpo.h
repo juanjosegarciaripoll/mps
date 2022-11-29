@@ -21,6 +21,7 @@
 #ifndef MPS_MPO_H
 #define MPS_MPO_H
 
+#include <mps/vector.h>
 #include <mps/mps.h>
 #include <mps/hamiltonian.h>
 #include <mps/mpo/types.h>
@@ -39,10 +40,9 @@ extern template void add_local_term(RMPO *mpdo, const RTensor &Hloc, index k);
 extern template void add_interaction(RMPO *mpdo, const RTensor &Hi, index i,
                                      const RTensor &Hj);
 
-extern template void add_product_term(RMPO *mpdo,
-                                      const std::vector<RTensor> &Hi);
+extern template void add_product_term(RMPO *mpdo, const vector<RTensor> &Hi);
 
-extern template void add_interaction(RMPO *mpdo, const std::vector<RTensor> &Hi,
+extern template void add_interaction(RMPO *mpdo, const vector<RTensor> &Hi,
                                      index i, const RTensor *sign);
 
 extern template void add_hopping_matrix(RMPO *mpdo, const RTensor &J,
@@ -54,7 +54,7 @@ extern template void add_jordan_wigner_matrix(RMPO *mpdo, const RTensor &J,
                                               const RTensor &a,
                                               const RTensor &sign);
 
-extern template RMPO local_Hamiltonian_mpo(const std::vector<RTensor> &Hloc);
+extern template RMPO local_Hamiltonian_mpo(const vector<RTensor> &Hloc);
 
 ///////////////////////////////////////////////////////////////
 // REAL SPECIALIZATIONS
@@ -65,10 +65,9 @@ extern template void add_local_term(CMPO *mpdo, const CTensor &Hloc, index k);
 extern template void add_interaction(CMPO *mpdo, const CTensor &Hi, index i,
                                      const CTensor &Hj);
 
-extern template void add_product_term(CMPO *mpdo,
-                                      const std::vector<CTensor> &Hi);
+extern template void add_product_term(CMPO *mpdo, const vector<CTensor> &Hi);
 
-extern template void add_interaction(CMPO *mpdo, const std::vector<CTensor> &Hi,
+extern template void add_interaction(CMPO *mpdo, const vector<CTensor> &Hi,
                                      index i, const CTensor *sign);
 
 extern template void add_hopping_matrix(CMPO *mpdo, const CTensor &J,
@@ -80,7 +79,7 @@ extern template void add_jordan_wigner_matrix(CMPO *mpdo, const CTensor &J,
                                               const CTensor &a,
                                               const CTensor &sign);
 
-extern template CMPO local_Hamiltonian_mpo(const std::vector<CTensor> &Hloc);
+extern template CMPO local_Hamiltonian_mpo(const vector<CTensor> &Hloc);
 
 /** Apply a Matrix Product Operator onto a state. */
 const RMPS apply(const RMPO &mpdo, const RMPS &state);

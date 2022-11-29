@@ -58,7 +58,7 @@ const Indices Lattice::states_in_particle_range(index sites, index nmin,
 
 static Lattice::word find_configuration(Lattice::word w,
                                         const Indices &configurations) {
-  Lattice::word j = configurations.size() - 1;
+  Lattice::word j = configurations.ssize() - 1;
   Lattice::word i = 0;
   if (w == configurations[i]) return i;
   if (w == configurations[j]) return j;
@@ -102,7 +102,8 @@ void Lattice::bipartition(index sites_left, Indices *left_states,
   *right_states = states_in_particle_range(sites_right, right_nmin, right_nmax);
   *matrix_indices = Indices(dimension());
 
-  index right_mask = ((word)1 << sites_right) - 1;
+  word one = 1;
+  word right_mask = (one << sites_right) - 1;
   for (word i = 0; i < static_cast<word>(configurations.size()); i++) {
     word w = configurations[i];
     word wl = w >> sites_right;
@@ -114,7 +115,7 @@ void Lattice::bipartition(index sites_left, Indices *left_states,
     // that 'ir' is the fastest running index and, in our convention,
     // it corresponds to the 'rows' (i.e. the first index in a tensor)
     //
-    word ndx = ir + il * right_states->size();
+    word ndx = ir + il * static_cast<word>(right_states->size());
     // std::cerr << "(w,wl,wr,ndx)=" << w << ',' << wl << ',' << wr << ',' << ndx << '\n';
     matrix_indices->at(i) = ndx;
   }

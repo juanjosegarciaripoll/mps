@@ -22,7 +22,7 @@
 #define MPS_MPO_INTERACTIONS_H
 
 #include <stdexcept>
-#include <vector>
+#include <mps/vector.h>
 #include <mps/mpo/types.h>
 
 namespace mps {
@@ -37,7 +37,7 @@ namespace mps {
      - "a" = 1 means we can only apply identities.
      - A(0,i,j,b>1) is the first operator from a nearest-neighbor
        interaction, which is paired by A(b,i,j,1)
-    
+
    */
 
 template <class Tensor>
@@ -128,8 +128,8 @@ inline void add_interaction(MPO<Tensor> *mpo, const Tensor &Hi, index i,
 }
 
 template <class Tensor>
-MPO<Tensor> local_Hamiltonian_mpo(const std::vector<Tensor> &Hloc) {
-  MPO<Tensor> output(Hloc.size(), 1);
+MPO<Tensor> local_Hamiltonian_mpo(const vector<Tensor> &Hloc) {
+  MPO<Tensor> output(Hloc.ssize(), 1);
   index i = 0, last = static_cast<index>(Hloc.size()) - 1;
   for (auto &H : Hloc) {
     index d = H.rows();
@@ -149,7 +149,7 @@ MPO<Tensor> local_Hamiltonian_mpo(const std::vector<Tensor> &Hloc) {
 }
 
 template <class Tensor>
-inline void add_product_term(MPO<Tensor> *mpo, const std::vector<Tensor> &H) {
+inline void add_product_term(MPO<Tensor> *mpo, const vector<Tensor> &H) {
   //
   // This function adds a term \prod_j H[j] to a Hamiltonian.
   //
@@ -163,7 +163,7 @@ inline void add_product_term(MPO<Tensor> *mpo, const std::vector<Tensor> &H) {
     return all_of(t == Tensor::eye(t.rows()));
   };
   index closing = 0, opening = 0;
-  index start = 0, end = mpo->size();
+  index start = 0, end = mpo->ssize();
   while (start < end && is_identity(H[start])) {
     ++start;
   }
@@ -195,13 +195,13 @@ inline void add_product_term(MPO<Tensor> *mpo, const std::vector<Tensor> &H) {
   }
 }
 template <class Tensor>
-void add_interaction(MPO<Tensor> *mpo, const std::vector<Tensor> &H, index i,
+void add_interaction(MPO<Tensor> *mpo, const vector<Tensor> &H, index i,
                      const Tensor *sign = nullptr) {
   //
   // This function add terms \sum_{j,j\neq i} H[i]*H[j] to a Hamiltonian.
   // The origin of interactions is thus marked by "i"
   //
-  index start = 0, end = mpo->size();
+  index start = 0, end = mpo->ssize();
   if (i < 0 || i >= end) {
     throw std::invalid_argument(
         "In add_interaction(), lattice site out of boundaries.");
@@ -258,9 +258,9 @@ inline void add_hopping_matrix(MPO<Tensor> *mpo, const Tensor &J,
     throw std::invalid_argument("Invalid matrix J in add_hopping_matrix().");
   }
 
-  index L = mpo->size();
+  index L = mpo->ssize();
   for (index j = 0; j < L; ++j) {
-    std::vector<Tensor> ops(L);
+    vector<Tensor> ops(L);
     for (index i = 0; i < L; ++i) {
       if (i == j)
         ops.at(j) = ad;

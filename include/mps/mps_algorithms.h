@@ -1,3 +1,4 @@
+#pragma once
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
@@ -53,17 +54,17 @@ double simplify(RMPS *P, const RMPS &Q, int *sense, bool periodicbc,
 double simplify(CMPS *P, const CMPS &Q, int *sense, bool periodicbc,
                 index sweeps, bool normalize);
 
-double simplify(RMPS *P, const std::vector<RMPS> &Q, const RTensor &weights,
+double simplify(RMPS *P, const vector<RMPS> &Q, const RTensor &weights,
                 int *sense, index sweeps, bool normalize);
 
-double simplify(CMPS *P, const std::vector<CMPS> &Q, const CTensor &weights,
+double simplify(CMPS *P, const vector<CMPS> &Q, const CTensor &weights,
                 int *sense, index sweeps, bool normalize);
 
-double simplify(RMPS *P, const std::vector<RMPS> &Q, const RTensor &weights,
+double simplify(RMPS *P, const vector<RMPS> &Q, const RTensor &weights,
                 index Dmax, double tol, int *sense, index sweeps,
                 bool normalize);
 
-double simplify(CMPS *P, const std::vector<CMPS> &Q, const CTensor &weights,
+double simplify(CMPS *P, const vector<CMPS> &Q, const CTensor &weights,
                 index Dmax, double tol, int *sense, index sweeps,
                 bool normalize);
 
@@ -77,11 +78,11 @@ double simplify_obc(CMPS *P, const CMPS &Q, int *sense, index sweeps,
                     bool normalize, index Dmax = 0, double tol = -1,
                     double *norm = 0);
 
-double simplify_obc(RMPS *P, const RTensor &weights, const std::vector<RMPS> &Q,
+double simplify_obc(RMPS *P, const RTensor &weights, const vector<RMPS> &Q,
                     int *sense, index sweeps, bool normalize, index Dmax = 0,
                     double tol = -1, double *norm = 0);
 
-double simplify_obc(CMPS *P, const CTensor &weights, const std::vector<CMPS> &Q,
+double simplify_obc(CMPS *P, const CTensor &weights, const vector<CMPS> &Q,
                     int *sense, index sweeps, bool normalize, index Dmax = 0,
                     double tol = -1, double *norm = 0);
 

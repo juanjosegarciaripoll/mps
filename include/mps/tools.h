@@ -30,7 +30,7 @@ using namespace tensor;
 enum { MPS_DEBUG_NONE = 0, MPS_DEBUG_SIMPLIFY_MANY = 2 };
 extern int debug_flags;
 
-size_t where_to_truncate(const RTensor &s, double tol, index max_dim);
+index_t where_to_truncate(const RTensor &s, double tol, index_t max_dim);
 
 Indices weights_to_keep(const RTensor &s, double tol, index max_dim);
 

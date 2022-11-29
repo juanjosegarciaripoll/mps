@@ -21,7 +21,7 @@
 
 namespace mps {
 
-double simplify(RMPS *P, const std::vector<RMPS> &Q, const RTensor &weights,
+double simplify(RMPS *P, const vector<RMPS> &Q, const RTensor &weights,
                 index Dmax, double tol, int *sense, index sweeps,
                 bool normalize) {
   MPSManySimplifier<RMPS> aux(Q, weights);

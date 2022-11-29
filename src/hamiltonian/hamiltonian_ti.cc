@@ -78,7 +78,7 @@ const CTensor TIHamiltonian::interaction_right(index /*k*/, index ndx,
 }
 
 index TIHamiltonian::interaction_depth(index /*k*/, double /*t*/) const {
-  return H12_left_.size();
+  return H12_left_.ssize();
 }
 
 const CTensor TIHamiltonian::local_term(index /*k*/, double /*t*/) const {

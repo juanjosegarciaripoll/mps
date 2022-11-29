@@ -46,7 +46,7 @@ class MPO : public MP<Tensor> {
   }
 
   MPO(const tensor::Indices &physical_dimensions)
-      : parent(physical_dimensions.size()) {
+      : parent(physical_dimensions.ssize()) {
     clear(physical_dimensions);
   }
 

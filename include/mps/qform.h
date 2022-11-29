@@ -1,3 +1,4 @@
+#pragma once
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
@@ -20,8 +21,7 @@
 #ifndef MPS_QFORM_H
 #define MPS_QFORM_H
 
-#include <vector>
-#include <list>
+#include <mps/vector.h>
 #include <mps/mpo.h>
 #include <mps/hamiltonian.h>
 #include <mps/algorithms/mpo_environments.h>
@@ -48,7 +48,7 @@ class QuadraticForm {
 	beginning or the end of the chain.*/
   QuadraticForm(const mpo_t &mpo, const mps_t &bra, const mps_t &ket,
                 index start = 0)
-      : current_site_{0}, mpo_(mpo), envs_(mpo.size() + 1, env_t(DIR_LEFT)) {
+      : current_site_{0}, mpo_(mpo), envs_(mpo.ssize() + 1, env_t(DIR_LEFT)) {
     initialize_environments(bra, ket, start);
   }
   /** Update the form changing the tensors of the bra and ket states. The
@@ -72,7 +72,7 @@ class QuadraticForm {
   /** Number of sites in the lattice. */
   size_t size() const { return mpo_.size(); }
   /** Last site in the lattice. */
-  index last_site() const { return size() - 1; }
+  index last_site() const { return ssize() - 1; }
 
   /** Matrix representation of the quadratic form with respect to site here().*/
   tensor_t single_site_matrix() const {
@@ -80,7 +80,7 @@ class QuadraticForm {
     return compose(left_environment(n), mpo_[n], right_environment(n));
   }
 
-  /** Matrix representation of the quadratic form with respect to 
+  /** Matrix representation of the quadratic form with respect to
      * sites here() and here()+1.*/
   tensor_t two_site_matrix(mps::Dir sense) const {
     index i, j;
@@ -145,7 +145,7 @@ class QuadraticForm {
 
  private:
   typedef MPOEnvironment<Tensor> env_t;
-  typedef std::vector<MPOEnvironment<Tensor>> env_list_t;
+  typedef vector<MPOEnvironment<Tensor>> env_list_t;
   typedef SparseMPO<Tensor> sparse_mpo_t;
 
   index current_site_;

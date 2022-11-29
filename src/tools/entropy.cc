@@ -33,7 +33,7 @@ double entropy(const RTensor &t) {
   if (t.rank() == 1) {
     const RTensor &l = t;
     double ltot = tensor::abs(sum(l)), s = 0.0;
-    for (size_t i = 0; i < l.size(); i++) {
+    for (index_t i = 0; i < l.ssize(); i++) {
       double li = tensor::abs(l[i]) / ltot;
       s -= li * log(li);
     }

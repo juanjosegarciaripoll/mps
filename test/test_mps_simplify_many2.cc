@@ -46,7 +46,7 @@ void trivial_simplify(int size) {
   index Dmax = 2;
   double tol = -1;
   for (int L = 1; L < 4; L++) {
-    std::vector<MPS> states(L, psi);
+    vector<MPS> states(L, psi);
     typename MPS::elt_t weights = tensor::abs(RTensor::random(L));
     int sense;
 
@@ -82,7 +82,7 @@ void trivial_simplify_with_errors(int size) {
   double tol = -1;
 
   for (int L = 1; L < 4; L++) {
-    std::vector<MPS> states(L, psi);
+    vector<MPS> states(L, psi);
     typename MPS::elt_t weights = tensor::abs(RTensor::random(L));
     int sense;
 

@@ -29,11 +29,11 @@ void set_canonical(RMPS &psi, index site, const RTensor &t, int sense,
 }
 
 RMPS canonical_form(const RMPS &psi, int sense) {
-  return canonical_form_at(psi, (sense < 0) ? 0 : (psi.size() - 1));
+  return canonical_form_at(psi, (sense < 0) ? 0 : (psi.ssize() - 1));
 }
 
 RMPS normal_form(const RMPS &psi, int sense) {
-  return normal_form_at(psi, (sense < 0) ? 0 : (psi.size() - 1));
+  return normal_form_at(psi, (sense < 0) ? 0 : (psi.ssize() - 1));
 }
 
 RMPS canonical_form_at(const RMPS &psi, index site) {

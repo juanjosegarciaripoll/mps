@@ -41,7 +41,7 @@ Tensor apply_qform1(const Tensor &P, const Indices &d, const QForm &qform,
                     const std::list<Tensor> &ortho) {
   Tensor v = orthogonalize(reshape(P, d), ortho);
   v = qform.apply_single_site_matrix(v);
-  return reshape(orthogonalize(v, ortho), P.size());
+  return reshape(orthogonalize(v, ortho), P.ssize());
 }
 
 template <class Tensor, class QForm>
@@ -64,7 +64,7 @@ Tensor apply_qform2(const Tensor &P, int sense, const Indices &d,
                     const QForm &qform, const std::list<Tensor> &ortho) {
   Tensor v = orthogonalize(reshape(P, d), ortho);
   v = qform.apply_two_site_matrix(v, sense);
-  return orthogonalize(reshape(v, v.size()), ortho);
+  return orthogonalize(reshape(v, v.ssize()), ortho);
 }
 
 template <class MPO>
@@ -99,7 +99,7 @@ struct Minimizer : public MinimizerOptions {
         step(+1),
         converged(true) {}
 
-  index size() { return psi.size(); }
+  index_t size() const { return psi.ssize(); }
 
   const mps_t &state() { return psi; }
 

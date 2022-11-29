@@ -21,7 +21,7 @@
 
 namespace mps {
 
-double simplify_obc(CMPS *ptrP, const CTensor &w, const std::vector<CMPS> &Q,
+double simplify_obc(CMPS *ptrP, const CTensor &w, const vector<CMPS> &Q,
                     int *sense, index sweeps, bool normalize, index Dmax,
                     double tol, double *norm) {
   return do_simplify(ptrP, w, Q, sense, sweeps, normalize, Dmax, tol, norm);
@@ -30,7 +30,7 @@ double simplify_obc(CMPS *ptrP, const CTensor &w, const std::vector<CMPS> &Q,
 double simplify_obc(CMPS *ptrP, const CMPS &Q, int *sense, index sweeps,
                     bool normalize, index Dmax, double tol, double *norm) {
   static const CTensor w = CTensor::ones(1);
-  std::vector<CMPS> vQ(1, Q);
+  vector<CMPS> vQ(1, Q);
   return do_simplify(ptrP, w, vQ, sense, sweeps, normalize, Dmax, tol, norm);
 }
 

@@ -26,7 +26,7 @@ static const MPO do_mmult(const MPO &A, const MPO &B) {
   typedef typename MPO::elt_t Tensor;
   tensor_assert(A.size() == B.size());
 
-  index L = A.size();
+  index L = A.ssize();
   MPO C = A;
 
   for (index n = 0; n < L; n++) {

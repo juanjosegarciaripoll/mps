@@ -1,3 +1,4 @@
+#pragma once
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2012 Juan Jose Garcia Ripoll
@@ -22,6 +23,7 @@
 
 #include <tensor/tensor.h>
 #include <tensor/sparse.h>
+#include <mps/vector.h>
 
 namespace mps {
 
@@ -71,14 +73,14 @@ const RSparse sparse_1d_hamiltonian(const RSparse &H12, const RSparse &Hlocal,
 
 /* Create a sparse Hamiltonian with given local interaction and nearest
    * neighbor interaction. */
-const CSparse sparse_1d_hamiltonian(const std::vector<CSparse> &H12,
-                                    const std::vector<CSparse> &Hlocal,
+const CSparse sparse_1d_hamiltonian(const vector<CSparse> &H12,
+                                    const vector<CSparse> &Hlocal,
                                     bool periodic = false);
 
 /* Create a sparse Hamiltonian with given local interaction and nearest
    * neighbor interaction. */
-const RSparse sparse_1d_hamiltonian(const std::vector<RSparse> &H12,
-                                    const std::vector<RSparse> &Hlocal,
+const RSparse sparse_1d_hamiltonian(const vector<RSparse> &H12,
+                                    const vector<RSparse> &Hlocal,
                                     bool periodic = false);
 
 void decompose_operator(const RTensor &H12, RTensor *H1, RTensor *H2);

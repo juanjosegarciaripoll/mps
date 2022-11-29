@@ -27,8 +27,8 @@ namespace mps {
 
 using mps::imath::isqrt;
 
-void split_interaction(const CTensor &H12, std::vector<CTensor> *v1,
-                       std::vector<CTensor> *v2) {
+void split_interaction(const CTensor &H12, vector<CTensor> *v1,
+                       vector<CTensor> *v2) {
   tensor_assert(H12.rank() == 2);
   /*
      * Notice the funny reordering of indices in O1 and O2, which is due to the
@@ -43,7 +43,7 @@ void split_interaction(const CTensor &H12, std::vector<CTensor> *v1,
       reshape(permute(reshape(H12, d1, d2, d1, d2), 1, 2), d1 * d1, d2 * d2);
   RTensor s = mps::limited_svd(U, &O1, &O2, 1e-13);
 
-  index n_op = s.size();
+  index n_op = s.ssize();
   v1->resize(n_op);
   v2->resize(n_op);
   for (index i = 0; i < n_op; i++) {

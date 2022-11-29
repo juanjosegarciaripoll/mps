@@ -20,10 +20,11 @@
 #ifndef MPS_MP_BASE_H
 #define MPS_MP_BASE_H
 
-#include <vector>
+#include <mps/vector.h>
 #include <tensor/traits.h>
 #include <tensor/tensor.h>
 #include <mps/except.h>
+#include <mps/vector.h>
 
 namespace mps {
 
@@ -45,26 +46,26 @@ class Sweeper {
 
 template <class Tensor>
 class MP {
-  typedef typename std::vector<Tensor> data_type;
+  using data_type = vector<Tensor>;
 
  public:
-  typedef Tensor elt_t;
-  typedef tensor_scalar_t<Tensor> number_t;
-  typedef typename data_type::iterator iterator;
-  typedef typename data_type::const_iterator const_iterator;
+  using elt_t = Tensor;
+  using number_t = tensor_scalar_t<Tensor>;
+  using iterator = typename data_type::iterator;
+  using const_iterator = typename data_type::const_iterator;
 
   MP() = default;
   MP(const MP &) = default;
   MP(MP &&) = default;
   MP &operator=(const MP &) = default;
   MP &operator=(MP &&) = default;
-  explicit MP(size_t size) : data_(size) {}
-  explicit MP(const std::vector<Tensor> &other) : data_(other) {}
+  explicit MP(index_t size) : data_(size) {}
+  explicit MP(const vector<Tensor> &other) : data_(other) {}
 
   size_t size() const { return data_.size(); }
-  index ssize() const { return static_cast<index>(size()); }
-  index last() const { return size() - 1; }
-  index last_index() const { return size() - 1; }
+  index ssize() const { return data_.ssize(); }
+  index last() const { return ssize() - 1; }
+  index last_index() const { return ssize() - 1; }
   void resize(index new_size) { data_.resize(new_size); }
 
   const Tensor &operator[](index n) const { return data_[normal_index(n)]; }
@@ -74,9 +75,9 @@ class MP {
   const_iterator begin() const { return data_.begin(); }
   const_iterator end() const { return data_.end(); }
   iterator end() { return data_.end(); }
-  const std::vector<Tensor> to_vector() const { return data_; }
+  const vector<Tensor> to_vector() const { return data_; }
 
-  Sweeper sweeper(index sense) const { return Sweeper(size(), sense); }
+  Sweeper sweeper(index sense) const { return Sweeper(ssize(), sense); }
 
   index normal_index(index mps_index) const {
     index mps_size = ssize();
@@ -100,7 +101,7 @@ struct mp_tensor_t_inner {};
 
 template <typename T>
 struct mp_tensor_t_inner<MP<T>> {
-  typedef T type;
+  using type = T;
 };
 
 template <typename T>

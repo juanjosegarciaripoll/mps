@@ -136,7 +136,8 @@ bool test_dmrg_inner(const mps::Hamiltonian &H, double &err) {
   // This value of Dmax guarantees that there are no truncation
   // errors due to the Matrix Product States ansatz.
   size_t L = H.size();
-  size_t max_Dmax = (unsigned int)pow((double)H.dimension(0), (double)L / 2);
+  size_t max_Dmax = (unsigned int)pow(static_cast<double>(H.dimension(0)),
+                                      static_cast<double>(L) / 2);
   size_t small_Dmax = 3 * max_Dmax / 4;
   if (small_Dmax + 20 >= max_Dmax) small_Dmax = max_Dmax;
 

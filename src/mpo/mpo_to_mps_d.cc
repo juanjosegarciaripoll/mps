@@ -22,7 +22,7 @@
 namespace mps {
 
 const RMPS mpo_to_mps(const RMPO &mpo) {
-  RMPS psi(mpo.size());
+  RMPS psi(mpo.ssize());
 
   for (int i = 0; i < mpo.ssize(); i++) {
     const RTensor &m = mpo[i];

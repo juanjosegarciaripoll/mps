@@ -388,7 +388,7 @@ void test_mps_product_state(int size) {
   }
   {
     mp_tensor_t<MPS> psi0 = {0, 1}, psi1 = {1, 0, 2};
-    std::vector<mp_tensor_t<MPS>> v = {psi0, psi1};
+    vector<mp_tensor_t<MPS>> v = {psi0, psi1};
     MPS state = product_state(v);
     EXPECT_EQ(state.size(), 2);
     EXPECT_ALL_EQUAL(state[0], reshape(psi0, 1, 2, 1));

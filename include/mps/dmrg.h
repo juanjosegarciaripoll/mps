@@ -1,3 +1,4 @@
+#pragma once
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
@@ -20,6 +21,7 @@
 #ifndef MPS_DMRG_H
 #define MPS_DMRG_H
 
+#include <mps/vector.h>
 #include <mps/mps.h>
 #include <mps/hamiltonian.h>
 
@@ -29,8 +31,8 @@ template <class MPS>
 class DMRG {
  public:
   typedef typename MPS::elt_t elt_t;
-  typedef typename std::vector<elt_t> elt_vector_t;
-  typedef typename std::vector<MPS> mps_vector_t;
+  typedef vector<elt_t> elt_vector_t;
+  typedef vector<MPS> mps_vector_t;
   typedef typename tensor::Sparse<typename elt_t::elt_t> sparse_t;
 
   bool error{false};

@@ -29,10 +29,10 @@ template void add_local_term(CMPO *mpdo, const CTensor &Hloc, index k);
 template void add_interaction(CMPO *mpdo, const CTensor &Hi, index i,
                               const CTensor &Hj);
 
-template void add_product_term(CMPO *mpdo, const std::vector<CTensor> &Hi);
+template void add_product_term(CMPO *mpdo, const vector<CTensor> &Hi);
 
-template void add_interaction(CMPO *mpdo, const std::vector<CTensor> &Hi,
-                              index i, const CTensor *sign = nullptr);
+template void add_interaction(CMPO *mpdo, const vector<CTensor> &Hi, index i,
+                              const CTensor *sign = nullptr);
 
 template void add_hopping_matrix(CMPO *mpdo, const CTensor &J,
                                  const CTensor &ad, const CTensor &a,
@@ -42,9 +42,9 @@ template void add_jordan_wigner_matrix(CMPO *mpdo, const CTensor &J,
                                        const CTensor &ad, const CTensor &a,
                                        const CTensor &sign);
 
-template CMPO local_Hamiltonian_mpo(const std::vector<CTensor> &Hloc);
+template CMPO local_Hamiltonian_mpo(const vector<CTensor> &Hloc);
 
 template std::ostream &impl::text_dump(std::ostream &s, const CMPO &mpo,
                                        const char *name);
 
-}
+}  // namespace mps

@@ -62,7 +62,7 @@ TrotterSolver::Unitary::Unitary(const Hamiltonian &H, index k, cdouble dt,
   }
   if (debug) std::cerr << "computing: ";
   dt = to_complex(-tensor::abs(imag(dt)), -real(dt));
-  for (int di, i = 0; i < (int)H.size(); i += di) {
+  for (int di, i = 0; i < static_cast<int>(H.size()); i += di) {
     CTensor Hi;
     if (i < k0 || i >= kN) {
       // Local operator
@@ -136,7 +136,7 @@ double TrotterSolver::Unitary::apply_onto_two_sites(CMPS &P, const CTensor &U12,
   } else {
     scale_inplace(P1, -1, s);
   }
-  a2 = s.size();
+  a2 = s.ssize();
   index new_a2 = where_to_truncate(s, tolerance, max_a2 ? max_a2 : a2);
   if (new_a2 != a2) {
     P1 = change_dimension(P1, -1, new_a2);
@@ -203,7 +203,7 @@ double TrotterSolver::Unitary::apply(CMPS *psi, int *sense, double tolerance,
   }
   tic();
 
-  index L = psi->size();
+  index L = psi->ssize();
   double err = 0;
   index dk = 2;
   if (*sense > 0) {
@@ -214,7 +214,7 @@ double TrotterSolver::Unitary::apply(CMPS *psi, int *sense, double tolerance,
       err +=
           apply_onto_two_sites(*psi, U[k], k, k + 1, *sense, tolerance, Dmax);
     }
-    for (index k = kN; k < (int)L; k++) {
+    for (index k = kN; k < static_cast<int>(L); k++) {
       apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
     }
   } else {

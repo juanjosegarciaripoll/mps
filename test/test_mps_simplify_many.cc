@@ -44,7 +44,7 @@ template <class MPS>
 void trivial_simplify(int size) {
   auto psi = MPS(ghz_state(size, false));
   for (int L = 1; L < 4; L++) {
-    std::vector<MPS> states(L, psi);
+    vector<MPS> states(L, psi);
     RTensor weights = tensor::abs(RTensor::random(L));
     int sense;
 
@@ -77,7 +77,7 @@ void trivial_simplify_with_errors(int size) {
   auto psi = MPS(ghz_state(size, false));
 
   for (int L = 1; L < 4; L++) {
-    std::vector<MPS> states(L, psi);
+    vector<MPS> states(L, psi);
     RTensor weights = tensor::abs(RTensor::random(L));
     int sense;
 

@@ -23,6 +23,7 @@
 
 #include <tensor/io.h>
 #include <tensor/sdf.h>
+#include <mps/vector.h>
 #include <mps/mps.h>
 #include <mps/mpo.h>
 
@@ -70,8 +71,8 @@ extern template std::ostream &text_dump(std::ostream &s,
                                         const char *name);
 
 template <class Tensor>
-std::vector<Tensor> load_tensors(sdf::InDataFile &d, const std::string &name) {
-  std::vector<Tensor> aux;
+vector<Tensor> load_tensors(sdf::InDataFile &d, const std::string &name) {
+  vector<Tensor> aux;
   d.load(&aux, name);
   return aux;
 }

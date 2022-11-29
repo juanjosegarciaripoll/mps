@@ -28,8 +28,8 @@ template <class Tensor>
 const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
                                  double dt, index nsteps, double tolerance,
                                  index max_dim, index deltan, int method,
-                                 std::vector<double> *energies,
-                                 std::vector<double> *entropies) {
+                                 vector<double> *energies,
+                                 vector<double> *entropies) {
   static const double FR_param[5] = {0.67560359597983, 1.35120719195966,
                                      -0.17560359597983, -1.70241438391932};
 
@@ -39,6 +39,8 @@ const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
     case 1:
       /* Second order Trotter expansion */
       eH12[1] = linalg::expm((-dt / 2) * H12);
+      eH12[0] = linalg::expm((-dt) * H12);
+      break;
     case 0:
       /* First order Trotter expansion */
       eH12[0] = linalg::expm((-dt) * H12);
@@ -60,8 +62,8 @@ const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
     deltan = 1;
   }
   std::cerr.precision(5);
-  std::cerr << nsteps << ", " << dt << " x " << deltan << " = " << dt * deltan
-            << '\n';
+  std::cerr << nsteps << ", " << dt << " x " << deltan << " = "
+            << dt * static_cast<double>(deltan) << '\n';
   std::cerr << "t=" << time << ";\tE=" << E << "; dE=" << 0.0 << ";\tS=" << S
             << "; dS=" << 0.0 << ";\tl="
             << std::max(psi.left_dimension(0), psi.right_dimension(0)) << '\n'

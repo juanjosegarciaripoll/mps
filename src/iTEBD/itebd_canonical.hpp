@@ -74,7 +74,7 @@ template <class Tensor>
 static Tensor itebd_power_eig(const Tensor &G, int sense) {
   index a, i;
   G.get_dimensions(&a, &i, &a);
-  Tensor v = reshape(Tensor::eye(a), a * a) / (double)a;
+  Tensor v = reshape(Tensor::eye(a), a * a) / static_cast<double>(a);
   linalg::eigs(
       [&](const Tensor &x) {
         return reshape(prop_matrix(reshape(x, a, a), sense, G, G), a * a);
@@ -142,7 +142,7 @@ static void split_tensor(Tensor GAB, Tensor lAB, Tensor *pA, Tensor *plA,
   if (!is_canonical)
     canonical_form<Tensor>(reshape(GAB, a, i * j, b), lAB, &GAB, &lAB,
                            tolerance, max_dim);
-  a = b = lAB.size();
+  a = b = lAB.ssize();
   /*
      * Now the state is given by
      *		|psi> = lB(a) GAB(a,i,j,b) lB(b) |a>|i,j>|b>
@@ -158,8 +158,8 @@ static void split_tensor(Tensor GAB, Tensor lAB, Tensor *pA, Tensor *plA,
   *plB = lAB;
   *plA = Tensor(
       limited_svd(reshape(GAB, a * i, j * b), pA, pB, tolerance, max_dim));
-  *pA = reshape(*pA, a, i, plA->size());
-  *pB = reshape(*pB, plA->size(), i, b);
+  *pA = reshape(*pA, a, i, plA->ssize());
+  *pB = reshape(*pB, plA->ssize(), i, b);
   *pA = scale(*pA, 0, 1.0 / (*plB));
   *pB = scale(*pB, -1, 1.0 / (*plB));
 }
@@ -179,8 +179,8 @@ iTEBD<Tensor>::iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance,
 template <class Tensor>
 static Tensor itebd_power_eig(const Tensor &A, const Tensor &lA,
                               const Tensor &B, const Tensor &lB, int sense) {
-  index a = lB.size();
-  Tensor v = reshape(Tensor::eye(a, a) / sqrt((double)a), a * a);
+  index a = lB.ssize();
+  Tensor v = reshape(Tensor::eye(a, a) / sqrt(static_cast<double>(a)), a * a);
   Tensor A1, A2;
   if (sense > 0) {
     A1 = scale(A, 0, lB);

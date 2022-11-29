@@ -31,12 +31,12 @@ static const Tensor do_split(Tensor *pU, Tensor psi, int sense, bool truncate) {
   if (sense > 0) {
     index r = psi.rank();
     index b = d[r - 1];
-    index ai = psi.size() / b;
+    index ai = psi.ssize() / b;
     RTensor s =
         mps::FLAGS.get(MPS_USE_BLOCK_SVD)
             ? linalg::block_svd(reshape(psi, ai, b), &U, &V, SVD_ECONOMIC)
             : linalg::svd(reshape(psi, ai, b), &U, &V, SVD_ECONOMIC);
-    index l = s.size();
+    index l = s.ssize();
     index new_l = where_to_truncate(
         s, truncate ? MPS_DEFAULT_TOLERANCE : MPS_TRUNCATE_ZEROS,
         std::min<index>(ai, b));
@@ -50,12 +50,12 @@ static const Tensor do_split(Tensor *pU, Tensor psi, int sense, bool truncate) {
     scale_inplace(V, 0, s);
   } else {
     index a = d[0];
-    index ib = psi.size() / a;
+    index ib = psi.ssize() / a;
     RTensor s =
         mps::FLAGS.get(MPS_USE_BLOCK_SVD)
             ? linalg::block_svd(reshape(psi, a, ib), &V, &U, SVD_ECONOMIC)
             : linalg::svd(reshape(psi, a, ib), &V, &U, SVD_ECONOMIC);
-    index l = s.size();
+    index l = s.ssize();
     index new_l = where_to_truncate(
         s, truncate ? MPS_DEFAULT_TOLERANCE : MPS_TRUNCATE_ZEROS,
         std::min<index>(a, ib));

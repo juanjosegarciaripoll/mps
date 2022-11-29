@@ -1,4 +1,5 @@
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
+#pragma once
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
 
@@ -20,7 +21,7 @@
 #ifndef MPS_LFORM_H
 #define MPS_LFORM_H
 
-#include <vector>
+#include <mps/vector.h>
 #include <mps/mps.h>
 
 namespace mps {
@@ -35,12 +36,12 @@ namespace mps {
 template <class Tensor>
 class LinearForm {
  public:
-  typedef MPS<Tensor> mps_t;
-  typedef Tensor tensor_t;
-  typedef tensor_scalar_t<Tensor> number_t;
+  using mps_t = MPS<Tensor>;
+  using tensor_t = Tensor;
+  using number_t = tensor_scalar_t<Tensor>;
 
   LinearForm(const mps_t &bra, const mps_t &ket, index start = 0);
-  LinearForm(const tensor_t &weights, const std::vector<mps_t> &bra,
+  LinearForm(const tensor_t &weights, const vector<mps_t> &bra,
              const mps_t &ket, index start = 0);
 
   /** Update the linear form, with a new value of the state it is applied on. */
@@ -53,9 +54,9 @@ class LinearForm {
   /** The site at which the quadratic form is defined. */
   index here() const { return current_site_; }
   /** Number of sites in the lattice. */
-  index size() const { return bra_[0].size(); }
+  index size() const { return bra_[0].ssize(); }
   /** Number of vectors that create the linear form. */
-  index number_of_bras() const { return bra_.size(); }
+  index number_of_bras() const { return bra_.ssize(); }
 
   /** Vector representation of the linear form with respect to site here().*/
   const tensor_t single_site_vector() const;
@@ -67,11 +68,11 @@ class LinearForm {
   double norm2() const;
 
  private:
-  typedef typename std::vector<tensor_t> matrix_array_t;
-  typedef typename std::vector<matrix_array_t> matrix_database_t;
+  using matrix_array_t = vector<tensor_t>;
+  using matrix_database_t = vector<matrix_array_t>;
 
   const tensor_t weight_;
-  const std::vector<mps_t> bra_;
+  const vector<mps_t> bra_;
   index size_, current_site_;
   matrix_database_t matrix_;
 
@@ -89,10 +90,10 @@ class LinearForm {
 };
 
 extern template class LinearForm<RTensor>;
-typedef LinearForm<RTensor> RLForm;
+using RLForm = LinearForm<RTensor>;
 
 extern template class LinearForm<CTensor>;
-typedef LinearForm<CTensor> CLForm;
+using CLForm = LinearForm<CTensor>;
 
 }  // namespace mps
 

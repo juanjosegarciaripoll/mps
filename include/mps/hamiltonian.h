@@ -1,3 +1,4 @@
+#pragma once
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
@@ -21,9 +22,10 @@
 #define MPS_HAMILTONIAN_H
 
 #include <list>
-#include <vector>
+#include <mps/vector.h>
 #include <memory>
 #include <tensor/sparse.h>
+#include <mps/vector.h>
 #include <mps/mps.h>
 
 namespace mps {
@@ -89,7 +91,7 @@ class TIHamiltonian : public Hamiltonian {
   CTensor H12_;
   CTensor H1_;
   bool periodic_;
-  std::vector<CTensor> H12_left_, H12_right_;
+  vector<CTensor> H12_left_, H12_right_;
 };
 
 /**1D Hamiltonian, constant but with no translational invariance*/
@@ -115,14 +117,14 @@ class ConstantHamiltonian : public Hamiltonian {
  private:
   const CTensor compute_interaction(index k) const;
 
-  std::vector<CTensor> H12_, H1_;
-  std::vector<std::vector<CTensor> > H12_left_, H12_right_;
+  vector<CTensor> H12_, H1_;
+  vector<vector<CTensor> > H12_left_, H12_right_;
   Indices dimensions_;
   bool periodic_;
 };
 
-void split_interaction(const CTensor &H12, std::vector<CTensor> *v1,
-                       std::vector<CTensor> *v2);
+void split_interaction(const CTensor &H12, vector<CTensor> *v1,
+                       vector<CTensor> *v2);
 
 /**@}*/
 

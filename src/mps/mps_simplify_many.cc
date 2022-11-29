@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <vector>
+#include <mps/vector.h>
 #include <algorithm>
 #include <tensor/linalg.h>
 #include <mps/mps_algorithms.h>
@@ -80,9 +80,9 @@ template <class MPS>
 struct MPSManySimplifier {
   typedef typename MPS::elt_t Tensor;
   typedef tensor_scalar_t<Tensor> number;
-  typedef std::vector<Tensor> tensor_vector_t;
-  typedef std::vector<tensor_vector_t> matrices_t;
-  typedef std::vector<MPS> mps_vector_t;
+  typedef vector<Tensor> tensor_vector_t;
+  typedef vector<tensor_vector_t> matrices_t;
+  typedef vector<MPS> mps_vector_t;
 
   index L;
   const index nvectors;
@@ -92,13 +92,13 @@ struct MPSManySimplifier {
   double normQ2;
 
   MPSManySimplifier(const mps_vector_t &aQ, const Tensor &aweights)
-      : nvectors(aQ.size()), Q(aQ), weights(aweights) {
+      : nvectors(aQ.ssize()), Q(aQ), weights(aweights) {
     if (nvectors == 0) {
       std::cerr << "In mps::simplify(), at least one vector has to be provided."
                 << '\n';
       abort();
     }
-    L = Q[0].size();
+    L = Q[0].ssize();
     if (L == 1) {
       std::cerr << "The mps::simplify() function is designed to "
                    "work with states that have more than one site."
