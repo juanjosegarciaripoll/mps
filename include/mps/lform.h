@@ -40,9 +40,9 @@ class LinearForm {
   using tensor_t = Tensor;
   using number_t = tensor_scalar_t<Tensor>;
 
-  LinearForm(const mps_t &bra, const mps_t &ket, index start = 0);
+  LinearForm(const mps_t &bra, const mps_t &ket, index_t start = 0);
   LinearForm(const tensor_t &weights, const vector<mps_t> &bra,
-             const mps_t &ket, index start = 0);
+             const mps_t &ket, index_t start = 0);
 
   /** Update the linear form, with a new value of the state it is applied on. */
   void propagate_right(const tensor_t &ketP);
@@ -52,11 +52,11 @@ class LinearForm {
   void propagate(const tensor_t &ketP, int sense);
 
   /** The site at which the quadratic form is defined. */
-  index here() const { return current_site_; }
+  index_t here() const { return current_site_; }
   /** Number of sites in the lattice. */
-  index size() const { return bra_[0].ssize(); }
+  index_t size() const { return bra_[0].ssize(); }
   /** Number of vectors that create the linear form. */
-  index number_of_bras() const { return bra_.ssize(); }
+  index_t number_of_bras() const { return bra_.ssize(); }
 
   /** Vector representation of the linear form with respect to site here().*/
   const tensor_t single_site_vector() const;
@@ -73,19 +73,19 @@ class LinearForm {
 
   const tensor_t weight_;
   const vector<mps_t> bra_;
-  index size_, current_site_;
+  index_t size_, current_site_;
   matrix_database_t matrix_;
 
-  tensor_t &left_matrix(index i, index site) { return matrix_[i][site]; }
-  tensor_t &right_matrix(index i, index site) { return matrix_[i][site + 1]; }
-  const tensor_t &left_matrix(index i, index site) const {
+  tensor_t &left_matrix(index_t i, index_t site) { return matrix_[i][site]; }
+  tensor_t &right_matrix(index_t i, index_t site) { return matrix_[i][site + 1]; }
+  const tensor_t &left_matrix(index_t i, index_t site) const {
     return matrix_[i][site];
   }
-  const tensor_t &right_matrix(index i, index site) const {
+  const tensor_t &right_matrix(index_t i, index_t site) const {
     return matrix_[i][site + 1];
   }
 
-  void initialize_matrices(index start, const mps_t &ket);
+  void initialize_matrices(index_t start, const mps_t &ket);
   matrix_database_t make_matrix_array();
 };
 

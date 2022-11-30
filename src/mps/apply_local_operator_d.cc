@@ -24,7 +24,7 @@ namespace mps {
 using namespace tensor;
 
 const RMPS apply_local_operator(const RMPS &psi, const RTensor &op,
-                                index site) {
+                                index_t site) {
   RMPS output = psi;
   output.at(site) = foldin(op, -1, psi[site], 1);
   return output;

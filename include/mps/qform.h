@@ -47,7 +47,7 @@ class QuadraticForm {
 	assumes that we are inspecting site 'start', which may be at the
 	beginning or the end of the chain.*/
   QuadraticForm(const mpo_t &mpo, const mps_t &bra, const mps_t &ket,
-                index start = 0)
+                index_t start = 0)
       : current_site_{0}, mpo_(mpo), envs_(mpo.ssize() + 1, env_t(DIR_LEFT)) {
     initialize_environments(bra, ket, start);
   }
@@ -66,38 +66,38 @@ class QuadraticForm {
     }
   }
   /** The site at which the quadratic form is defined. */
-  index here() const { return current_site_; }
+  index_t here() const { return current_site_; }
   /** Number of sites in the lattice. */
-  index ssize() const { return mpo_.ssize(); }
+  index_t ssize() const { return mpo_.ssize(); }
   /** Number of sites in the lattice. */
   size_t size() const { return mpo_.size(); }
   /** Last site in the lattice. */
-  index last_site() const { return ssize() - 1; }
+  index_t last_site() const { return ssize() - 1; }
 
   /** Matrix representation of the quadratic form with respect to site here().*/
   tensor_t single_site_matrix() const {
-    index n = here();
+    index_t n = here();
     return compose(left_environment(n), mpo_[n], right_environment(n));
   }
 
   /** Matrix representation of the quadratic form with respect to
      * sites here() and here()+1.*/
   tensor_t two_site_matrix(mps::Dir sense) const {
-    index i, j;
+    index_t i, j;
     get_index_pair(sense, i, j);
     return compose(left_environment(i), mpo_[i], mpo_[j], right_environment(j));
   }
 
   /** Apply the two_site_matrix() onto a tensor representing one site. */
   linalg::LinearMap<Tensor> single_site_map() const {
-    index n = here();
+    index_t n = here();
     return single_site_linear_map(left_environment(n), mpo_[n],
                                   right_environment(n));
   }
 
   /** Apply the two_site_matrix() onto a tensor representing two sites. */
   linalg::LinearMap<Tensor> two_site_map(mps::Dir direction) const {
-    index i, j;
+    index_t i, j;
     get_index_pair(direction, i, j);
     return two_site_linear_map(left_environment(i), mpo_[i], mpo_[j],
                                right_environment(j));
@@ -113,7 +113,7 @@ class QuadraticForm {
 
   Tensor take_two_site_matrix_diag(mps::Dir direction) const {
     Tensor output;
-    index i, j;
+    index_t i, j;
     get_index_pair(direction, i, j);
     const auto &Lenv = left_environment(i);
     const auto &Renv = right_environment(j);
@@ -125,10 +125,10 @@ class QuadraticForm {
           // R(a3,b3,a1,b1)
           const auto &R = Renv[op2.right_index].tensor();
           if (!L.is_empty() && !R.is_empty()) {
-            index a2 = L.dimension(2);
-            index b2 = L.dimension(3);
-            index a3 = R.dimension(0);
-            index b3 = R.dimension(1);
+            index_t a2 = L.dimension(2);
+            index_t b2 = L.dimension(3);
+            index_t a3 = R.dimension(0);
+            index_t b3 = R.dimension(1);
             // We implement this
             // Q12(a2,i,j,a3) = L(a1,a1,a2,a2) O1(i,i) O2(j,j) R(a3,a3,a1,a1)
             // where a1 = 1, because of periodic boundary conditions
@@ -148,18 +148,18 @@ class QuadraticForm {
   typedef vector<MPOEnvironment<Tensor>> env_list_t;
   typedef SparseMPO<Tensor> sparse_mpo_t;
 
-  index current_site_;
+  index_t current_site_;
   sparse_mpo_t mpo_;
   env_list_t envs_;
 
-  env_t &left_environment(index site) { return envs_[site]; }
-  env_t &right_environment(index site) { return envs_[site + 1]; }
+  env_t &left_environment(index_t site) { return envs_[site]; }
+  env_t &right_environment(index_t site) { return envs_[site + 1]; }
 
-  const env_t &left_environment(index site) const { return envs_[site]; }
-  const env_t &right_environment(index site) const { return envs_[site + 1]; }
+  const env_t &left_environment(index_t site) const { return envs_[site]; }
+  const env_t &right_environment(index_t site) const { return envs_[site + 1]; }
 
-  void get_index_pair(Dir sense, index &i, index &j) const {
-    index n = here();
+  void get_index_pair(Dir sense, index_t &i, index_t &j) const {
+    index_t n = here();
     if (sense == DIR_RIGHT) {
       tensor_assert2(
           n < last_site(),
@@ -180,7 +180,7 @@ class QuadraticForm {
   }
 
   void initialize_environments(const mps_t &bra, const mps_t &ket,
-                               index start) {
+                               index_t start) {
     tensor_assert2(bra.size() == size() && ket.size() == size(),
                    std::invalid_argument("Wrong sizes of MPS in QForm"));
     // Prepare the right matrices from site start to size()-1 to 0

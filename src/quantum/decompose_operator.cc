@@ -44,8 +44,8 @@ static inline void do_decompose_operator(const tensor &U0, tensor *O1,
      * following statement and which simplifies the application of O1 and O2 on a
      * given vector.
      */
-  index d1 = isqrt(U0.rows());
-  index d2 = d1;
+  index_t d1 = isqrt(U0.rows());
+  index_t d2 = d1;
 
   if (U0.rows() != U0.columns()) {
     std::cerr << "The routine decompose_operator() can only act on square "

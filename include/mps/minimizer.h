@@ -27,13 +27,13 @@
 namespace mps {
 
 struct MinimizerOptions {
-  index sweeps{32};
+  index_t sweeps{32};
   bool display{false};
-  index debug{false};
+  index_t debug{false};
   double tolerance{1e-10};
   double svd_tolerance{1e-11};
   int allow_E_growth{1};
-  index Dmax{0};
+  index_t Dmax{0};
 
   bool compute_gap{false};
   double gap{0}, constrained_gap{0};

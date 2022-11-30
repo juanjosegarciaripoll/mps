@@ -27,14 +27,14 @@
 namespace mps {
 
 template <class MPS, class Tensor>
-static void set_canonical_2_sites_inner(MPS &P, const Tensor &Pij, index site,
-                                        int sense, index Dmax, double tol,
+static void set_canonical_2_sites_inner(MPS &P, const Tensor &Pij, index_t site,
+                                        int sense, index_t Dmax, double tol,
                                         bool canonicalize_both) {
   /*
      * Since the projector that we obtained spans two sites, we have to split
      * it, ensuring that we remain below the desired dimension Dmax.
      */
-  index a1, i1, j1, c1;
+  index_t a1, i1, j1, c1;
   Pij.get_dimensions(&a1, &i1, &j1, &c1);
   Tensor Pi, Pj;
   RTensor s =
@@ -49,7 +49,7 @@ static void set_canonical_2_sites_inner(MPS &P, const Tensor &Pij, index site,
     std::cerr << "s=" << s << '\n';
     abort();
   }
-  index b1 = where_to_truncate(s, tol, Dmax);
+  index_t b1 = where_to_truncate(s, tol, Dmax);
   if (b1 != s.ssize()) {
     Pi = change_dimension(Pi, -1, b1);
     Pj = change_dimension(Pj, 0, b1);

@@ -22,11 +22,11 @@
 namespace mps {
 
 template <typename mps, typename t>
-static inline const t do_density_matrix(const mps &psi, index site) {
+static inline const t do_density_matrix(const mps &psi, index_t site) {
   t ML, MR;
   tensor_assert(site < psi.ssize());
-  for (index i = 0; i < site; i++) ML = prop_matrix(ML, +1, psi[i], psi[i]);
-  for (index i = psi.ssize() - 1; i > site; i--)
+  for (index_t i = 0; i < site; i++) ML = prop_matrix(ML, +1, psi[i], psi[i]);
+  for (index_t i = psi.ssize() - 1; i > site; i--)
     MR = prop_matrix(MR, -1, psi[i], psi[i]);
   /* Dimensions:
      *	ML(a1,b1,a2,b2)
@@ -34,11 +34,11 @@ static inline const t do_density_matrix(const mps &psi, index site) {
      *  A(a2,d,a3)
      *  A*(b2,d,b3)
      */
-  index a1, b1, a2, b2, a3, b3;
+  index_t a1, b1, a2, b2, a3, b3;
   ML.get_dimensions(&a1, &b1, &a2, &b2);
   MR.get_dimensions(&a3, &b3, &a1, &b1);
   t A = psi[site];
-  index d = A.dimension(1);
+  index_t d = A.dimension(1);
 
   /* E(a3,b3,a2,b2) <- MR(a3,b3,[a1b1]) ML([a1b1],a2,b2) */
   t E =

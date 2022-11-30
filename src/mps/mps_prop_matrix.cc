@@ -31,7 +31,7 @@ static inline const t do_prop_init(const t &Q, const t &P, const t *op) {
 
 template <typename t>
 static inline const t do_prop_close(const t &M) {
-  index a1, b1, a2, b2;
+  index_t a1, b1, a2, b2;
   M.get_dimensions(&a1, &b1, &a2, &b2);
   return trace(reshape(M, a1 * b1, a2 * b2), 0, -1);
 }
@@ -43,7 +43,7 @@ static inline const t do_prop_close(const t &L, const t &R) {
   else if (L.is_empty())
     return do_prop_close<t>(R);
   else {
-    index a1, a2, b1, b2;
+    index_t a1, a2, b1, b2;
     L.get_dimensions(&a1, &a2, &b1, &b2);
     R.get_dimensions(&b1, &b2, &a1, &a2);
     return mmult(
@@ -62,7 +62,7 @@ static inline const t do_prop_right(const t &M0, const t &Q, const t &P,
     return do_prop_right(reshape(M0, 1, 1, M0.dimension(0), M0.dimension(1)), Q,
                          P, op);
   }
-  index a1, b1, a2, b2, i2, a3, b3;
+  index_t a1, b1, a2, b2, i2, a3, b3;
   M0.get_dimensions(&a1, &b1, &a2, &b2);
   Q.get_dimensions(&a2, &i2, &a3);
   P.get_dimensions(&b2, &i2, &b3);
@@ -87,7 +87,7 @@ static inline const t do_prop_left(const t &M0, const t &Q, const t &P,
     return do_prop_left(reshape(M0, M0.dimension(0), M0.dimension(1), 1, 1), Q,
                         P, op);
   }
-  index a1, b1, a2, b2, a0, b0, i0;
+  index_t a1, b1, a2, b2, a0, b0, i0;
   M0.get_dimensions(&a1, &b1, &a2, &b2);
   Q.get_dimensions(&a0, &i0, &a1);
   P.get_dimensions(&b0, &i0, &b1);
@@ -103,7 +103,7 @@ static inline const t do_prop_left(const t &M0, const t &Q, const t &P,
 
 template <class Tensor>
 static const Tensor prop_matrix_sub_qform(const Tensor &L, const Tensor &R) {
-  index a1, a2, a3, b1, b2, b3;
+  index_t a1, a2, a3, b1, b2, b3;
   Tensor Q;
   //
   // We have some quadratic function expressed as
@@ -112,7 +112,7 @@ static const Tensor prop_matrix_sub_qform(const Tensor &L, const Tensor &R) {
   // where
   //	Q([a1,i,a2],[b1,j,b2]) = Op(i,j) (R*L)
   //
-  // Notice that in L(a1,[a3,b3],b1), 'a1' is the index associated with the
+  // Notice that in L(a1,[a3,b3],b1), 'a1' is the index_t associated with the
   // complex conjugate of P, while in R(b2,[a3,b3],a2) it is 'a2', the last
   // one. IT IS CRITICAL THAT WE GET THE ORDER OF THE a's AND b's IN Q RIGHT.
   // Use effective_Hamiltonian_test(), by setting opts.debug=1 in

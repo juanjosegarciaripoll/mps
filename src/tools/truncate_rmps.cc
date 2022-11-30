@@ -21,7 +21,7 @@
 
 namespace mps {
 
-bool truncate(RMPS *Q, const RMPS &P, index Dmax, bool periodic,
+bool truncate(RMPS *Q, const RMPS &P, index_t Dmax, bool periodic,
               bool increase) {
   return truncate_inner(Q, P, Dmax, periodic, increase);
 }

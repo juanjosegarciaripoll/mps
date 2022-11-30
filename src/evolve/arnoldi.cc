@@ -62,7 +62,7 @@ ArnoldiSolver::ArnoldiSolver(const CMPO &H, cdouble dt, int nvectors)
   }
 }
 
-double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
+double ArnoldiSolver::one_step(CMPS *psi, index_t Dmax) {
   // Number of passes in simplify_obc when building the Arnoldi matrix
   const int simplify_internal_sweeps =
       mps::FLAGS.get_int(MPS_ARNOLDI_SIMPLIFY_INTERNAL_SWEEPS);
@@ -92,7 +92,7 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
   if (debug) {
     std::cerr << "Arnoldi step\n";
   }
-  for (index ndx = 1; ndx < max_states_; ndx++) {
+  for (index_t ndx = 1; ndx < max_states_; ndx++) {
     // TODO: why unused?
     // const CMPS &last = states[ndx - 1];
     //
@@ -159,7 +159,7 @@ double ArnoldiSolver::one_step(CMPS *psi, index Dmax) {
     //
     states.push_back(current);
     Hcurrent = apply_canonical(H_, current, mps_sense, truncate_mpo_on_mps);
-    for (index n = 0; n < ndx; n++) {
+    for (index_t n = 0; n < ndx; n++) {
       cdouble aux;
       N.at(n, ndx) = aux = scprod(states[n], current, mps_sense);
       N.at(ndx, n) = tensor::conj(aux);

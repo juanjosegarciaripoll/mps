@@ -26,7 +26,7 @@
 
 namespace mps {
 
-TrotterSolver::Unitary::Unitary(const Hamiltonian &H, index k, cdouble dt,
+TrotterSolver::Unitary::Unitary(const Hamiltonian &H, index_t k, cdouble dt,
                                 int do_debug)
     : debug(do_debug),
       k0(tensor::narrow_cast<int>(k)),
@@ -86,11 +86,11 @@ TrotterSolver::Unitary::Unitary(const Hamiltonian &H, index k, cdouble dt,
 }
 
 void TrotterSolver::Unitary::apply_onto_one_site(CMPS &P, const CTensor &Uloc,
-                                                 index k, int dk,
-                                                 index max_a2) const {
+                                                 index_t k, int dk,
+                                                 index_t max_a2) const {
   CTensor P1 = P[k];
   if (!Uloc.is_empty()) {
-    index a1, i1, a2;
+    index_t a1, i1, a2;
     P1.get_dimensions(&a1, &i1, &a2);
     P1 = foldin(Uloc, -1, P1, 1);
   }
@@ -102,10 +102,10 @@ void TrotterSolver::Unitary::apply_onto_one_site(CMPS &P, const CTensor &Uloc,
 }
 
 double TrotterSolver::Unitary::apply_onto_two_sites(CMPS &P, const CTensor &U12,
-                                                    index k1, index k2, int dk,
+                                                    index_t k1, index_t k2, int dk,
                                                     double tolerance,
-                                                    index max_a2) const {
-  index a1, i1, a2, i2, a3;
+                                                    index_t max_a2) const {
+  index_t a1, i1, a2, i2, a3;
 
   CTensor P1 = P[k1];
   P1.get_dimensions(&a1, &i1, &a2);
@@ -137,12 +137,12 @@ double TrotterSolver::Unitary::apply_onto_two_sites(CMPS &P, const CTensor &U12,
     scale_inplace(P1, -1, s);
   }
   a2 = s.ssize();
-  index new_a2 = where_to_truncate(s, tolerance, max_a2 ? max_a2 : a2);
+  index_t new_a2 = where_to_truncate(s, tolerance, max_a2 ? max_a2 : a2);
   if (new_a2 != a2) {
     P1 = change_dimension(P1, -1, new_a2);
     P2 = change_dimension(P2, 0, new_a2);
     a2 = new_a2;
-    for (index i = a2; i < s.ssize(); i++) err += square(s[i]);
+    for (index_t i = a2; i < s.ssize(); i++) err += square(s[i]);
   }
   if (max_a2) {
     /* If we impose a truncation at this stage, we are using
@@ -173,7 +173,7 @@ double TrotterSolver::Unitary::apply_onto_two_sites(CMPS &P, const CTensor &U12,
 }
 
 double TrotterSolver::Unitary::apply_and_simplify(CMPS *psi, int *sense,
-                                                  double tolerance, index Dmax,
+                                                  double tolerance, index_t Dmax,
                                                   bool normalize) const {
   /*
      * In this version we first apply all unitaries. The state is not
@@ -189,7 +189,7 @@ double TrotterSolver::Unitary::apply_and_simplify(CMPS *psi, int *sense,
   int simplify_sense = -1;
   *psi = canonical_form(*psi, simplify_sense);
   if (largest_bond_dimension(*psi) > Dmax) {
-    index override_sweeps = 12;
+    index_t override_sweeps = 12;
     err += simplify_obc(psi, *psi, &simplify_sense, override_sweeps, normalize,
                         Dmax);
   }
@@ -197,35 +197,35 @@ double TrotterSolver::Unitary::apply_and_simplify(CMPS *psi, int *sense,
 }
 
 double TrotterSolver::Unitary::apply(CMPS *psi, int *sense, double tolerance,
-                                     index Dmax, bool normalize) const {
+                                     index_t Dmax, bool normalize) const {
   if (*sense == 0) {
     *sense = +1;
   }
   tic();
 
-  index L = psi->ssize();
+  index_t L = psi->ssize();
   double err = 0;
-  index dk = 2;
+  index_t dk = 2;
   if (*sense > 0) {
-    for (index k = 0; k < k0; k++) {
+    for (index_t k = 0; k < k0; k++) {
       apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
     }
-    for (index k = k0; k < kN; k += dk) {
+    for (index_t k = k0; k < kN; k += dk) {
       err +=
           apply_onto_two_sites(*psi, U[k], k, k + 1, *sense, tolerance, Dmax);
     }
-    for (index k = kN; k < static_cast<int>(L); k++) {
+    for (index_t k = kN; k < static_cast<int>(L); k++) {
       apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
     }
   } else {
-    for (index k = L - 1; k >= kN; k--) {
+    for (index_t k = L - 1; k >= kN; k--) {
       apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
     }
-    for (index k = kN - dk; k >= k0; k -= dk) {
+    for (index_t k = kN - dk; k >= k0; k -= dk) {
       err +=
           apply_onto_two_sites(*psi, U[k], k, k + 1, *sense, tolerance, Dmax);
     }
-    for (index k = k0 - 1; k >= 0; k--) {
+    for (index_t k = k0 - 1; k >= 0; k--) {
       apply_onto_one_site(*psi, U[k], k, *sense, Dmax);
     }
   }

@@ -25,17 +25,17 @@ template double norm2(const RMPS &psi);
 
 template double scprod(const RMPS &psi1, const RMPS &psi2, int direction);
 
-template double expected(const RMPS &a, const RTensor &Op1, index k,
+template double expected(const RMPS &a, const RTensor &Op1, index_t k,
                          int direction);
 
-template cdouble expected(const RMPS &a, const CTensor &Op1, index k,
+template cdouble expected(const RMPS &a, const CTensor &Op1, index_t k,
                           int direction);
 
-template double expected(const RMPS &a, const RTensor &Op1, index k1,
-                         const RTensor &Op2, index k2, int direction);
+template double expected(const RMPS &a, const RTensor &Op1, index_t k1,
+                         const RTensor &Op2, index_t k2, int direction);
 
-template cdouble expected(const RMPS &a, const CTensor &Op1, index k1,
-                          const CTensor &Op2, index k2, int direction);
+template cdouble expected(const RMPS &a, const CTensor &Op1, index_t k1,
+                          const CTensor &Op2, index_t k2, int direction);
 
 template RTensor expected_vector(const RMPS &a, const RTensor &Op1);
 

@@ -23,7 +23,7 @@
 
 namespace mps {
 
-void set_canonical(CMPS &psi, index site, const CTensor &t, int sense,
+void set_canonical(CMPS &psi, index_t site, const CTensor &t, int sense,
                    bool truncate) {
   set_canonical_inner(psi, site, t, sense, truncate);
 }
@@ -36,11 +36,11 @@ CMPS normal_form(const CMPS &psi, int sense) {
   return normal_form_at(psi, (sense < 0) ? 0 : (psi.ssize() - 1));
 }
 
-CMPS canonical_form_at(const CMPS &psi, index site) {
+CMPS canonical_form_at(const CMPS &psi, index_t site) {
   return either_form_inner(psi, site, false);
 }
 
-CMPS normal_form_at(const CMPS &psi, index site) {
+CMPS normal_form_at(const CMPS &psi, index_t site) {
   return either_form_inner(psi, site, true);
 }
 

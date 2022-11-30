@@ -24,14 +24,14 @@ namespace mps {
 
 template class MPO<RTensor>;
 
-template void add_local_term(RMPO *mpdo, const RTensor &Hloc, index k);
+template void add_local_term(RMPO *mpdo, const RTensor &Hloc, index_t k);
 
-template void add_interaction(RMPO *mpdo, const RTensor &Hi, index i,
+template void add_interaction(RMPO *mpdo, const RTensor &Hi, index_t i,
                               const RTensor &Hj);
 
 template void add_product_term(RMPO *mpdo, const vector<RTensor> &Hi);
 
-template void add_interaction(RMPO *mpdo, const vector<RTensor> &Hi, index i,
+template void add_interaction(RMPO *mpdo, const vector<RTensor> &Hi, index_t i,
                               const RTensor *sign = nullptr);
 
 template void add_hopping_matrix(RMPO *mpdo, const RTensor &J,

@@ -38,7 +38,7 @@ namespace mps {
    */
 template <class Tensor>
 double do_solve(const MPO<Tensor> &H, MPS<Tensor> *ptrP, const MPS<Tensor> &oQ,
-                int *sense, index sweeps, bool normalize, index Dmax,
+                int *sense, index_t sweeps, bool normalize, index_t Dmax,
                 double tol) {
   bool single_site =
       FLAGS.get(MPS_SOLVE_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM;

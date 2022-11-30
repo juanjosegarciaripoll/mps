@@ -35,15 +35,15 @@ using namespace tensor;
 // REAL SPECIALIZATIONS
 //
 
-extern template void add_local_term(RMPO *mpdo, const RTensor &Hloc, index k);
+extern template void add_local_term(RMPO *mpdo, const RTensor &Hloc, index_t k);
 
-extern template void add_interaction(RMPO *mpdo, const RTensor &Hi, index i,
+extern template void add_interaction(RMPO *mpdo, const RTensor &Hi, index_t i,
                                      const RTensor &Hj);
 
 extern template void add_product_term(RMPO *mpdo, const vector<RTensor> &Hi);
 
 extern template void add_interaction(RMPO *mpdo, const vector<RTensor> &Hi,
-                                     index i, const RTensor *sign);
+                                     index_t i, const RTensor *sign);
 
 extern template void add_hopping_matrix(RMPO *mpdo, const RTensor &J,
                                         const RTensor &ad, const RTensor &a,
@@ -60,15 +60,15 @@ extern template RMPO local_Hamiltonian_mpo(const vector<RTensor> &Hloc);
 // REAL SPECIALIZATIONS
 //
 
-extern template void add_local_term(CMPO *mpdo, const CTensor &Hloc, index k);
+extern template void add_local_term(CMPO *mpdo, const CTensor &Hloc, index_t k);
 
-extern template void add_interaction(CMPO *mpdo, const CTensor &Hi, index i,
+extern template void add_interaction(CMPO *mpdo, const CTensor &Hi, index_t i,
                                      const CTensor &Hj);
 
 extern template void add_product_term(CMPO *mpdo, const vector<CTensor> &Hi);
 
 extern template void add_interaction(CMPO *mpdo, const vector<CTensor> &Hi,
-                                     index i, const CTensor *sign);
+                                     index_t i, const CTensor *sign);
 
 extern template void add_hopping_matrix(CMPO *mpdo, const CTensor &J,
                                         const CTensor &ad, const CTensor &a,

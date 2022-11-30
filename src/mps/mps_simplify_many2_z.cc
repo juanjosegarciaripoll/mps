@@ -22,7 +22,7 @@
 namespace mps {
 
 double simplify(CMPS *P, const vector<CMPS> &Q, const CTensor &weights,
-                index Dmax, double tol, int *sense, index sweeps,
+                index_t Dmax, double tol, int *sense, index_t sweeps,
                 bool normalize) {
   MPSManySimplifier<CMPS> aux(Q, weights);
   return aux.simplify_2_sites(*P, Dmax, tol, sense, sweeps, normalize);

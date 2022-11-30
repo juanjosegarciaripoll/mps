@@ -21,13 +21,13 @@
 #ifndef MPS_VECTOR_H
 #define MPS_VECTOR_H
 
-#include <mps/vector.h>
+#include <vector>
 #include <tensor/numbers.h>
 
 namespace mps {
 
 using index_t = tensor::index_t;
-using index = tensor::index_t;
+using index = const char *;
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push

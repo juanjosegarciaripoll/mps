@@ -40,25 +40,25 @@ class Hamiltonian {
   /**Create a copy of this object.*/
   virtual std::unique_ptr<const Hamiltonian> duplicate() const = 0;
 
-  virtual index size() const = 0;
+  virtual index_t size() const = 0;
   /**Is there interaction between the first and the last sites?*/
   virtual bool is_periodic() const = 0;
   /**Does the Hamiltonian depend on time? */
   virtual bool is_constant() const = 0;
   /**Nearest neighbor interaction between sites 'k' and 'k+1'*/
-  virtual const CTensor interaction(index k, double t = 0.0) const = 0;
-  virtual const CTensor interaction_left(index k, index n,
+  virtual const CTensor interaction(index_t k, double t = 0.0) const = 0;
+  virtual const CTensor interaction_left(index_t k, index_t n,
                                          double t = 0.0) const;
-  virtual const CTensor interaction_right(index k, index n,
+  virtual const CTensor interaction_right(index_t k, index_t n,
                                           double t = 0.0) const;
-  virtual index interaction_depth(index k, double t = 0.0) const;
+  virtual index_t interaction_depth(index_t k, double t = 0.0) const;
   /**Local term of the Hamiltonian on site 'k'.*/
-  virtual const CTensor local_term(index k, double t = 0.0) const = 0;
+  virtual const CTensor local_term(index_t k, double t = 0.0) const = 0;
   /**Dimension of the Hilbert space on the k-th site.*/
-  virtual index dimension(index k) const;
+  virtual index_t dimension(index_t k) const;
   const Indices dimensions() const;
 
-  void reshape(index new_length);
+  void reshape(index_t new_length);
 };
 
 /** Expected value of a Hamiltonian over a matrix product state.*/
@@ -73,21 +73,21 @@ const CSparse sparse_hamiltonian(const Hamiltonian &H, double t = 0.0);
 /**1D Hamiltonian, translationally invariant and constant.*/
 class TIHamiltonian : public Hamiltonian {
  public:
-  TIHamiltonian(index N, const CTensor &newH12, const CTensor &newH1,
+  TIHamiltonian(index_t N, const CTensor &newH12, const CTensor &newH1,
                 bool periodic = 0);
 
   virtual std::unique_ptr<const Hamiltonian> duplicate() const;
-  virtual index size() const;
+  virtual index_t size() const;
   virtual bool is_periodic() const;
   virtual bool is_constant() const;
-  virtual const CTensor interaction(index k, double t) const;
-  virtual const CTensor interaction_left(index k, index n, double t) const;
-  virtual const CTensor interaction_right(index k, index n, double t) const;
-  virtual index interaction_depth(index k, double t = 0.0) const;
-  virtual const CTensor local_term(index k, double t) const;
+  virtual const CTensor interaction(index_t k, double t) const;
+  virtual const CTensor interaction_left(index_t k, index_t n, double t) const;
+  virtual const CTensor interaction_right(index_t k, index_t n, double t) const;
+  virtual index_t interaction_depth(index_t k, double t = 0.0) const;
+  virtual const CTensor local_term(index_t k, double t) const;
 
  private:
-  index size_;
+  index_t size_;
   CTensor H12_;
   CTensor H1_;
   bool periodic_;
@@ -97,25 +97,25 @@ class TIHamiltonian : public Hamiltonian {
 /**1D Hamiltonian, constant but with no translational invariance*/
 class ConstantHamiltonian : public Hamiltonian {
  public:
-  ConstantHamiltonian(index N, bool periodic = false);
+  ConstantHamiltonian(index_t N, bool periodic = false);
 
-  void set_interaction(index k, const CTensor &H1, const CTensor &H2);
-  void add_interaction(index k, const CTensor &H1, const CTensor &H2);
-  void set_local_term(index k, const CTensor &H1);
+  void set_interaction(index_t k, const CTensor &H1, const CTensor &H2);
+  void add_interaction(index_t k, const CTensor &H1, const CTensor &H2);
+  void set_local_term(index_t k, const CTensor &H1);
 
   virtual std::unique_ptr<const Hamiltonian> duplicate() const;
-  virtual index size() const;
+  virtual index_t size() const;
   virtual bool is_periodic() const;
   virtual bool is_constant() const;
-  virtual const CTensor interaction(index k, double t) const;
-  virtual const CTensor interaction_left(index k, index n, double t) const;
-  virtual const CTensor interaction_right(index k, index n, double t) const;
-  virtual index interaction_depth(index k, double t = 0.0) const;
-  virtual const CTensor local_term(index k, double t) const;
-  virtual index dimension(index k) const;
+  virtual const CTensor interaction(index_t k, double t) const;
+  virtual const CTensor interaction_left(index_t k, index_t n, double t) const;
+  virtual const CTensor interaction_right(index_t k, index_t n, double t) const;
+  virtual index_t interaction_depth(index_t k, double t = 0.0) const;
+  virtual const CTensor local_term(index_t k, double t) const;
+  virtual index_t dimension(index_t k) const;
 
  private:
-  const CTensor compute_interaction(index k) const;
+  const CTensor compute_interaction(index_t k) const;
 
   vector<CTensor> H12_, H1_;
   vector<vector<CTensor> > H12_left_, H12_right_;

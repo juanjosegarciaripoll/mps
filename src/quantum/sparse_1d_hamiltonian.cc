@@ -35,28 +35,28 @@ using mps::imath::isqrt;
 
 template <class sparse, class tensor>
 static const sparse do_pair_Hamiltonian(const sparse &H12, const sparse &H1,
-                                        index N, bool periodic) {
+                                        index_t N, bool periodic) {
   if (H12.is_empty() && H1.is_empty()) {
     std::cerr
         << "In pair_Hamiltonian(H12, H1, N), all matrices are empty. You must\n"
         << "supply either an interaction or a local Hamiltonian for each site.";
     abort();
   }
-  index d = std::max(H1.rows(), isqrt(H12.rows()));
-  index D = ipow(d, N);
+  index_t d = std::max(H1.rows(), isqrt(H12.rows()));
+  index_t D = ipow(d, N);
   sparse output(D, D, 0);
 
   if (H12.length()) {
-    for (index k = 1; k < N; k++) {
-      index D1 = ipow(d, k - 1);
-      index D2 = ipow(d, N - k - 1);
+    for (index_t k = 1; k < N; k++) {
+      index_t D1 = ipow(d, k - 1);
+      index_t D2 = ipow(d, N - k - 1);
       output = output + kron(sparse::eye(D1), kron(H12, sparse::eye(D2)));
     }
     if (periodic && (N > 1)) {
       tensor O1, O2;
       decompose_operator(full(H12), &O1, &O2);
       sparse aux = sparse::eye(ipow(d, N - 2));
-      for (index i = 0; i < O1.dimension(-1); i++) {
+      for (index_t i = 0; i < O1.dimension(-1); i++) {
         sparse sO1 = sparse(squeeze(O1(_, _, range(i))));
         sparse sO2 = sparse(squeeze(O2(_, _, range(i))));
         output = output + kron(sO2, kron(aux, sO1));
@@ -64,9 +64,9 @@ static const sparse do_pair_Hamiltonian(const sparse &H12, const sparse &H1,
     }
   }
   if (H1.length()) {
-    for (index k = 0; k < N; k++) {
-      index D1 = ipow(d, k);
-      index D2 = ipow(d, N - k - 1);
+    for (index_t k = 0; k < N; k++) {
+      index_t D1 = ipow(d, k);
+      index_t D2 = ipow(d, N - k - 1);
       output = output + kron(sparse::eye(D1), kron(H1, sparse::eye(D2)));
     }
   }

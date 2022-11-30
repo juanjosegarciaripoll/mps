@@ -24,7 +24,7 @@
 namespace mps {
 
 template <class MPS, class Tensor>
-static void set_canonical_inner(MPS &psi, index ndx, const Tensor &t, int sense,
+static void set_canonical_inner(MPS &psi, index_t ndx, const Tensor &t, int sense,
                                 bool truncate) {
   if (sense > 0) {
     if (ndx + 1 == psi.ssize()) {
@@ -44,8 +44,8 @@ static void set_canonical_inner(MPS &psi, index ndx, const Tensor &t, int sense,
 }
 
 template <class MPS>
-static MPS either_form_inner(MPS psi, index site, bool normalize) {
-  index i;
+static MPS either_form_inner(MPS psi, index_t site, bool normalize) {
+  index_t i;
   for (i = psi.last(); i > site; i--) set_canonical(psi, i, psi[i], -1);
   for (i = 0; i < site; i++) set_canonical(psi, i, psi[i], +1);
   if (normalize) psi.at(i) /= norm2(psi[i]);

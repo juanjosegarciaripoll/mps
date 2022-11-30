@@ -26,11 +26,11 @@ static const MPS do_apply(const MPO &mpdo, const MPS &psi) {
   typedef typename MPS::elt_t Tensor;
   tensor_assert(mpdo.size() == psi.size());
 
-  index a1, c1, j, c2, a2;
-  index L = mpdo.ssize();
+  index_t a1, c1, j, c2, a2;
+  index_t L = mpdo.ssize();
   MPS chi(psi.ssize());
 
-  for (index i = 0; i < L; i++) {
+  for (index_t i = 0; i < L; i++) {
     const Tensor &A = psi[i];  /* A(a1,i,a2) */
     const Tensor &O = mpdo[i]; /* O(c1,j,i,c2) */
 

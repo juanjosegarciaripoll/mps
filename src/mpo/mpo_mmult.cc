@@ -26,16 +26,16 @@ static const MPO do_mmult(const MPO &A, const MPO &B) {
   typedef typename MPO::elt_t Tensor;
   tensor_assert(A.size() == B.size());
 
-  index L = A.ssize();
+  index_t L = A.ssize();
   MPO C = A;
 
-  for (index n = 0; n < L; n++) {
+  for (index_t n = 0; n < L; n++) {
     const Tensor &tA = A[n]; /* tA(a1,i,j,a2) */
     const Tensor &tB = B[n]; /* tB(c1,j,k,c2) */
 
     /* tC(a1,i,c1,k,c2,a2) = tB(c1,j,k,c2) tA(a1,i,j,a2) */
     Tensor tC = foldin(tB, 1, tA, 2);
-    index a1, i, a2, c1, k, c2;
+    index_t a1, i, a2, c1, k, c2;
     tC.get_dimensions(&a1, &i, &c1, &k, &c2, &a2);
     tC = reshape(permute(permute(tC, 1, 2), 4, 5), a1 * c1, i, k, a2 * c2);
 

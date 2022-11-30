@@ -24,34 +24,34 @@ namespace mps {
 
 Hamiltonian::~Hamiltonian() {}
 
-index Hamiltonian::dimension(index k) const {
+index_t Hamiltonian::dimension(index_t k) const {
   return local_term(k, 0).dimension(1);
 }
 
 const Indices Hamiltonian::dimensions() const {
-  index l = size();
+  index_t l = size();
   Indices output(l);
-  for (index i = 0; i < l; i++) {
+  for (index_t i = 0; i < l; i++) {
     output.at(i) = dimension(i);
   }
   return output;
 }
 
-const CTensor Hamiltonian::interaction_left(index k, index ndx,
+const CTensor Hamiltonian::interaction_left(index_t k, index_t ndx,
                                             double t) const {
   CTensor O1, O2;
   decompose_operator(interaction(k, t), &O1, &O2);
   return squeeze(O1(_, _, range(ndx)));
 }
 
-const CTensor Hamiltonian::interaction_right(index k, index ndx,
+const CTensor Hamiltonian::interaction_right(index_t k, index_t ndx,
                                              double t) const {
   CTensor O1, O2;
   decompose_operator(interaction(k, t), &O1, &O2);
   return squeeze(O2(_, _, range(ndx)));
 }
 
-index Hamiltonian::interaction_depth(index k, double t) const {
+index_t Hamiltonian::interaction_depth(index_t k, double t) const {
   CTensor O1, O2;
   decompose_operator(interaction(k, t), &O1, &O2);
   return O1.dimension(3);

@@ -39,7 +39,7 @@ class MPO : public MP<Tensor> {
   MPO &operator=(const MPO &) = default;
   MPO &operator=(MPO &&) = default;
 
-  MPO(index length, index physical_dimension) : parent(length) {
+  MPO(index_t length, index_t physical_dimension) : parent(length) {
     tensor::Indices dims(length);
     std::fill(dims.begin(), dims.end(), physical_dimension);
     clear(dims);
@@ -65,8 +65,8 @@ class MPO : public MP<Tensor> {
     }
     // TODO: Simplify. We only need sizes (1,d,d,1) for the add_local/add_interaction to succeed.
     Tensor P;
-    for (index i = 0; i < this->ssize(); i++) {
-      index d = physical_dimensions[i];
+    for (index_t i = 0; i < this->ssize(); i++) {
+      index_t d = physical_dimensions[i];
       Tensor Id = Tensor::eye(d, d);
       if (i == 0) {
         /* first */

@@ -32,7 +32,7 @@ using mps::imath::isqrt;
    * sites, 'H12' is the nearest neighbor interaction between every two sites,
    * 'H1' is the local term and 'periodic' determines whether there is also
    * interaction between sites 1 and N. */
-TIHamiltonian::TIHamiltonian(index N, const CTensor &H12, const CTensor &H1,
+TIHamiltonian::TIHamiltonian(index_t N, const CTensor &H12, const CTensor &H1,
                              bool periodic)
     : size_(N), H12_(H12), H1_(H1), periodic_(periodic) {
   if (H1.is_empty()) {
@@ -41,12 +41,12 @@ TIHamiltonian::TIHamiltonian(index N, const CTensor &H12, const CTensor &H1,
                    "term or an interaction.\n";
       abort();
     } else {
-      index d = isqrt(H12.rows());
+      index_t d = isqrt(H12.rows());
       H1_ = RTensor::zeros(d, d);
     }
   }
   if (H12.is_empty()) {
-    index d = H1_.rows();
+    index_t d = H1_.rows();
     H12_ = RTensor::zeros(d * d, d * d);
   } else if (norm2(H12)) {
     split_interaction(H12_, &H12_left_, &H12_right_);
@@ -57,31 +57,31 @@ std::unique_ptr<const Hamiltonian> TIHamiltonian::duplicate() const {
   return std::unique_ptr<const Hamiltonian>(new TIHamiltonian(*this));
 }
 
-index TIHamiltonian::size() const { return size_; }
+index_t TIHamiltonian::size() const { return size_; }
 
 bool TIHamiltonian::is_constant() const { return 1; }
 
 bool TIHamiltonian::is_periodic() const { return periodic_; }
 
-const CTensor TIHamiltonian::interaction(index /*k*/, double /*t*/) const {
+const CTensor TIHamiltonian::interaction(index_t /*k*/, double /*t*/) const {
   return H12_;
 }
 
-const CTensor TIHamiltonian::interaction_left(index /*k*/, index ndx,
+const CTensor TIHamiltonian::interaction_left(index_t /*k*/, index_t ndx,
                                               double /*t*/) const {
   return H12_left_[ndx];
 }
 
-const CTensor TIHamiltonian::interaction_right(index /*k*/, index ndx,
+const CTensor TIHamiltonian::interaction_right(index_t /*k*/, index_t ndx,
                                                double /*t*/) const {
   return H12_right_[ndx];
 }
 
-index TIHamiltonian::interaction_depth(index /*k*/, double /*t*/) const {
+index_t TIHamiltonian::interaction_depth(index_t /*k*/, double /*t*/) const {
   return H12_left_.ssize();
 }
 
-const CTensor TIHamiltonian::local_term(index /*k*/, double /*t*/) const {
+const CTensor TIHamiltonian::local_term(index_t /*k*/, double /*t*/) const {
   return H1_;
 }
 

@@ -27,7 +27,7 @@ const CSparse sparse_hamiltonian(const Hamiltonian &H, const double t) {
   bool periodic = H.is_periodic();
   vector<CSparse> H12(N);
   vector<CSparse> H1(N);
-  for (index k = 0; k < N; k++) {
+  for (index_t k = 0; k < N; k++) {
     H1.at(k) = CSparse(H.local_term(k, t));
     if ((k < (N - 1)) || periodic)
       if (H.interaction_depth(k)) H12.at(k) = CSparse(H.interaction(k, t));

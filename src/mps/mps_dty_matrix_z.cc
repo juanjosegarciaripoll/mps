@@ -23,7 +23,7 @@
 
 namespace mps {
 
-const CTensor density_matrix(const CMPS &psi, index site) {
+const CTensor density_matrix(const CMPS &psi, index_t site) {
   return do_density_matrix<CMPS, CTensor>(psi, site);
 }
 

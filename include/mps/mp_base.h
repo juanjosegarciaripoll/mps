@@ -32,16 +32,16 @@ using namespace tensor;
 
 class Sweeper {
  public:
-  Sweeper(index L, index sense);
-  index operator*() const { return k_; };
+  Sweeper(index_t L, index_t sense);
+  index_t operator*() const { return k_; };
   bool operator--();
   bool is_last() const { return k_ == kN_; };
   int sense() const { return tensor::narrow_cast<int>(dk_); };
-  index site() const { return k_; };
+  index_t site() const { return k_; };
   void flip();
 
  private:
-  index k_, k0_, kN_, dk_;
+  index_t k_, k0_, kN_, dk_;
 };
 
 template <class Tensor>
@@ -63,13 +63,13 @@ class MP {
   explicit MP(const vector<Tensor> &other) : data_(other) {}
 
   size_t size() const { return data_.size(); }
-  index ssize() const { return data_.ssize(); }
-  index last() const { return ssize() - 1; }
-  index last_index() const { return ssize() - 1; }
-  void resize(index new_size) { data_.resize(new_size); }
+  index_t ssize() const { return data_.ssize(); }
+  index_t last() const { return ssize() - 1; }
+  index_t last_index() const { return ssize() - 1; }
+  void resize(index_t new_size) { data_.resize(new_size); }
 
-  const Tensor &operator[](index n) const { return data_[normal_index(n)]; }
-  Tensor &at(index n) { return data_.at(normal_index(n)); }
+  const Tensor &operator[](index_t n) const { return data_[normal_index(n)]; }
+  Tensor &at(index_t n) { return data_.at(normal_index(n)); }
 
   iterator begin() { return data_.begin(); }
   const_iterator begin() const { return data_.begin(); }
@@ -77,10 +77,10 @@ class MP {
   iterator end() { return data_.end(); }
   const vector<Tensor> to_vector() const { return data_; }
 
-  Sweeper sweeper(index sense) const { return Sweeper(ssize(), sense); }
+  Sweeper sweeper(index_t sense) const { return Sweeper(ssize(), sense); }
 
-  index normal_index(index mps_index) const {
-    index mps_size = ssize();
+  index_t normal_index(index_t mps_index) const {
+    index_t mps_size = ssize();
     if (mps_index < 0) {
       mps_index += mps_size;
       tensor_assert2(mps_index >= 0 && mps_index < mps_size,
@@ -108,8 +108,8 @@ template <typename T>
 using mp_tensor_t = typename mp_tensor_t_inner<T>::type;
 
 template <typename Tensor>
-inline index largest_bond_dimension(const MP<Tensor> &mp) {
-  index output = 0;
+inline index_t largest_bond_dimension(const MP<Tensor> &mp) {
+  index_t output = 0;
   for (auto &t : mp) {
     output = std::max(output, t.dimension(0));
   }

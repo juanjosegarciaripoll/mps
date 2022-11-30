@@ -24,14 +24,14 @@ namespace mps {
 
 template class MPO<CTensor>;
 
-template void add_local_term(CMPO *mpdo, const CTensor &Hloc, index k);
+template void add_local_term(CMPO *mpdo, const CTensor &Hloc, index_t k);
 
-template void add_interaction(CMPO *mpdo, const CTensor &Hi, index i,
+template void add_interaction(CMPO *mpdo, const CTensor &Hi, index_t i,
                               const CTensor &Hj);
 
 template void add_product_term(CMPO *mpdo, const vector<CTensor> &Hi);
 
-template void add_interaction(CMPO *mpdo, const vector<CTensor> &Hi, index i,
+template void add_interaction(CMPO *mpdo, const vector<CTensor> &Hi, index_t i,
                               const CTensor *sign = nullptr);
 
 template void add_hopping_matrix(CMPO *mpdo, const CTensor &J,

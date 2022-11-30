@@ -24,7 +24,7 @@
 namespace mps {
 
 template <class Tensor>
-LinearForm<Tensor>::LinearForm(const mps_t &bra, const mps_t &ket, index start)
+LinearForm<Tensor>::LinearForm(const mps_t &bra, const mps_t &ket, index_t start)
     : weight_(tensor_t::ones(1)),
       bra_(vector<mps_t>(1, bra)),
       matrix_(make_matrix_array()) {
@@ -39,13 +39,13 @@ LinearForm<Tensor>::LinearForm(const mps_t &bra, const mps_t &ket, index start)
 template <class Tensor>
 LinearForm<Tensor>::LinearForm(const tensor_t &weight,
                                const vector<mps_t> &bras, const mps_t &ket,
-                               index start)
+                               index_t start)
     : weight_(weight), bra_(bras), matrix_(make_matrix_array()) {
   initialize_matrices(start, ket);
 }
 
 template <class Tensor>
-void LinearForm<Tensor>::initialize_matrices(index start, const mps_t &ket) {
+void LinearForm<Tensor>::initialize_matrices(index_t start, const mps_t &ket) {
   for (current_site_ = 0; here() < start;) {
     propagate_right(ket[here()]);
   }
@@ -118,7 +118,7 @@ static tensor_t compose(const tensor_t &L, const tensor_t &P,
   // std::cerr << " L=" << L << '\n'
   //           << " P=" << P << '\n'
   //           << " R=" << R << '\n';
-  index a1, a2, b1, b2, a3, b3, i;
+  index_t a1, a2, b1, b2, a3, b3, i;
   L.get_dimensions(&a1, &b1, &a2, &b2);
   R.get_dimensions(&a3, &b3, &a1, &b1);
   P.get_dimensions(&a2, &i, &a3);
@@ -150,7 +150,7 @@ static tensor_t compose4(const tensor_t L, const tensor_t &P1,
   if (R.is_empty()) {
     return compose4(L, P1, P2, tensor_t::ones(1, 1, 1, 1));
   }
-  index a1, a2, b1, b2, a3, /*b3,*/ a4, b4, i, j;
+  index_t a1, a2, b1, b2, a3, /*b3,*/ a4, b4, i, j;
   L.get_dimensions(&a1, &b1, &a2, &b2);
   R.get_dimensions(&a4, &b4, &a1, &b1);
   tensor_assert(a1 == 1 && b1 == 1);
@@ -167,7 +167,7 @@ template <class Tensor>
 const typename LinearForm<Tensor>::tensor_t LinearForm<Tensor>::two_site_vector(
     int sense) const {
   tensor_t output;
-  index i, j;
+  index_t i, j;
   if (sense > 0) {
     i = here();
     j = i + 1;

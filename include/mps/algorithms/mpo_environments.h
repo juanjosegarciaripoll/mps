@@ -36,9 +36,9 @@ template <class Tensor>
 class Sparse4Tensor {
  public:
   struct subtensor_t {
-    index left_index, right_index;
+    index_t left_index, right_index;
     Tensor matrix;
-    subtensor_t(index left, index right, Tensor &&m)
+    subtensor_t(index_t left, index_t right, Tensor &&m)
         : left_index{left}, right_index{right}, matrix{std::move(m)} {}
   };
 
@@ -47,7 +47,7 @@ class Sparse4Tensor {
 
   const Dimensions &dimensions() const { return dimensions_; }
 
-  index dimension(index which) const { return dimensions_[which]; }
+  index_t dimension(index_t which) const { return dimensions_[which]; }
 
   Tensor zero_matrix() const {
     return Tensor::zeros(dimensions_[1], dimensions_[2]);
@@ -63,10 +63,10 @@ class Sparse4Tensor {
 
   static data_t make_subtensors(const Tensor &t) {
     data_t output;
-    index M = t.dimension(0);
-    index N = t.dimension(3);
-    for (index left_index = 0; left_index < M; ++left_index) {
-      for (index right_index = 0; right_index < N; ++right_index) {
+    index_t M = t.dimension(0);
+    index_t N = t.dimension(3);
+    for (index_t left_index = 0; left_index < M; ++left_index) {
+      for (index_t right_index = 0; right_index < N; ++right_index) {
         Tensor matrix = t(range(left_index), _, _, range(right_index));
         if (norm2(matrix) != 0.0) {
           output.emplace_back(left_index, right_index, std::move(matrix));
@@ -87,8 +87,8 @@ class SparseMPO {
   auto begin() const { return tensors_.begin(); }
   auto end() const { return tensors_.end(); }
   size_t size() const { return tensors_.size(); }
-  index ssize() const { return tensors_.ssize(); }
-  const value_type &operator[](index i) const { return tensors_[i]; }
+  index_t ssize() const { return tensors_.ssize(); }
+  const value_type &operator[](index_t i) const { return tensors_[i]; }
 
  private:
   typedef vector<Sparse4Tensor<Tensor>> tensor_list_t;
@@ -108,7 +108,7 @@ template <class Tensor>
 class MPOEnvironment {
  public:
   typedef Environment<Tensor> single_env_t;
-  typedef std::unordered_map<index, single_env_t> env_t;
+  typedef std::unordered_map<index_t, single_env_t> env_t;
 
   explicit MPOEnvironment(Dir direction) : direction_{direction} {
     tensor_assert2(direction == DIR_RIGHT || direction == DIR_LEFT,
@@ -134,23 +134,23 @@ class MPOEnvironment {
   MPOEnvironment propagate(const Tensor &bra, const Tensor &ket,
                            const Sparse4Tensor<Tensor> &op) const {
     if (direction_ == DIR_RIGHT) {
-      Dimensions dims = {index(1), index(1), bra.dimension(2),
+      Dimensions dims = {index_t(1), index_t(1), bra.dimension(2),
                          ket.dimension(2)};
       return MPOEnvironment(direction(), propagate_right(envs_, bra, ket, op),
                             dims);
     } else {
-      Dimensions dims = {bra.dimension(0), ket.dimension(0), index(1),
-                         index(1)};
+      Dimensions dims = {bra.dimension(0), ket.dimension(0), index_t(1),
+                         index_t(1)};
       return MPOEnvironment(direction(), propagate_left(envs_, bra, ket, op),
                             dims);
     }
   }
 
-  bool has_environment_at(index i) const {
+  bool has_environment_at(index_t i) const {
     return has_environment_at(envs_, i);
   }
 
-  const single_env_t &operator[](index i) const { return envs_.at(i); }
+  const single_env_t &operator[](index_t i) const { return envs_.at(i); }
 
   size_t size() const { return envs_.size(); }
 
@@ -169,7 +169,7 @@ class MPOEnvironment {
   Dir direction_{DIR_RIGHT};
   Dimensions dimensions_{1, 1, 1, 1};
 
-  static bool has_environment_at(const env_t &env, index n) {
+  static bool has_environment_at(const env_t &env, index_t n) {
     return env.find(n) != env.end();
   }
 

@@ -39,7 +39,7 @@ ForestRuthSolver::ForestRuthSolver(const Hamiltonian &H, cdouble dt)
       U4(H, 1, dt * FR_param[3]),
       sense(0) {}
 
-double ForestRuthSolver::one_step(CMPS *P, index Dmax) {
+double ForestRuthSolver::one_step(CMPS *P, index_t Dmax) {
   int debug = tensor::narrow_cast<int>(FLAGS.get(MPS_DEBUG_TROTTER));
   if (!Dmax) {
     if (strategy != DO_NOT_TRUNCATE) {

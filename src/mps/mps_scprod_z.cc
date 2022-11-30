@@ -25,11 +25,11 @@ template double norm2(const CMPS &psi);
 
 template cdouble scprod(const CMPS &psi1, const CMPS &psi2, int direction);
 
-template cdouble expected(const CMPS &a, const CTensor &Op1, index k,
+template cdouble expected(const CMPS &a, const CTensor &Op1, index_t k,
                           int direction);
 
-template cdouble expected(const CMPS &a, const CTensor &Op1, index k1,
-                          const CTensor &Op2, index k2, int direction);
+template cdouble expected(const CMPS &a, const CTensor &Op1, index_t k1,
+                          const CTensor &Op2, index_t k2, int direction);
 
 template CTensor expected_vector(const CMPS &a, const CTensor &Op1);
 

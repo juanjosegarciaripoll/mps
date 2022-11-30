@@ -42,7 +42,7 @@ class TimeSolver {
   /**Compute next time step. Given the state \f$\psi(0)\f$ represented
        by P, estimate the state at \f$\psi(\Delta t)\f$ within the space
        of MPS with dimension <= Dmax. P contains the output.*/
-  virtual double one_step(CMPS *P, index Dmax) = 0;
+  virtual double one_step(CMPS *P, index_t Dmax) = 0;
 
   /**How long in time this solver advances.*/
   cdouble time_step() const { return dt_; }
@@ -85,23 +85,23 @@ class TrotterSolver : public TimeSolver {
     int debug;
 
     /*Construct the unitary operator.*/
-    Unitary(const Hamiltonian &H, index k, cdouble dt, int do_debug = 0);
+    Unitary(const Hamiltonian &H, index_t k, cdouble dt, int do_debug = 0);
 
     /*Apply the unitary on a MPS.*/
-    double apply(CMPS *psi, int *dk, double tolerance, index Dmax,
+    double apply(CMPS *psi, int *dk, double tolerance, index_t Dmax,
                  bool normalize = false) const;
 
     /*Apply the unitary on a MPS and optimize the output.*/
-    double apply_and_simplify(CMPS *psi, int *dk, double tolerance, index Dmax,
+    double apply_and_simplify(CMPS *psi, int *dk, double tolerance, index_t Dmax,
                               bool normalize = false) const;
 
    private:
     int k0, kN;
     vector<CTensor> U;
-    void apply_onto_one_site(CMPS &P, const CTensor &Uloc, index k, int dk,
-                             index max_a2) const;
-    double apply_onto_two_sites(CMPS &P, const CTensor &U12, index k1, index k2,
-                                int dk, double tolerance, index max_a2) const;
+    void apply_onto_one_site(CMPS &P, const CTensor &Uloc, index_t k, int dk,
+                             index_t max_a2) const;
+    double apply_onto_two_sites(CMPS &P, const CTensor &U12, index_t k1, index_t k2,
+                                int dk, double tolerance, index_t max_a2) const;
   };
 };
 
@@ -117,7 +117,7 @@ class Trotter2Solver : public TrotterSolver {
   /**Create a solver for the given nearest neighbor Hamiltonian and time step.*/
   Trotter2Solver(const Hamiltonian &H, cdouble dt);
 
-  virtual double one_step(CMPS *P, index Dmax);
+  virtual double one_step(CMPS *P, index_t Dmax);
 };
 
 /**Trotter method with three passes. This method uses the second order
@@ -136,7 +136,7 @@ class Trotter3Solver : public TrotterSolver {
   /**Create a solver for the given nearest neighbor Hamiltonian and time step.*/
   Trotter3Solver(const Hamiltonian &H, cdouble dt);
 
-  virtual double one_step(CMPS *P, index Dmax);
+  virtual double one_step(CMPS *P, index_t Dmax);
 };
 
 /**Forest-Ruth method. This method uses a fourth order Forest-Ruth decomposition
@@ -151,7 +151,7 @@ class ForestRuthSolver : public TrotterSolver {
   /**Create a solver for the given nearest neighbor Hamiltonian and time step.*/
   ForestRuthSolver(const Hamiltonian &H, cdouble dt);
 
-  virtual double one_step(CMPS *P, index Dmax);
+  virtual double one_step(CMPS *P, index_t Dmax);
 };
 
 /**Time evolution with the Arnoldi method.
@@ -167,7 +167,7 @@ class ArnoldiSolver : public TimeSolver {
   /**Compute next time step. Given the state \f$\psi(0)\f$ represented
        by P, estimate the state at \f$\psi(\Delta t)\f$ within the space
        of MPS with dimension <= Dmax. P contains the output.*/
-  virtual double one_step(CMPS *P, index Dmax);
+  virtual double one_step(CMPS *P, index_t Dmax);
 
  private:
   const cdouble dt_;

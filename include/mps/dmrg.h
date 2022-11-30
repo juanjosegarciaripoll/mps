@@ -36,13 +36,13 @@ class DMRG {
   typedef typename tensor::Sparse<typename elt_t::elt_t> sparse_t;
 
   bool error{false};
-  index sweeps{32};
+  index_t sweeps{32};
   bool display{true};
-  index debug{0};
+  index_t debug{0};
   double tolerance{1e-6};
   double svd_tolerance{1e-8};
   int allow_E_growth;
-  index neigenvalues{1};
+  index_t neigenvalues{1};
 
   RTensor eigenvalues{};
 
@@ -63,9 +63,9 @@ class DMRG {
   void clear_conserved_quantities();
   void commutes_with(const elt_t &Q);
 
-  double minimize(MPS *P, index Dmax = 0, double E = 0.0);
+  double minimize(MPS *P, index_t Dmax = 0, double E = 0.0);
 
-  index size() const { return H_->size(); }
+  index_t size() const { return H_->size(); }
   bool is_periodic() const { return H_->is_periodic(); }
 
  private:
@@ -77,39 +77,39 @@ class DMRG {
   mps_vector_t P0_{}, Proj_{};
 
   mps_vector_t Ql_{}, Qr_{};
-  index full_size_{0};
+  index_t full_size_{0};
   Indices valid_cells_{};
 
-  const elt_t interaction(index k) const;
-  const elt_t interaction_left(index k, index m) const;
-  const elt_t interaction_right(index k, index m) const;
-  const elt_t local_term(index k) const;
-  index interaction_depth(index k) const;
+  const elt_t interaction(index_t k) const;
+  const elt_t interaction_left(index_t k, index_t m) const;
+  const elt_t interaction_right(index_t k, index_t m) const;
+  const elt_t local_term(index_t k) const;
+  index_t interaction_depth(index_t k) const;
 
-  void init_matrices(const MPS &P, index k0, bool also_Q);
-  void update_matrices_right(const MPS &P, index k0);
-  void update_matrices_left(const MPS &P, index k0);
+  void init_matrices(const MPS &P, index_t k0, bool also_Q);
+  void update_matrices_right(const MPS &P, index_t k0);
+  void update_matrices_left(const MPS &P, index_t k0);
 
-  const elt_vector_t compute_interactions_right(const MPS &Pk, index k) const;
-  const elt_vector_t compute_interactions_left(const MPS &Pk, index k) const;
-  const elt_t block_site_interaction_right(const MPS &P, index k);
-  const elt_t block_site_interaction_left(const MPS &P, index k);
+  const elt_vector_t compute_interactions_right(const MPS &Pk, index_t k) const;
+  const elt_vector_t compute_interactions_left(const MPS &Pk, index_t k) const;
+  const elt_t block_site_interaction_right(const MPS &P, index_t k);
+  const elt_t block_site_interaction_left(const MPS &P, index_t k);
 
-  index n_orth_states() const;
-  const elt_t projector(const elt_t &Pk, index k);
-  const elt_t projector_twosites(const elt_t &Pk, index k);
+  index_t n_orth_states() const;
+  const elt_t projector(const elt_t &Pk, index_t k);
+  const elt_t projector_twosites(const elt_t &Pk, index_t k);
 
-  index n_constants() const;
+  index_t n_constants() const;
 
-  double minimize_single_site(MPS &P, index k, int dk);
-  double minimize_two_sites(MPS &P, index k, int dk, index Dmax);
+  double minimize_single_site(MPS &P, index_t k, int dk);
+  double minimize_two_sites(MPS &P, index_t k, int dk, index_t Dmax);
 
-  void prepare_simplifier(index k, const elt_t &Pk);
+  void prepare_simplifier(index_t k, const elt_t &Pk);
   const elt_t simplify_state(const elt_t &Pk);
   const elt_t simplify_operator(const elt_t &H);
   const elt_t reconstruct_state(const elt_t &Psimple);
 
-  virtual void show_state_info(const MPS &Pk, index iter, index k, double newE);
+  virtual void show_state_info(const MPS &Pk, index_t iter, index_t k, double newE);
 };
 
 extern template class DMRG<RMPS>;

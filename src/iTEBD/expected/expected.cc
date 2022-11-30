@@ -62,7 +62,7 @@ tensor_scalar_t<Tensor> string_order(const Tensor &Opi, int i,
 template <class Tensor>
 tensor_scalar_t<Tensor> iTEBD<Tensor>::expected_value12(const Tensor &Op12,
                                                         int site) const {
-  index a, i, b, j, c;
+  index_t a, i, b, j, c;
   const Tensor &AlA = (site & 1) ? BlB_ : AlA_;
   const Tensor &B = (site & 1) ? A_ : B_;
   const Tensor &lB = (site & 1) ? lA_ : lB_;

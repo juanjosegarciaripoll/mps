@@ -23,7 +23,7 @@
 namespace mps {
 
 double simplify(CMPS *P, const CMPS &Q, int *sense, bool periodicbc,
-                index sweeps, bool normalize) {
+                index_t sweeps, bool normalize) {
   return do_simplify(P, Q, sense, periodicbc, sweeps, normalize);
 }
 

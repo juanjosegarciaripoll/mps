@@ -32,30 +32,30 @@ extern int debug_flags;
 
 index_t where_to_truncate(const RTensor &s, double tol, index_t max_dim);
 
-Indices weights_to_keep(const RTensor &s, double tol, index max_dim);
+Indices weights_to_keep(const RTensor &s, double tol, index_t max_dim);
 
 const RTensor limited_svd(RTensor A, RTensor *U, RTensor *V, double tolerance,
-                          index max_dim = 0);
+                          index_t max_dim = 0);
 
 const RTensor split(RTensor *A, const RTensor &origA, int sense, bool truncate);
 
-const RTensor build_E_matrix(const RTensor &A, index *a = 0, index *b = 0);
+const RTensor build_E_matrix(const RTensor &A, index_t *a = 0, index_t *b = 0);
 
-const RTensor build_E_matrix(const RTensor &A, const RTensor &B, index *a = 0,
-                             index *b = 0);
+const RTensor build_E_matrix(const RTensor &A, const RTensor &B, index_t *a = 0,
+                             index_t *b = 0);
 
 const RTensor propagate_right(const RTensor &v, const RTensor &A,
                               const RTensor &op);
 
 const RTensor limited_svd(CTensor A, CTensor *U, CTensor *V, double tolerance,
-                          index max_dim = 0);
+                          index_t max_dim = 0);
 
 const CTensor split(CTensor *A, const CTensor &origA, int sense, bool truncate);
 
-const CTensor build_E_matrix(const CTensor &A, index *a = 0, index *b = 0);
+const CTensor build_E_matrix(const CTensor &A, index_t *a = 0, index_t *b = 0);
 
-const CTensor build_E_matrix(const CTensor &A, const CTensor &B, index *a = 0,
-                             index *b = 0);
+const CTensor build_E_matrix(const CTensor &A, const CTensor &B, index_t *a = 0,
+                             index_t *b = 0);
 
 const CTensor propagate_right(const CTensor &v, const CTensor &A,
                               const CTensor &op);

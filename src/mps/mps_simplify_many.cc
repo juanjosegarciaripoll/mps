@@ -62,7 +62,7 @@ namespace mps {
    */
 template <class Tensor>
 static void normalize_this(Tensor &Pk, int sense) {
-  index a1, i1, a2;
+  index_t a1, i1, a2;
   Tensor U;
   if (sense > 0) {
     Pk.get_dimensions(&a1, &i1, &a2);
@@ -84,8 +84,8 @@ struct MPSManySimplifier {
   typedef vector<tensor_vector_t> matrices_t;
   typedef vector<MPS> mps_vector_t;
 
-  index L;
-  const index nvectors;
+  index_t L;
+  const index_t nvectors;
   const mps_vector_t &Q;
   const Tensor &weights;
   matrices_t A;
@@ -122,7 +122,7 @@ struct MPSManySimplifier {
     normQ2 = real(x);
   }
 
-  Tensor &matrix(index site, index vector) { return A[site + 1].at(vector); }
+  Tensor &matrix(index_t site, index_t vector) { return A[site + 1].at(vector); }
 
 #if 0
   void dump_matrices(const char *context = "foo") {
@@ -138,7 +138,7 @@ struct MPSManySimplifier {
   void dump_matrices(const char *) {}
 #endif
 
-  void update_matrices(index site, const Tensor &Pk, int sense) {
+  void update_matrices(index_t site, const Tensor &Pk, int sense) {
     if (sense > 0) {
       for (int i = 0; i < nvectors; i++) {
         matrix(site, i) = prop_matrix(matrix(site - 1, i), +1, Pk, Q[i][site]);
@@ -160,11 +160,11 @@ struct MPSManySimplifier {
 
   void initialize_matrices(const MPS &P, int sense) {
     if (sense > 0) {
-      for (index k = L; k--;) {
+      for (index_t k = L; k--;) {
         update_matrices(k, P[k], -1);
       }
     } else if (sense < 0) {
-      for (index k = 0; k < L; k++) {
+      for (index_t k = 0; k < L; k++) {
         update_matrices(k, P[k], +1);
       }
     } else {
@@ -174,7 +174,7 @@ struct MPSManySimplifier {
     dump_matrices("initialization");
   }
 
-  number scalar_product(index site) {
+  number scalar_product(index_t site) {
     number M = number_zero<number>();
     dump_matrices("scprod");
     for (int i = 0; i < nvectors; i++) {
@@ -184,7 +184,7 @@ struct MPSManySimplifier {
   }
 
   const Tensor next_projector(Tensor Ml, Tensor Mr, const Tensor &Qk) {
-    index a1, a2, b1, i1, b2, a3, b3;
+    index_t a1, a2, b1, i1, b2, a3, b3;
 
     if (Mr.is_empty()) {
       if (Ml.is_empty()) {
@@ -228,7 +228,7 @@ struct MPSManySimplifier {
 #endif
   }
 
-  const Tensor next_projector(index site) {
+  const Tensor next_projector(index_t site) {
     Tensor output;
     for (int i = 0; i < nvectors; i++) {
       Tensor new_Pk =
@@ -262,7 +262,7 @@ struct MPSManySimplifier {
      *
      * 3) The value of SENSE can be passed further to apply_unitary(), simplify(), etc.
      */
-  double simplify(MPS &P, int *sense, index sweeps, bool normalize) {
+  double simplify(MPS &P, int *sense, index_t sweeps, bool normalize) {
     bool debug = mps::FLAGS.get(MPS_DEBUG_SIMPLIFY);
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
 
@@ -279,10 +279,10 @@ struct MPSManySimplifier {
                 << " states with norm " << normQ2 << '\n';
     }
     double err = normQ2 * 10, scp, normP2;
-    for (index sweep = 0; sweep < sweeps; sweep++) {
+    for (index_t sweep = 0; sweep < sweeps; sweep++) {
       Tensor Pk;
       if (*sense > 0) {
-        for (index k = 0; k < L; k++) {
+        for (index_t k = 0; k < L; k++) {
           Pk = next_projector(k);
           set_canonical(P, k, Pk, +1, false);
           Pk = P.at(k);
@@ -291,7 +291,7 @@ struct MPSManySimplifier {
         scp = real(scalar_product(L - 1));
         normP2 = real(scprod(Pk, Pk));
       } else {
-        for (index k = L; k--;) {
+        for (index_t k = L; k--;) {
           Pk = next_projector(k);
           set_canonical(P, k, Pk, -1, false);
           Pk = P.at(k);
@@ -308,7 +308,7 @@ struct MPSManySimplifier {
       if (tensor::abs(olderr - err) < 1e-5 * tensor::abs(normQ2) ||
           (err < tolerance * normQ2) || (err < 1e-14)) {
         if (normalize) {
-          index ndx = (*sense > 0) ? L - 1 : 0;
+          index_t ndx = (*sense > 0) ? L - 1 : 0;
           P.at(ndx) = Pk / sqrt(normP2);
           *sense = -*sense;
         }
@@ -319,9 +319,9 @@ struct MPSManySimplifier {
     return err;
   }
 
-  const Tensor next_projector_2_sites(index site) {
+  const Tensor next_projector_2_sites(index_t site) {
     Tensor output;
-    index a1, i1 = 0, i2 = 0, a2;
+    index_t a1, i1 = 0, i2 = 0, a2;
     for (int i = 0; i < nvectors; i++) {
       Tensor P = fold(Q[i][site], -1, Q[i][site + 1], 0);
       P.get_dimensions(&a1, &i1, &i2, &a2);
@@ -357,8 +357,8 @@ struct MPSManySimplifier {
      *
      * 3) The value of SENSE can be passed further to apply_unitary(), simplify(), etc.
      */
-  double simplify_2_sites(MPS &P, index Dmax, double tol, int *sense,
-                          index sweeps, bool normalize) {
+  double simplify_2_sites(MPS &P, index_t Dmax, double tol, int *sense,
+                          index_t sweeps, bool normalize) {
     bool debug = mps::FLAGS.get(MPS_DEBUG_SIMPLIFY);
     double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
 
@@ -376,10 +376,10 @@ struct MPSManySimplifier {
     }
 
     double err = normQ2 * 10, scp, normP2;
-    for (index sweep = 0; sweep < sweeps; sweep++) {
+    for (index_t sweep = 0; sweep < sweeps; sweep++) {
       Tensor Pk;
       if (*sense > 0) {
-        for (index k = 0; k < (L - 1); k++) {
+        for (index_t k = 0; k < (L - 1); k++) {
           Pk = next_projector_2_sites(k);
           set_canonical_2_sites(P, Pk, k, +1, Dmax, tol);
           update_matrices(k, P[k], +1);
@@ -388,7 +388,7 @@ struct MPSManySimplifier {
         scp = real(scalar_product(L - 1));
         normP2 = real(scprod(Pk, Pk));
       } else {
-        for (index k = L - 1; k > 0; k--) {
+        for (index_t k = L - 1; k > 0; k--) {
           Pk = next_projector_2_sites(k - 1);
           set_canonical_2_sites(P, Pk, k, -1, Dmax, tol);
           update_matrices(k, P[k], -1);
@@ -405,7 +405,7 @@ struct MPSManySimplifier {
       if (tensor::abs(olderr - err) < 1e-5 * tensor::abs(normQ2) ||
           (err < tolerance * normQ2) || (err < 1e-14)) {
         if (normalize) {
-          index ndx = (*sense > 0) ? L - 1 : 0;
+          index_t ndx = (*sense > 0) ? L - 1 : 0;
           P.at(ndx) = Pk / sqrt(normP2);
           *sense = -*sense;
         }

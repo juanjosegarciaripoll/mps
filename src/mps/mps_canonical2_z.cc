@@ -21,8 +21,8 @@
 
 namespace mps {
 
-void set_canonical_2_sites(CMPS &P, const CTensor &Pij, index site, int sense,
-                           index Dmax, double tol, bool canonicalize_both) {
+void set_canonical_2_sites(CMPS &P, const CTensor &Pij, index_t site, int sense,
+                           index_t Dmax, double tol, bool canonicalize_both) {
   set_canonical_2_sites_inner(P, Pij, site, sense, Dmax, tol,
                               canonicalize_both);
 }

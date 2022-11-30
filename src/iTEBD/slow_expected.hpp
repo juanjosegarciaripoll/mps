@@ -86,9 +86,9 @@ static inline typename t::elt_t slow_string_order(const t &Op1, int i,
 
 template <class t>
 static inline const t ensure_3_indices(const t &A) {
-  index l = A.ssize();
-  index a = A.dimension(0);
-  index b = A.dimension(A.rank() - 1);
+  index_t l = A.ssize();
+  index_t a = A.dimension(0);
+  index_t b = A.dimension(A.rank() - 1);
   return reshape(A, a, l / (a * b), b);
 }
 

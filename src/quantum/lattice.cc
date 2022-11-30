@@ -23,7 +23,7 @@
 namespace mps {
 
 /* Number of nonzero bits in a word */
-static const index byte[256] = {
+static const index_t byte[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4,
     2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
     2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4,
@@ -36,7 +36,7 @@ static const index byte[256] = {
     4, 5, 5, 6, 5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
     4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8};
 
-index Lattice::count_bits(Lattice::word w) {
+index_t Lattice::count_bits(Lattice::word w) {
   if (sizeof(w) == 4) {
     return byte[w & 0xff] + byte[(w >> 8) & 0xff] + byte[(w >> 16) & 0xff] +
            byte[(w >> 24) & 0xff];
@@ -46,7 +46,7 @@ index Lattice::count_bits(Lattice::word w) {
   }
 }
 
-const Indices Lattice::states_with_n_particles(index sites, index filling) {
+const Indices Lattice::states_with_n_particles(index_t sites, index_t filling) {
   tensor_assert(sites < max_sites());
   tensor_assert(sites > 0);
   tensor_assert(filling >= 0 && filling <= sites);
@@ -67,14 +67,14 @@ const Indices Lattice::states_with_n_particles(index sites, index filling) {
   return output;
 }
 
-Lattice::Lattice(index sites, index N)
+Lattice::Lattice(index_t sites, index_t N)
     : number_of_sites(sites),
       number_of_particles(N),
       configurations(
           states_with_n_particles(number_of_sites, number_of_particles)) {}
 
-void Lattice::hopping_inner(RTensor *values, Indices *ndx, index to_site,
-                            index from_site, particle_kind_t kind) const {
+void Lattice::hopping_inner(RTensor *values, Indices *ndx, index_t to_site,
+                            index_t from_site, particle_kind_t kind) const {
   word L = configurations.ssize();
   *values = RTensor::zeros(L);
 
@@ -134,7 +134,7 @@ void Lattice::hopping_inner(RTensor *values, Indices *ndx, index to_site,
   }
 }
 
-const RSparse Lattice::hopping_operator(index to_site, index from_site,
+const RSparse Lattice::hopping_operator(index_t to_site, index_t from_site,
                                         particle_kind_t kind) const {
   if (to_site == from_site) return number_operator(from_site);
   Indices rows;
@@ -145,18 +145,18 @@ const RSparse Lattice::hopping_operator(index to_site, index from_site,
   return RSparse(rows, cols, values, rows.ssize(), rows.ssize());
 }
 
-const RSparse Lattice::number_operator(index site) const {
+const RSparse Lattice::number_operator(index_t site) const {
   return interaction_operator(site, site);
 }
 
-const RSparse Lattice::interaction_operator(index site1, index site2) const {
+const RSparse Lattice::interaction_operator(index_t site1, index_t site2) const {
   auto L = configurations.ssize();
   RTensor values = interaction_inner(site1, site2);
   Indices n = iota(0, L - 1);
   return RSparse(n, n, values, L, L);
 }
 
-const RTensor Lattice::interaction_inner(index site1, index site2) const {
+const RTensor Lattice::interaction_inner(index_t site1, index_t site2) const {
   auto L = configurations.ssize();
   RTensor values = RTensor::empty(L);
 
@@ -178,8 +178,8 @@ static Sparse maybe_add(const Sparse &H, Sparse &&Op) {
 const RSparse Lattice::Hamiltonian(const RTensor &J, const RTensor &U,
                                    double mu, particle_kind_t kind) const {
   RSparse H;
-  for (index i = 0; i < J.rows(); i++) {
-    for (index j = 0; j < J.columns(); j++) {
+  for (index_t i = 0; i < J.rows(); i++) {
+    for (index_t j = 0; j < J.columns(); j++) {
       double Jij = J(i, j) - (i == j) * mu;
       if (Jij) {
         maybe_add<RSparse>(H, Jij * hopping_operator(i, j, kind));
@@ -196,8 +196,8 @@ const RSparse Lattice::Hamiltonian(const RTensor &J, const RTensor &U,
 const CSparse Lattice::Hamiltonian(const CTensor &J, const CTensor &U,
                                    double mu, particle_kind_t kind) const {
   CSparse H;
-  for (index i = 0; i < J.rows(); i++) {
-    for (index j = 0; j < J.columns(); j++) {
+  for (index_t i = 0; i < J.rows(); i++) {
+    for (index_t j = 0; j < J.columns(); j++) {
       cdouble Jij = J(i, j) - (i == j) * mu;
       if (real(Jij) || imag(Jij)) {
         H = maybe_add<CSparse>(H, Jij * hopping_operator(i, j, kind));
@@ -211,10 +211,10 @@ const CSparse Lattice::Hamiltonian(const CTensor &J, const CTensor &U,
   return H;
 }
 
-index Lattice::size() const { return number_of_sites; }
+index_t Lattice::size() const { return number_of_sites; }
 
-index Lattice::particles() const { return number_of_particles; }
+index_t Lattice::particles() const { return number_of_particles; }
 
-index Lattice::dimension() const { return configurations.ssize(); }
+index_t Lattice::dimension() const { return configurations.ssize(); }
 
 }  // namespace mps

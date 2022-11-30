@@ -64,12 +64,12 @@ CTensor coherent_state(cdouble alpha, int nmax);
 /* Create a sparse Hamiltonian with given local interaction and nearest
    * neighbor interaction. */
 const CSparse sparse_1d_hamiltonian(const CSparse &H12, const CSparse &Hlocal,
-                                    index size, bool periodic = false);
+                                    index_t size, bool periodic = false);
 
 /* Create a sparse Hamiltonian with given local interaction and nearest
    * neighbor interaction. */
 const RSparse sparse_1d_hamiltonian(const RSparse &H12, const RSparse &Hlocal,
-                                    index size, bool periodic = false);
+                                    index_t size, bool periodic = false);
 
 /* Create a sparse Hamiltonian with given local interaction and nearest
    * neighbor interaction. */

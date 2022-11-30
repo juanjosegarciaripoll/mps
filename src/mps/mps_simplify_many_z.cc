@@ -23,7 +23,7 @@
 namespace mps {
 
 double simplify(CMPS *P, const vector<CMPS> &Q, const CTensor &weights,
-                int *sense, index sweeps, bool normalize) {
+                int *sense, index_t sweeps, bool normalize) {
   MPSManySimplifier<CMPS> aux(Q, weights);
   return aux.simplify(*P, sense, sweeps, normalize);
 }

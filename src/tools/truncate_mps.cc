@@ -23,21 +23,21 @@
 namespace mps {
 
 template <class MPS>
-static const Indices expected_dimensions(const MPS &P, index Dmax,
+static const Indices expected_dimensions(const MPS &P, index_t Dmax,
                                          bool periodic) {
-  index l = P.ssize();
+  index_t l = P.ssize();
   Indices d(l + 1);
   if (periodic) {
-    for (index i = 0; i <= l; i++) d.at(i) = Dmax;
+    for (index_t i = 0; i <= l; i++) d.at(i) = Dmax;
   } else {
     d.at(0) = 1;
     d.at(l) = 1;
-    for (index i = 1, c = 1; i < l; i++) {
+    for (index_t i = 1, c = 1; i < l; i++) {
       c *= P[i - 1].dimension(1);
       if (c > Dmax) c = Dmax;
       d.at(i) = c;
     }
-    for (index i = l, c = 1; i--;) {
+    for (index_t i = l, c = 1; i--;) {
       c *= P[i].dimension(1);
       if (c > Dmax) c = Dmax;
       if (c < d[i]) d.at(i) = c;
@@ -47,7 +47,7 @@ static const Indices expected_dimensions(const MPS &P, index Dmax,
 }
 
 template <class MPS>
-bool truncate_inner(MPS *Q, const MPS &P, index Dmax, bool periodic,
+bool truncate_inner(MPS *Q, const MPS &P, index_t Dmax, bool periodic,
                     bool increase) {
   if (Dmax == 0) {
     *Q = P;
@@ -55,9 +55,9 @@ bool truncate_inner(MPS *Q, const MPS &P, index Dmax, bool periodic,
   }
   Indices d = expected_dimensions<MPS>(P, Dmax, periodic);
   bool truncated = 0;
-  index L = P.ssize();
+  index_t L = P.ssize();
   *Q = MPS(L);
-  for (index k = 0; k < L; k++) {
+  for (index_t k = 0; k < L; k++) {
     typename MPS::elt_t Qk = P[k];
     if (Qk.dimension(0) > d[k]) {
       truncated = 1;

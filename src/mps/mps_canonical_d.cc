@@ -23,7 +23,7 @@
 
 namespace mps {
 
-void set_canonical(RMPS &psi, index site, const RTensor &t, int sense,
+void set_canonical(RMPS &psi, index_t site, const RTensor &t, int sense,
                    bool truncate) {
   set_canonical_inner(psi, site, t, sense, truncate);
 }
@@ -36,11 +36,11 @@ RMPS normal_form(const RMPS &psi, int sense) {
   return normal_form_at(psi, (sense < 0) ? 0 : (psi.ssize() - 1));
 }
 
-RMPS canonical_form_at(const RMPS &psi, index site) {
+RMPS canonical_form_at(const RMPS &psi, index_t site) {
   return either_form_inner(psi, site, false);
 }
 
-RMPS normal_form_at(const RMPS &psi, index site) {
+RMPS normal_form_at(const RMPS &psi, index_t site) {
   return either_form_inner(psi, site, true);
 }
 

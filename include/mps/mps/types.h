@@ -79,7 +79,7 @@ class MPS : public MP<Tensor> {
                    [](const otherT &t) { return Tensor(t); });
   }
 
-  MPS(index size, index physical_dimension = 0, index bond_dimension = 1,
+  MPS(index_t size, index_t physical_dimension = 0, index_t bond_dimension = 1,
       bool periodic = false)
       : parent(size) {
     if (physical_dimension) {
@@ -89,7 +89,7 @@ class MPS : public MP<Tensor> {
     }
   }
 
-  MPS(const tensor::Indices &physical_dimensions, index bond_dimension = 1,
+  MPS(const tensor::Indices &physical_dimensions, index_t bond_dimension = 1,
       bool periodic = false)
       : parent(physical_dimensions.ssize()) {
     presize(physical_dimensions, bond_dimension, periodic);
@@ -108,16 +108,16 @@ class MPS : public MP<Tensor> {
   /**Can the RMP be used for a periodic boundary condition problem?*/
   bool is_periodic() const {
     if (this->size()) {
-      index d0 = (*this)[0].dimension(0);
-      index dl = (*this)[-1].dimension(2);
+      index_t d0 = (*this)[0].dimension(0);
+      index_t dl = (*this)[-1].dimension(2);
       if (d0 == dl && d0 > 1) return true;
     }
     return false;
   }
 
   /**Create a random MPS. */
-  static MPS<Tensor> random(index length, index physical_dimension,
-                            index bond_dimension, bool periodic = false) {
+  static MPS<Tensor> random(index_t length, index_t physical_dimension,
+                            index_t bond_dimension, bool periodic = false) {
     MPS<Tensor> output(length, physical_dimension, bond_dimension, periodic);
     randomize(output);
     return output;
@@ -125,14 +125,14 @@ class MPS : public MP<Tensor> {
 
   /**Create a random MPS. */
   static MPS random(const tensor::Indices &physical_dimensions,
-                    index bond_dimension, bool periodic = false) {
+                    index_t bond_dimension, bool periodic = false) {
     MPS<Tensor> output(physical_dimensions, bond_dimension, periodic);
     randomize(output);
     return output;
   }
 
   /**Create a product state with all sites sharing the same vector.*/
-  static MPS<Tensor> product_state(index length, const Tensor &local_state) {
+  static MPS<Tensor> product_state(index_t length, const Tensor &local_state) {
     tensor_assert2((local_state.rank() == 1) && (local_state.size() != 0),
                    std::invalid_argument(
                        "Not a valid local_state in MPS::product_state()."));
@@ -167,12 +167,12 @@ class MPS : public MP<Tensor> {
   typedef MP<Tensor> parent;
 
   inline void presize(const tensor::Indices &physical_dimensions,
-                      index bond_dimension, bool periodic) {
+                      index_t bond_dimension, bool periodic) {
     tensor_assert(bond_dimension > 0);
     tensor_assert(this->size() == physical_dimensions.size());
-    index l = physical_dimensions.ssize();
-    tensor::Indices dimensions = {bond_dimension, index(0), bond_dimension};
-    for (index i = 0; i < l; i++) {
+    index_t l = physical_dimensions.ssize();
+    tensor::Indices dimensions = {bond_dimension, index_t(0), bond_dimension};
+    for (index_t i = 0; i < l; i++) {
       tensor_assert(physical_dimensions[i] > 0);
       dimensions.at(1) = physical_dimensions[i];
       dimensions.at(0) = (periodic || (i > 0)) ? bond_dimension : 1;

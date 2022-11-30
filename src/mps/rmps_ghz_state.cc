@@ -24,7 +24,7 @@ namespace mps {
 
 using namespace tensor;
 
-const RMPS ghz_state(index length, bool periodic) {
+const RMPS ghz_state(index_t length, bool periodic) {
   RMPS output(length, 2, 2, periodic);
   if (length == 1) {
     double v = 1.0 / sqrt(2.0);
@@ -39,7 +39,7 @@ const RMPS ghz_state(index length, bool periodic) {
     }
   } else {
     double v = 1.0 / sqrt(sqrt(2.0));
-    for (index i = 0; i < length; i++) {
+    for (index_t i = 0; i < length; i++) {
       RTensor &aux = output.at(i);
       aux.fill_with_zeros();
       if (i == 0) {

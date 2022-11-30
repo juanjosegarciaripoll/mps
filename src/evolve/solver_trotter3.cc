@@ -30,7 +30,7 @@ namespace mps {
 Trotter3Solver::Trotter3Solver(const Hamiltonian &H, cdouble dt)
     : TrotterSolver(dt), U1(H, 1, dt), U2(H, 0, dt / 2.0), sense(0) {}
 
-double Trotter3Solver::one_step(CMPS *P, index Dmax) {
+double Trotter3Solver::one_step(CMPS *P, index_t Dmax) {
   int debug = static_cast<int>(FLAGS.get(MPS_DEBUG_TROTTER));
   if (!Dmax) {
     if (strategy != DO_NOT_TRUNCATE) {

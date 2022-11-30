@@ -23,8 +23,8 @@ namespace mps {
 
 template const iTEBD<RTensor> evolve_itime(iTEBD<RTensor> psi,
                                            const RTensor &H12, double dt,
-                                           index nsteps, double tolerance,
-                                           index max_dim, index deltan,
+                                           index_t nsteps, double tolerance,
+                                           index_t max_dim, index_t deltan,
                                            int method, vector<double> *energy,
                                            vector<double> *entropy);
 

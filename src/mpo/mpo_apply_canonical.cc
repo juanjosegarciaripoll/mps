@@ -25,10 +25,10 @@ template <class MPS, class MPO>
 static void do_apply_rightwards(MPS &chi, const MPO &mpdo, const MPS &psi,
                                 bool truncate) {
   typedef typename MPS::elt_t Tensor;
-  index b = 1, a1, c1, di, dj, c2, a2;
+  index_t b = 1, a1, c1, di, dj, c2, a2;
   Tensor L = Tensor::ones(1, 1, 1); /* L(b,c1,a1) */
 
-  for (index ndx = 0; ndx < psi.ssize(); ++ndx) {
+  for (index_t ndx = 0; ndx < psi.ssize(); ++ndx) {
     const Tensor &A = psi[ndx]; /* A(a1,i,a2) */
     A.get_dimensions(&a1, &di, &a2);
 
@@ -56,10 +56,10 @@ template <class MPS, class MPO>
 static void do_apply_leftwards(MPS &chi, const MPO &mpdo, const MPS &psi,
                                bool truncate) {
   typedef typename MPS::elt_t Tensor;
-  index b = 1, a1, c1, di, dj, c2, a2;
+  index_t b = 1, a1, c1, di, dj, c2, a2;
   Tensor L = Tensor::ones(1, 1, 1); /* L(a2,c2,b) */
 
-  for (index ndx = psi.ssize(); ndx--;) {
+  for (index_t ndx = psi.ssize(); ndx--;) {
     const Tensor &A = psi[ndx]; /* A(a1,i,a2) */
     A.get_dimensions(&a1, &di, &a2);
 

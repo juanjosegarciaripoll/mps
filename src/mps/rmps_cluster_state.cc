@@ -24,7 +24,7 @@ namespace mps {
 
 using namespace tensor;
 
-const RMPS cluster_state(index length) {
+const RMPS cluster_state(index_t length) {
   if (length == 1) {
     return ghz_state(length);
   } else {
@@ -44,7 +44,7 @@ const RMPS cluster_state(index length) {
     PL.at(1, 0, 0) = 1;
     PL.at(1, 1, 0) = -1;
 
-    for (index i = 1; i < (length - 1); i++) {
+    for (index_t i = 1; i < (length - 1); i++) {
       RTensor &P = output.at(i);
       P.fill_with_zeros();
       P.at(0, 0, 0) = 1;

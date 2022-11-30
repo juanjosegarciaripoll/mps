@@ -29,17 +29,17 @@ static const Tensor do_split(Tensor *pU, Tensor psi, int sense, bool truncate) {
   Tensor &U = *pU, V;
   Indices d = psi.dimensions();
   if (sense > 0) {
-    index r = psi.rank();
-    index b = d[r - 1];
-    index ai = psi.ssize() / b;
+    index_t r = psi.rank();
+    index_t b = d[r - 1];
+    index_t ai = psi.ssize() / b;
     RTensor s =
         mps::FLAGS.get(MPS_USE_BLOCK_SVD)
             ? linalg::block_svd(reshape(psi, ai, b), &U, &V, SVD_ECONOMIC)
             : linalg::svd(reshape(psi, ai, b), &U, &V, SVD_ECONOMIC);
-    index l = s.ssize();
-    index new_l = where_to_truncate(
+    index_t l = s.ssize();
+    index_t new_l = where_to_truncate(
         s, truncate ? MPS_DEFAULT_TOLERANCE : MPS_TRUNCATE_ZEROS,
-        std::min<index>(ai, b));
+        std::min<index_t>(ai, b));
     if (new_l != l) {
       U = change_dimension(U, 1, new_l);
       V = change_dimension(V, 0, new_l);
@@ -49,16 +49,16 @@ static const Tensor do_split(Tensor *pU, Tensor psi, int sense, bool truncate) {
     d.at(r - 1) = l;
     scale_inplace(V, 0, s);
   } else {
-    index a = d[0];
-    index ib = psi.ssize() / a;
+    index_t a = d[0];
+    index_t ib = psi.ssize() / a;
     RTensor s =
         mps::FLAGS.get(MPS_USE_BLOCK_SVD)
             ? linalg::block_svd(reshape(psi, a, ib), &V, &U, SVD_ECONOMIC)
             : linalg::svd(reshape(psi, a, ib), &V, &U, SVD_ECONOMIC);
-    index l = s.ssize();
-    index new_l = where_to_truncate(
+    index_t l = s.ssize();
+    index_t new_l = where_to_truncate(
         s, truncate ? MPS_DEFAULT_TOLERANCE : MPS_TRUNCATE_ZEROS,
-        std::min<index>(a, ib));
+        std::min<index_t>(a, ib));
     if (new_l != l) {
       U = change_dimension(U, 0, new_l);
       V = change_dimension(V, 1, new_l);

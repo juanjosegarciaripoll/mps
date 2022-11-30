@@ -45,7 +45,7 @@ class iTEBD {
   typedef Tensor t;
 
   /** Create an random iTEBD state with given physical dimensions. */
-  explicit iTEBD(index dimension);
+  explicit iTEBD(index_t dimension);
 
   /** Create a product state iTEBD. */
   iTEBD(const Tensor &newA);
@@ -58,7 +58,7 @@ class iTEBD {
         const Tensor &newlB, bool canonical = false);
 
   /* Given a two-site wavefunction, split it. */
-  iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance, index max_dim);
+  iTEBD(const Tensor &AB, const Tensor &lAB, double tolerance, index_t max_dim);
 
   /** Is this iTEBD state in canonical form? */
   bool is_canonical() const { return canonical_; }
@@ -66,11 +66,11 @@ class iTEBD {
   /** Construct a new state after acting on 'odd' or 'even' pair of sites with the two-site operator U. */
   const iTEBD<Tensor> apply_operator(const Tensor &U, int odd = 0,
                                      double tolerance = -1,
-                                     index max_dim = 0) const;
+                                     index_t max_dim = 0) const;
 
   /** Return a new state which is in canonical form. */
   const iTEBD<Tensor> canonical_form(double tolerance = -1,
-                                     index max_dim = 0) const;
+                                     index_t max_dim = 0) const;
 
   /** Estimate the entanglement entropy associated to splitting the state around 'site' */
   double entropy(int site) const;
@@ -102,13 +102,13 @@ class iTEBD {
   const Tensor &right_vector(int site) const { return (site & 1) ? lB_ : lA_; }
 
   /** Physical dimension of the given site. */
-  index site_dimension(int site) const { return matrix(site).dimension(1); }
+  index_t site_dimension(int site) const { return matrix(site).dimension(1); }
 
   /** Return dimension of the MPS to the left of this site. */
-  index left_dimension(int site) const { return matrix(site).dimension(0); }
+  index_t left_dimension(int site) const { return matrix(site).dimension(0); }
 
   /** Return dimension of the MPS to the right of this site. */
-  index right_dimension(int site) const { return matrix(site).dimension(2); }
+  index_t right_dimension(int site) const { return matrix(site).dimension(2); }
 
   const Tensor left_boundary(int site) const {
     return diag(left_vector(site) * left_vector(site));
@@ -197,8 +197,8 @@ double energy(const CiTEBD &psi, const CTensor &Op12);
  state on the standard text output. */
 template <class Tensor>
 const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
-                                 double dt, index nsteps, double tolerance = -1,
-                                 index max_dim = 0, index deltan = 1,
+                                 double dt, index_t nsteps, double tolerance = -1,
+                                 index_t max_dim = 0, index_t deltan = 1,
                                  int method = 1, vector<double> *energies = 0,
                                  vector<double> *entropies = 0);
 

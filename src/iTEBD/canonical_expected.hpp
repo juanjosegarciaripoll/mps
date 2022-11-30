@@ -28,7 +28,7 @@ static inline const tensor_scalar_t<Tensor> do_expected12(
   if (!psi.is_canonical()) {
     return do_expected12(psi.canonical_form(), Op12, site);
   } else {
-    index a, i, b, j;
+    index_t a, i, b, j;
     const Tensor &AlA = psi.combined_matrix(0);
     const Tensor &BlB = psi.combined_matrix(1);
     AlA.get_dimensions(&a, &i, &b);

@@ -34,7 +34,7 @@ namespace impl {
 template <class Tensor>
 inline std::ostream &text_dump(std::ostream &s, const MP<Tensor> &mp,
                                const char *name) {
-  index n = 0;
+  index_t n = 0;
   for (const auto &P : mp) {
     s << name << '[' << n++ << "]=" << P << '\n';
   }
@@ -44,12 +44,12 @@ inline std::ostream &text_dump(std::ostream &s, const MP<Tensor> &mp,
 template <class Tensor>
 inline std::ostream &text_dump(std::ostream &s, const MPO<Tensor> &mpo,
                                const char *name) {
-  index n = 0;
+  index_t n = 0;
   for (const auto &P : mpo) {
-    index r = P.dimension(1);
-    index c = P.dimension(2);
-    for (index i = 0; i < P.dimension(0); i++) {
-      for (index j = 0; j < P.dimension(3); j++) {
+    index_t r = P.dimension(1);
+    index_t c = P.dimension(2);
+    for (index_t i = 0; i < P.dimension(0); i++) {
+      for (index_t j = 0; j < P.dimension(3); j++) {
         s << name << '[' << n << "](" << i << ",:,:," << j << ")=\n"
           << matrix_form(reshape(P(range(i), _, _, range(j)).copy(), r, c))
           << '\n';

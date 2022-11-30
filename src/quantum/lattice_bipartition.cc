@@ -22,8 +22,8 @@
 
 namespace mps {
 
-const Indices Lattice::states_in_particle_range(index sites, index nmin,
-                                                index nmax) {
+const Indices Lattice::states_in_particle_range(index_t sites, index_t nmin,
+                                                index_t nmax) {
   if (sizeof(word) == 4) {
     if (sites >= 32) {
       std::cerr << "In this architecture with 32-bit words, Lattice can only "
@@ -41,14 +41,14 @@ const Indices Lattice::states_in_particle_range(index sites, index nmin,
   word problem_size = 0;
   const word end = word(1) << sites;
   for (word configuration = 0; configuration < end; ++configuration) {
-    const index particles = count_bits(configuration);
+    const index_t particles = count_bits(configuration);
     if (particles >= nmin && particles <= nmax) {
       ++problem_size;
     }
   }
   Indices output(problem_size);
   for (word n = 0, configuration = 0; configuration < end; ++configuration) {
-    const index particles = count_bits(configuration);
+    const index_t particles = count_bits(configuration);
     if (particles >= nmin && particles <= nmax) {
       output.at(n++) = configuration;
     }
@@ -76,10 +76,10 @@ static Lattice::word find_configuration(Lattice::word w,
   return i;
 }
 
-void Lattice::bipartition(index sites_left, Indices *left_states,
+void Lattice::bipartition(index_t sites_left, Indices *left_states,
                           Indices *right_states,
                           Indices *matrix_indices) const {
-  index sites_right = size() - sites_left;
+  index_t sites_right = size() - sites_left;
   if (sites_left <= 0 || sites_right <= 0) {
     std::cerr << "In Lattice::bipartition(), the number of sites "
                  "in any bipartition cannot be less than one."
@@ -91,12 +91,12 @@ void Lattice::bipartition(index sites_left, Indices *left_states,
 
   // The lowest number of particles in the left bipartition is
   // achieved when all are in the right half.
-  index left_nmin = std::max<index>(0, particles() - sites_right);
-  index right_nmin = std::max<index>(0, particles() - sites_left);
+  index_t left_nmin = std::max<index_t>(0, particles() - sites_right);
+  index_t right_nmin = std::max<index_t>(0, particles() - sites_left);
   // The highest number of particles in a half of the lattice is
   // achieved by filling with the most possible number of particles
-  index left_nmax = std::min<index>(sites_left, particles());
-  index right_nmax = std::min<index>(sites_right, particles());
+  index_t left_nmax = std::min<index_t>(sites_left, particles());
+  index_t right_nmax = std::min<index_t>(sites_right, particles());
 
   *left_states = states_in_particle_range(sites_left, left_nmin, left_nmax);
   *right_states = states_in_particle_range(sites_right, right_nmin, right_nmax);

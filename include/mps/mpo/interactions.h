@@ -41,19 +41,19 @@ namespace mps {
    */
 
 template <class Tensor>
-inline void add_local_term(MPO<Tensor> *mpo, const Tensor &Hloc, index i) {
+inline void add_local_term(MPO<Tensor> *mpo, const Tensor &Hloc, index_t i) {
   if (i < 0 || i >= mpo->ssize()) {
-    std::cerr << "In add_local_term(), the index " << i
+    std::cerr << "In add_local_term(), the index_t " << i
               << " is outside the lattice.\n";
     abort();
   }
   if (Hloc.columns() != Hloc.rows()) {
-    std::cerr << "In add_local_term(MPO, Tensor, index), the Tensor is not a "
+    std::cerr << "In add_local_term(MPO, Tensor, index_t), the Tensor is not a "
                  "square matrix.\n";
     abort();
   }
   Tensor Pi = (*mpo)[i];
-  index d = Pi.dimension(1);
+  index_t d = Pi.dimension(1);
   if (d != Hloc.rows()) {
     std::cerr << "In add_local_term(MPO, Tensor, index), the dimensions of the "
                  "tensor do not match those of the MPO.\n";
@@ -76,7 +76,7 @@ inline void add_local_term(MPO<Tensor> *mpo, const Tensor &Hloc, index i) {
 }
 
 template <class Tensor>
-inline void add_interaction(MPO<Tensor> *mpo, const Tensor &Hi, index i,
+inline void add_interaction(MPO<Tensor> *mpo, const Tensor &Hi, index_t i,
                             const Tensor &Hj) {
   if (i < 0) {
     std::cerr << "In add_interaction(), the index " << i
@@ -98,10 +98,10 @@ inline void add_interaction(MPO<Tensor> *mpo, const Tensor &Hi, index i,
                  "square matrix\n";
     abort();
   }
-  index di = Hi.rows(), dj = Hj.rows();
+  index_t di = Hi.rows(), dj = Hj.rows();
   Tensor Pi = mpo->at(i);
   Tensor Pj = mpo->at(i + 1);
-  index b = Pi.dimension(3) + 1;
+  index_t b = Pi.dimension(3) + 1;
   Pi = change_dimension(Pi, 3, b);
   Pj = change_dimension(Pj, 0, b);
 
@@ -130,9 +130,9 @@ inline void add_interaction(MPO<Tensor> *mpo, const Tensor &Hi, index i,
 template <class Tensor>
 MPO<Tensor> local_Hamiltonian_mpo(const vector<Tensor> &Hloc) {
   MPO<Tensor> output(Hloc.ssize(), 1);
-  index i = 0, last = static_cast<index>(Hloc.size()) - 1;
+  index_t i = 0, last = static_cast<index_t>(Hloc.size()) - 1;
   for (auto &H : Hloc) {
-    index d = H.rows();
+    index_t d = H.rows();
     Tensor aux = Tensor::zeros(2, d, d, 2);
     aux.at(range(0), _, _, range(1)) = H;
 
@@ -162,8 +162,8 @@ inline void add_product_term(MPO<Tensor> *mpo, const vector<Tensor> &H) {
   auto is_identity = [](const Tensor &t) -> bool {
     return all_of(t == Tensor::eye(t.rows()));
   };
-  index closing = 0, opening = 0;
-  index start = 0, end = mpo->ssize();
+  index_t closing = 0, opening = 0;
+  index_t start = 0, end = mpo->ssize();
   while (start < end && is_identity(H[start])) {
     ++start;
   }
@@ -171,11 +171,11 @@ inline void add_product_term(MPO<Tensor> *mpo, const vector<Tensor> &H) {
     --end;
     closing = 1;
   }
-  for (index j = start; j < end; ++j) {
+  for (index_t j = start; j < end; ++j) {
     const Tensor &Hj = H[j];
     Tensor Pj = (*mpo)[j];
-    index dl = Pj.dimension(0);
-    index dr = Pj.dimension(3);
+    index_t dl = Pj.dimension(0);
+    index_t dr = Pj.dimension(3);
     if (j > start) {
       Pj = change_dimension(Pj, 0, dl + 1);
     } else {
@@ -195,13 +195,13 @@ inline void add_product_term(MPO<Tensor> *mpo, const vector<Tensor> &H) {
   }
 }
 template <class Tensor>
-void add_interaction(MPO<Tensor> *mpo, const vector<Tensor> &H, index i,
+void add_interaction(MPO<Tensor> *mpo, const vector<Tensor> &H, index_t i,
                      const Tensor *sign = nullptr) {
   //
   // This function add terms \sum_{j,j\neq i} H[i]*H[j] to a Hamiltonian.
   // The origin of interactions is thus marked by "i"
   //
-  index start = 0, end = mpo->ssize();
+  index_t start = 0, end = mpo->ssize();
   if (i < 0 || i >= end) {
     throw std::invalid_argument(
         "In add_interaction(), lattice site out of boundaries.");
@@ -209,7 +209,7 @@ void add_interaction(MPO<Tensor> *mpo, const vector<Tensor> &H, index i,
   if (norm2(H[i]) == 0) {
     return;
   }
-  index last_closing = 0;
+  index_t last_closing = 0;
   while (start < end && norm2(H[start]) == 0) {
     ++start;
   }
@@ -217,12 +217,12 @@ void add_interaction(MPO<Tensor> *mpo, const vector<Tensor> &H, index i,
     --end;
     last_closing = 1;
   }
-  for (index j = start; j < end; ++j) {
+  for (index_t j = start; j < end; ++j) {
     const Tensor &Hj = H[j];
     Tensor Pj = mpo->at(j);
-    index dl = Pj.dimension(0);
-    index dr = Pj.dimension(3);
-    index opening = 0, closing = 1;
+    index_t dl = Pj.dimension(0);
+    index_t dr = Pj.dimension(3);
+    index_t opening = 0, closing = 1;
     if (j + 1 < end) {
       Pj = change_dimension(Pj, 3, dr + 1);
       if (j <= i) {
@@ -258,10 +258,10 @@ inline void add_hopping_matrix(MPO<Tensor> *mpo, const Tensor &J,
     throw std::invalid_argument("Invalid matrix J in add_hopping_matrix().");
   }
 
-  index L = mpo->ssize();
-  for (index j = 0; j < L; ++j) {
+  index_t L = mpo->ssize();
+  for (index_t j = 0; j < L; ++j) {
     vector<Tensor> ops(L);
-    for (index i = 0; i < L; ++i) {
+    for (index_t i = 0; i < L; ++i) {
       if (i == j)
         ops.at(j) = ad;
       else
@@ -280,12 +280,12 @@ inline void add_jordan_wigner_matrix(MPO<Tensor> *mpo, const Tensor &J,
 
 template <class Tensor>
 inline void add_Hamiltonian(MPO<Tensor> *mpo, const Hamiltonian &H, double t) {
-  for (index i = 0; i < mpo->ssize(); i++) {
+  for (index_t i = 0; i < mpo->ssize(); i++) {
     auto Hi = tensor_cast(*mpo, H.local_term(i, t));
     add_local_term(mpo, Hi, i);
   }
-  for (index i = 0; i < mpo->ssize(); i++) {
-    for (index j = 0; j < H.interaction_depth(i, t); j++) {
+  for (index_t i = 0; i < mpo->ssize(); i++) {
+    for (index_t j = 0; j < H.interaction_depth(i, t); j++) {
       auto Hi = tensor_cast(*mpo, H.interaction_left(i, j, t));
       if (!Hi.is_empty()) {
         auto Hj = tensor_cast(*mpo, H.interaction_right(i, j, t));

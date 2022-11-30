@@ -26,11 +26,11 @@ using namespace tensor;
 template <typename elt_t>
 static inline const Tensor<elt_t> do_build_E_matrix(const Tensor<elt_t> &A1,
                                                     const Tensor<elt_t> &A2,
-                                                    index *l, index *r) {
+                                                    index_t *l, index_t *r) {
   Tensor<elt_t> R = fold(A1, 1, tensor::conj(A2), 1);
-  index a, b;
+  index_t a, b;
   R.get_dimensions(&a, &b, &a, &b);
-  index a2 = a * a, b2 = b * b;
+  index_t a2 = a * a, b2 = b * b;
   R = reshape(permute(R, 1, 2), a2, b2);
   if (l) *l = a;
   if (r) *r = b;

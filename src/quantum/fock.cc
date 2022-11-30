@@ -27,7 +27,7 @@ namespace mps {
      \ingroup QM
   */
 RSparse number_operator(int nmax) {
-  index d = nmax + 1;  // Matrix size
+  index_t d = nmax + 1;  // Matrix size
   Indices ndx = iota(0, nmax);
   RTensor n = linspace(0, nmax, nmax + 1);
   return RSparse(ndx, ndx, n, d, d);
@@ -37,7 +37,7 @@ RSparse number_operator(int nmax) {
      \ingroup QM
   */
 RSparse destruction_operator(int nmax) {
-  index d = nmax + 1;  // Matrix size
+  index_t d = nmax + 1;  // Matrix size
   Indices row = iota(0, nmax - 1);
   Indices col = iota(1, nmax);
   RTensor n = sqrt(linspace(1.0, nmax, nmax));
@@ -48,7 +48,7 @@ RSparse destruction_operator(int nmax) {
      \ingroup QM
   */
 RSparse creation_operator(int nmax) {
-  index d = nmax + 1;  // Matrix size
+  index_t d = nmax + 1;  // Matrix size
   Indices row = iota(1, nmax);
   Indices col = iota(0, nmax - 1);
   RTensor n = sqrt(linspace(1.0, nmax, nmax));

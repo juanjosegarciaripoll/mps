@@ -36,7 +36,7 @@ using linalg::LinearMap;
    */
 class Lattice {
  public:
-  typedef index word;
+  typedef index_t word;
 
   enum particle_kind_t {
     /** The lattice will contain impenetrable bosonic particles. */
@@ -47,20 +47,20 @@ class Lattice {
 
   /** Construct the internal representation for a lattice with N particles in
         those 'sites'*/
-  Lattice(index sites, index N);
+  Lattice(index_t sites, index_t N);
 
   /** Maximum number of sites that a lattice can have */
-  static constexpr index max_sites() { return (sizeof(word) == 4) ? 31 : 34; }
+  static constexpr index_t max_sites() { return (sizeof(word) == 4) ? 31 : 34; }
 
   /** Hopping operator for a particle between two sites. Returns the
         equivalent of \$a^\dagger_{to}a_{from}\$. */
-  const RSparse hopping_operator(index to, index from,
+  const RSparse hopping_operator(index_t to, index_t from,
                                  particle_kind_t kind = FERMIONS) const;
   /** Number operator for the given lattice site.*/
-  const RSparse number_operator(index site) const;
+  const RSparse number_operator(index_t site) const;
   /** Hubbard interaction between different lattice site. It implements
         operator \$ n_{site1} n_{site2} \$.*/
-  const RSparse interaction_operator(index site1, index site2) const;
+  const RSparse interaction_operator(index_t site1, index_t site2) const;
 
   /** Full Hamiltonian containing hopping of kind and
         interactions. Matrix J(i,j) is nonzero when there is hopping between
@@ -83,24 +83,24 @@ class Lattice {
         of a wavefunction is mapped to the ndx[i] entry of a reduced density
         matrix, of size L1 * L2.
     */
-  void bipartition(index sites_left, Indices *left_states,
+  void bipartition(index_t sites_left, Indices *left_states,
                    Indices *right_states, Indices *matrix_indices) const;
 
   /** Number of sites in the lattice. */
-  index size() const;
+  index_t size() const;
   /** Preconfigured number of particles. */
-  index particles() const;
+  index_t particles() const;
   /** Dimensionality of the constrained Hilbert space. */
-  index dimension() const;
+  index_t dimension() const;
 
   template <class Tensor>
   Tensor apply(const Tensor &psi, const Tensor &J, const Tensor &U,
                particle_kind_t kind = FERMIONS) const {
     if (psi.rank() > 1) {
-      index M = psi.dimension(0);
-      index L = psi.ssize() / M;
+      index_t M = psi.dimension(0);
+      index_t L = psi.ssize() / M;
       Tensor output = reshape(psi, M, L);
-      for (index i = 0; i < L; ++i) {
+      for (index_t i = 0; i < L; ++i) {
         output.at(_, range(i)) = apply(Tensor(output(_, range(i))), J, U, kind);
       }
       return reshape(output, psi.dimensions());
@@ -108,8 +108,8 @@ class Lattice {
       Tensor output = Tensor::zeros(psi.dimensions());
       RTensor values;
       Indices ndx;
-      for (index i = 0; i < J.rows(); ++i) {
-        for (index j = 0; j < J.columns(); ++j) {
+      for (index_t i = 0; i < J.rows(); ++i) {
+        for (index_t j = 0; j < J.columns(); ++j) {
           if (abs(J(i, j)) != 0) {
             /* TODO: Avoid sort_indices() by doing the adjoint of the hopping */
             hopping_inner(&values, &ndx, i, j, kind);
@@ -149,21 +149,21 @@ class Lattice {
                         vectors, converged);
   }
 
-  void hopping_inner(RTensor *values, Indices *ndx, index to_site,
-                     index from_site, particle_kind_t kind) const;
-  const RTensor interaction_inner(index site1, index site2) const;
+  void hopping_inner(RTensor *values, Indices *ndx, index_t to_site,
+                     index_t from_site, particle_kind_t kind) const;
+  const RTensor interaction_inner(index_t site1, index_t site2) const;
 
  private:
-  const index number_of_sites;
-  const index number_of_particles;
+  const index_t number_of_sites;
+  const index_t number_of_particles;
   const Indices configurations;
 
-  static index count_bits(Lattice::word w);
+  static index_t count_bits(Lattice::word w);
 
-  static const Indices states_with_n_particles(index sites,
-                                               index number_of_particles);
-  static const Indices states_in_particle_range(index sites, index nmin,
-                                                index nmax);
+  static const Indices states_with_n_particles(index_t sites,
+                                               index_t number_of_particles);
+  static const Indices states_in_particle_range(index_t sites, index_t nmin,
+                                                index_t nmax);
 };
 
 }  // namespace mps

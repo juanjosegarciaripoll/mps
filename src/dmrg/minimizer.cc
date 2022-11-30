@@ -84,7 +84,7 @@ struct Minimizer : public MinimizerOptions {
   std::list<lform_t> OrthoLform;
   number_t Nvalue;
   double Ntol;
-  index site;
+  index_t site;
   int step;
   bool converged;
 
@@ -110,7 +110,7 @@ struct Minimizer : public MinimizerOptions {
     }
   }
 
-  tensor_list_t orthogonal_projectors(index current_site, int sense) {
+  tensor_list_t orthogonal_projectors(index_t current_site, int sense) {
     tensor_list_t output;
     for (const auto &lform : OrthoLform) {
       if (current_site != lform.here()) {
@@ -126,7 +126,7 @@ struct Minimizer : public MinimizerOptions {
   }
 
   // TODO: Why P is not referenced?
-  void propagate(const tensor_t & /*P*/, index this_site, int this_step) {
+  void propagate(const tensor_t & /*P*/, index_t this_site, int this_step) {
     // Update Hamiltonian, constraints and linear forms for orthogonal
     // states with the new tensors that have just been introduced into
     // 'psi'.
@@ -314,7 +314,7 @@ struct Minimizer : public MinimizerOptions {
                 << "two-sites = " << !single_site()
                 << (Nqform ? ", constrained" : ", unconstrained") << '\n';
     }
-    for (index failures = 0, i = 0; i < sweeps; i++) {
+    for (index_t failures = 0, i = 0; i < sweeps; i++) {
       double newE = single_site() ? single_site_sweep() : two_site_sweep();
       if (debug) {
         std::cerr << "iteration=" << i << "; E=" << newE << "; dE=" << newE - E

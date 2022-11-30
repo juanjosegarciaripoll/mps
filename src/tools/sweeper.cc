@@ -22,7 +22,7 @@
 
 namespace mps {
 
-Sweeper::Sweeper(index L, index sense) {
+Sweeper::Sweeper(index_t L, index_t sense) {
   tensor_assert(L > 0);
   if (sense > 0) {
     k_ = k0_ = 0;

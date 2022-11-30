@@ -26,8 +26,8 @@ namespace mps {
 
 template <class Tensor>
 const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
-                                 double dt, index nsteps, double tolerance,
-                                 index max_dim, index deltan, int method,
+                                 double dt, index_t nsteps, double tolerance,
+                                 index_t max_dim, index_t deltan, int method,
                                  vector<double> *energies,
                                  vector<double> *entropies) {
   static const double FR_param[5] = {0.67560359597983, 1.35120719195966,
@@ -68,8 +68,8 @@ const iTEBD<Tensor> evolve_itime(iTEBD<Tensor> psi, const Tensor &H12,
             << "; dS=" << 0.0 << ";\tl="
             << std::max(psi.left_dimension(0), psi.right_dimension(0)) << '\n'
             << "l = " << matrix_form(real(psi.left_vector(0))) << '\n';
-  for (index phases = (nsteps + deltan - 1) / deltan; phases; phases--) {
-    for (index i = 0; (i < deltan); i++) {
+  for (index_t phases = (nsteps + deltan - 1) / deltan; phases; phases--) {
+    for (index_t i = 0; (i < deltan); i++) {
       switch (method) {
         case 0:
           psi = psi.apply_operator(eH12[0], 0, tolerance, max_dim);

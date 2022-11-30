@@ -109,7 +109,7 @@ class Environment {
   Dir direction_;
 
   static inline scalar_t close_tensor(const Tensor &env) {
-    index a1, b1, a2, b2;
+    index_t a1, b1, a2, b2;
     env.get_dimensions(&a1, &b1, &a2, &b2);
     return trace(reshape(env, a1 * b1, a2 * b2), 0, -1)[0];
   }
@@ -127,7 +127,7 @@ class Environment {
     if (env.is_empty()) {
       return init_environment(Q, P, op);
     }
-    index a1, b1, a2, b2, i2, a3, b3;
+    index_t a1, b1, a2, b2, i2, a3, b3;
     env.get_dimensions(&a1, &b1, &a2, &b2);
     Q.get_dimensions(&a2, &i2, &a3);
     P.get_dimensions(&b2, &i2, &b3);
@@ -146,7 +146,7 @@ class Environment {
     if (env.is_empty()) {
       return init_environment(Q, P, op);
     }
-    index a1, b1, a2, b2, a0, b0, i0;
+    index_t a1, b1, a2, b2, a0, b0, i0;
     env.get_dimensions(&a1, &b1, &a2, &b2);
     Q.get_dimensions(&a0, &i0, &a1);
     P.get_dimensions(&b0, &i0, &b1);
@@ -169,7 +169,7 @@ class Environment {
     if (R.is_empty()) {
       return close_tensor(L);
     }
-    index a1, a2, b1, b2;
+    index_t a1, a2, b1, b2;
     L.get_dimensions(&a1, &a2, &b1, &b2);
     R.get_dimensions(&b1, &b2, &a1, &a2);
     return mmult(reshape(L, 1, a1 * a2 * b1 * b2),
@@ -203,20 +203,20 @@ inline Tensor qform_matrix(const Environment<Tensor> &Lenv,
       // This state has a single site.
       return Tensor::eye(1);
     } else {
-      index a1, a2, b1, b2;
+      index_t a1, a2, b1, b2;
       R.get_dimensions(&a2, &b2, &a1, &b1);
       // R(a2,b2,a1,b1) -> R(b1,b2,a1,a2) -> R(a1,a2,b1,b2) =: Q
       return transpose(reshape(permute(R, 0, 3), b1 * b2, a1 * a2));
     }
   } else if (R.is_empty()) {
-    index a1, a2, b1, b2;
+    index_t a1, a2, b1, b2;
     // Similar as before, but P is the matrix is the one of the last site
     // and R(a2,b2,a3,b3) = delta(a2,a3)delta(b2,b3)
     L.get_dimensions(&a2, &b2, &a1, &b1);
     // L(a2,b2,a1,b1) -> L(b1,b2,a1,a2) -> L(a1*a2,b1*b2) =: Q
     return transpose(reshape(permute(L, 0, 3), b1 * b2, a1 * a2));
   } else {
-    index a1, a2, a3, b1, b2, b3;
+    index_t a1, a2, a3, b1, b2, b3;
     L.get_dimensions(&a3, &b3, &a1, &b1);
     R.get_dimensions(&a2, &b2, &a3, &b3);
     // L(a3,b3,a1,b1)R(a2,b2,a3,b3) -> Q(a1,b1,a2,b2)
@@ -236,7 +236,7 @@ Tensor compose(const Environment<Tensor> &Lenv, const Tensor &op,
   //           << " op=" << op << '\n';
   auto L = Lenv.tensor();
   auto R = Renv.tensor();
-  index a1, a2, b1, b2, a3, b3;
+  index_t a1, a2, b1, b2, a3, b3;
   // L(a1,b1,a2,b2) op(i,j) R(a3,b3,a1,b1) -> H([a2,i,a3],[b2,j,b3])
   L.get_dimensions(&a1, &b1, &a2, &b2);
   R.get_dimensions(&a3, &b3, &a1, &b1);
@@ -255,7 +255,7 @@ Tensor compose(const Environment<Tensor> &Lenv, const Tensor &op1,
   //           << " op2=" << op2 << '\n';
   auto L = Lenv.tensor();
   auto R = Renv.tensor();
-  index a1, a2, b1, b2, a3, b3;
+  index_t a1, a2, b1, b2, a3, b3;
   // L(a1,b1,a2,b2) op(i,j) R(a3,b3,a1,b1) -> H([a2,i,a3],[b2,j,b3])
   L.get_dimensions(&a1, &b1, &a2, &b2);
   R.get_dimensions(&a3, &b3, &a1, &b1);
@@ -269,10 +269,10 @@ Tensor apply_environments(const Environment<Tensor> &Lenv,
                           const Environment<Tensor> &Renv, const Tensor &P) {
   const auto &Ltensor = Lenv.tensor();
   const auto &Rtensor = Renv.tensor();
-  index a2 = Ltensor.dimension(2);
-  index b2 = Ltensor.dimension(3);
-  index a3 = Rtensor.dimension(0);
-  index b3 = Rtensor.dimension(1);
+  index_t a2 = Ltensor.dimension(2);
+  index_t b2 = Ltensor.dimension(3);
+  index_t a3 = Rtensor.dimension(0);
+  index_t b3 = Rtensor.dimension(1);
   return fold(fold(reshape(Ltensor, a2, b2), 1, P, 0), -1,
               reshape(Rtensor, a3, b3), 1);
 }

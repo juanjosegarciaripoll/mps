@@ -93,7 +93,7 @@ static inline tensor ensure_Hermitian(const tensor &A) {
 }
 
 template <class MPS>
-double DMRG<MPS>::minimize_single_site(MPS &P, index k, int dk) {
+double DMRG<MPS>::minimize_single_site(MPS &P, index_t k, int dk) {
   /* First we build the components of the Hamiltonian:
      *		Op = Opl + Opli + Opi + Opir + Opr
      * which are the Hamiltonian for the left and right block (Opl,Opr) the
@@ -103,7 +103,7 @@ double DMRG<MPS>::minimize_single_site(MPS &P, index k, int dk) {
      * Opr and Opr on the other. Opi is either added to Opli or to Opri
      * depending on which operator we will use in update_matrices_left/right.
      */
-  index a1, i1, b1;
+  index_t a1, i1, b1;
   elt_t Pk = P[k];
   Pk.get_dimensions(&a1, &i1, &b1);
 
@@ -121,7 +121,7 @@ double DMRG<MPS>::minimize_single_site(MPS &P, index k, int dk) {
      * matrix.  NOTE: For small sizes, our iterative algorithm (ARPACK) fails
      * and we have to resort to a full diagonalization.
      */
-  index neig = std::max<index>(index(1), neigenvalues);
+  index_t neig = std::max<index_t>(index_t(1), neigenvalues);
   elt_t aux;
   if (a1 * i1 * b1 <= 10) {
     elt_t Heff = kron2(Opli, elt_t::eye(b1)) + kron2(elt_t::eye(a1), Opir);
@@ -165,7 +165,7 @@ double DMRG<MPS>::minimize_single_site(MPS &P, index k, int dk) {
    */
 
 template <class MPS>
-index DMRG<MPS>::n_constants() const {
+index_t DMRG<MPS>::n_constants() const {
   return Q_operators.ssize();
 }
 
@@ -180,12 +180,12 @@ void DMRG<MPS>::commutes_with(const elt_t &Q) {
 }
 
 template <class MPS>
-void DMRG<MPS>::prepare_simplifier(index k, const elt_t &Pij) {
-  index n_Q = Q_values.ssize();
+void DMRG<MPS>::prepare_simplifier(index_t k, const elt_t &Pij) {
+  index_t n_Q = Q_values.ssize();
   if (n_Q) {
     RTensor Z = RTensor::zeros(1, 1);
     Booleans flag;
-    for (index n = 0; n < n_Q; n++) {
+    for (index_t n = 0; n < n_Q; n++) {
       RTensor Nl = (k > 0) ? tensor::real(Ql_[n][k - 1]) : Z;
       RTensor Nr = ((k + 2) < ssize(Qr_[n])) ? tensor::real(Qr_[n][k + 2]) : Z;
       RTensor Ni = tensor::real(take_diag(Q_operators[n]));
@@ -238,18 +238,18 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::reconstruct_state(
    */
 
 template <class MPS>
-double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
+double DMRG<MPS>::minimize_two_sites(MPS &P, index_t k, int dk, index_t Dmax) {
   /* We must find out the dimensions of the problem, and also a suitable initial
      * condition for the minimization. This we do by inspecting the wavefunction
      * from the previous step.
      */
-  index a1, i1, b1, j1, c1;
+  index_t a1, i1, b1, j1, c1;
   elt_t Pi = P[k];
   elt_t Pj = P[k + 1];
   Pi.get_dimensions(&a1, &i1, &b1);
   Pj.get_dimensions(&b1, &j1, &c1);
 
-  index L1 = a1 * i1, L2 = j1 * c1;
+  index_t L1 = a1 * i1, L2 = j1 * c1;
   Pi = reshape(fold(Pi, -1, Pj, 0), L1 * L2);
   Pj = elt_t();
 
@@ -280,8 +280,8 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
      * and we have to resort to a full diagonalization.
      */
   elt_t aux;
-  index smallL = Pi.ssize();
-  index neig = std::max(index(1), neigenvalues);
+  index_t smallL = Pi.ssize();
+  index_t neig = std::max(index_t(1), neigenvalues);
   if (Q_values.size()) {
     if (smallL <= 10) {
       //cout << "Heff=\n"; show_matrix(std::cerr, kron2(Opli, elt_t::eye(j1*c1)) + kron2(elt_t::eye(a1*i1), Opjr));
@@ -386,16 +386,16 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index k, int dk, index Dmax) {
    */
 
 template <class MPS>
-void DMRG<MPS>::show_state_info(const MPS &P, index iter, index k,
+void DMRG<MPS>::show_state_info(const MPS &P, index_t iter, index_t k,
                                 double newE) {
   std::cerr << "k=" << k << "; iteration=" << iter << "; E=" << newE
             << "; E'=" << expected(P, *H_, 0);
 }
 
 template <class MPS>
-double DMRG<MPS>::minimize(MPS *Pptr, index Dmax, double E) {
+double DMRG<MPS>::minimize(MPS *Pptr, index_t Dmax, double E) {
   MPS &P = *Pptr;
-  index dk = +1, k0, kN;
+  index_t dk = +1, k0, kN;
 
   //SpecialVar<bool> old_accurate_svd(accurate_svd, true);
 
@@ -405,7 +405,7 @@ double DMRG<MPS>::minimize(MPS *Pptr, index Dmax, double E) {
   init_matrices(P, 0, Dmax > 0);
 
   int failures = 0;
-  for (index L = size(), iter = 0; iter < sweeps; iter++, dk = -dk) {
+  for (index_t L = size(), iter = 0; iter < sweeps; iter++, dk = -dk) {
     double newE = E;
     /*
        * We sweep from the left to the right or viceversa. We also try to
@@ -437,7 +437,7 @@ double DMRG<MPS>::minimize(MPS *Pptr, index Dmax, double E) {
         dk = -1;
       }
     }
-    for (index k = k0; k != kN; k += dk) {
+    for (index_t k = k0; k != kN; k += dk) {
       error = false;
       if (Dmax) {
         newE = DMRG::minimize_two_sites(P, k, narrow_cast<int>(dk), Dmax);
@@ -513,34 +513,34 @@ inline const CTensor to_tensor(const DMRG<CMPS> &, const CTensor &op) {
 }  // namespace
 
 template <class MPS>
-const typename DMRG<MPS>::elt_t DMRG<MPS>::interaction(index k) const {
+const typename DMRG<MPS>::elt_t DMRG<MPS>::interaction(index_t k) const {
   return to_tensor(*this, H_->interaction(k));
 }
 
 template <class MPS>
-const typename DMRG<MPS>::elt_t DMRG<MPS>::interaction_left(index k,
-                                                            index m) const {
+const typename DMRG<MPS>::elt_t DMRG<MPS>::interaction_left(index_t k,
+                                                            index_t m) const {
   return to_tensor(*this, H_->interaction_left(k, m));
 }
 
 template <class MPS>
-const typename DMRG<MPS>::elt_t DMRG<MPS>::interaction_right(index k,
-                                                             index m) const {
+const typename DMRG<MPS>::elt_t DMRG<MPS>::interaction_right(index_t k,
+                                                             index_t m) const {
   return to_tensor(*this, H_->interaction_right(k, m));
 }
 
 template <class MPS>
-const typename DMRG<MPS>::elt_t DMRG<MPS>::local_term(index k) const {
+const typename DMRG<MPS>::elt_t DMRG<MPS>::local_term(index_t k) const {
   return to_tensor(*this, H_->local_term(k));
 }
 
 template <class MPS>
-index DMRG<MPS>::interaction_depth(index k) const {
+index_t DMRG<MPS>::interaction_depth(index_t k) const {
   return H_->interaction_depth(k);
 }
 
 template <class MPS>
-void DMRG<MPS>::init_matrices(const MPS &P, index k0, bool also_Q) {
+void DMRG<MPS>::init_matrices(const MPS &P, index_t k0, bool also_Q) {
   if (also_Q) {
     Ql_ = mps_vector_t(Q_values.ssize(), MPS(size()));
     Qr_ = Ql_;
@@ -551,26 +551,26 @@ void DMRG<MPS>::init_matrices(const MPS &P, index k0, bool also_Q) {
 
   Proj_ = P0_;
 
-  for (index i = 0; i < k0; i++) {
+  for (index_t i = 0; i < k0; i++) {
     update_matrices_left(P, i);
   }
-  for (index i = size(); i-- > k0;) {
+  for (index_t i = size(); i-- > k0;) {
     update_matrices_right(P, i);
   }
 }
 
 template <class MPS>
 const typename DMRG<MPS>::elt_vector_t DMRG<MPS>::compute_interactions_right(
-    const MPS &P, index k) const {
+    const MPS &P, index_t k) const {
   tensor_assert(k + 1 < size());
 
   elt_t Pk = P[k + 1];
-  index a1, j1, b1;
+  index_t a1, j1, b1;
   Pk.get_dimensions(&a1, &j1, &b1);
 
-  index l = interaction_depth(k);
+  index_t l = interaction_depth(k);
   elt_vector_t output(l);
-  for (index m = 0; m < l; m++) {
+  for (index_t m = 0; m < l; m++) {
     // Pk'(a1,j1,b1) O(j1,j2) Pk(a2,j2,b1) -> aux(a1,a2)
     output.at(m) = foldc(
         reshape(Pk, a1, j1 * b1), -1,
@@ -581,16 +581,16 @@ const typename DMRG<MPS>::elt_vector_t DMRG<MPS>::compute_interactions_right(
 
 template <class MPS>
 const typename DMRG<MPS>::elt_vector_t DMRG<MPS>::compute_interactions_left(
-    const MPS &P, index k) const {
+    const MPS &P, index_t k) const {
   tensor_assert(k >= 1);
 
   elt_t Pk = P[k - 1];
-  index a1, j1, b1;
+  index_t a1, j1, b1;
   Pk.get_dimensions(&a1, &j1, &b1);
 
-  index l = interaction_depth(k - 1);
+  index_t l = interaction_depth(k - 1);
   elt_vector_t output(l);
-  for (index m = 0; m < l; m++) {
+  for (index_t m = 0; m < l; m++) {
     // Pk'(a1,j1,b1) O(j1,j2) Pk(a1,j2,b2) -> aux(b1,b2)
     output.at(m) = foldc(
         reshape(Pk, a1 * j1, b1), 0,
@@ -601,14 +601,14 @@ const typename DMRG<MPS>::elt_vector_t DMRG<MPS>::compute_interactions_left(
 
 template <class MPS>
 const typename DMRG<MPS>::elt_t DMRG<MPS>::block_site_interaction_right(
-    const MPS &P, index k) {
-  index a1, i1, a2;
+    const MPS &P, index_t k) {
+  index_t a1, i1, a2;
   P[k].get_dimensions(&a1, &i1, &a2);
   elt_t Heff = elt_t::zeros(i1 * a2, i1 * a2);
   if (k + 1 < size()) {
     elt_vector_t Heffir = compute_interactions_right(P, k);
     Heff = kron2(elt_t::eye(i1), Hr_[k + 1]);
-    for (index m = 0; m < ssize(Heffir); m++) {
+    for (index_t m = 0; m < ssize(Heffir); m++) {
       Heff = Heff + kron2(interaction_left(k, m), Heffir[m]);
     }
   }
@@ -617,14 +617,14 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::block_site_interaction_right(
 
 template <class MPS>
 const typename DMRG<MPS>::elt_t DMRG<MPS>::block_site_interaction_left(
-    const MPS &P, index k) {
-  index a1, i1, a2;
+    const MPS &P, index_t k) {
+  index_t a1, i1, a2;
   P[k].get_dimensions(&a1, &i1, &a2);
   elt_t Heff = elt_t::zeros(a1 * i1, a1 * i1);
   if (k > 0) {
     elt_vector_t Heffli = compute_interactions_left(P, k);
     Heff = kron2(Hl_[k - 1], elt_t::eye(i1));
-    for (index m = 0; m < ssize(Heffli); m++) {
+    for (index_t m = 0; m < ssize(Heffli); m++) {
       Heff = Heff + kron2(Heffli[m], interaction_right(k - 1, m));
     }
   }
@@ -636,16 +636,16 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::block_site_interaction_left(
    */
 
 template <class MPS>
-index DMRG<MPS>::n_orth_states() const {
+index_t DMRG<MPS>::n_orth_states() const {
   return P0_.ssize();
 }
 
 /* TODO: Why Pk is not used */
 template <class MPS>
 const typename DMRG<MPS>::elt_t DMRG<MPS>::projector(
-    const typename DMRG<MPS>::elt_t & /*Pk*/, index k) {
+    const typename DMRG<MPS>::elt_t & /*Pk*/, index_t k) {
   elt_t V;
-  for (index state = 0; state < n_orth_states(); state++) {
+  for (index_t state = 0; state < n_orth_states(); state++) {
     elt_t Qk = P0_[state][k];
     if (k > 0) {
       Qk = fold(Proj_[state][k - 1], 2, Qk, 0);
@@ -670,9 +670,9 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::projector(
 
 template <class MPS>
 const typename DMRG<MPS>::elt_t DMRG<MPS>::projector_twosites(
-    const typename DMRG<MPS>::elt_t & /*Pk*/, index k) {
+    const typename DMRG<MPS>::elt_t & /*Pk*/, index_t k) {
   elt_t V;
-  for (index state = 0; state < n_orth_states(); state++) {
+  for (index_t state = 0; state < n_orth_states(); state++) {
     elt_t Qk = fold(P0_[state][k], -1, P0_[state][k + 1], 0);
     if (k > 0) {
       Qk = fold(Proj_[state][k - 1], 2, Qk, 0);
@@ -696,16 +696,16 @@ const typename DMRG<MPS>::elt_t DMRG<MPS>::projector_twosites(
 }
 
 template <class MPS>
-void DMRG<MPS>::update_matrices_right(const MPS &P, index k) {
+void DMRG<MPS>::update_matrices_right(const MPS &P, index_t k) {
   elt_t Pk = P[k];
 
   // We have the operator Hblock(ib,i'b') expressed on the basis |i>|b>
   // and want the same expression on the basis |a>=P(a,i,b)|i>|b>.
-  index a1, i1, b1;
+  index_t a1, i1, b1;
   Pk.get_dimensions(&a1, &i1, &b1);
 
   // Projector on a given state
-  for (index state = 0; state < n_orth_states(); state++) {
+  for (index_t state = 0; state < n_orth_states(); state++) {
     elt_t prev = (k + 1 < size()) ? Proj_[state][k + 1] : elt_t();
     Proj_[state].at(k) = prop_matrix(prev, -1, P0_[state][k], Pk);
   }
@@ -719,8 +719,8 @@ void DMRG<MPS>::update_matrices_right(const MPS &P, index k) {
       fold(foldc(Pk, -1, reshape(Hblock, i1 * b1, i1 * b1), 0), -1, Pk, -1);
 
   // Conserved quantities:
-  index n_Q = Q_values.ssize();
-  for (index n = 0; n < n_Q; n++) {
+  index_t n_Q = Q_values.ssize();
+  for (index_t n = 0; n < n_Q; n++) {
     elt_t prev_Q = (k + 1 < size()) ? Qr_[n][k + 1] : elt_t::zeros(1, 1);
     prev_Q = direct_sum(elt_t(take_diag(Q_operators[n])), prev_Q);
     prev_Q = foldc(Pk, -1, scale(Pk, -1, prev_Q), -1);
@@ -731,16 +731,16 @@ void DMRG<MPS>::update_matrices_right(const MPS &P, index k) {
 }
 
 template <class MPS>
-void DMRG<MPS>::update_matrices_left(const MPS &P, index k) {
+void DMRG<MPS>::update_matrices_left(const MPS &P, index_t k) {
   elt_t Pk = P[k];
 
   // We have the operator Hblock(bi,b'i') expressed on the basis |b>|i>
   // and want the same expression on the basis |a>=P(b,i,a)|b>|i>.
-  index b1, i1, a1;
+  index_t b1, i1, a1;
   Pk.get_dimensions(&b1, &i1, &a1);
 
   // Projector on a given state
-  for (index state = 0; state < n_orth_states(); state++) {
+  for (index_t state = 0; state < n_orth_states(); state++) {
     elt_t prev = (k == 0) ? elt_t() : Proj_[state][k - 1];
     Proj_[state].at(k) = prop_matrix(prev, +1, P0_[state][k], Pk);
   }
@@ -753,7 +753,7 @@ void DMRG<MPS>::update_matrices_left(const MPS &P, index k) {
   Hl_.at(k) = foldc(Pk, 0, mmult(reshape(Hblock, b1 * i1, b1 * i1), Pk), 0);
 
   // Conserved quantities:
-  for (index n = 0; n < ssize(Q_values); n++) {
+  for (index_t n = 0; n < ssize(Q_values); n++) {
     elt_t prev_Q = (k > 0) ? Ql_[n][k - 1] : elt_t::zeros(1, 1);
     prev_Q = direct_sum(prev_Q, elt_t(take_diag(Q_operators[n])));
     prev_Q = foldc(Pk, 0, scale(Pk, 0, prev_Q), 0);

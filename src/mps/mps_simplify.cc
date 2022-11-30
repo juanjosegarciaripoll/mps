@@ -62,7 +62,7 @@ namespace mps {
    */
 template <class Tensor>
 static void normalize_this(Tensor &Pk, int sense) {
-  index a1, i1, a2;
+  index_t a1, i1, a2;
   Tensor U;
   if (sense > 0) {
     Pk.get_dimensions(&a1, &i1, &a2);
@@ -80,7 +80,7 @@ template <class Tensor>
 static void build_next_projector(Tensor &Pk, Tensor Ml, Tensor Mr,
                                  const Tensor &Nl, const Tensor &Nr,
                                  const Tensor &Qk) {
-  index a1, a2, b1, i1, b2, a3, b3;
+  index_t a1, a2, b1, i1, b2, a3, b3;
 
   if (Mr.is_empty()) {
     Ml.get_dimensions(&a1, &b1, &a2, &b2);
@@ -149,7 +149,7 @@ static void build_next_projector(Tensor &Pk, Tensor Ml, Tensor Mr,
    */
 template <class MPS>
 static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
-                          index sweeps, bool normalize) {
+                          index_t sweeps, bool normalize) {
   bool debug = FLAGS.get(MPS_DEBUG_SIMPLIFY);
   double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
   typedef typename MPS::elt_t Tensor;
@@ -166,12 +166,12 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
     abort();
   }
 
-  index N = P.ssize();
+  index_t N = P.ssize();
   MPS A(N), B(N);
 
   if (*sense > 0) {
     Tensor Mr, Nr;
-    for (index k = N; k--;) {
+    for (index_t k = N; k--;) {
       Tensor Pk = P[k];
       Mr = prop_matrix(Mr, -1, Pk, Q[k]);
       A.at(k) = Mr;
@@ -182,7 +182,7 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
     }
   } else if (*sense < 0) {
     Tensor Ml, Nl;
-    for (index k = 0; k < N; k++) {
+    for (index_t k = 0; k < N; k++) {
       Tensor Pk = P[k];
       Ml = prop_matrix(Ml, +1, Pk, Q[k]);
       A.at(k) = Ml;
@@ -196,7 +196,7 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
     abort();
   }
   double err = 1.0, olderr, scp, normP2;
-  for (index sweep = 0; sweep < sweeps; sweep++) {
+  for (index_t sweep = 0; sweep < sweeps; sweep++) {
     Tensor Pk;
     if (debug) {
       tic();
@@ -204,7 +204,7 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
     }
     if (*sense > 0) {
       Tensor Ml, Nl;
-      for (index k = 0; k < N; k++) {
+      for (index_t k = 0; k < N; k++) {
         Tensor Qk = Q[k];
         Tensor Nr = k < (N - 1) ? B[k + 1] : Tensor();
         Tensor Mr = k < (N - 1) ? A[k + 1] : Tensor();
@@ -230,7 +230,7 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
       }
     } else {
       Tensor Mr, Nr;
-      for (index k = N; k--;) {
+      for (index_t k = N; k--;) {
         Tensor Qk = Q[k];
         Tensor Nl = k > 0 ? B[k - 1] : Tensor();
         Tensor Ml = k > 0 ? A[k - 1] : Tensor();
