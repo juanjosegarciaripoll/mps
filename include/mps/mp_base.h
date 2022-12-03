@@ -1,3 +1,4 @@
+#pragma once
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
@@ -46,13 +47,13 @@ class Sweeper {
 
 template <class Tensor>
 class MP {
-  using data_type = vector<Tensor>;
 
  public:
   using elt_t = Tensor;
   using number_t = tensor_scalar_t<Tensor>;
-  using iterator = typename data_type::iterator;
-  using const_iterator = typename data_type::const_iterator;
+  using tensor_array_t = vector<Tensor>;
+  using iterator = typename tensor_array_t::iterator;
+  using const_iterator = typename tensor_array_t::const_iterator;
 
   MP() = default;
   MP(const MP &) = default;
@@ -61,6 +62,7 @@ class MP {
   MP &operator=(MP &&) = default;
   explicit MP(index_t size) : data_(size) {}
   explicit MP(const vector<Tensor> &other) : data_(other) {}
+  explicit MP(vector<Tensor> &&other) : data_(std::move(other)) {}
 
   size_t size() const { return data_.size(); }
   index_t ssize() const { return data_.ssize(); }
@@ -93,7 +95,7 @@ class MP {
   }
 
  private:
-  data_type data_{};
+  tensor_array_t data_{};
 };
 
 template <typename T>
