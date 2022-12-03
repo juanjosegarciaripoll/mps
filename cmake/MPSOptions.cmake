@@ -5,9 +5,9 @@ option(WARNINGS_AS_ERRORS "Compilation and analysis warnings become errors" OFF)
 
 function(make_mps_options)
     add_library(mps_options INTERFACE)
-    target_precompile_headers(mps_options
-        INTERFACE <algorithm> <cmath> <complex> <cstring> <functional>
-                  <memory> <iostream> <string> <vector>)
+    #target_precompile_headers(mps_options
+    #    INTERFACE <algorithm> <cmath> <complex> <cstring> <functional>
+    #              <memory> <iostream> <string> <vector>)
 
     if (MPS_OPTIMIZED_BUILD)
         mps_add_optimizations()
