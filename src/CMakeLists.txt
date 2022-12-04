@@ -1,5 +1,6 @@
 target_sources(mps
   PRIVATE
+    analysis/space/space.cc
     quantum/spin.cc
     quantum/fock.cc
     quantum/decompose_operator_d.cc

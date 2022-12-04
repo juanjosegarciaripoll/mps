@@ -1,3 +1,4 @@
+#pragma once
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 //
 // Copyright 2008, Juan Jose Garcia-Ripoll
@@ -15,7 +16,9 @@
 #include <tensor/io.h>
 #include <tensor/tools.h>
 #include <mps/mps.h>
+#include <mps/mpo.h>
 #include <mps/hamiltonian.h>
+#include <mps/io.h>
 
 #define EPSILON 1e-12
 #define STRICT_EPSILON std::numeric_limits<double>::epsilon()
@@ -83,6 +86,17 @@ bool simeq(const mps::MPS<elt_t> &a, const mps::MPS<elt_t> &b,
 template <typename t1, typename t2>
 testing::AssertionResult all_equal(const t1 &a, const t2 &b) {
   if (::tensor::all_equal(a, b))
+    return testing::AssertionSuccess() << "same elements and size";
+  else
+    return testing::AssertionFailure() << a << " is not " << b;
+}
+
+template <typename t>
+testing::AssertionResult all_equal(const mps::MPO<t> &a, const mps::MPO<t> &b) {
+  if (a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(), b.end(),
+                                         [](const t &ta, const t &tb) {
+                                           return ::tensor::all_equal(ta, tb);
+                                         }))
     return testing::AssertionSuccess() << "same elements and size";
   else
     return testing::AssertionFailure() << a << " is not " << b;

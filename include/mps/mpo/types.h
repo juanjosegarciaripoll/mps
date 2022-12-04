@@ -50,6 +50,8 @@ class MPO : public MP<Tensor> {
 
   MPO(tensor_array_t tensors) : parent_t(std::move(tensors)) {}
 
+  MPO(const std::initializer_list<Tensor> &l) : parent_t(tensor_array_t(l)) {}
+
  private:
   static tensor_array_t empty_mpo_tensors(
       const tensor::Indices &physical_dimensions) {
