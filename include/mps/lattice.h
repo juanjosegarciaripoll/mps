@@ -137,16 +137,16 @@ class Lattice {
                size_t neig, RTensor *vectors = nullptr,
                bool *converged = nullptr,
                particle_kind_t kind = FERMIONS) const {
-    return linalg::eigs(this->map(J, U, kind), dimension(), eig_type, neig,
-                        vectors, converged);
+    return linalg::eigs(this->map(J, U, kind), static_cast<size_t>(dimension()),
+                        eig_type, neig, vectors, converged);
   }
 
   CTensor eigs(const CTensor &J, const CTensor &U, EigType eig_type,
                size_t neig, CTensor *vectors = nullptr,
                bool *converged = nullptr,
                particle_kind_t kind = FERMIONS) const {
-    return linalg::eigs(this->map(J, U, kind), dimension(), eig_type, neig,
-                        vectors, converged);
+    return linalg::eigs(this->map(J, U, kind), static_cast<size_t>(dimension()),
+                        eig_type, neig, vectors, converged);
   }
 
   void hopping_inner(RTensor *values, Indices *ndx, index_t to_site,

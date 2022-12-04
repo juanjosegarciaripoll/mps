@@ -45,7 +45,7 @@ template <class MPO>
 inline MPO initialize_interactions_mpo(const tensor::Indices &dimensions) {
   using tensor_t = typename MPO::elt_t;
   vector<tensor_t> tensors;
-  tensors.reserve(dimensions.size());
+  tensors.reserve(dimensions.ssize());
   for (auto d : dimensions) {
     auto Id = tensor_t::eye(d, d);
     if (tensors.ssize() == 0) {

@@ -116,7 +116,7 @@ double do_solve(const MPO<Tensor> &H, MPS<Tensor> *ptrP, const MPS<Tensor> &oQ,
           vP = flatten(fold(P[s.site() - 1], -1, P[s.site()], 0));
         }
         vP = reshape(linalg::cgs(qf.two_site_map(s.sense()), flatten(vHQ), &vP,
-                                 2 * vHQ.ssize(), tol),
+                                 2 * vHQ.size(), tol),
                      vHQ.dimensions());
         set_canonical_2_sites(P, vP, s.site(), s.sense(), Dmax, tol);
 

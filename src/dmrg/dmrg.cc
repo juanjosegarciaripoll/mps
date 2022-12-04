@@ -121,7 +121,7 @@ double DMRG<MPS>::minimize_single_site(MPS &P, index_t k, int dk) {
      * matrix.  NOTE: For small sizes, our iterative algorithm (ARPACK) fails
      * and we have to resort to a full diagonalization.
      */
-  index_t neig = std::max<index_t>(index_t(1), neigenvalues);
+  size_t neig = std::max(size_t(1), neigenvalues);
   elt_t aux;
   if (a1 * i1 * b1 <= 10) {
     elt_t Heff = kron2(Opli, elt_t::eye(b1)) + kron2(elt_t::eye(a1), Opir);
@@ -280,8 +280,8 @@ double DMRG<MPS>::minimize_two_sites(MPS &P, index_t k, int dk, index_t Dmax) {
      * and we have to resort to a full diagonalization.
      */
   elt_t aux;
-  index_t smallL = Pi.ssize();
-  index_t neig = std::max(index_t(1), neigenvalues);
+  size_t smallL = Pi.size();
+  size_t neig = std::max(size_t(1), neigenvalues);
   if (Q_values.size()) {
     if (smallL <= 10) {
       //cout << "Heff=\n"; show_matrix(std::cerr, kron2(Opli, elt_t::eye(j1*c1)) + kron2(elt_t::eye(a1*i1), Opjr));
