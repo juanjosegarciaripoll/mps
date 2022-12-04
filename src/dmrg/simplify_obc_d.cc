@@ -29,9 +29,8 @@ double simplify_obc(RMPS *ptrP, const RTensor &w, const vector<RMPS> &Q,
 
 double simplify_obc(RMPS *ptrP, const RMPS &Q, int *sense, index_t sweeps,
                     bool normalize, index_t Dmax, double tol, double *norm) {
-  static const RTensor w = RTensor::ones(1);
-  vector<RMPS> vQ(1, Q);
-  return do_simplify(ptrP, w, vQ, sense, sweeps, normalize, Dmax, tol, norm);
+  return do_simplify(ptrP, RTensor::ones(1), vector<RMPS>(1, Q), sense, sweeps,
+                     normalize, Dmax, tol, norm);
 }
 
 }  // namespace mps
