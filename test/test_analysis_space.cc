@@ -122,4 +122,21 @@ TEST(Space, TwoDimensionalPositionMPO) {
   EXPECT_ALL_EQUAL(mpo_to_matrix(position_mpo(space, 1)), kron2(Id, 2.0 * X));
 }
 
+TEST(Space, OneDimensionalDerivativeMPO) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  Space space({{start, end, qubits}});
+
+  auto mpo = first_derivative_mpo(space, 0);
+  ASSERT_EQ(mpo.ssize(), space.total_qubits());
+
+  double dx = (end - start) / (1 << qubits);
+  RTensor first_order_finite_differences{{0.0, 1 / dx, 0.0, -1 / dx},
+                                         {-1 / dx, 0.0, 1 / dx, 0.0},
+                                         {0.0, -1 / dx, 0.0, 1 / dx},
+                                         {1 / dx, 0.0, -1 / dx, 0.0}};
+  EXPECT_ALL_EQUAL(mpo_to_matrix(first_derivative_mpo(space, 0)),
+                   first_order_finite_differences);
+}
+
 }  // namespace tensor_test
