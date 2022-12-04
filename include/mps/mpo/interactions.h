@@ -1,5 +1,5 @@
-// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 #pragma once
+// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
 
@@ -40,6 +40,34 @@ namespace mps {
 
    */
 
+template <class MPO>
+inline MPO initialize_interactions_mpo(const tensor::Indices &dimensions) {
+  using tensor_t = typename MPO::elt_t;
+  vector<tensor_t> tensors;
+  tensors.reserve(dimensions.size());
+  for (auto d : dimensions) {
+    auto Id = tensor_t::eye(d, d);
+    if (tensors.ssize() == 0) {
+      /* first */
+      auto P = tensor_t::zeros(1, d, d, 2);
+      P.at(range(0), _, _, range(0)) = Id;
+      tensors.emplace_back(P);
+    } else if (tensors.ssize() + 1 < dimensions.ssize()) {
+      /* last */
+      auto P = tensor_t::zeros(2, d, d, 2);
+      P.at(range(1), _, _, range(1)) = Id;
+      P.at(range(0), _, _, range(0)) = Id;
+      tensors.emplace_back(P);
+    } else {
+      /* otherwise */
+      auto P = tensor_t::zeros(2, d, d, 1);
+      P.at(range(1), _, _, range(0)) = Id;
+      tensors.emplace_back(P);
+    }
+  }
+  return MPO(tensors);
+}
+
 template <class Tensor>
 inline void add_local_term(MPO<Tensor> *mpo, const Tensor &Hloc, index_t i) {
   if (i < 0 || i >= mpo->ssize()) {
@@ -48,7 +76,7 @@ inline void add_local_term(MPO<Tensor> *mpo, const Tensor &Hloc, index_t i) {
     abort();
   }
   if (Hloc.columns() != Hloc.rows()) {
-    std::cerr << "In add_local_term(MPO, Tensor, index_t), the Tensor is not a "
+    std::cerr << "In add_local_term(MPO, Tensor, index), the Tensor is not a "
                  "square matrix.\n";
     abort();
   }
@@ -59,16 +87,19 @@ inline void add_local_term(MPO<Tensor> *mpo, const Tensor &Hloc, index_t i) {
                  "tensor do not match those of the MPO.\n";
     abort();
   }
-  if (Pi.dimension(0) == 1) {
-    /* First */
+  bool unprepared_mpo = (Pi.dimension(3) == 1 && Pi.dimension(0) == 1);
+  if (unprepared_mpo) {
+    std::cerr << "In add_local_term(MPO, Tensor, index), the MPO has not been "
+                 "prepared\n";
+    abort();
+  }
+  if (i == 0) {
     Pi.at(range(0), _, _, range(1)) =
         Tensor(Pi(range(0), _, _, range(1))) + reshape(Hloc, 1, d, d, 1);
-  } else if (Pi.dimension(3) == 1) {
-    /* Last */
+  } else if (i == mpo->last_index()) {
     Pi.at(range(0), _, _, range(0)) =
         Tensor(Pi(range(0), _, _, range(0))) + reshape(Hloc, 1, d, d, 1);
   } else {
-    /* Middle */
     Pi.at(range(0), _, _, range(1)) =
         Tensor(Pi(range(0), _, _, range(1))) + reshape(Hloc, 1, d, d, 1);
   }
@@ -293,6 +324,13 @@ inline void add_Hamiltonian(MPO<Tensor> *mpo, const Hamiltonian &H, double t) {
       }
     }
   }
+}
+
+template <class MPO>
+inline MPO Hamiltonian_to(const Hamiltonian &H, double t = 0.0) {
+  auto output = initialize_interactions_mpo<MPO>(H.dimensions());
+  add_Hamiltonian(&output, H, t);
+  return output;
 }
 
 }  // namespace mps

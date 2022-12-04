@@ -30,38 +30,26 @@ using namespace tensor;
 
 template <class MPO>
 void test_zero_mpo(int size) {
-  typedef typename MPO::elt_t Tensor;
+  using Tensor = typename MPO::elt_t;
+  using MPS = typename MPO::MPS;
 
-  Tensor first = Tensor::zeros(1, 2, 2, 2);
-  first.at(0, 0, 0, 0) = 1.0;
-  first.at(0, 1, 1, 0) = 1.0;
-
-  Tensor last = Tensor::zeros(2, 2, 2, 1);
-  last.at(1, 0, 0, 0) = 1.0;
-  last.at(1, 1, 1, 0) = 1.0;
-
-  Tensor middle = Tensor::zeros(2, 2, 2, 2);
-  middle.at(0, 0, 0, 0) = 1.0;
-  middle.at(0, 1, 1, 0) = 1.0;
-  middle.at(1, 0, 0, 1) = 1.0;
-  middle.at(1, 1, 1, 1) = 1.0;
-
+  Tensor target = Tensor::zeros(1, 2, 2, 1);
+  target.at(0, 0, 0, 0) = 1.0;
+  target.at(0, 1, 1, 0) = 1.0;
   MPO mpo(size, 2);
-  for (int i = 0; i < size; i++) {
-    Tensor target;
-    if (i == 0)
-      target = first;
-    else if (i + 1 == size)
-      target = last;
-    else
-      target = middle;
-    std::cerr << "mpo[" << i << "]=" << mpo[i] << '\n'
-              << "target=" << target << '\n';
-    EXPECT_ALL_EQUAL(mpo[i], target);
+  for (const auto &tensor : mpo) {
+    EXPECT_ALL_EQUAL(tensor, target);
   }
 
-  auto psi = typename MPO::MPS(cluster_state(size));
-  EXPECT_CEQ(norm2(apply(mpo, psi)), 0.0);
+  auto psi = MPS(cluster_state(size));
+  auto mpo_times_psi = apply(mpo, psi);
+  EXPECT_CEQ(scprod(psi, mpo_times_psi), 1.0);
+}
+
+template <class MPO>
+void test_local_mpo_failure() {
+  MPO mpo(2, 2);
+  ASSERT_ERROR_DETECTED(add_local_term(&mpo, MPO::elt_t::eye(2, 2), 0));
 }
 
 /*
@@ -76,7 +64,7 @@ void test_small_local_mpo() {
   const auto Pauli_z = tensor_cast(psi, mps::Pauli_z);
   const auto Pauli_id = tensor_cast(psi, mps::Pauli_id);
   {
-    MPO mpo(2, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2});
     add_local_term(&mpo, Pauli_z, 0);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
@@ -86,7 +74,7 @@ void test_small_local_mpo() {
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
-    MPO mpo(2, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2});
     add_local_term(&mpo, Pauli_z, 1);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
@@ -96,7 +84,7 @@ void test_small_local_mpo() {
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
-    MPO mpo(2, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2});
     add_local_term(&mpo, Pauli_z, 0);
     add_local_term(&mpo, Pauli_z, 1);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
@@ -109,7 +97,7 @@ void test_small_local_mpo() {
 
   psi = MPS(cluster_state(3));
   {
-    MPO mpo(3, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_local_term(&mpo, Pauli_z, 0);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
@@ -119,7 +107,7 @@ void test_small_local_mpo() {
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
-    MPO mpo(3, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_local_term(&mpo, Pauli_z, 1);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
@@ -129,7 +117,7 @@ void test_small_local_mpo() {
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
-    MPO mpo(3, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_local_term(&mpo, Pauli_z, 2);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
@@ -139,7 +127,7 @@ void test_small_local_mpo() {
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
-    MPO mpo(3, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_local_term(&mpo, Pauli_z, 0);
     add_local_term(&mpo, Pauli_z, 2);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
@@ -164,7 +152,7 @@ void test_small_nn_mpo() {
   const auto Pauli_z = tensor_cast(psi, mps::Pauli_z);
   const auto Pauli_id = tensor_cast(psi, mps::Pauli_id);
   {
-    MPO mpo(2, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2});
     add_interaction(&mpo, Pauli_z, 0, Pauli_z);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
@@ -175,7 +163,7 @@ void test_small_nn_mpo() {
   }
   psi = MPS(cluster_state(3));
   {
-    MPO mpo(3, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_interaction(&mpo, Pauli_z, 0, Pauli_z);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
@@ -185,7 +173,7 @@ void test_small_nn_mpo() {
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
-    MPO mpo(3, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_interaction(&mpo, Pauli_z, 1, Pauli_z);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
 
@@ -195,7 +183,7 @@ void test_small_nn_mpo() {
     EXPECT_CEQ(norm2(Hpsi1 - Hpsi2), 0.0);
   }
   {
-    MPO mpo(3, 2);
+    auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_interaction(&mpo, Pauli_z, 0, Pauli_z);
     add_interaction(&mpo, Pauli_z, 1, Pauli_z);
     Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
@@ -220,7 +208,7 @@ void test_random_mpo(int size) {
   const auto Pauli_id = tensor_cast(psi, mps::Pauli_id);
   for (int i = 0; i < size; i++) {
     ConstantHamiltonian H(size);
-    MPO mpo(size, 2);
+    auto mpo = initialize_interactions_mpo<MPO>(Indices(size, 2));
 
     for (int j = 0; j < size; j++) {
       typename MPO::elt_t Hloc = rand<double>() * Pauli_z +
@@ -250,6 +238,8 @@ void test_random_mpo(int size) {
 
 TEST(RMPO, Zero) { test_over_integers(2, 10, test_zero_mpo<RMPO>); }
 
+TEST(RMPO, LocalMPORequiresInitialization) { test_local_mpo_failure<RMPO>(); }
+
 TEST(RMPO, SmallLocalMPO) { test_small_local_mpo<RMPO>(); }
 
 TEST(RMPO, SmallNNMPO) { test_small_nn_mpo<RMPO>(); }
@@ -259,6 +249,8 @@ TEST(RMPO, Random) { test_over_integers(2, 10, test_random_mpo<RMPO>); }
 ////////////////////////////////////////////////////////////
 
 TEST(CMPO, Zero) { test_over_integers(2, 10, test_zero_mpo<CMPO>); }
+
+TEST(CMPO, LocalMPORequiresInitialization) { test_local_mpo_failure<CMPO>(); }
 
 TEST(CMPO, SmallLocalMPO) { test_small_local_mpo<CMPO>(); }
 

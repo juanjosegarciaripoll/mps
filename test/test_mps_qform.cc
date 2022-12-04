@@ -69,7 +69,7 @@ void test_qform_shape(const MPS<Tensor> &psi) {
   // Random Hamiltonian of spin 1/2 model with the given
   index L = psi.size();
   TestHamiltonian H(model, 0.5, L, false, false);
-  MPO<Tensor> mpo(H);
+  auto mpo = Hamiltonian_to<MPO<Tensor>>(H);
   if (psi[0].dimension(1) != mpo[0].dimension(1)) return;
   // We run over all sites
   for (index i = 0; i < L; i++) {
@@ -88,7 +88,7 @@ void test_qform2_shape(const MPS<Tensor> &psi) {
   // Random Hamiltonian of spin 1/2 model with the given
   index L = psi.size();
   TestHamiltonian H(model, 0.5, L, false, false);
-  MPO<Tensor> mpo(H);
+  auto mpo = Hamiltonian_to<MPO<Tensor>>(H);
   if (psi[0].dimension(1) != mpo[0].dimension(1)) return;
   // We run over all sites
   for (index i = 1; i < L; i++) {
@@ -110,7 +110,7 @@ void test_qform_expected(const MPS<Tensor> &psi0) {
     auto psi = psi0;
     index L = psi.size();
     TestHamiltonian H(model, 0.5, L, false, false);
-    MPO<Tensor> mpo(H);
+    auto mpo = Hamiltonian_to<MPO<Tensor>>(H);
     // We run over all sites
     for (index i = 0; i < L; i++) {
       QuadraticForm<Tensor> qf(mpo, psi, psi, i);
@@ -151,7 +151,7 @@ void test_qform_expected2(const MPS<Tensor> &psi0) {
     auto psi = psi0;
     index L = psi.size();
     auto testH = TestHamiltonian(model, 0.5, L, false, false);
-    MPO<Tensor> mpo(testH);
+    auto mpo = Hamiltonian_to<MPO<Tensor>>(testH);
     // We run over all sites
     for (index i = 1; i < L; i++) {
       QuadraticForm<Tensor> qf(mpo, psi, psi, i - 1);

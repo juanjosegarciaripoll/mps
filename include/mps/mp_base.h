@@ -50,6 +50,7 @@ class MP {
 
  public:
   using elt_t = Tensor;
+  using tensor_t = Tensor;
   using number_t = tensor_scalar_t<Tensor>;
   using tensor_array_t = vector<Tensor>;
   using iterator = typename tensor_array_t::iterator;
@@ -61,8 +62,8 @@ class MP {
   MP &operator=(const MP &) = default;
   MP &operator=(MP &&) = default;
   explicit MP(index_t size) : data_(size) {}
-  explicit MP(const vector<Tensor> &other) : data_(other) {}
-  explicit MP(vector<Tensor> &&other) : data_(std::move(other)) {}
+  explicit MP(const tensor_array_t &other) : data_(other) {}
+  explicit MP(tensor_array_t &&other) : data_(std::move(other)) {}
 
   size_t size() const { return data_.size(); }
   index_t ssize() const { return data_.ssize(); }

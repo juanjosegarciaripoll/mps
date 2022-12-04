@@ -20,6 +20,7 @@
 #include <tensor/linalg.h>
 #include <tensor/io.h>
 #include <mps/mps_algorithms.h>
+#include <mps/mpo/interactions.h>
 #include <mps/time_evolve.h>
 #include <mps/tools.h>
 #include <mps/io.h>
@@ -43,7 +44,7 @@ static CTensor ground_state(const CTensor &Heff, const CTensor &N) {
 }
 
 ArnoldiSolver::ArnoldiSolver(const Hamiltonian &H, cdouble dt, int nvectors)
-    : TimeSolver(dt), H_(H, 0.0), max_states_(nvectors), tolerance_(0) {
+  : TimeSolver(dt), H_(Hamiltonian_to<CMPO>(H, 0.0)), max_states_(nvectors), tolerance_(0) {
   if (max_states_ <= 0 || max_states_ >= 30) {
     std::cerr << "In ArnoldiSolver(...), the number of states exceeds the "
                  "limits [1,30]"
@@ -53,7 +54,7 @@ ArnoldiSolver::ArnoldiSolver(const Hamiltonian &H, cdouble dt, int nvectors)
 }
 
 ArnoldiSolver::ArnoldiSolver(const CMPO &H, cdouble dt, int nvectors)
-    : TimeSolver(dt), H_(H), max_states_(nvectors), tolerance_(0) {
+  : TimeSolver(dt), H_(H), max_states_(nvectors), tolerance_(0) {
   if (max_states_ <= 0 || max_states_ >= 30) {
     std::cerr << "In ArnoldiSolver(...), the number of states exceeds the "
                  "limits [1,30]"

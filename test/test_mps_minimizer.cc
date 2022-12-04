@@ -59,7 +59,7 @@ void test_minimizer_model(index L) {
   // Random Hamiltonian of spin 1/2 model with the given
   TestHamiltonian H(model, 0.5, L, false, false);
 
-  MPO mpo(H);
+  auto mpo = Hamiltonian_to<MPO>(H);
   MPS psi;
   double minE = ground_state(mpo, &psi);
 

@@ -21,6 +21,7 @@
 #ifndef MPS_MPO_TYPES_H
 #define MPS_MPO_TYPES_H
 
+#include <mps/mp_base.h>
 #include <mps/hamiltonian.h>
 
 namespace mps {
@@ -32,58 +33,33 @@ namespace mps {
 template <typename Tensor>
 class MPO : public MP<Tensor> {
  public:
-  typedef MPS<Tensor> MPS;
+  using parent_t = MP<Tensor>;
+  using tensor_array_t = typename parent_t::tensor_array_t;
+  using MPS = MPS<Tensor>;
+
   MPO() = default;
   MPO(const MPO &) = default;
   MPO(MPO &&) = default;
   MPO &operator=(const MPO &) = default;
   MPO &operator=(MPO &&) = default;
 
-  MPO(index_t length, index_t physical_dimension) : parent(length) {
-    tensor::Indices dims(length);
-    std::fill(dims.begin(), dims.end(), physical_dimension);
-    clear(dims);
-  }
+  MPO(index_t length, index_t physical_dimension)
+      : parent_t(empty_mpo_tensors(Indices(length, physical_dimension))) {}
 
   MPO(const tensor::Indices &physical_dimensions)
-      : parent(physical_dimensions.ssize()) {
-    clear(physical_dimensions);
-  }
+      : parent_t(empty_mpo_tensors(physical_dimensions)) {}
 
-  MPO(const Hamiltonian &H, double t = 0.0) : parent(H.size()) {
-    clear(H.dimensions());
-    add_Hamiltonian(this, H, t);
-  }
+  MPO(tensor_array_t tensors) : parent_t(std::move(tensors)) {}
 
  private:
-  typedef MP<Tensor> parent;
-
-  void clear(const tensor::Indices &physical_dimensions) {
-    if (physical_dimensions.size() < 2) {
-      std::cerr << "Cannot create MPO with size 0 or 1.\n";
-      abort();
+  static tensor_array_t empty_mpo_tensors(
+      const tensor::Indices &physical_dimensions) {
+    tensor_array_t output;
+    output.reserve(physical_dimensions.ssize());
+    for (auto d : physical_dimensions) {
+      output.emplace_back(reshape(Tensor::eye(d,d), 1,d,d,1));
     }
-    // TODO: Simplify. We only need sizes (1,d,d,1) for the add_local/add_interaction to succeed.
-    Tensor P;
-    for (index_t i = 0; i < this->ssize(); i++) {
-      index_t d = physical_dimensions[i];
-      Tensor Id = Tensor::eye(d, d);
-      if (i == 0) {
-        /* first */
-        P = Tensor::zeros(1, d, d, 2);
-        P.at(range(0), _, _, range(0)) = Id;
-      } else if (i + 1 < this->ssize()) {
-        /* last */
-        P = Tensor::zeros(2, d, d, 2);
-        P.at(range(1), _, _, range(1)) = Id;
-        P.at(range(0), _, _, range(0)) = Id;
-      } else {
-        /* otherwise */
-        P = Tensor::zeros(2, d, d, 1);
-        P.at(range(1), _, _, range(0)) = Id;
-      }
-      this->at(i) = P;
-    }
+    return output;
   }
 };
 

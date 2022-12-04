@@ -34,7 +34,7 @@ const CMPO build_MPO(void (*fH)(ConstantHamiltonian &H, const Indices &d),
   if (Hsparse) {
     *Hsparse = sparse_hamiltonian(H);
   }
-  return H;
+  return Hamiltonian_to<CMPO>(H);
 }
 
 // Given an input state, 'psi', it creates some random Hamiltonian
@@ -47,7 +47,7 @@ template <void (*fH)(ConstantHamiltonian &H, const Indices &d)>
 void test_solve(CMPS psi) {
   /*
      * We create a random Hamiltonian H and solve
-     *		
+     *
      */
   int sense = -1;
   CSparse Hsp;
