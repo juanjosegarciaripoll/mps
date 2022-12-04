@@ -23,6 +23,7 @@
 namespace mps {
 
 template class MPO<RTensor>;
+template class MPOList<MPO<RTensor>>;
 
 template void add_local_term(RMPO *mpdo, const RTensor &Hloc, index_t k);
 

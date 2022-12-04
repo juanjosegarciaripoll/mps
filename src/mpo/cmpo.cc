@@ -23,6 +23,7 @@
 namespace mps {
 
 template class MPO<CTensor>;
+template class MPOList<MPO<CTensor>>;
 
 template void add_local_term(CMPO *mpdo, const CTensor &Hloc, index_t k);
 

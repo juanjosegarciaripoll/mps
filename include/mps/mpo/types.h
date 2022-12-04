@@ -1,5 +1,5 @@
-// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 #pragma once
+// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
 
@@ -57,7 +57,7 @@ class MPO : public MP<Tensor> {
     tensor_array_t output;
     output.reserve(physical_dimensions.ssize());
     for (auto d : physical_dimensions) {
-      output.emplace_back(reshape(Tensor::eye(d,d), 1,d,d,1));
+      output.emplace_back(reshape(Tensor::eye(d, d), 1, d, d, 1));
     }
     return output;
   }
@@ -76,8 +76,43 @@ struct RMPO : public MPS<RTensor> {};
 /**Complex matrix product structure.*/
 struct CMPO : public MPS<CTensor> {};
 #else
-typedef MPO<RTensor> RMPO;
-typedef MPO<CTensor> CMPO;
+using RMPO = MPO<RTensor>;
+using CMPO = MPO<CTensor>;
+#endif
+
+/**Matrix Product Operator list.*/
+
+template <typename MPO>
+class MPOList : public vector<MPO> {
+  using parent_t = vector<MPO>;
+
+ public:
+  using elt_t = MPO;
+  using mpo_t = MPO;
+  using tensor_t = typename MPO::tensor_t;
+  using mpo_array_t = vector<mpo_t>;
+
+  MPOList() = default;
+  MPOList(const MPOList &) = default;
+  MPOList(MPOList &&) = default;
+  MPOList &operator=(const MPOList &) = default;
+  MPOList &operator=(MPOList &&) = default;
+  ~MPOList() = default;
+
+  MPOList(const mpo_array_t &mpos) : parent_t(mpos) {}
+  MPOList(mpo_array_t &&mpos) : parent_t(std::move(mpos)) {}
+};
+
+extern template class MPOList<RMPO>;
+extern template class MPOList<CMPO>;
+#ifdef DOXYGEN_ONLY
+/**Real matrix product structure.*/
+struct RMPOList : public MPOList<RMPO> {};
+/**Complex matrix product structure.*/
+struct CMPOList : public MPOList<CMPO> {};
+#else
+using RMPOList = MPOList<RMPO>;
+using CMPOList = MPOList<CMPO>;
 #endif
 
 /* @} */

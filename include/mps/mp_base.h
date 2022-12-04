@@ -95,6 +95,13 @@ class MP {
     }
   }
 
+  bool operator==(const MP &other) const {
+    return std::equal(begin(), end(), other.begin(),
+                      [](const tensor_t &a, const tensor_t &b) {
+                        return (a.dimensions() == b.dimensions()) && all_equal(a, b);
+                      });
+  }
+
  private:
   tensor_array_t data_{};
 };
