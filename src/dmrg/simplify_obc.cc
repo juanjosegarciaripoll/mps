@@ -23,7 +23,7 @@
 #include <tensor/io.h>
 #include <mps/flags.h>
 #include <mps/mps.h>
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 #include <mps/lform.h>
 
 namespace mps {

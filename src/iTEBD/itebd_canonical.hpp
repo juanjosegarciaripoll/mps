@@ -21,7 +21,7 @@
 #include <tensor/io.h>
 #include <mps/tools.h>
 #include <mps/itebd.h>
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 
 namespace mps {
 

@@ -19,7 +19,7 @@
 
 #include <tensor/exceptions.h>
 #include <mps/time_evolve.h>
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 
 namespace mps {
 

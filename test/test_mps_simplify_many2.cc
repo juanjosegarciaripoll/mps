@@ -20,7 +20,7 @@
 #include "loops.h"
 #include <gtest/gtest.h>
 #include <mps/mps.h>
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 
 namespace tensor_test {
 

@@ -19,7 +19,7 @@
 
 #include <algorithm>
 #include <mps/lform.h>
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 
 namespace mps {
 

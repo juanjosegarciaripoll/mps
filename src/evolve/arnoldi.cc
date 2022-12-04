@@ -19,7 +19,7 @@
 
 #include <tensor/linalg.h>
 #include <tensor/io.h>
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 #include <mps/mpo/interactions.h>
 #include <mps/time_evolve.h>
 #include <mps/tools.h>

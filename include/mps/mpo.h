@@ -1,5 +1,5 @@
-// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 #pragma once
+// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
 
@@ -23,7 +23,6 @@
 
 #include <mps/vector.h>
 #include <mps/mps.h>
-#include <mps/hamiltonian.h>
 #include <mps/mpo/types.h>
 #include <mps/mpo/interactions.h>
 

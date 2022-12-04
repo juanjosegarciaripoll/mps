@@ -21,8 +21,7 @@
 #ifndef MPS_MPO_TYPES_H
 #define MPS_MPO_TYPES_H
 
-#include <mps/mp_base.h>
-#include <mps/hamiltonian.h>
+#include <mps/mps.h>
 
 namespace mps {
 

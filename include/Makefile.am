@@ -10,7 +10,7 @@ nobase_include_HEADERS = \
 	mps/mp_base.h \
 	mps/mpo.h \
 	mps/mps.h \
-	mps/mps_algorithms.h \
+	mps/algorithms.h \
 	mps/qform.h \
 	mps/quantum.h \
 	mps/lattice.h \
@@ -20,4 +20,3 @@ nobase_include_HEADERS = \
 	mps/tools.h \
 	mps/flags.h \
 	mps/minimizer.h
-

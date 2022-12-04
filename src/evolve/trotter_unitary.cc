@@ -22,7 +22,7 @@
 #include <tensor/io.h>
 #include <tensor/tools.h>
 #include <mps/time_evolve.h>
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 
 namespace mps {
 

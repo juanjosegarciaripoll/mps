@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 #include <mps/hamiltonian.h>
 #include <mps/quantum.h>
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 
 namespace tensor_test {
 

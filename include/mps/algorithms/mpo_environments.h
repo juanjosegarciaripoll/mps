@@ -1,5 +1,5 @@
-// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 #pragma once
+// -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
 
@@ -17,10 +17,11 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef MPS_ALGORITHMS_MPO_MPOEnvironmentS_H
-#define MPS_ALGORITHMS_MPO_MPOEnvironmentS_H
+#ifndef MPS_ALGORITHMS_MPO_ENVIRONMENTS_H
+#define MPS_ALGORITHMS_MPO_ENVIRONMENTS_H
 
 #include <stdexcept>
+#include <list>
 #include <unordered_map>
 #include <tensor/tensor.h>
 #include <tensor/linalg.h>
@@ -57,7 +58,7 @@ class Sparse4Tensor {
   auto end() const { return subtensors_.end(); }
 
  private:
-  typedef std::list<subtensor_t> data_t;
+  using data_t = std::list<subtensor_t>;
   Dimensions dimensions_;
   data_t subtensors_;
 

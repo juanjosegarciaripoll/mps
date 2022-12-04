@@ -22,7 +22,7 @@
 #include <tensor/tools.h>
 #include <mps/flags.h>
 #include <mps/mps.h>
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 #include "mps_prop_matrix.cc"
 
 namespace mps {

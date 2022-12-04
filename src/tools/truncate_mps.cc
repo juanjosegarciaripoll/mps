@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 #include <tensor/io.h>
 
 namespace mps {

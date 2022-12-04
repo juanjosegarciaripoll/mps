@@ -20,7 +20,7 @@
 #include <mps/vector.h>
 #include <algorithm>
 #include <tensor/linalg.h>
-#include <mps/mps_algorithms.h>
+#include <mps/algorithms.h>
 #include <mps/flags.h>
 #include <tensor/io.h>
 #include "mps_prop_matrix.cc"
