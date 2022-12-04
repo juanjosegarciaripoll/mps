@@ -92,4 +92,34 @@ TEST(Space, ExtendMPO) {
                    s.extend_mpo(RMPO({sigma_x_tensor}), 1));
 }
 
+TEST(Space, OneDimensionalPositionMPO) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  Space s({{start, end, qubits}});
+
+  auto mpo = position_mpo(s, 0);
+  ASSERT_EQ(mpo.ssize(), s.total_qubits());
+
+  double dx = (end - start) / (1 << qubits);
+  EXPECT_ALL_EQUAL(
+      mpo_to_matrix(mpo),
+      diag(RTensor({start, start + dx, start + 2 * dx, start + 3 * dx})));
+}
+
+TEST(Space, TwoDimensionalPositionMPO) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  Space space({{start, end, qubits}, {2 * start, 2 * end, qubits}});
+
+  ASSERT_EQ(position_mpo(space, 0).ssize(), space.total_qubits());
+  ASSERT_EQ(position_mpo(space, 1).ssize(), space.total_qubits());
+
+  double dx = (end - start) / (1 << qubits);
+  auto X = diag(RTensor({start, start + dx, start + 2 * dx, start + 3 * dx}));
+  auto Id = RTensor::eye(4);
+
+  EXPECT_ALL_EQUAL(mpo_to_matrix(position_mpo(space, 0)), kron2(X, Id));
+  EXPECT_ALL_EQUAL(mpo_to_matrix(position_mpo(space, 1)), kron2(Id, 2.0 * X));
+}
+
 }  // namespace tensor_test

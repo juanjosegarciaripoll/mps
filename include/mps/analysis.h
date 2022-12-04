@@ -36,6 +36,7 @@ class Space {
     index_t qubits{1};
 
     index_t ssize() const { return 1 << qubits; }
+    double step() const { return (end - start) / static_cast<double>(ssize()); }
   };
 
   using domain_t = vector<interval_t>;
@@ -64,10 +65,7 @@ class Space {
   double dimension_end(index_t axis) const { return interval(axis).end; }
 
   /** Lattice step of given dimension. */
-  double dimension_step(index_t axis) const {
-    const auto &i = interval(axis);
-    return (i.end - i.start) / i.ssize();
-  }
+  double dimension_step(index_t axis) const { return interval(axis).step(); }
 
   /** Dimension of the selected coordinate. */
   index_t dimension_size(index_t axis) const;
@@ -98,11 +96,17 @@ class Space {
   index_t first_qubit(index_t axis) const;
 };
 
-/** Finite difference derivative operator as MPO. */
+/** Finite difference derivative operator as sparse matrix. */
 RSparse first_derivative_matrix(const Space &space, index_t axis = 0);
 
-/** Coordinate operator as MPO. */
+/** Coordinate operator as sparse matrix. */
 RSparse position_matrix(const Space &space, index_t axis = 0);
+
+/** Finite difference derivative operator as MPO. */
+RMPO first_derivative_mpo(const Space &space, index_t axis = 0);
+
+/** Coordinate operator as MPO. */
+RMPO position_mpo(const Space &space, index_t axis = 0);
 
 }  // namespace mps
 
