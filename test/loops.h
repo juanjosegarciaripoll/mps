@@ -74,6 +74,12 @@ bool simeq(const Tensor<elt_t> &a, const Tensor<elt_t> &b,
                     });
 }
 
+template <typename elt_t>
+bool simeq(const mps::MPS<elt_t> &a, const mps::MPS<elt_t> &b,
+           double epsilon = 2 * EPSILON) {
+  return simeq(mps::mps_to_vector(a), mps::mps_to_vector(b), epsilon);
+}
+
 template <typename t1, typename t2>
 testing::AssertionResult all_equal(const t1 &a, const t2 &b) {
   if (::tensor::all_equal(a, b))

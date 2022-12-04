@@ -87,6 +87,12 @@ const RMPS apply(const RMPO &mpdo, const RMPS &state);
 /** Apply a Matrix Product Operator onto a state. */
 const CMPS apply(const CMPO &mpdo, const CMPS &state);
 
+/** Apply a sequence of Matrix Product Operators onto a state. */
+const RMPS apply(const RMPOList &mpdo, const RMPS &state);
+
+/** Apply a sequence of Matrix Product Operators onto a state. */
+const CMPS apply(const CMPOList &mpdo, const CMPS &state);
+
 /** Apply a Matrix Product Operator onto a state, obtaining a canonical form. */
 const RMPS apply_canonical(const RMPO &mpdo, const RMPS &state, int sense = +1,
                            bool truncate = true);

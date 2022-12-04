@@ -22,17 +22,17 @@
 namespace mps {
 
 template <class MPS, class MPO>
-static const MPS do_apply(const MPO &mpdo, const MPS &psi) {
-  typedef typename MPS::elt_t Tensor;
-  tensor_assert(mpdo.size() == psi.size());
+static const MPS do_apply(const MPO &mpo, const MPS &psi) {
+  using Tensor = typename MPS::tensor_t;
+  tensor_assert(mpo.size() == psi.size());
 
   index_t a1, c1, j, c2, a2;
-  index_t L = mpdo.ssize();
+  index_t L = mpo.ssize();
   MPS chi(psi.ssize());
 
   for (index_t i = 0; i < L; i++) {
-    const Tensor &A = psi[i];  /* A(a1,i,a2) */
-    const Tensor &O = mpdo[i]; /* O(c1,j,i,c2) */
+    const Tensor &A = psi[i]; /* A(a1,i,a2) */
+    const Tensor &O = mpo[i]; /* O(c1,j,i,c2) */
 
     /* B(a1,c1,j,c2,a2) = O(c1,j,i,c2) A(a1,i,a2) */
     Tensor B = foldin(O, 2, A, 1);

@@ -36,12 +36,11 @@ void test_empty_mpo_list() {
 
 template <class MPO>
 void test_small_mpo_list() {
-  using Tensor = typename MPO::tensor_t;
   using MPS = typename MPO::MPS;
 
   auto psi = MPS(cluster_state(2));
-  const Tensor Pauli_z = tensor_cast(psi, mps::Pauli_z);
-  const Tensor Pauli_x = tensor_cast(psi, mps::Pauli_x);
+  auto Pauli_z = tensor_cast(psi, mps::Pauli_z);
+  auto Pauli_x = tensor_cast(psi, mps::Pauli_x);
 
   auto mpo1 = initialize_interactions_mpo<MPO>({2, 2});
   add_interaction(&mpo1, Pauli_z, 0, Pauli_x);
@@ -53,6 +52,8 @@ void test_small_mpo_list() {
   MPOList<MPO> list({mpo1, mpo2});
   EXPECT_EQ(list[0], mpo1);
   EXPECT_EQ(list[1], mpo2);
+
+  EXPECT_CEQ(apply(list, psi), apply(mpo2, apply(mpo1, psi)));
 }
 
 ////////////////////////////////////////////////////////////

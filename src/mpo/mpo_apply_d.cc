@@ -17,12 +17,19 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <algorithm>
 #include "mpo_apply.cc"
 
 namespace mps {
 
-const RMPS apply(const RMPO &mpdo, const RMPS &psi) {
-  return do_apply(mpdo, psi);
+const RMPS apply(const RMPO &mpo, const RMPS &psi) {
+  return do_apply(mpo, psi);
+}
+
+const RMPS apply(const RMPOList &mpolist, const RMPS &psi) {
+  return std::accumulate(
+      mpolist.begin(), mpolist.end(), psi,
+      [](const RMPS &state, const RMPO &mpo) { return apply(mpo, state); });
 }
 
 }  // namespace mps
