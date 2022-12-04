@@ -29,7 +29,7 @@ double simplify_obc(CMPS *ptrP, const CTensor &w, const vector<CMPS> &Q,
 
 double simplify_obc(CMPS *ptrP, const CMPS &Q, int *sense, index_t sweeps,
                     bool normalize, index_t Dmax, double tol, double *norm) {
-  return do_simplify(ptrP, CTensor::ones(1), vector<CMPS>(1, vQ), sense, sweeps,
+  return do_simplify(ptrP, CTensor::ones(1), vector<CMPS>(1, Q), sense, sweeps,
                      normalize, Dmax, tol, norm);
 }
 
