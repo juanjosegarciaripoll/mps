@@ -75,8 +75,8 @@ TEST(Space, ExtendMatrix) {
 
   auto sigma_z = RSparse(Pauli_z);
   auto id = RSparse::eye(2);
-  EXPECT_ALL_EQUAL(kron(sigma_z, id), s.extend_matrix(sigma_z, 0));
-  EXPECT_ALL_EQUAL(kron(id, sigma_z), s.extend_matrix(sigma_z, 1));
+  EXPECT_ALL_EQUAL(kron2(sigma_z, id), s.extend_matrix(sigma_z, 0));
+  EXPECT_ALL_EQUAL(kron2(id, sigma_z), s.extend_matrix(sigma_z, 1));
 }
 
 TEST(Space, ExtendMPO) {
@@ -136,6 +136,44 @@ TEST(Space, OneDimensionalDerivativeMPO) {
                                          {0.0, -1 / dx, 0.0, 1 / dx},
                                          {1 / dx, 0.0, -1 / dx, 0.0}};
   EXPECT_ALL_EQUAL(mpo_to_matrix(first_derivative_mpo(space, 0)),
+                   first_order_finite_differences);
+}
+
+TEST(Space, OneDimensionalPositionMatrix) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  Space space({{start, end, qubits}});
+
+  double dx = (end - start) / (1 << qubits);
+  EXPECT_ALL_EQUAL(
+      full(position_matrix(space)),
+      diag(RTensor({start, start + dx, start + 2 * dx, start + 3 * dx})));
+}
+
+TEST(Space, TwoDimensionalPositionMatrix) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  Space space({{start, end, qubits}, {2 * start, 2 * end, qubits}});
+
+  double dx = (end - start) / (1 << qubits);
+  auto X = diag(RTensor({start, start + dx, start + 2 * dx, start + 3 * dx}));
+  auto Id = RTensor::eye(4);
+
+  EXPECT_ALL_EQUAL(full(position_matrix(space, 0)), kron2(X, Id));
+  EXPECT_ALL_EQUAL(full(position_matrix(space, 1)), kron2(Id, 2.0 * X));
+}
+
+TEST(Space, OneDimensionalDerivativeMatrix) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  Space space({{start, end, qubits}});
+
+  double dx = (end - start) / (1 << qubits);
+  RTensor first_order_finite_differences{{0.0, 1 / dx, 0.0, -1 / dx},
+                                         {-1 / dx, 0.0, 1 / dx, 0.0},
+                                         {0.0, -1 / dx, 0.0, 1 / dx},
+                                         {1 / dx, 0.0, -1 / dx, 0.0}};
+  EXPECT_ALL_EQUAL(full(first_derivative_matrix(space, 0)),
                    first_order_finite_differences);
 }
 

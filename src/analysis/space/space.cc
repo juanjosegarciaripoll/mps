@@ -57,8 +57,8 @@ RSparse Space::extend_matrix(const RSparse &op, index_t axis) const {
       right_dimension *= d;
     }
   }
-  return kron(RSparse::eye(left_dimension),
-              kron(op, RSparse::eye(right_dimension)));
+  return kron2(RSparse::eye(left_dimension),
+               kron2(op, RSparse::eye(right_dimension)));
 }
 
 index_t Space::total_qubits() const {

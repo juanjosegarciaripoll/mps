@@ -1,6 +1,7 @@
 target_sources(mps
   PRIVATE
     analysis/space/space.cc
+    analysis/space/space_matrices.cc
     analysis/space/space_mpo.cc
     quantum/spin.cc
     quantum/fock.cc
