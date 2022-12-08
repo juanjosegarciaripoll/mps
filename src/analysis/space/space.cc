@@ -29,6 +29,13 @@ index_t Space::dimension_size(index_t axis) const {
   return domain_[axis].ssize();
 }
 
+Indices Space::tensor_dimensions() const {
+  Indices output(dimensions(), 0);
+  std::transform(domain_.begin(), domain_.end(), output.begin(),
+                 [](const interval_t &i) { return i.ssize(); });
+  return output;
+}
+
 index_t Space::first_qubit(index_t axis) const {
   assert_valid_axis(axis);
   return std::accumulate(

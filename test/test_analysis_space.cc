@@ -65,7 +65,20 @@ TEST(Space, TwoDimensions) {
   EXPECT_EQ(s.dimension_size(1), 8);
   EXPECT_ALL_EQUAL(s.dimension_qubits(1), Indices({2, 3, 4}));
 
+  EXPECT_ALL_EQUAL(s.tensor_dimensions(), Indices({4, 8}));
+
   ASSERT_ERROR_DETECTED(s.dimension_start(2));
+}
+
+TEST(Space, TensorDimensions) {
+  {
+    Space space({{0.0, 1.0, 2}});
+    EXPECT_ALL_EQUAL(space.tensor_dimensions(), Indices({4}));
+  }
+  {
+    Space space({{0.0, 1.0, 2}, {0.0, 1.0, 3}});
+    EXPECT_ALL_EQUAL(space.tensor_dimensions(), Indices({4, 8}));
+  }
 }
 
 TEST(Space, ExtendMatrix) {

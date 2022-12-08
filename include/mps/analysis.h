@@ -58,6 +58,9 @@ class Space {
     return domain_[axis];
   }
 
+  /** State dimensions when viewed as a tensor. */
+  Indices tensor_dimensions() const;
+
   /** Start of given dimension. */
   double dimension_start(index_t axis) const { return interval(axis).start; }
 
