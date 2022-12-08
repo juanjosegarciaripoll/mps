@@ -84,7 +84,22 @@ bool simeq(const mps::MPS<elt_t> &a, const mps::MPS<elt_t> &b,
 }
 
 template <typename t1, typename t2>
-testing::AssertionResult all_equal(const t1 &a, const t2 &b) {
+testing::AssertionResult test_all_equal(const t1 &a, const t2 &b) {
+  if (::tensor::all_equal(a, b))
+    return testing::AssertionSuccess() << "same elements and size";
+  else
+    return testing::AssertionFailure() << a << " is not " << b;
+}
+
+template <typename t1, typename t2>
+testing::AssertionResult test_all_equal(const Tensor<t1> &a,
+                                        const Tensor<t2> &b) {
+  if ((a.rank() != b.rank()) ||
+      !::tensor::all_equal(a.dimensions(), b.dimensions())) {
+    return testing::AssertionFailure()
+           << "tensors with different sizes:\na.dimensions()=" << a.dimensions()
+           << "\nb.dimensions()=" << b.dimensions() << '\n';
+  }
   if (::tensor::all_equal(a, b))
     return testing::AssertionSuccess() << "same elements and size";
   else
@@ -92,7 +107,8 @@ testing::AssertionResult all_equal(const t1 &a, const t2 &b) {
 }
 
 template <typename t>
-testing::AssertionResult all_equal(const mps::MPO<t> &a, const mps::MPO<t> &b) {
+testing::AssertionResult test_all_equal(const mps::MPO<t> &a,
+                                        const mps::MPO<t> &b) {
   if (a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(), b.end(),
                                          [](const t &ta, const t &tb) {
                                            return ::tensor::all_equal(ta, tb);
@@ -120,7 +136,7 @@ testing::AssertionResult simeq_assertion(const t1 &a, const t2 &b,
            << a << " is not ~ " << b << " within " << tolerance;
 }
 
-#define EXPECT_ALL_EQUAL(a, b) EXPECT_TRUE(::tensor_test::all_equal(a, b))
+#define EXPECT_ALL_EQUAL(a, b) EXPECT_TRUE(::tensor_test::test_all_equal(a, b))
 #define EXPECT_CEQ(a, b) EXPECT_TRUE(::tensor_test::simeq_assertion(a, b))
 #define EXPECT_CEQ3(a, b, c) \
   EXPECT_TRUE(::tensor_test::simeq_assertion(a, b, c))
