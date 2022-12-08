@@ -2,7 +2,9 @@ include(CMakeFindDependencyMacro)
 
 # This is a list of find_dependency() search statements created
 # during configuration
-@MPS_DEPENDENCIES@
+if(NOT tensor_FOUND)
+  find_dependency(tensor)
+endif()
 
 # Add the targets file
-include("${CMAKE_CURRENT_LIST_DIR}/tensorTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/mpsTargets.cmake")
