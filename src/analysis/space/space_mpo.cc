@@ -67,8 +67,8 @@ static RMPO interval_first_derivative_mpo(const Space::interval_t &interval) {
 }
 
 static RMPO interval_second_derivative_mpo(const Space::interval_t &interval) {
-  auto dx = interval.step();
-  return finite_difference_mpo(-2 / dx, 1 / dx, 1 / dx, interval.qubits);
+  auto dx2 = square(interval.step());
+  return finite_difference_mpo(-2 / dx2, 1 / dx2, 1 / dx2, interval.qubits);
 }
 
 RMPO first_derivative_mpo(const Space &space, index_t axis) {

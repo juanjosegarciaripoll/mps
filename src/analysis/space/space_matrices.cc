@@ -55,8 +55,8 @@ static RSparse interval_first_derivative_matrix(
 
 static RSparse interval_second_derivative_matrix(
     const Space::interval_t &interval) {
-  auto dx = interval.step();
-  return finite_difference_matrix(-2.0 / dx, 1.0 / dx, 1.0 / dx,
+  auto dx2 = square(interval.step());
+  return finite_difference_matrix(-2.0 / dx2, 1.0 / dx2, 1.0 / dx2,
                                   interval.qubits);
 }
 

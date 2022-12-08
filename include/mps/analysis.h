@@ -99,11 +99,17 @@ class Space {
 /** Finite difference derivative operator as sparse matrix. */
 RSparse first_derivative_matrix(const Space &space, index_t axis = 0);
 
+/** Finite difference second order derivative operator as sparse matrix. */
+RSparse second_derivative_matrix(const Space &space, index_t axis);
+
 /** Coordinate operator as sparse matrix. */
 RSparse position_matrix(const Space &space, index_t axis = 0);
 
 /** Finite difference derivative operator as MPO. */
 RMPO first_derivative_mpo(const Space &space, index_t axis = 0);
+
+/** Finite difference second order derivative operator as MPO. */
+RMPO second_derivative_mpo(const Space &space, index_t axis = 0);
 
 /** Coordinate operator as MPO. */
 RMPO position_mpo(const Space &space, index_t axis = 0);

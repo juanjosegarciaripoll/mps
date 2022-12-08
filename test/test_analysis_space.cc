@@ -139,6 +139,23 @@ TEST(Space, OneDimensionalDerivativeMPO) {
                    first_order_finite_differences);
 }
 
+TEST(Space, OneDimensionalSecondDerivativeMPO) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  Space space({{start, end, qubits}});
+
+  auto mpo = second_derivative_mpo(space, 0);
+  ASSERT_EQ(mpo.ssize(), space.total_qubits());
+
+  double dx2 = square((end - start) / (1 << qubits));
+  RTensor second_finite_differences{{-2 / dx2, 1 / dx2, 0.0, 1 / dx2},
+                                    {1 / dx2, -2 / dx2, 1 / dx2, 0.0},
+                                    {0.0, 1 / dx2, -2 / dx2, 1 / dx2},
+                                    {1 / dx2, 0.0, 1 / dx2, -2 / dx2}};
+  EXPECT_ALL_EQUAL(mpo_to_matrix(second_derivative_mpo(space, 0)),
+                   second_finite_differences);
+}
+
 TEST(Space, OneDimensionalPositionMatrix) {
   double start = 1.0, end = 2.0;
   index_t qubits = 2;
@@ -175,6 +192,20 @@ TEST(Space, OneDimensionalDerivativeMatrix) {
                                          {1 / dx, 0.0, -1 / dx, 0.0}};
   EXPECT_ALL_EQUAL(full(first_derivative_matrix(space, 0)),
                    first_order_finite_differences);
+}
+
+TEST(Space, OneDimensionalSecondDerivativeMatrix) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  Space space({{start, end, qubits}});
+
+  double dx2 = square((end - start) / (1 << qubits));
+  RTensor second_finite_differences{{-2 / dx2, 1 / dx2, 0.0, 1 / dx2},
+                                    {1 / dx2, -2 / dx2, 1 / dx2, 0.0},
+                                    {0.0, 1 / dx2, -2 / dx2, 1 / dx2},
+                                    {1 / dx2, 0.0, 1 / dx2, -2 / dx2}};
+  EXPECT_ALL_EQUAL(full(second_derivative_matrix(space, 0)),
+                   second_finite_differences);
 }
 
 }  // namespace tensor_test
