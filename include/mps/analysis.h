@@ -34,9 +34,17 @@ class Space {
   struct interval_t {
     double start{0}, end{1};
     index_t qubits{1};
+    bool periodic{true};
 
     index_t ssize() const { return 1 << qubits; }
-    double step() const { return (end - start) / static_cast<double>(ssize()); }
+
+    double step() const {
+      if (periodic) {
+        return (end - start) / static_cast<double>(ssize());
+      } else {
+        return (end - start) / static_cast<double>(ssize() - 1);
+      }
+    }
   };
 
   using domain_t = vector<interval_t>;
@@ -78,6 +86,9 @@ class Space {
 
   /** Total number of qubits to represent this space. */
   index_t total_qubits() const;
+
+  /** Total dimensionality of Hilbert space. */
+  index_t total_dimension() const;
 
   /** Dimensions of an MPS that represents a function in this space. */
   const Indices &mps_dimensions() const { return mps_dimensions_; }

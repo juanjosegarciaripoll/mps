@@ -24,8 +24,10 @@
 namespace mps {
 
 static RSparse interval_position_matrix(const Space::interval_t &interval) {
-  RTensor coordinates = linspace(interval.start, interval.end - interval.step(),
-                                 interval.ssize());
+  double last_coordinate =
+      interval.periodic ? interval.end - interval.step() : interval.end;
+  RTensor coordinates =
+      linspace(interval.start, last_coordinate, interval.ssize());
   return RSparse::diag(coordinates, 0);
 }
 
@@ -35,13 +37,19 @@ RSparse position_matrix(const Space &space, index_t axis) {
 }
 
 static RSparse finite_difference_matrix(double a, double b, double c,
-                                        index_t qubits) {
+                                        index_t qubits, bool periodic) {
   std::vector<SparseTriplet<double>> triplets;
   index_t L = 1 << qubits;
   triplets.reserve(static_cast<size_t>(L * 3));
   for (index_t i = 0; i < L; ++i) {
-    triplets.emplace_back(i, (i + 1) % L, c);
-    triplets.emplace_back(i, (i + L - 1) % L, b);
+    index_t next = (i + 1);
+    if (next < L || periodic) {
+      triplets.emplace_back(i, next % L, c);
+    }
+    next = (i - 1);
+    if (next >= 0 || periodic) {
+      triplets.emplace_back(i, (L + next) % L, b);
+    }
     triplets.emplace_back(i, i, a);
   }
   return RSparse(triplets, L, L);
@@ -50,14 +58,15 @@ static RSparse finite_difference_matrix(double a, double b, double c,
 static RSparse interval_first_derivative_matrix(
     const Space::interval_t &interval) {
   auto dx = interval.step();
-  return finite_difference_matrix(0, (-1.0) / dx, (+1.0) / dx, interval.qubits);
+  return finite_difference_matrix(0, (-1.0) / dx, (+1.0) / dx, interval.qubits,
+                                  interval.periodic);
 }
 
 static RSparse interval_second_derivative_matrix(
     const Space::interval_t &interval) {
   auto dx2 = square(interval.step());
   return finite_difference_matrix(-2.0 / dx2, 1.0 / dx2, 1.0 / dx2,
-                                  interval.qubits);
+                                  interval.qubits, interval.periodic);
 }
 
 RSparse first_derivative_matrix(const Space &space, index_t axis) {

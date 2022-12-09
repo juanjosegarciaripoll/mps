@@ -74,6 +74,8 @@ index_t Space::total_qubits() const {
       [](index_t x, const interval_t &i) { return x + i.qubits; });
 }
 
+index_t Space::total_dimension() const { return index_t(1) << total_qubits(); }
+
 RMPO Space::identity_mpo() const { return RMPO(make_mps_dimensions()); }
 
 RMPO Space::extend_mpo(const RMPO &op, index_t axis) const {
