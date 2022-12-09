@@ -38,11 +38,13 @@ class Space {
 
     index_t ssize() const { return 1 << qubits; }
 
+    double length() const { return end - start; }
+
     double step() const {
       if (periodic) {
-        return (end - start) / static_cast<double>(ssize());
+        return length() / static_cast<double>(ssize());
       } else {
-        return (end - start) / static_cast<double>(ssize() - 1);
+        return length() / static_cast<double>(ssize() - 1);
       }
     }
   };
@@ -127,6 +129,9 @@ RMPO second_derivative_mpo(const Space &space, index_t axis = 0);
 
 /** Coordinate operator as MPO. */
 RMPO position_mpo(const Space &space, index_t axis = 0);
+
+/** Sum of products \sum_{i,j} J[i,j]*x[i]*x[j] of coordinates. */
+RMPO position_product_mpo(const Space &space, const RTensor &J);
 
 }  // namespace mps
 

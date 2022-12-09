@@ -44,6 +44,45 @@ RMPO position_mpo(const Space &space, index_t axis) {
   return space.extend_mpo(interval_position_mpo(space.interval(axis)), axis);
 }
 
+RMPO position_product_mpo(const Space &space, const RTensor &J) {
+  RTensor s = diag(RTensor{0, 1});
+  std::vector<RTensor> output;
+  auto N = space.dimensions();
+
+  for (index_t axis = 0; axis < space.dimensions(); ++axis) {
+    auto &interval = space.interval(axis);
+
+    for (index_t m = 0; m < interval.qubits; ++m) {
+      index_t power = interval.qubits - m - 1;
+      RTensor t = s * (interval.length() / (2 << power));
+      if (power == 0) {
+        t += Pauli_id * interval.start;
+      }
+
+      RTensor P = RTensor::zeros(N + 2, 2, 2, N + 2);
+      P.at(range(0), _, _, range(0)) = Pauli_id;
+      P.at(range(1), _, _, range(1)) = Pauli_id;
+      P.at(range(0), _, _, range(axis + 2)) = t;
+
+      for (index_t other = 0; other < axis; ++other) {
+        double weight = (J(axis, other) + J(other, axis));
+        if (weight != 0.0) {
+          P.at(range(other + 2), _, _, range(1)) = weight * t;
+        }
+      }
+      double weight = J(axis, axis);
+      if (weight != 0.0) {
+        P.at(range(axis + 2), _, _, range(1)) = 2.0 * weight * t;
+        P.at(range(0), _, _, range(1)) = weight * t * t;
+      }
+      output.emplace_back(P);
+    }
+  }
+  output[0] = output[0](range(Indices{0}), _, _, _);
+  output.back() = output.back()(_, _, _, range(Indices{1}));
+  return RMPO(output);
+}
+
 static RMPO finite_difference_mpo(double a, double b, double c,
                                   index_t qubits) {
   RTensor A(RTensor::zeros({3, 2, 2, 3}));

@@ -108,10 +108,10 @@ TEST(Space, ExtendMPO) {
 TEST(Space, OneDimensionalPositionMPO) {
   double start = 1.0, end = 2.0;
   index_t qubits = 2;
-  Space s({{start, end, qubits}});
+  Space space({{start, end, qubits}});
 
-  auto mpo = position_mpo(s, 0);
-  ASSERT_EQ(mpo.ssize(), s.total_qubits());
+  auto mpo = position_mpo(space, 0);
+  ASSERT_EQ(mpo.ssize(), space.total_qubits());
 
   double dx = (end - start) / (1 << qubits);
   EXPECT_ALL_EQUAL(
@@ -219,6 +219,55 @@ TEST(Space, OneDimensionalSecondDerivativeMatrix) {
                                     {1 / dx2, 0.0, 1 / dx2, -2 / dx2}};
   EXPECT_ALL_EQUAL(full(second_derivative_matrix(space, 0)),
                    second_finite_differences);
+}
+
+TEST(Space, OneDimensionalPositionProductMPO) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  Space space({{start, end, qubits}});
+
+  auto mpo = position_product_mpo(space, RTensor::eye(1, 1));
+
+  ASSERT_EQ(mpo.ssize(), space.total_qubits());
+  EXPECT_ALL_EQUAL(mpo_to_matrix(mpo),
+                   position_matrix(space, 0) * position_matrix(space, 0));
+}
+
+TEST(Space, TwoDimensionalPositionProductMPO) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 1;
+  Space space({{start, end, qubits}, {2 * start, 2 * end, qubits}});
+  {
+    RTensor J{{1.0, 0.0}, {0.0, 0.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_EQUAL(mpo_to_matrix(mpo), 1.0 * position_matrix(space, 0) *
+                                             position_matrix(space, 0));
+  }
+  {
+    RTensor J{{0.0, 0.0}, {0.0, 3.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_EQUAL(mpo_to_matrix(mpo), 3.0 * position_matrix(space, 1) *
+                                             position_matrix(space, 1));
+  }
+  {
+    RTensor J{{0.0, -1.0}, {-1.5, 0.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_EQUAL(mpo_to_matrix(mpo), -2.5 * position_matrix(space, 0) *
+                                             position_matrix(space, 1));
+  }
+  {
+    RTensor J{{1.0, -1.0}, {-1.5, 3.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_EQUAL(
+        mpo_to_matrix(mpo),
+        1.0 * square(position_matrix(space, 0)) +
+            3.0 * square(position_matrix(space, 1)) -
+            2.5 * position_matrix(space, 0) * position_matrix(space, 1));
+  }
 }
 
 }  // namespace tensor_test
