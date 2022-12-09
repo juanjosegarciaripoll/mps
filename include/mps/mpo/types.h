@@ -52,6 +52,12 @@ class MPO : public MP<Tensor> {
 
   MPO(const std::initializer_list<Tensor> &l) : parent_t(tensor_array_t(l)) {}
 
+  friend MPO operator*(typename MPO::number_t value, const MPO &other) {
+	MPO output = other;
+	output.at(0) *= value;
+	return output;
+  }
+
  private:
   static tensor_array_t empty_mpo_tensors(
       const tensor::Indices &physical_dimensions) {
