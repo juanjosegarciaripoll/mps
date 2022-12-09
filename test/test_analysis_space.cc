@@ -296,19 +296,19 @@ TEST(Space, OneDimensionalSecondDerivativeMatrix) {
                    second_finite_differences);
 }
 
-TEST(Space, OneDimensionalPositionProductMPO) {
-  double start = 1.0, end = 2.0;
+TEST(Space, OneDimensionalPositionProductMPOPeriodic) {
+  double start = -5.0, end = 5.0;
   index_t qubits = 2;
   Space space({{start, end, qubits}});
 
+  double dx = (end - start) / 4;
+  RTensor x = {start, start + dx, start + 2 * dx, start + 3 * dx};
   auto mpo = position_product_mpo(space, RTensor::eye(1, 1));
-
   ASSERT_EQ(mpo.ssize(), space.total_qubits());
-  EXPECT_ALL_EQUAL(mpo_to_matrix(mpo),
-                   position_matrix(space, 0) * position_matrix(space, 0));
+  EXPECT_ALL_NEAR(mpo_to_matrix(mpo), diag(square(x), 0), EPSILON);
 }
 
-TEST(Space, TwoDimensionalPositionProductMPO) {
+TEST(Space, TwoDimensionalPositionProductMPOPeriodic) {
   double start = 1.0, end = 2.0;
   index_t qubits = 1;
   Space space({{start, end, qubits}, {2 * start, 2 * end, qubits}});
@@ -316,32 +316,146 @@ TEST(Space, TwoDimensionalPositionProductMPO) {
     RTensor J{{1.0, 0.0}, {0.0, 0.0}};
     auto mpo = position_product_mpo(space, J);
     ASSERT_EQ(mpo.ssize(), space.total_qubits());
-    EXPECT_ALL_EQUAL(mpo_to_matrix(mpo), 1.0 * position_matrix(space, 0) *
-                                             position_matrix(space, 0));
+    EXPECT_ALL_NEAR(mpo_to_matrix(mpo),
+                    full(1.0 * square(position_matrix(space, 0))), EPSILON);
   }
   {
     RTensor J{{0.0, 0.0}, {0.0, 3.0}};
     auto mpo = position_product_mpo(space, J);
     ASSERT_EQ(mpo.ssize(), space.total_qubits());
-    EXPECT_ALL_EQUAL(mpo_to_matrix(mpo), 3.0 * position_matrix(space, 1) *
-                                             position_matrix(space, 1));
+    EXPECT_ALL_NEAR(mpo_to_matrix(mpo),
+                    full(3.0 * square(position_matrix(space, 1))), EPSILON);
   }
   {
     RTensor J{{0.0, -1.0}, {-1.5, 0.0}};
     auto mpo = position_product_mpo(space, J);
     ASSERT_EQ(mpo.ssize(), space.total_qubits());
-    EXPECT_ALL_EQUAL(mpo_to_matrix(mpo), -2.5 * position_matrix(space, 0) *
-                                             position_matrix(space, 1));
+    EXPECT_ALL_NEAR(
+        mpo_to_matrix(mpo),
+        full(-2.5 * position_matrix(space, 1) * position_matrix(space, 0)),
+        EPSILON);
   }
   {
     RTensor J{{1.0, -1.0}, {-1.5, 3.0}};
     auto mpo = position_product_mpo(space, J);
     ASSERT_EQ(mpo.ssize(), space.total_qubits());
-    EXPECT_ALL_EQUAL(
+    EXPECT_ALL_NEAR(
         mpo_to_matrix(mpo),
-        1.0 * square(position_matrix(space, 0)) +
-            3.0 * square(position_matrix(space, 1)) -
-            2.5 * position_matrix(space, 0) * position_matrix(space, 1));
+        full(1.0 * square(position_matrix(space, 0)) +
+             3.0 * square(position_matrix(space, 1)) -
+             2.5 * position_matrix(space, 0) * position_matrix(space, 1)),
+        EPSILON);
+  }
+}
+
+TEST(Space, OneDimensionalPositionProductMPOOpenBoundary) {
+  double start = -5.0, end = 5.0;
+  index_t qubits = 2;
+  bool not_periodic = false;
+  Space space({{start, end, qubits, not_periodic}});
+
+  double dx = (end - start) / 3;
+  RTensor x = {start, start + dx, start + 2 * dx, end};
+  auto mpo = position_product_mpo(space, RTensor::eye(1, 1));
+  ASSERT_EQ(mpo.ssize(), space.total_qubits());
+  EXPECT_ALL_NEAR(mpo_to_matrix(mpo), diag(square(x), 0), EPSILON);
+}
+
+TEST(Space, TwoDimensionalPositionProductMPOOpenBoundary) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  bool not_periodic = false;
+  Space space({{start, end, qubits, not_periodic},
+               {2 * start, 2 * end, qubits, not_periodic}});
+  {
+    RTensor J{{1.0, 0.0}, {0.0, 0.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_NEAR(mpo_to_matrix(mpo),
+                    full(1.0 * square(position_matrix(space, 0))), EPSILON);
+  }
+  {
+    RTensor J{{0.0, 0.0}, {0.0, 3.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_NEAR(mpo_to_matrix(mpo),
+                    full(3.0 * square(position_matrix(space, 1))), EPSILON);
+  }
+  {
+    RTensor J{{0.0, -1.0}, {-1.5, 0.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_NEAR(
+        mpo_to_matrix(mpo),
+        full(-2.5 * position_matrix(space, 0) * position_matrix(space, 1)),
+        EPSILON);
+  }
+  {
+    RTensor J{{1.0, -1.0}, {-1.5, 3.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_NEAR(
+        mpo_to_matrix(mpo),
+        full(1.0 * square(position_matrix(space, 0)) +
+             3.0 * square(position_matrix(space, 1)) -
+             2.5 * position_matrix(space, 0) * position_matrix(space, 1)),
+        EPSILON);
+  }
+}
+
+TEST(Space, OneDimensionalPositionProductMPOOpenBoundary3qubits) {
+  double start = 0.0, end = 7.0;
+  index_t qubits = 3;
+  bool not_periodic = false;
+  Space space({{start, end, qubits, not_periodic}});
+
+  double dx = (end - start) / 7;
+  RTensor x = {start,          start + dx,     start + 2 * dx, start + 3 * dx,
+               start + 4 * dx, start + 5 * dx, start + 6 * dx, end};
+  auto mpo = position_product_mpo(space, RTensor::eye(1, 1));
+  ASSERT_EQ(mpo.ssize(), space.total_qubits());
+  EXPECT_ALL_NEAR(mpo_to_matrix(mpo), diag(square(x), 0), EPSILON);
+}
+
+TEST(Space, TwoDimensionalPositionProductMPOOpenBoundary3Qubits) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 3;
+  bool not_periodic = false;
+  Space space({{start, end, qubits, not_periodic},
+               {2 * start, 2 * end, qubits, not_periodic}});
+  {
+    RTensor J{{1.0, 0.0}, {0.0, 0.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_NEAR(mpo_to_matrix(mpo),
+                    full(1.0 * square(position_matrix(space, 0))), EPSILON);
+  }
+  {
+    RTensor J{{0.0, 0.0}, {0.0, 3.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_NEAR(mpo_to_matrix(mpo),
+                    full(3.0 * square(position_matrix(space, 1))), EPSILON);
+  }
+  {
+    RTensor J{{0.0, -1.0}, {-1.5, 0.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_NEAR(
+        mpo_to_matrix(mpo),
+        full(-2.5 * position_matrix(space, 0) * position_matrix(space, 1)),
+        EPSILON);
+  }
+  {
+    RTensor J{{1.0, -1.0}, {-1.5, 3.0}};
+    auto mpo = position_product_mpo(space, J);
+    ASSERT_EQ(mpo.ssize(), space.total_qubits());
+    EXPECT_ALL_NEAR(
+        mpo_to_matrix(mpo),
+        full(1.0 * square(position_matrix(space, 0)) +
+             3.0 * square(position_matrix(space, 1)) -
+             2.5 * position_matrix(space, 0) * position_matrix(space, 1)),
+        EPSILON);
   }
 }
 

@@ -52,11 +52,10 @@ RMPO position_product_mpo(const Space &space, const RTensor &J) {
 
   for (index_t axis = 0; axis < space.dimensions(); ++axis) {
     auto &interval = space.interval(axis);
-
-    for (index_t m = 0; m < interval.qubits; ++m) {
-      index_t power = interval.qubits - m - 1;
-      RTensor t = s * (interval.length() / (2 << power));
-      if (power == 0) {
+    auto dx = interval.step();
+    for (index_t m = 0; m < interval.qubits; ++m, dx *= 2) {
+      RTensor t = s * dx;
+      if (m == interval.qubits - 1) {
         t += Pauli_id * interval.start;
       }
 
@@ -64,7 +63,9 @@ RMPO position_product_mpo(const Space &space, const RTensor &J) {
       P.at(range(0), _, _, range(0)) = Pauli_id;
       P.at(range(1), _, _, range(1)) = Pauli_id;
       P.at(range(0), _, _, range(axis + 2)) = t;
-
+      for (index_t other = 0; other <= axis; ++other) {
+        P.at(range(other + 2), _, _, range(other + 2)) = Pauli_id;
+      }
       for (index_t other = 0; other < axis; ++other) {
         double weight = (J(axis, other) + J(other, axis));
         if (weight != 0.0) {
@@ -74,7 +75,7 @@ RMPO position_product_mpo(const Space &space, const RTensor &J) {
       double weight = J(axis, axis);
       if (weight != 0.0) {
         P.at(range(axis + 2), _, _, range(1)) = 2.0 * weight * t;
-        P.at(range(0), _, _, range(1)) = weight * t * t;
+        P.at(range(0), _, _, range(1)) = weight * mmult(t, t);
       }
       output.emplace_back(P);
     }
