@@ -121,6 +121,9 @@ RSparse second_derivative_matrix(const Space &space, index_t axis);
 /** Coordinate operator as sparse matrix. */
 RSparse position_matrix(const Space &space, index_t axis = 0);
 
+/** Sum of products \sum_{i,j} J[i,j]*x[i]*x[j] of coordinates. */
+RSparse position_product_matrix(const Space &space, const RTensor &J);
+
 /** Finite difference derivative operator as MPO. */
 RMPO first_derivative_mpo(const Space &space, index_t axis = 0);
 

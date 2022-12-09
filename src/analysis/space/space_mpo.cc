@@ -48,6 +48,7 @@ RMPO position_product_mpo(const Space &space, const RTensor &J) {
   RTensor s = diag(RTensor{0, 1});
   std::vector<RTensor> output;
   auto N = space.dimensions();
+  tensor_assert(J.rank() == 2 && N == J.rows() && N == J.columns());
 
   for (index_t axis = 0; axis < space.dimensions(); ++axis) {
     auto &interval = space.interval(axis);

@@ -270,4 +270,45 @@ TEST(Space, TwoDimensionalPositionProductMPO) {
   }
 }
 
+TEST(Space, OneDimensionalPositionProductMatrix) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  Space space({{start, end, qubits}});
+
+  EXPECT_ALL_EQUAL(full(position_product_matrix(space, RTensor::eye(1, 1))),
+                   position_matrix(space, 0) * position_matrix(space, 0));
+}
+
+TEST(Space, TwoDimensionalPositionProductMatrix) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 1;
+  Space space({{start, end, qubits}, {2 * start, 2 * end, qubits}});
+  {
+    RTensor J{{1.0, 0.0}, {0.0, 0.0}};
+    EXPECT_ALL_EQUAL(
+        full(position_product_matrix(space, J)),
+        1.0 * position_matrix(space, 0) * position_matrix(space, 0));
+  }
+  {
+    RTensor J{{0.0, 0.0}, {0.0, 3.0}};
+    EXPECT_ALL_EQUAL(
+        full(position_product_matrix(space, J)),
+        3.0 * position_matrix(space, 1) * position_matrix(space, 1));
+  }
+  {
+    RTensor J{{0.0, -1.0}, {-1.5, 0.0}};
+    EXPECT_ALL_EQUAL(
+        full(position_product_matrix(space, J)),
+        -2.5 * position_matrix(space, 0) * position_matrix(space, 1));
+  }
+  {
+    RTensor J{{1.0, -1.0}, {-1.5, 3.0}};
+    EXPECT_ALL_EQUAL(
+        full(position_product_matrix(space, J)),
+        1.0 * square(position_matrix(space, 0)) +
+            3.0 * square(position_matrix(space, 1)) -
+            2.5 * position_matrix(space, 0) * position_matrix(space, 1));
+  }
+}
+
 }  // namespace tensor_test

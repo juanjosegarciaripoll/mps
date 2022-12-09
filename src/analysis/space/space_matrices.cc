@@ -36,6 +36,23 @@ RSparse position_matrix(const Space &space, index_t axis) {
                              axis);
 }
 
+RSparse position_product_matrix(const Space &space, const RTensor &J) {
+  auto N = space.dimensions();
+  tensor_assert(J.rank() == 2 && N == J.rows() && N == J.columns());
+  RSparse output(space.total_dimension(), space.total_dimension(), 0);
+  for (index_t axis = 0; axis < N; ++axis) {
+    for (index_t other = 0; other <= axis; ++other) {
+      double weight =
+          (other != axis) ? (J(other, axis) + J(axis, other)) : J(axis, axis);
+      if (weight != 0) {
+        output = output + weight * position_matrix(space, axis) *
+                              position_matrix(space, other);
+      }
+    }
+  }
+  return output;
+}
+
 static RSparse finite_difference_matrix(double a, double b, double c,
                                         index_t qubits, bool periodic) {
   std::vector<SparseTriplet<double>> triplets;
