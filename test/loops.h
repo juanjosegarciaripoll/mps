@@ -141,6 +141,10 @@ testing::AssertionResult simeq_assertion(const t1 &a, const t2 &b,
 #define EXPECT_CEQ3(a, b, c) \
   EXPECT_TRUE(::tensor_test::simeq_assertion(a, b, c))
 #define ASSERT_CEQ(a, b) ASSERT_TRUE(::tensor_test::simeq_assertion(a, b))
+#define EXPECT_ALL_NEAR(a, b, c) \
+  EXPECT_TRUE(::tensor_test::simeq_assertion(a, b, c))
+#define ASSERT_ALL_NEAR(a, b, c) \
+  ASSERT_TRUE(::tensor_test::simeq_assertion(a, b, c))
 
 /*
    * Approximately equal tensors.
