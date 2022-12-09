@@ -27,47 +27,86 @@ namespace tensor_test {
 using namespace mps;
 using namespace tensor;
 
-TEST(Space, OneDimension) {
+TEST(Space, OneDimensionPeriodic) {
   double start = 0.0, end = 1.0;
   index_t qubits = 2;
-  Space s({{start, end, qubits}});
+  Space space({{start, end, qubits}});
 
-  EXPECT_EQ(s.dimensions(), 1);
-  EXPECT_EQ(s.total_qubits(), 2);
+  EXPECT_EQ(space.dimensions(), 1);
+  EXPECT_EQ(space.total_qubits(), 2);
 
-  EXPECT_EQ(s.dimension_size(0), 4);
-  EXPECT_EQ(s.dimension_start(0), start);
-  EXPECT_EQ(s.dimension_end(0), end);
+  EXPECT_EQ(space.dimension_size(0), 4);
+  EXPECT_EQ(space.dimension_start(0), start);
+  EXPECT_EQ(space.dimension_end(0), end);
 
-  EXPECT_ALL_EQUAL(s.dimension_qubits(0), Indices({0, 1}));
+  EXPECT_ALL_EQUAL(space.dimension_qubits(0), Indices({0, 1}));
 
-  ASSERT_ERROR_DETECTED(s.dimension_start(-1));
-  ASSERT_ERROR_DETECTED(s.dimension_start(2));
+  ASSERT_ERROR_DETECTED(space.dimension_start(-1));
+  ASSERT_ERROR_DETECTED(space.dimension_start(2));
 }
 
-TEST(Space, TwoDimensions) {
+TEST(Space, TwoDimensionsPeriodic) {
   double start1 = 0.0, end1 = 1.0;
   index_t qubits1 = 2;
   double start2 = 0.0, end2 = 1.0;
   index_t qubits2 = 3;
-  Space s({{start1, end1, qubits1}, {start2, end2, qubits2}});
+  Space space({{start1, end1, qubits1}, {start2, end2, qubits2}});
 
-  EXPECT_EQ(s.dimensions(), 2);
-  EXPECT_EQ(s.total_qubits(), qubits1 + qubits2);
+  EXPECT_EQ(space.dimensions(), 2);
+  EXPECT_EQ(space.total_qubits(), qubits1 + qubits2);
 
-  EXPECT_EQ(s.dimension_start(0), start1);
-  EXPECT_EQ(s.dimension_end(0), end1);
-  EXPECT_EQ(s.dimension_size(0), 4);
-  EXPECT_ALL_EQUAL(s.dimension_qubits(0), Indices({0, 1}));
+  EXPECT_EQ(space.dimension_start(0), start1);
+  EXPECT_EQ(space.dimension_end(0), end1);
+  EXPECT_EQ(space.dimension_size(0), 4);
+  EXPECT_ALL_EQUAL(space.dimension_qubits(0), Indices({0, 1}));
 
-  EXPECT_EQ(s.dimension_start(1), start2);
-  EXPECT_EQ(s.dimension_end(1), end2);
-  EXPECT_EQ(s.dimension_size(1), 8);
-  EXPECT_ALL_EQUAL(s.dimension_qubits(1), Indices({2, 3, 4}));
+  EXPECT_EQ(space.dimension_start(1), start2);
+  EXPECT_EQ(space.dimension_end(1), end2);
+  EXPECT_EQ(space.dimension_size(1), 8);
+  EXPECT_ALL_EQUAL(space.dimension_qubits(1), Indices({2, 3, 4}));
 
-  EXPECT_ALL_EQUAL(s.tensor_dimensions(), Indices({4, 8}));
+  EXPECT_ALL_EQUAL(space.tensor_dimensions(), Indices({4, 8}));
 
-  ASSERT_ERROR_DETECTED(s.dimension_start(2));
+  ASSERT_ERROR_DETECTED(space.dimension_start(2));
+}
+
+TEST(Space, OneDimensionOpenBoundary) {
+  double start = 0.0, end = 1.0;
+  index_t qubits = 2;
+  bool not_periodic = false;
+  Space space({{start, end, qubits, not_periodic}});
+
+  EXPECT_EQ(space.dimensions(), 1);
+  EXPECT_EQ(space.total_qubits(), 2);
+
+  EXPECT_EQ(space.dimension_size(0), 4);
+  EXPECT_EQ(space.dimension_start(0), start);
+  EXPECT_EQ(space.dimension_end(0), end);
+
+  EXPECT_EQ(space.interval(0).step(), (end - start) / (4 - 1));
+}
+
+TEST(Space, TwoDimensionsOpenBoundary) {
+  double start1 = 0.0, end1 = 1.0;
+  index_t qubits1 = 2;
+  double start2 = 0.0, end2 = 1.0;
+  index_t qubits2 = 3;
+  bool not_periodic = false;
+  Space space({{start1, end1, qubits1, not_periodic},
+               {start2, end2, qubits2, not_periodic}});
+
+  EXPECT_EQ(space.dimensions(), 2);
+  EXPECT_EQ(space.total_qubits(), qubits1 + qubits2);
+
+  EXPECT_EQ(space.dimension_start(0), start1);
+  EXPECT_EQ(space.dimension_end(0), end1);
+  EXPECT_EQ(space.dimension_size(0), 4);
+  EXPECT_EQ(space.interval(0).step(), (end1 - start1) / (4 - 1));
+
+  EXPECT_EQ(space.dimension_start(1), start2);
+  EXPECT_EQ(space.dimension_end(1), end2);
+  EXPECT_EQ(space.dimension_size(1), 8);
+  EXPECT_EQ(space.interval(1).step(), (end2 - start2) / (8 - 1));
 }
 
 TEST(Space, TensorDimensions) {
@@ -135,7 +174,7 @@ TEST(Space, TwoDimensionalPositionMPO) {
   EXPECT_ALL_EQUAL(mpo_to_matrix(position_mpo(space, 1)), kron2(Id, 2.0 * X));
 }
 
-TEST(Space, OneDimensionalDerivativeMPO) {
+TEST(Space, OneDimensionalDerivativeMPOPeriodic) {
   double start = 1.0, end = 2.0;
   index_t qubits = 2;
   Space space({{start, end, qubits}});
@@ -152,7 +191,7 @@ TEST(Space, OneDimensionalDerivativeMPO) {
                    first_order_finite_differences);
 }
 
-TEST(Space, OneDimensionalSecondDerivativeMPO) {
+TEST(Space, OneDimensionalSecondDerivativeMPOPeriodic) {
   double start = 1.0, end = 2.0;
   index_t qubits = 2;
   Space space({{start, end, qubits}});
@@ -165,6 +204,42 @@ TEST(Space, OneDimensionalSecondDerivativeMPO) {
                                     {1 / dx2, -2 / dx2, 1 / dx2, 0.0},
                                     {0.0, 1 / dx2, -2 / dx2, 1 / dx2},
                                     {1 / dx2, 0.0, 1 / dx2, -2 / dx2}};
+  EXPECT_ALL_EQUAL(mpo_to_matrix(second_derivative_mpo(space, 0)),
+                   second_finite_differences);
+}
+
+TEST(Space, OneDimensionalDerivativeMPOOpenBoundary) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  bool not_periodic = false;
+  Space space({{start, end, qubits, not_periodic}});
+
+  auto mpo = first_derivative_mpo(space, 0);
+  ASSERT_EQ(mpo.ssize(), space.total_qubits());
+
+  double dx = space.interval(0).step();
+  RTensor first_order_finite_differences{{0.0, 1 / dx, 0.0, 0.0},
+                                         {-1 / dx, 0.0, 1 / dx, 0.0},
+                                         {0.0, -1 / dx, 0.0, 1 / dx},
+                                         {0.0, 0.0, -1 / dx, 0.0}};
+  EXPECT_ALL_EQUAL(mpo_to_matrix(first_derivative_mpo(space, 0)),
+                   first_order_finite_differences);
+}
+
+TEST(Space, OneDimensionalSecondDerivativeMPOOpenBoundary) {
+  double start = 1.0, end = 2.0;
+  index_t qubits = 2;
+  bool not_periodic = false;
+  Space space({{start, end, qubits, not_periodic}});
+
+  auto mpo = second_derivative_mpo(space, 0);
+  ASSERT_EQ(mpo.ssize(), space.total_qubits());
+
+  double dx2 = square(space.interval(0).step());
+  RTensor second_finite_differences{{-2 / dx2, 1 / dx2, 0.0, 0.0},
+                                    {1 / dx2, -2 / dx2, 1 / dx2, 0.0},
+                                    {0.0, 1 / dx2, -2 / dx2, 1 / dx2},
+                                    {0.0, 0.0, 1 / dx2, -2 / dx2}};
   EXPECT_ALL_EQUAL(mpo_to_matrix(second_derivative_mpo(space, 0)),
                    second_finite_differences);
 }

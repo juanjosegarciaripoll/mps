@@ -84,8 +84,8 @@ RMPO position_product_mpo(const Space &space, const RTensor &J) {
   return RMPO(output);
 }
 
-static RMPO finite_difference_mpo(double a, double b, double c,
-                                  index_t qubits) {
+static RMPO finite_difference_mpo(double a, double b, double c, index_t qubits,
+                                  bool periodic) {
   RTensor A(RTensor::zeros({3, 2, 2, 3}));
   A.at(0, 0, 0, 0) = 1.0;  // Identity
   A.at(0, 1, 1, 0) = 1.0;
@@ -96,19 +96,22 @@ static RMPO finite_difference_mpo(double a, double b, double c,
 
   vector<RTensor> tensors(qubits, A);
   tensors.at(0) = reshape(fold(RTensor{a, b, c}, -1, A, 0), 1, 2, 2, 3);
-  tensors.at(qubits - 1) = reshape(sum(A, -1), 3, 2, 2, 1);
+  tensors.at(qubits - 1) = periodic ? reshape(sum(A, -1), 3, 2, 2, 1)
+                                    : A(_, _, _, range(Indices{0}));
 
   return RMPO(tensors);
 }
 
 static RMPO interval_first_derivative_mpo(const Space::interval_t &interval) {
   auto dx = interval.step();
-  return finite_difference_mpo(0, (-1) / dx, (+1) / dx, interval.qubits);
+  return finite_difference_mpo(0, (-1) / dx, (+1) / dx, interval.qubits,
+                               interval.periodic);
 }
 
 static RMPO interval_second_derivative_mpo(const Space::interval_t &interval) {
   auto dx2 = square(interval.step());
-  return finite_difference_mpo(-2 / dx2, 1 / dx2, 1 / dx2, interval.qubits);
+  return finite_difference_mpo(-2 / dx2, 1 / dx2, 1 / dx2, interval.qubits,
+                               interval.periodic);
 }
 
 RMPO first_derivative_mpo(const Space &space, index_t axis) {
