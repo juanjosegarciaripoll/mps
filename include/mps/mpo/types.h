@@ -34,7 +34,7 @@ class MPO : public MP<Tensor> {
  public:
   using parent_t = MP<Tensor>;
   using tensor_array_t = typename parent_t::tensor_array_t;
-  using MPS = MPS<Tensor>;
+  using MPS = ::mps::MPS<Tensor>;
 
   MPO() = default;
   MPO(const MPO &) = default;
