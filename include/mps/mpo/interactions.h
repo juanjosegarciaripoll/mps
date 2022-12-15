@@ -172,8 +172,8 @@ MPO<Tensor> local_Hamiltonian_mpo(const vector<Tensor> &Hloc) {
     aux.at(range(1), _, _, range(1)) = id;
     aux.at(range(0), _, _, range(0)) = id;
 
-    if (i == 0) aux = aux(range(0), _, _, _);
-    if (i == last) aux = aux(_, _, _, range(1));
+    if (i == 0) aux = aux(Indices{0}, _, _, _);
+    if (i == last) aux = aux(_, _, _, Indices{1});
     output.at(i) = aux;
     ++i;
   }
