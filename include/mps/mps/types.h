@@ -66,6 +66,8 @@ using namespace tensor;
 /**Generic basi for matrix product state.*/
 template <typename Tensor>
 class MPS : public MP<Tensor> {
+  using parent_t = MP<Tensor>;
+
  public:
   MPS() = default;
   MPS(const MPS &) = default;
@@ -74,14 +76,14 @@ class MPS : public MP<Tensor> {
   MPS &operator=(MPS &&) = default;
 
   template <typename otherT>
-  explicit MPS(const MPS<otherT> &mps) : parent(mps.size()) {
+  explicit MPS(const MPS<otherT> &mps) : parent_t(mps.size()) {
     std::transform(std::begin(mps), std::end(mps), this->begin(),
                    [](const otherT &t) { return Tensor(t); });
   }
 
   MPS(index_t size, index_t physical_dimension = 0, index_t bond_dimension = 1,
       bool periodic = false)
-      : parent(size) {
+      : parent_t(size) {
     if (physical_dimension) {
       auto d = tensor::Indices::empty(size);
       std::fill(d.begin(), d.end(), physical_dimension);
@@ -91,11 +93,11 @@ class MPS : public MP<Tensor> {
 
   MPS(const tensor::Indices &physical_dimensions, index_t bond_dimension = 1,
       bool periodic = false)
-      : parent(physical_dimensions.ssize()) {
+      : parent_t(physical_dimensions.ssize()) {
     presize(physical_dimensions, bond_dimension, periodic);
   }
 
-  explicit MPS(const vector<Tensor> &data) : parent(data){};
+  explicit MPS(const vector<Tensor> &data) : parent_t(data){};
 
   /**Return the physical dimensions of the state. */
   Indices dimensions() const {
@@ -163,9 +165,25 @@ class MPS : public MP<Tensor> {
     }
   }
 
- private:
-  typedef MP<Tensor> parent;
+  static MPS<Tensor> from_vector(Tensor state, const Indices &dimensions) {
+    vector<Tensor> data;
+    data.reserve(dimensions.ssize());
+    state = reshape(state, 1, state.ssize());
+    for (auto d : dimensions) {
+      if (d == state.dimension(1)) {
+        data.push_back(
+            reshape(state, state.dimension(0), state.dimension(1), 1));
+      } else {
+        state = reshape(state, state.dimension(0), d, state.dimension(1) / d);
+        Tensor P;
+        state = split(&P, state, +1, true /* truncate */);
+        data.push_back(P);
+      }
+    }
+    return MPS<Tensor>(data);
+  }
 
+ private:
   inline void presize(const tensor::Indices &physical_dimensions,
                       index_t bond_dimension, bool periodic) {
     tensor_assert(bond_dimension > 0);

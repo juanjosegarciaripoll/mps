@@ -56,10 +56,12 @@ const RMPS ghz_state(index_t length, bool periodic = false);
 const RMPS cluster_state(index_t length);
 
 /** Apply a local operator on the given site. */
-const RMPS apply_local_operator(const RMPS &psi, const RTensor &op, index_t site);
+const RMPS apply_local_operator(const RMPS &psi, const RTensor &op,
+                                index_t site);
 
 /** Apply a local operator on the given site. */
-const CMPS apply_local_operator(const CMPS &psi, const CTensor &op, index_t site);
+const CMPS apply_local_operator(const CMPS &psi, const CTensor &op,
+                                index_t site);
 
 /**Convert an MPS to a complex vector, contracting all tensors.*/
 template <typename Tensor>

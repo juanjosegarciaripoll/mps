@@ -420,6 +420,38 @@ void test_mps_to_vector() {
   }
 }
 
+template <class MPS>
+void test_mps_from_vector() {
+  using tensor_t = typename MPS::tensor_t;
+  {
+    tensor_t psi = tensor_t::random(2);
+    MPS mps = MPS::from_vector(psi, Indices{2});
+    EXPECT_EQ(mps.ssize(), 1);
+    EXPECT_ALL_NEAR(mps[0], reshape(psi, 1, 2, 1), EPSILON);
+  }
+  {
+    tensor_t psi = tensor_t::random(2 * 3);
+    MPS mps = MPS::from_vector(psi, Indices{2, 3});
+    EXPECT_EQ(mps.ssize(), 2);
+    EXPECT_ALL_NEAR(mps.to_vector(), psi, EPSILON);
+    EXPECT_EQ(mps[0].dimension(0), 1);
+    EXPECT_EQ(mps[0].dimension(1), 2);
+    EXPECT_EQ(mps[1].dimension(1), 3);
+    EXPECT_EQ(mps[1].dimension(2), 1);
+  }
+  {
+    tensor_t psi = tensor_t::random(2 * 3 * 4);
+    MPS mps = MPS::from_vector(psi, Indices{2, 3, 4});
+    EXPECT_EQ(mps.ssize(), 3);
+    EXPECT_ALL_NEAR(mps.to_vector(), psi, EPSILON);
+    EXPECT_EQ(mps[0].dimension(0), 1);
+    EXPECT_EQ(mps[0].dimension(1), 2);
+    EXPECT_EQ(mps[1].dimension(1), 3);
+    EXPECT_EQ(mps[2].dimension(1), 4);
+    EXPECT_EQ(mps[2].dimension(2), 1);
+  }
+}
+
 //////////////////////////////////////////////////////////////////////
 // REAL SPECIALIZATIONS
 //
@@ -456,6 +488,8 @@ TEST(RMPS, AccesOperators) {
 }
 
 TEST(RMPS, ToVector) { test_mps_to_vector<RMPS>(); }
+
+TEST(RMPS, FromVector) { test_mps_from_vector<RMPS>(); }
 
 //////////////////////////////////////////////////////////////////////
 // COMPLEX SPECIALIZATIONS
@@ -505,5 +539,7 @@ TEST(CMPS, AccesOperators) {
 }
 
 TEST(CMPS, ToVector) { test_mps_to_vector<CMPS>(); }
+
+TEST(CMPS, FromVector) { test_mps_from_vector<CMPS>(); }
 
 }  // namespace tensor_test
