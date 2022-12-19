@@ -36,7 +36,7 @@ class Space {
     index_t qubits{1};
     bool periodic{true};
 
-    index_t ssize() const { return 1 << qubits; }
+    index_t ssize() const { return index_t(1) << qubits; }
 
     double length() const { return end - start; }
 
@@ -46,6 +46,10 @@ class Space {
       } else {
         return length() / static_cast<double>(ssize() - 1);
       }
+    }
+
+    RTensor coordinates() const {
+      return start + step() * linspace(0, ssize() - 1, ssize());
     }
   };
 
