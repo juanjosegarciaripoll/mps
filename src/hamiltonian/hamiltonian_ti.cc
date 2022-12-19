@@ -63,18 +63,30 @@ bool TIHamiltonian::is_constant() const { return 1; }
 
 bool TIHamiltonian::is_periodic() const { return periodic_; }
 
-const CTensor TIHamiltonian::interaction(index_t /*k*/, double /*t*/) const {
-  return H12_;
+const CTensor TIHamiltonian::interaction(index_t k, double /*t*/) const {
+  if (k + 1 < size_) {
+    return H12_;
+  } else {
+    return CTensor();
+  }
 }
 
-const CTensor TIHamiltonian::interaction_left(index_t /*k*/, index_t ndx,
+const CTensor TIHamiltonian::interaction_left(index_t k, index_t ndx,
                                               double /*t*/) const {
-  return H12_left_[ndx];
+  if (k + 1 < size_) {
+    return H12_left_[ndx];
+  } else {
+    return CTensor();
+  }
 }
 
-const CTensor TIHamiltonian::interaction_right(index_t /*k*/, index_t ndx,
+const CTensor TIHamiltonian::interaction_right(index_t k, index_t ndx,
                                                double /*t*/) const {
-  return H12_right_[ndx];
+  if (k + 1 < size_) {
+    return H12_right_[ndx];
+  } else {
+    return CTensor();
+  }
 }
 
 index_t TIHamiltonian::interaction_depth(index_t /*k*/, double /*t*/) const {
