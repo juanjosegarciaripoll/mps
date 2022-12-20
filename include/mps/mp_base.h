@@ -47,7 +47,6 @@ class Sweeper {
 
 template <class Tensor>
 class MP {
-
  public:
   using elt_t = Tensor;
   using tensor_t = Tensor;
@@ -78,7 +77,7 @@ class MP {
   const_iterator begin() const { return data_.begin(); }
   const_iterator end() const { return data_.end(); }
   iterator end() { return data_.end(); }
-  const vector<Tensor> to_vector() const { return data_; }
+  const vector<Tensor> to_tensor_vector() const { return data_; }
 
   Sweeper sweeper(index_t sense) const { return Sweeper(ssize(), sense); }
 
@@ -98,7 +97,8 @@ class MP {
   bool operator==(const MP &other) const {
     return std::equal(begin(), end(), other.begin(),
                       [](const tensor_t &a, const tensor_t &b) {
-                        return (a.dimensions() == b.dimensions()) && all_equal(a, b);
+                        return (a.dimensions() == b.dimensions()) &&
+                               all_equal(a, b);
                       });
   }
 

@@ -99,7 +99,7 @@ inline std::ostream &operator<<(std::ostream &s, const CMPO &mpo) {
 template <class Tensor>
 inline void dump(sdf::OutDataFile &d, const MPS<Tensor> &mps,
                  const std::string &name) {
-  d.dump(mps.to_vector(), name);
+  d.dump(mps.to_tensor_vector(), name);
 }
 
 inline RMPS load_rmps(sdf::InDataFile &d, const std::string &name) {
