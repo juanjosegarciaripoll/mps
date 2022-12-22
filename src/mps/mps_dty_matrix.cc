@@ -22,7 +22,7 @@
 namespace mps {
 
 template <typename mps, typename t>
-static inline const t do_density_matrix(const mps &psi, index_t site) {
+static inline t do_density_matrix(const mps &psi, index_t site) {
   t ML, MR;
   tensor_assert(site < psi.ssize());
   for (index_t i = 0; i < site; i++) ML = prop_matrix(ML, +1, psi[i], psi[i]);

@@ -24,7 +24,7 @@ namespace mps {
 using namespace tensor;
 
 template <class MPO, class Tensor>
-static const Tensor to_matrix(const MPO &A) {
+static Tensor to_matrix(const MPO &A) {
   Tensor B = Tensor::ones(1, 1, 1);
   index_t D = 1;
 

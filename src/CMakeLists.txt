@@ -86,7 +86,6 @@ target_sources(mps
     mpo/mpo_expected_z.cc
     mpo/mpo_fidelity_d.cc
     mpo/mpo_fidelity_z.cc
-    mpo/mpo_adjoint_d.cc
     mpo/mpo_adjoint_z.cc
     mpo/mpo_mmult_d.cc
     mpo/mpo_mmult_z.cc

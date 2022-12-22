@@ -24,7 +24,7 @@ namespace mps {
 
 using namespace tensor;
 
-const RMPS ghz_state(index_t length, bool periodic) {
+RMPS ghz_state(index_t length, bool periodic) {
   RMPS output(length, 2, 2, periodic);
   if (length == 1) {
     double v = 1.0 / sqrt(2.0);

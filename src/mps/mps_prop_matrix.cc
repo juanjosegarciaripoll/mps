@@ -22,7 +22,7 @@
 namespace mps {
 
 template <typename t>
-static inline const t do_prop_init(const t &Q, const t &P, const t *op) {
+static inline t do_prop_init(const t &Q, const t &P, const t *op) {
   // M(a1,a2,b1,b2) = Q'(a1,i,a2) P(b1,i,b2)
   t M = op ? foldc(Q, 1, fold(*op, 1, P, 1), 0) : foldc(Q, 1, P, 1);
   // M(a1,a2,b1,b2) -> M(a1,b1,a2,b2)
@@ -30,14 +30,14 @@ static inline const t do_prop_init(const t &Q, const t &P, const t *op) {
 }
 
 template <typename t>
-static inline const t do_prop_close(const t &M) {
+static inline t do_prop_close(const t &M) {
   index_t a1, b1, a2, b2;
   M.get_dimensions(&a1, &b1, &a2, &b2);
   return trace(reshape(M, a1 * b1, a2 * b2), 0, -1);
 }
 
 template <typename t>
-static inline const t do_prop_close(const t &L, const t &R) {
+static inline t do_prop_close(const t &L, const t &R) {
   if (R.is_empty())
     return do_prop_close<t>(L);
   else if (L.is_empty())
@@ -53,8 +53,8 @@ static inline const t do_prop_close(const t &L, const t &R) {
 }
 
 template <typename t>
-static inline const t do_prop_right(const t &M0, const t &Q, const t &P,
-                                    const t *op) {
+static inline t do_prop_right(const t &M0, const t &Q, const t &P,
+                              const t *op) {
   if (M0.is_empty()) {
     return do_prop_init(Q, P, op);
   }
@@ -78,8 +78,7 @@ static inline const t do_prop_right(const t &M0, const t &Q, const t &P,
 }
 
 template <typename t>
-static inline const t do_prop_left(const t &M0, const t &Q, const t &P,
-                                   const t *op) {
+static inline t do_prop_left(const t &M0, const t &Q, const t &P, const t *op) {
   if (M0.is_empty()) {
     return do_prop_init(Q, P, op);
   }
@@ -102,7 +101,7 @@ static inline const t do_prop_left(const t &M0, const t &Q, const t &P,
 }
 
 template <class Tensor>
-static const Tensor prop_matrix_sub_qform(const Tensor &L, const Tensor &R) {
+static Tensor prop_matrix_sub_qform(const Tensor &L, const Tensor &R) {
   index_t a1, a2, a3, b1, b2, b3;
   Tensor Q;
   //

@@ -22,7 +22,7 @@
 namespace mps {
 
 template <class MPO>
-static const MPO do_mmult(const MPO &A, const MPO &B) {
+static MPO do_mmult(const MPO &A, const MPO &B) {
   typedef typename MPO::elt_t Tensor;
   tensor_assert(A.size() == B.size());
 

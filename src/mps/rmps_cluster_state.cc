@@ -24,7 +24,7 @@ namespace mps {
 
 using namespace tensor;
 
-const RMPS cluster_state(index_t length) {
+RMPS cluster_state(index_t length) {
   if (length == 1) {
     return ghz_state(length);
   } else {

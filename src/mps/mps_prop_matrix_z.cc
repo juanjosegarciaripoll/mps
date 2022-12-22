@@ -22,14 +22,14 @@
 
 namespace mps {
 
-const CTensor prop_matrix_close(const CTensor &N) { return do_prop_close(N); }
+CTensor prop_matrix_close(const CTensor &N) { return do_prop_close(N); }
 
-const CTensor prop_matrix_close(const CTensor &L, const CTensor &R) {
+CTensor prop_matrix_close(const CTensor &L, const CTensor &R) {
   return do_prop_close(L, R);
 }
 
-const CTensor prop_matrix(const CTensor &M0, int sense, const CTensor &Q,
-                          const CTensor &P, const CTensor *op) {
+CTensor prop_matrix(const CTensor &M0, int sense, const CTensor &Q,
+                    const CTensor &P, const CTensor *op) {
   if (M0.is_empty()) {
     return do_prop_init(Q, P, op);
   } else if (sense > 0) {

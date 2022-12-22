@@ -21,7 +21,7 @@
 
 namespace mps {
 
-const RMPS mpo_to_mps(const RMPO &mpo) {
+RMPS mpo_to_mps(const RMPO &mpo) {
   RMPS psi(mpo.ssize());
 
   for (int i = 0; i < mpo.ssize(); i++) {

@@ -50,18 +50,16 @@ inline MPS<Tensor> product_state(const vector<Tensor> &local_states) {
 }
 
 /**Create a GHZ state.*/
-const RMPS ghz_state(index_t length, bool periodic = false);
+RMPS ghz_state(index_t length, bool periodic = false);
 
 /**Create a cluster state.*/
-const RMPS cluster_state(index_t length);
+RMPS cluster_state(index_t length);
 
 /** Apply a local operator on the given site. */
-const RMPS apply_local_operator(const RMPS &psi, const RTensor &op,
-                                index_t site);
+RMPS apply_local_operator(const RMPS &psi, const RTensor &op, index_t site);
 
 /** Apply a local operator on the given site. */
-const CMPS apply_local_operator(const CMPS &psi, const CTensor &op,
-                                index_t site);
+CMPS apply_local_operator(const CMPS &psi, const CTensor &op, index_t site);
 
 /**Convert an MPS to a complex vector, contracting all tensors.*/
 template <typename Tensor>
@@ -200,10 +198,10 @@ void set_canonical_2_sites(CMPS &P, const CTensor &Pij, index_t site, int sense,
                            bool canonicalize_both = true);
 
 /* Return a single-site density matrix out of an MPS. */
-const RTensor density_matrix(const RMPS &psi, index_t site);
+RTensor density_matrix(const RMPS &psi, index_t site);
 
 /* Return a single-site density matrix out of an MPS. */
-const CTensor density_matrix(const CMPS &psi, index_t site);
+CTensor density_matrix(const CMPS &psi, index_t site);
 
 }  // namespace mps
 

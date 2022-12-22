@@ -23,8 +23,7 @@ namespace mps {
 
 using namespace tensor;
 
-const CMPS apply_local_operator(const CMPS &psi, const CTensor &op,
-                                index_t site) {
+CMPS apply_local_operator(const CMPS &psi, const CTensor &op, index_t site) {
   CMPS output = psi;
   output.at(site) = foldin(op, -1, psi[site], 1);
   return output;

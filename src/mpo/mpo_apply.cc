@@ -22,7 +22,7 @@
 namespace mps {
 
 template <class MPS, class MPO>
-static const MPS do_apply(const MPO &mpo, const MPS &psi) {
+static MPS do_apply(const MPO &mpo, const MPS &psi) {
   using Tensor = typename MPS::tensor_t;
   tensor_assert(mpo.size() == psi.size());
 

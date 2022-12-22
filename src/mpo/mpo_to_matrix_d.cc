@@ -21,8 +21,6 @@
 
 namespace mps {
 
-const RTensor mpo_to_matrix(const RMPO &A) {
-  return to_matrix<RMPO, RTensor>(A);
-}
+RTensor mpo_to_matrix(const RMPO &A) { return to_matrix<RMPO, RTensor>(A); }
 
 }  // namespace mps

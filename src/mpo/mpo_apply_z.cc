@@ -22,11 +22,9 @@
 
 namespace mps {
 
-const CMPS apply(const CMPO &mpo, const CMPS &psi) {
-  return do_apply(mpo, psi);
-}
+CMPS apply(const CMPO &mpo, const CMPS &psi) { return do_apply(mpo, psi); }
 
-const CMPS apply(const CMPOList &mpolist, const CMPS &psi) {
+CMPS apply(const CMPOList &mpolist, const CMPS &psi) {
   return std::accumulate(
       mpolist.begin(), mpolist.end(), psi,
       [](const CMPS &state, const CMPO &mpo) { return apply(mpo, state); });

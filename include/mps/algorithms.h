@@ -26,19 +26,19 @@
 
 namespace mps {
 
-const RTensor prop_matrix_close(const RTensor &N);
+RTensor prop_matrix_close(const RTensor &N);
 
-const RTensor prop_matrix_close(const RTensor &L, const RTensor &R);
+RTensor prop_matrix_close(const RTensor &L, const RTensor &R);
 
-const RTensor prop_matrix(const RTensor &M0, int sense, const RTensor &Q,
-                          const RTensor &P, const RTensor *op = nullptr);
+RTensor prop_matrix(const RTensor &M0, int sense, const RTensor &Q,
+                    const RTensor &P, const RTensor *op = nullptr);
 
-const CTensor prop_matrix_close(const CTensor &N);
+CTensor prop_matrix_close(const CTensor &N);
 
-const CTensor prop_matrix_close(const CTensor &L, const CTensor &R);
+CTensor prop_matrix_close(const CTensor &L, const CTensor &R);
 
-const CTensor prop_matrix(const CTensor &M0, int sense, const CTensor &Q,
-                          const CTensor &P, const CTensor *op = nullptr);
+CTensor prop_matrix(const CTensor &M0, int sense, const CTensor &Q,
+                    const CTensor &P, const CTensor *op = nullptr);
 
 /** Given an MPS, produce another with bond dimension <= Dmax, by truncating it. */
 bool truncate(RMPS *P, const RMPS &Q, index_t Dmax, bool periodicbc,
@@ -79,18 +79,20 @@ double simplify_obc(CMPS *P, const CMPS &Q, int *sense, index_t sweeps,
                     double *norm = 0);
 
 double simplify_obc(RMPS *P, const RTensor &weights, const vector<RMPS> &Q,
-                    int *sense, index_t sweeps, bool normalize, index_t Dmax = 0,
-                    double tol = -1, double *norm = 0);
+                    int *sense, index_t sweeps, bool normalize,
+                    index_t Dmax = 0, double tol = -1, double *norm = 0);
 
 double simplify_obc(CMPS *P, const CTensor &weights, const vector<CMPS> &Q,
-                    int *sense, index_t sweeps, bool normalize, index_t Dmax = 0,
-                    double tol = -1, double *norm = 0);
+                    int *sense, index_t sweeps, bool normalize,
+                    index_t Dmax = 0, double tol = -1, double *norm = 0);
 
-double solve(const RMPO &H, RMPS *ptrP, const RMPS &Q, int *sense, index_t sweeps,
-             bool normalize = false, index_t Dmax = 0, double tol = -1);
+double solve(const RMPO &H, RMPS *ptrP, const RMPS &Q, int *sense,
+             index_t sweeps, bool normalize = false, index_t Dmax = 0,
+             double tol = -1);
 
-double solve(const CMPO &H, CMPS *ptrP, const CMPS &Q, int *sense, index_t sweeps,
-             bool normalize = false, index_t Dmax = 0, double tol = -1);
+double solve(const CMPO &H, CMPS *ptrP, const CMPS &Q, int *sense,
+             index_t sweeps, bool normalize = false, index_t Dmax = 0,
+             double tol = -1);
 
 }  // namespace mps
 
