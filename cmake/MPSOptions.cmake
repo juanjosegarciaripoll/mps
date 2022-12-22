@@ -1,6 +1,7 @@
 option(MPS_DEFAULT_WARNINGS "Add known default compiler warnings" ON)
 option(MPS_OPTIMIZED_BUILD "Add well known optimization arguments" ON)
 option(MPS_CLANG_TIDY "Enable running clang-tidy if found" OFF)
+option(MPS_CPPCHECK "Enable running cppcheck if found" OFF)
 option(WARNINGS_AS_ERRORS "Compilation and analysis warnings become errors" OFF)
 
 function(make_mps_options)
@@ -19,6 +20,10 @@ function(make_mps_options)
 
     if (MPS_CLANG_TIDY)
         mps_enable_clang_tidy()
+    endif()
+
+    if (MPS_CPPCHECK)
+        mps_enable_cppcheck()
     endif()
 endfunction()
 
@@ -134,3 +139,33 @@ function(mps_enable_clang_tidy)
         message(WARNING "clang-tidy requested but not found")
     endif()
 endfunction()
+
+macro(mps_enable_cppcheck)
+    find_program(CPPCHECK cppcheck)
+    if(CPPCHECK)
+        set(CMAKE_CXX_CPPCHECK ${CPPCHECK}
+          --template=${CPPCHECK_TEMPLATE}
+          --enable=style,performance,warning,portability
+          --inline-suppr
+		  --library=googletest
+		  -D__cppcheck__
+          # We cannot act on a bug/missing feature of cppcheck
+          --suppress=internalAstError
+          # if a file does not have an internalAstError, we get an unmatchedSuppression error
+          --suppress=unmatchedSuppression
+          # noExplicitConstructor gives false positives on move constructors
+          --suppress=noExplicitConstructor
+		  --suppressions-list=${PROJECT_SOURCE_DIR}/.cppcheck
+          --inconclusive)
+        if(${CMAKE_CXX_STANDARD})
+            set(CMAKE_CXX_CPPCHECK ${CMAKE_CXX_CPPCHECK} --std=c++${CMAKE_CXX_STANDARD})
+        endif()
+        if(WARNINGS_AS_ERRORS)
+            list(APPEND CMAKE_CXX_CPPCHECK -warnings-as-errors=*)
+        endif()
+        set(CMAKE_CXX_CPPCHECK ${CMAKE_CXX_CPPCHECK} PARENT_SCOPE)
+        message(STATUS "cppcheck enabled with options CMAKE_CXX_CPPCHECK=${CMAKE_CXX_CPPCHECK}")
+    else()
+        message(WARNING "cppcheck requested but not found")
+    endif()
+endmacro()
