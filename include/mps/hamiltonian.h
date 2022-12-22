@@ -76,15 +76,15 @@ class TIHamiltonian : public Hamiltonian {
   TIHamiltonian(index_t N, const CTensor &newH12, const CTensor &newH1,
                 bool periodic = 0);
 
-  virtual std::unique_ptr<const Hamiltonian> duplicate() const;
-  virtual index_t size() const;
-  virtual bool is_periodic() const;
-  virtual bool is_constant() const;
-  virtual const CTensor interaction(index_t k, double t) const;
-  virtual const CTensor interaction_left(index_t k, index_t n, double t) const;
-  virtual const CTensor interaction_right(index_t k, index_t n, double t) const;
-  virtual index_t interaction_depth(index_t k, double t = 0.0) const;
-  virtual const CTensor local_term(index_t k, double t) const;
+  virtual std::unique_ptr<const Hamiltonian> duplicate() const override;
+  virtual index_t size() const override;
+  virtual bool is_periodic() const override;
+  virtual bool is_constant() const override;
+  virtual const CTensor interaction(index_t k, double t) const override;
+  virtual const CTensor interaction_left(index_t k, index_t n, double t) const override;
+  virtual const CTensor interaction_right(index_t k, index_t n, double t) const override;
+  virtual index_t interaction_depth(index_t k, double t = 0.0) const override;
+  virtual const CTensor local_term(index_t k, double t) const override;
 
  private:
   index_t size_;
@@ -103,16 +103,16 @@ class ConstantHamiltonian : public Hamiltonian {
   void add_interaction(index_t k, const CTensor &H1, const CTensor &H2);
   void set_local_term(index_t k, const CTensor &H1);
 
-  virtual std::unique_ptr<const Hamiltonian> duplicate() const;
-  virtual index_t size() const;
-  virtual bool is_periodic() const;
-  virtual bool is_constant() const;
-  virtual const CTensor interaction(index_t k, double t) const;
-  virtual const CTensor interaction_left(index_t k, index_t n, double t) const;
-  virtual const CTensor interaction_right(index_t k, index_t n, double t) const;
-  virtual index_t interaction_depth(index_t k, double t = 0.0) const;
-  virtual const CTensor local_term(index_t k, double t) const;
-  virtual index_t dimension(index_t k) const;
+  virtual std::unique_ptr<const Hamiltonian> duplicate() const override;
+  virtual index_t size() const override;
+  virtual bool is_periodic() const override;
+  virtual bool is_constant() const override;
+  virtual const CTensor interaction(index_t k, double t) const override;
+  virtual const CTensor interaction_left(index_t k, index_t n, double t) const override;
+  virtual const CTensor interaction_right(index_t k, index_t n, double t) const override;
+  virtual index_t interaction_depth(index_t k, double t = 0.0) const override;
+  virtual const CTensor local_term(index_t k, double t) const override;
+  virtual index_t dimension(index_t k) const override;
 
  private:
   const CTensor compute_interaction(index_t k) const;
