@@ -36,8 +36,7 @@ ForestRuthSolver::ForestRuthSolver(const Hamiltonian &H, cdouble dt)
       U1(H, 0, dt * FR_param[0]),
       U2(H, 1, dt * FR_param[1]),
       U3(H, 0, dt * FR_param[2]),
-      U4(H, 1, dt * FR_param[3]),
-      sense(0) {}
+      U4(H, 1, dt * FR_param[3]) {}
 
 double ForestRuthSolver::one_step(CMPS *P, index_t Dmax) {
   int debug = tensor::narrow_cast<int>(FLAGS.get(MPS_DEBUG_TROTTER));

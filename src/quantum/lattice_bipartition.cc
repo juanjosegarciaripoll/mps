@@ -41,15 +41,15 @@ const Indices Lattice::states_in_particle_range(index_t sites, index_t nmin,
   word problem_size = 0;
   const word end = word(1) << sites;
   for (word configuration = 0; configuration < end; ++configuration) {
-    const index_t particles = count_bits(configuration);
-    if (particles >= nmin && particles <= nmax) {
+    const index_t total_particles = count_bits(configuration);
+    if (total_particles >= nmin && total_particles <= nmax) {
       ++problem_size;
     }
   }
   Indices output(problem_size);
   for (word n = 0, configuration = 0; configuration < end; ++configuration) {
-    const index_t particles = count_bits(configuration);
-    if (particles >= nmin && particles <= nmax) {
+    const index_t total_particles = count_bits(configuration);
+    if (total_particles >= nmin && total_particles <= nmax) {
       output.at(n++) = configuration;
     }
   }

@@ -195,7 +195,7 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
     std::cerr << "In simplify(MPS &,...): sense=0 is not a valid direction";
     abort();
   }
-  double err = 1.0, olderr, scp, normP2;
+  double err = 1.0, scp, normP2;
   for (index_t sweep = 0; sweep < sweeps; sweep++) {
     Tensor Pk;
     if (debug) {
@@ -255,7 +255,7 @@ static double do_simplify(MPS *ptrP, const MPS &Q, int *sense, bool periodicbc,
         normP2 = real(scprod(Pk, Pk));
       }
     }
-    olderr = err;
+    double olderr = err;
     err = 1 - scp / sqrt(normQ2 * normP2);
     if (debug) {
       std::cerr << ", truncation error = " << err << "\t[" << toc() << "s]\n";

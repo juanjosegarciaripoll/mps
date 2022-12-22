@@ -135,7 +135,7 @@ struct MPSManySimplifier {
       }
   }
 #else
-  void dump_matrices(const char *) {}
+  static void dump_matrices(const char *) {}
 #endif
 
   void update_matrices(index_t site, const Tensor &Pk, int sense) {

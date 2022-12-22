@@ -24,8 +24,7 @@
 namespace mps {
 
 static RMPO interval_position_mpo(const Space::interval_t &interval) {
-  Indices dimensions(interval.qubits, 2);
-  auto output = initialize_interactions_mpo<RMPO>(dimensions);
+  auto output = initialize_interactions_mpo<RMPO>(Indices(interval.qubits, 2));
 
   RTensor s = diag(RTensor{0, 1});
 

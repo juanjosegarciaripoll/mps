@@ -31,7 +31,7 @@ namespace mps {
    */
 
 Trotter2Solver::Trotter2Solver(const Hamiltonian &H, cdouble dt)
-    : TrotterSolver(dt), Ueven(H, 0, dt), Uodd(H, 1, dt), sense(0) {}
+    : TrotterSolver(dt), Ueven(H, 0, dt), Uodd(H, 1, dt) {}
 
 double Trotter2Solver::one_step(CMPS *P, index_t Dmax) {
   int debug = tensor::narrow_cast<int>(FLAGS.get(MPS_DEBUG_TROTTER));

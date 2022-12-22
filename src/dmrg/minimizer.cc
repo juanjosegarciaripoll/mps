@@ -101,7 +101,7 @@ struct Minimizer : public MinimizerOptions {
 
   index_t size() const { return psi.ssize(); }
 
-  const mps_t &state() { return psi; }
+  const mps_t &state() const { return psi; }
 
   void add_states(const std::list<mps_t> &psi_orthogonal) {
     for (const auto &orthogonal_state : psi_orthogonal) {
@@ -110,7 +110,7 @@ struct Minimizer : public MinimizerOptions {
     }
   }
 
-  tensor_list_t orthogonal_projectors(index_t current_site, int sense) {
+  tensor_list_t orthogonal_projectors(index_t current_site, int sense) const {
     tensor_list_t output;
     for (const auto &lform : OrthoLform) {
       if (current_site != lform.here()) {
@@ -304,7 +304,7 @@ struct Minimizer : public MinimizerOptions {
     return E;
   }
 
-  bool single_site() { return !Dmax; }
+  bool single_site() const { return !Dmax; }
 
   double full_sweep(mps_t *psi_out) {
     double E = 1e28;

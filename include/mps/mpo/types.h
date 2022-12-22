@@ -53,9 +53,9 @@ class MPO : public MP<Tensor> {
   MPO(const std::initializer_list<Tensor> &l) : parent_t(tensor_array_t(l)) {}
 
   friend MPO operator*(typename MPO::number_t value, const MPO &other) {
-	MPO output = other;
-	output.at(0) *= value;
-	return output;
+    MPO output = other;
+    output.at(0) *= value;
+    return output;
   }
 
  private:
@@ -63,9 +63,10 @@ class MPO : public MP<Tensor> {
       const tensor::Indices &physical_dimensions) {
     tensor_array_t output;
     output.reserve(physical_dimensions.ssize());
-    for (auto d : physical_dimensions) {
-      output.emplace_back(reshape(Tensor::eye(d, d), 1, d, d, 1));
-    }
+    std::transform(physical_dimensions.begin(), physical_dimensions.end(),
+                   std::back_inserter(output), [](index_t d) {
+                     return reshape(Tensor::eye(d, d), 1, d, d, 1);
+                   });
     return output;
   }
 };

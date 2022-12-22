@@ -98,9 +98,7 @@ class SparseMPO {
   static tensor_list_t make_sparse_tensors(const MPO<Tensor> &mpo) {
     tensor_list_t output;
     output.reserve(mpo.ssize());
-    for (const auto &P : mpo) {
-      output.emplace_back(P);
-    }
+	std::copy(mpo.begin(), mpo.end(), std::back_inserter(output));
     return output;
   }
 };

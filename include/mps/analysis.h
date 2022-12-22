@@ -49,7 +49,7 @@ class Space {
     }
 
     RTensor coordinates() const {
-      return start + step() * linspace(0, ssize() - 1, ssize());
+      return start + step() * linspace(0.0, static_cast<double>(ssize() - 1), ssize());
     }
   };
 

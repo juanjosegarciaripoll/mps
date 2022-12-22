@@ -58,17 +58,13 @@ class TrotterSolver : public TimeSolver {
     TRUNCATE_EACH_LAYER = 1,
     TRUNCATE_EACH_UNITARY = 2,
     DO_NOT_TRUNCATE = 3
-  } strategy;
+  } strategy{TRUNCATE_EACH_LAYER};
 
-  int sweeps;
-  bool normalize;
-  int sense;
+  int sweeps{8};
+  bool normalize{true};
+  int sense{0};
 
-  TrotterSolver(cdouble new_dt)
-      : TimeSolver(new_dt),
-        strategy(TRUNCATE_EACH_LAYER),
-        sweeps(8),
-        normalize(true){};
+  TrotterSolver(cdouble new_dt) : TimeSolver(new_dt){};
 
   virtual ~TrotterSolver();
 
@@ -92,16 +88,17 @@ class TrotterSolver : public TimeSolver {
                  bool normalize = false) const;
 
     /*Apply the unitary on a MPS and optimize the output.*/
-    double apply_and_simplify(CMPS *psi, int *dk, double tolerance, index_t Dmax,
-                              bool normalize = false) const;
+    double apply_and_simplify(CMPS *psi, int *dk, double tolerance,
+                              index_t Dmax, bool normalize = false) const;
 
    private:
     int k0, kN;
     vector<CTensor> U;
     void apply_onto_one_site(CMPS &P, const CTensor &Uloc, index_t k, int dk,
                              index_t max_a2) const;
-    double apply_onto_two_sites(CMPS &P, const CTensor &U12, index_t k1, index_t k2,
-                                int dk, double tolerance, index_t max_a2) const;
+    double apply_onto_two_sites(CMPS &P, const CTensor &U12, index_t k1,
+                                index_t k2, int dk, double tolerance,
+                                index_t max_a2) const;
   };
 };
 
@@ -111,13 +108,12 @@ class TrotterSolver : public TimeSolver {
   */
 class Trotter2Solver : public TrotterSolver {
   Unitary Ueven, Uodd;
-  int sense;
 
  public:
   /**Create a solver for the given nearest neighbor Hamiltonian and time step.*/
   Trotter2Solver(const Hamiltonian &H, cdouble dt);
 
-  virtual double one_step(CMPS *P, index_t Dmax);
+  virtual double one_step(CMPS *P, index_t Dmax) override;
 };
 
 /**Trotter method with three passes. This method uses the second order
@@ -130,28 +126,24 @@ class Trotter2Solver : public TrotterSolver {
   */
 class Trotter3Solver : public TrotterSolver {
   Unitary U1, U2;
-  int sense;
 
  public:
   /**Create a solver for the given nearest neighbor Hamiltonian and time step.*/
   Trotter3Solver(const Hamiltonian &H, cdouble dt);
 
-  virtual double one_step(CMPS *P, index_t Dmax);
+  virtual double one_step(CMPS *P, index_t Dmax) override;
 };
 
 /**Forest-Ruth method. This method uses a fourth order Forest-Ruth decomposition
      (see http://xxx.arxiv.org/cond-mat/0610210)*/
 class ForestRuthSolver : public TrotterSolver {
   Unitary U1, U2, U3, U4;
-  int sense;
 
  public:
-  int sweeps;
-  bool normalize;
   /**Create a solver for the given nearest neighbor Hamiltonian and time step.*/
   ForestRuthSolver(const Hamiltonian &H, cdouble dt);
 
-  virtual double one_step(CMPS *P, index_t Dmax);
+  virtual double one_step(CMPS *P, index_t Dmax) override;
 };
 
 /**Time evolution with the Arnoldi method.
@@ -167,7 +159,7 @@ class ArnoldiSolver : public TimeSolver {
   /**Compute next time step. Given the state \f$\psi(0)\f$ represented
        by P, estimate the state at \f$\psi(\Delta t)\f$ within the space
        of MPS with dimension <= Dmax. P contains the output.*/
-  virtual double one_step(CMPS *P, index_t Dmax);
+  virtual double one_step(CMPS *P, index_t Dmax) override;
 
  private:
   const cdouble dt_;

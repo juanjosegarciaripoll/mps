@@ -21,8 +21,8 @@
 
 namespace mps {
 
-bool truncate(CMPS *Q, const CMPS &P, index_t Dmax, bool periodic, bool enlarge) {
-  return truncate_inner(Q, P, Dmax, periodic, enlarge);
+bool truncate(CMPS *P, const CMPS &Q, index_t Dmax, bool periodic, bool enlarge) {
+  return truncate_inner(P, Q, Dmax, periodic, enlarge);
 }
 
 }  // namespace mps

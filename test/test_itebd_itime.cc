@@ -189,58 +189,50 @@ void test_itime_ising() {
 ///
 
 TEST(RiTEBDTest, RiTEBDItimeIsingUniformField) {
-  index max_chi = 30;
-  double tolerance = -1;
+  constexpr index max_chi = 30;
+  constexpr double tolerance = -1;
   std::cerr << "UNIFORM MAGNETIC FIELD\n\n";
-  {
-    RTensor A = RTensor::random(2);
-    iTEBD<RTensor> psi(A, A);
-    RTensor H12 = kron(Pauli_z, Pauli_id) + kron(Pauli_id, Pauli_z);
-    evolve_itime(psi, H12, 0.1, 100, tolerance, max_chi);
-  }
+  RTensor A = RTensor::random(2);
+  iTEBD<RTensor> psi(A, A);
+  RTensor H12 = kron(Pauli_z, Pauli_id) + kron(Pauli_id, Pauli_z);
+  evolve_itime(psi, H12, 0.1, 100, tolerance, max_chi);
 }
 
 TEST(RiTEBDTest, RiTEBDItimeIsingAntiferromagnetic) {
-  index max_chi = 30;
-  double tolerance = -1;
+  constexpr index max_chi = 30;
+  constexpr double tolerance = -1;
   std::cerr << "ANTIFERROMAGNETIC ISING\n\n";
-  {
-    RTensor A = RTensor::random(2);
-    iTEBD<RTensor> psi(A, flip(A));
-    RTensor H12 = -kron(Pauli_z, Pauli_z);
-    evolve_itime(psi, H12, 0.1, 100, tolerance, max_chi);
-  }
+  RTensor A = RTensor::random(2);
+  iTEBD<RTensor> psi(A, flip(A));
+  RTensor H12 = -kron(Pauli_z, Pauli_z);
+  evolve_itime(psi, H12, 0.1, 100, tolerance, max_chi);
 }
 
 TEST(RiTEBDTest, RiTEBDItimeIsingFerromagnetic) {
-  index max_chi = 30;
-  double tolerance = -1;
+  constexpr index max_chi = 30;
+  constexpr double tolerance = -1;
   std::cerr << "FERROMAGNETIC ISING\n\n";
-  {
-    RTensor A = RTensor::random(2);
-    iTEBD<RTensor> psi(A, A);
-    RTensor H12 = -4.0 * kron(Pauli_z, Pauli_z);
-    evolve_itime(psi, H12, 0.2, 100, tolerance, max_chi);
-  }
+  RTensor A = RTensor::random(2);
+  iTEBD<RTensor> psi(A, A);
+  RTensor H12 = -4.0 * kron(Pauli_z, Pauli_z);
+  evolve_itime(psi, H12, 0.2, 100, tolerance, max_chi);
 }
 
 TEST(RiTEBDTest, RiTEBDItimeFerromagneticHeisenberg) {
-  index max_chi = 30;
-  double tolerance = -1;
+  constexpr index max_chi = 30;
+  constexpr double tolerance = -1;
   std::cerr << "FERROMAGNETIC HEISENBERG\n\n";
-  {
-    RTensor A = RTensor::random(2);
-    iTEBD<RTensor> psi(A, A);
-    RTensor H12 = -kron(Pauli_x, Pauli_x) - real(kron(Pauli_y, Pauli_y)) -
-                  kron(Pauli_z, Pauli_z);
-    evolve_itime(psi, H12, 0.2, 100, tolerance, max_chi);
-  }
+  RTensor A = RTensor::random(2);
+  iTEBD<RTensor> psi(A, A);
+  RTensor H12 = -kron(Pauli_x, Pauli_x) - real(kron(Pauli_y, Pauli_y)) -
+                kron(Pauli_z, Pauli_z);
+  evolve_itime(psi, H12, 0.2, 100, tolerance, max_chi);
 }
 
 #ifdef TEST_MPS_EXPENSIVE_SIMULATIONS
 TEST(RiTEBDTest, RiTEBDItimeIsingTransverseField) {
-  index max_chi = 30;
-  double tolerance = -1;
+  constexpr index max_chi = 30;
+  constexpr double tolerance = -1;
   std::cerr << "FERROMAGNETIC ISING + TRANSVERSE FIELD\n\n";
 
   RTensor h(linspace(0.0001, 1.2, 25));

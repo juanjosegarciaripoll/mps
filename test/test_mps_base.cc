@@ -160,7 +160,6 @@ void test_mps_move_constructor() {
   EXPECT_EQ(new_state.size(), 2);
   EXPECT_ALL_EQUAL(new_state[0], psi);
   EXPECT_ALL_EQUAL(new_state[1], psi);
-  EXPECT_EQ(state.size(), 0);
 }
 
 template <class MPS>
@@ -178,7 +177,6 @@ void test_mps_operator_eq_move() {
   EXPECT_EQ(new_state.size(), 2);
   EXPECT_ALL_EQUAL(new_state[0], psi);
   EXPECT_ALL_EQUAL(new_state[1], psi);
-  EXPECT_EQ(state.size(), 0);
 }
 
 template <class MPS>

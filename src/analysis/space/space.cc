@@ -45,9 +45,9 @@ index_t Space::first_qubit(index_t axis) const {
 
 Indices Space::dimension_qubits(index_t axis) const {
   auto start = first_qubit(axis);
-  auto interval = domain_[axis];
-  Indices output(interval.qubits);
-  for (index_t i = 0; i < interval.qubits; ++i) {
+  auto this_interval = domain_[axis];
+  Indices output(this_interval.qubits);
+  for (index_t i = 0; i < this_interval.qubits; ++i) {
     output.at(i) = start + i;
   }
   return output;

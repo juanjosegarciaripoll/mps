@@ -69,7 +69,7 @@ class Environment {
 
   scalar_t close() const { return close_tensor(env_); }
 
-  scalar_t operator*(Environment &other) {
+  scalar_t operator*(const Environment &other) {
     tensor_assert2(
         this->direction_ == DIR_RIGHT && other.direction_ == DIR_LEFT,
         std::invalid_argument(

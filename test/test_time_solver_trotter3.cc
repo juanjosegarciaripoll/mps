@@ -40,7 +40,7 @@ CTensor apply_trotter3(const Hamiltonian &H, cdouble idt, const CTensor &psi) {
   return new_psi;
 }
 
-const CMPS apply_H_Trotter3(const Hamiltonian &H, double dt, const CMPS &psi) {
+CMPS apply_H_Trotter3(const Hamiltonian &H, double dt, const CMPS &psi) {
   Trotter3Solver solver(H, 0.1);
   CMPS aux = psi;
   solver.one_step(&aux, 2);
@@ -64,7 +64,7 @@ void test_Trotter3_truncated(const Hamiltonian &H, double dt, const CMPS &psi) {
   CMPS truncated_psi_t = psi;
   Trotter3Solver solver(H, dt);
   solver.strategy = Trotter2Solver::TRUNCATE_EACH_LAYER;
-  double err = solver.one_step(&truncated_psi_t, Dmax);
+  solver.one_step(&truncated_psi_t, Dmax);
   EXPECT_CEQ(norm2(truncated_psi_t), 1.0);
   CTensor psi_t = apply_trotter3(H, to_complex(0.0, -dt), mps_to_vector(psi));
   EXPECT_CEQ(mps_to_vector(truncated_psi_t), psi_t);

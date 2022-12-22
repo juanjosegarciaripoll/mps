@@ -189,13 +189,13 @@ class MPS : public MP<Tensor> {
     tensor_assert(bond_dimension > 0);
     tensor_assert(this->size() == physical_dimensions.size());
     index_t l = physical_dimensions.ssize();
-    tensor::Indices dimensions = {bond_dimension, index_t(0), bond_dimension};
+    tensor::Indices new_dimensions = {bond_dimension, index_t(0), bond_dimension};
     for (index_t i = 0; i < l; i++) {
       tensor_assert(physical_dimensions[i] > 0);
-      dimensions.at(1) = physical_dimensions[i];
-      dimensions.at(0) = (periodic || (i > 0)) ? bond_dimension : 1;
-      dimensions.at(2) = (periodic || (i < (l - 1))) ? bond_dimension : 1;
-      this->at(i) = Tensor::zeros(dimensions);
+      new_dimensions.at(1) = physical_dimensions[i];
+      new_dimensions.at(0) = (periodic || (i > 0)) ? bond_dimension : 1;
+      new_dimensions.at(2) = (periodic || (i < (l - 1))) ? bond_dimension : 1;
+      this->at(i) = Tensor::zeros(new_dimensions);
     }
   }
 

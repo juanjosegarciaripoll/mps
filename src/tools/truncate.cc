@@ -78,11 +78,11 @@ index_t where_to_truncate(const RTensor &s, double tol, index_t max_dim) {
      * site. This means that if we keep (i+1) leading elements, the error will
      * be exactly cumulated[i].
      */
-  auto cumulated = std::make_unique<double[]>(L);
+  auto cumulated = std::make_unique<double[]>(static_cast<size_t>(L));
   double total = 0;
   for (index_t i = L; i--;) {
     total += square(s[i]);
-    cumulated[i] = total;
+    cumulated[static_cast<size_t>(i)] = total;
   }
   /* Due to the precision limits in current processors, we automatically
      * relax the tolerance to DBL_EPSILON, which is a floating point number
@@ -91,7 +91,7 @@ index_t where_to_truncate(const RTensor &s, double tol, index_t max_dim) {
      */
   double limit = std::max(tol, DBL_EPSILON) * total;
   for (index_t i = 0; i < max_dim; i++) {
-    if (cumulated[i] <= limit) {
+    if (cumulated[static_cast<size_t>(i)] <= limit) {
       max_dim = i;
       break;
     }

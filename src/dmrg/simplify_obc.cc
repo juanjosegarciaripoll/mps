@@ -51,7 +51,7 @@ double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
   //	    err^2 = 1 - (norm(Pk)^2/normQ2)
   Sweeper s = P.sweeper(-*sense);
   LinearForm<mp_tensor_t<MPS>> lf(w, Q, P, s.site());
-  double err = 1.0, olderr, normQ2 = square(lf.norm2()), normP2 = 0.0;
+  double err = 1.0, normQ2 = square(lf.norm2()), normP2 = 0.0;
   if (debug) {
     std::cerr << "simplify_obc: " << (single_site ? "single_site" : "two-sites")
               << ", dmax=" << Dmax << ", truncate_tol=" << tol
@@ -73,7 +73,7 @@ double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
       } while (!s.is_last());
     }
     normP2 = abs(scprod(P[s.site()], P[s.site()]));
-    olderr = err;
+    double olderr = err;
     err = sqrt(abs(1 - normP2 / normQ2));
     if (debug) {
       std::cerr << "\terr=" << err << ", sense=" << s.sense() << '\n';

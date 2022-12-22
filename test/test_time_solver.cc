@@ -59,8 +59,8 @@ void split_Hamiltonian(std::unique_ptr<const Hamiltonian> *ppHeven,
 
 //////////////////////////////////////////////////////////////////////
 
-void evolve_identity(int size, const CMPS apply_U(const Hamiltonian &H,
-                                                  double dt, const CMPS &psi)) {
+void evolve_identity(int size,
+                     CMPS apply_U(const Hamiltonian &, double, const CMPS &)) {
   auto psi = CMPS(ghz_state(size));
   // Id is a zero operator that causes the evolution operator to
   // be the identity
@@ -71,9 +71,8 @@ void evolve_identity(int size, const CMPS apply_U(const Hamiltonian &H,
   EXPECT_CEQ(mps_to_vector(psi), mps_to_vector(aux));
 }
 
-void evolve_global_phase(int size,
-                         const CMPS apply_U(const Hamiltonian &H, double dt,
-                                            const CMPS &psi)) {
+void evolve_global_phase(int size, CMPS apply_U(const Hamiltonian &, double,
+                                                const CMPS &)) {
   auto psi = CMPS(ghz_state(size));
   // H is a multiple of the identity, causing the evolution
   // operator to be just a global phase
@@ -83,9 +82,8 @@ void evolve_global_phase(int size,
   EXPECT_CEQ3(abs(scprod(aux, psi)), 1.0, 10 * EPSILON);
 }
 
-void evolve_local_operator_sz(int size,
-                              void do_test(const Hamiltonian &H, double dt,
-                                           const CMPS &psi)) {
+void evolve_local_operator_sz(int size, void do_test(const Hamiltonian &,
+                                                     double, const CMPS &)) {
   double dphi = 1.3 / size;
   ConstantHamiltonian H(size);
   for (int i = 0; i < size; i++) {
@@ -95,9 +93,8 @@ void evolve_local_operator_sz(int size,
   do_test(H, 0.1, CMPS(cluster_state(size)));
 }
 
-void evolve_local_operator_sx(int size,
-                              void do_test(const Hamiltonian &H, double dt,
-                                           const CMPS &psi)) {
+void evolve_local_operator_sx(int size, void do_test(const Hamiltonian &,
+                                                     double, const CMPS &)) {
   double dphi = 0.3;
   ConstantHamiltonian H(size);
   for (int i = 0; i < size; i++) {
@@ -110,9 +107,8 @@ void evolve_local_operator_sx(int size,
   do_test(H, 0.1, CMPS(cluster_state(size)));
 }
 
-void evolve_interaction_zz(int size, void do_test(const Hamiltonian &H,
-                                                  double dt, const CMPS &psi)) {
-  double dphi = 1.3 / size;
+void evolve_interaction_zz(int size, void do_test(const Hamiltonian &, double,
+                                                  const CMPS &)) {
   ConstantHamiltonian H(size);
   for (int i = 0; i < size; i++) {
     H.set_local_term(i, mps::Pauli_id * 0.0);
@@ -122,9 +118,8 @@ void evolve_interaction_zz(int size, void do_test(const Hamiltonian &H,
   do_test(H, 0.1, CMPS(cluster_state(size)));
 }
 
-void evolve_interaction_xx(int size, void do_test(const Hamiltonian &H,
-                                                  double dt, const CMPS &psi)) {
-  double dphi = 1.3 / size;
+void evolve_interaction_xx(int size, void do_test(const Hamiltonian &, double,
+                                                  const CMPS &)) {
   ConstantHamiltonian H(size);
   for (int i = 0; i < size; i++) {
     H.set_local_term(i, mps::Pauli_id * 0.0);

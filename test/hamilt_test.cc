@@ -85,8 +85,8 @@ const char *TestHamiltonian::model_name(index model) {
 
 index TestHamiltonian::last_model() { return 6; }
 
-void test_over_H(bool test(const mps::Hamiltonian &H, double &err),
-                 int max_spins, bool pbc) {
+void test_over_H(bool test(const mps::Hamiltonian &, double &), int max_spins,
+                 bool pbc) {
   for (int periodic = 0; periodic < (pbc ? 2 : 1); periodic++) {
     for (unsigned model = 0; model <= TestHamiltonian::last_model(); model++) {
       for (int ti = 1; ti >= 0; ti--) {

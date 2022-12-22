@@ -33,8 +33,6 @@ Tensor<double> random_permutation(int n, int iterations) {
     Tensor<double> diagonal = RTensor::ones(n);
     while (iterations--) {
       Indices columns = rows;
-      int i = rand<int>(0, n);
-      int j = (i + rand<int>(1, n)) % n;
       output = mmult(RSparse(rows, columns, diagonal, n, n), output);
     }
   }

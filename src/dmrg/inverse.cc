@@ -64,7 +64,7 @@ double do_solve(const MPO<Tensor> &H, MPS<Tensor> *ptrP, const MPS<Tensor> &oQ,
   if (!sense) sense = &aux;
   tensor_assert(sweeps > 0);
 
-  double olderr = 0.0, err = 0.0;  // err = <P|H^2|P> + <Q|Q> - 2re<Q|H|P>
+  double err = 0.0;  // err = <P|H^2|P> + <Q|Q> - 2re<Q|H|P>
   double normHP;                   // <P|H^2|P>
   tensor_scalar_t<Tensor> scp;     // <Q|H|P>
   double normQ2 = abs(scprod(Q[0], Q[0]));  // <Q|Q>
@@ -132,13 +132,13 @@ double do_solve(const MPO<Tensor> &H, MPS<Tensor> *ptrP, const MPS<Tensor> &oQ,
 
     // Compute stop criteria.
     scp = scprod(vHQ, vP);
-    olderr = err;
+    double olderr = err;
     err = normHP + normQ2 - 2 * real(scp);
     if (debug) {
       std::cerr << "[mps::solve] sweeps=" << sweeps << ", err=" << err
                 << ", derr=" << olderr - err << '\n';
     }
-    if (olderr) {
+    if (olderr != 0) {
       if ((olderr - err) < 1e-5 * tensor::abs(olderr) || (err < tolerance)) {
         break;
       }
