@@ -122,7 +122,9 @@ struct MPSManySimplifier {
     normQ2 = real(x);
   }
 
-  Tensor &matrix(index_t site, index_t vector) { return A[site + 1].at(vector); }
+  Tensor &matrix(index_t site, index_t vector) {
+    return A[site + 1].at(vector);
+  }
 
 #if 0
   void dump_matrices(const char *context = "foo") {
@@ -183,7 +185,7 @@ struct MPSManySimplifier {
     return M;
   }
 
-  const Tensor next_projector(Tensor Ml, Tensor Mr, const Tensor &Qk) {
+  Tensor next_projector(Tensor Ml, Tensor Mr, const Tensor &Qk) {
     index_t a1, a2, b1, i1, b2, a3, b3;
 
     if (Mr.is_empty()) {
@@ -228,7 +230,7 @@ struct MPSManySimplifier {
 #endif
   }
 
-  const Tensor next_projector(index_t site) {
+  Tensor next_projector(index_t site) {
     Tensor output;
     for (int i = 0; i < nvectors; i++) {
       Tensor new_Pk =
@@ -319,7 +321,7 @@ struct MPSManySimplifier {
     return err;
   }
 
-  const Tensor next_projector_2_sites(index_t site) {
+  Tensor next_projector_2_sites(index_t site) {
     Tensor output;
     index_t a1, i1 = 0, i2 = 0, a2;
     for (int i = 0; i < nvectors; i++) {
