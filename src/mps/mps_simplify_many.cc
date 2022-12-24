@@ -109,22 +109,18 @@ struct MPSManySimplifier {
     A = matrices_t(L + 2, tensor_vector_t(nvectors));
     dump_matrices("Const");
 
-    number x = number_zero<number>();
+    double x = 0.0;
     for (int i = 0; i < nvectors; i++) {
+      auto wi = tensor::conj(weights[i]);
       for (int j = i; j < nvectors; j++) {
-        number y = scprod(Q[i], Q[j]) * tensor::conj(weights[i]) * weights[j];
-        if (i == j)
-          x = x + y;
-        else
-          x = x + 2 * real(y);
+        double y = real(scprod(Q[i], Q[j]) * wi * weights[j]);
+        x += (i == j) ? y : 2 * y;
       }
     }
-    normQ2 = real(x);
+    normQ2 = x;
   }
 
-  Tensor &matrix(index_t site, index_t vector) {
-    return A[site + 1].at(vector);
-  }
+  Tensor &matrix(index_t site, index_t vector) { return A[site + 1][vector]; }
 
 #if 0
   void dump_matrices(const char *context = "foo") {
@@ -185,7 +181,7 @@ struct MPSManySimplifier {
     return M;
   }
 
-  Tensor next_projector(Tensor Ml, Tensor Mr, const Tensor &Qk) {
+  Tensor next_projector(const Tensor &Ml, const Tensor &Mr, const Tensor &Qk) {
     index_t a1, a2, b1, i1, b2, a3, b3;
 
     if (Mr.is_empty()) {
@@ -195,31 +191,31 @@ struct MPSManySimplifier {
         Ml.get_dimensions(&a1, &b1, &a2, &b2);
         Qk.get_dimensions(&b2, &i1, &b1);
         // Ml(a1,b1,a2,b2) -> Ml([b2,b1],a2,a1)
-        Ml = reshape(permute(Ml, 0, 3), b2 * b1, a2, a1);
+        auto new_Ml = reshape(permute(Ml, 0, 3), b2 * b1, a2, a1);
         // Qk(b2,i1,b1) -> Pk([b2,b1],i1)
-        Tensor Pk = reshape(permute(Qk, 1, 2), b2 * b1, i1);
+        auto Pk = reshape(permute(Qk, 1, 2), b2 * b1, i1);
         // Pk(a2,i1,a1) = Ml([b2,b1],a2,a1) Pk([b2,b1],i1)
-        return permute(reshape(fold(Ml, 0, Pk, 0), a2, a1, i1), 1, 2);
+        return permute(reshape(fold(new_Ml, 0, Pk, 0), a2, a1, i1), 1, 2);
       }
     } else if (Ml.is_empty()) {
       Mr.get_dimensions(&a1, &b1, &a2, &b2);
       Qk.get_dimensions(&b2, &i1, &b1);
       // Mr(a1,b1,a2,b2) -> Mr([b2,b1],a2,a1)
-      Mr = reshape(permute(Mr, 0, 3), b2 * b1, a2, a1);
+      auto new_Mr = reshape(permute(Mr, 0, 3), b2 * b1, a2, a1);
       // Qk(b2,i1,b1) -> Pk([b2,b1],i1)
-      Tensor Pk = reshape(permute(Qk, 1, 2), b2 * b1, i1);
+      auto Pk = reshape(permute(Qk, 1, 2), b2 * b1, i1);
       // Pk(a2,i1,a1) = Mr([b2,b1],a2,a1) Pk([b2,b1],i1)
-      return permute(reshape(fold(Mr, 0, Pk, 0), a2, a1, i1), 1, 2);
+      return permute(reshape(fold(new_Mr, 0, Pk, 0), a2, a1, i1), 1, 2);
     } else {
       Ml.get_dimensions(&a1, &b1, &a2, &b2);
       Qk.get_dimensions(&b2, &i1, &b3);
       Mr.get_dimensions(&a3, &b3, &a1, &b1);
       // Qk(b2,i1,b3) Ml(a1,b1,a2,b2) -> Pk(i1,[b3,a1,b1],a2)
-      Tensor Pk = reshape(fold(Qk, 0, Ml, 3), i1, b3 * a1 * b1, a2);
+      auto Pk = reshape(fold(Qk, 0, Ml, 3), i1, b3 * a1 * b1, a2);
       // Mr(a1,b1,a3,b3) -> Mr([a1,b1,b3],a3)
-      Mr = reshape(permute(permute(Mr, 2, 3), 0, 2), b3 * a1 * b1, a3);
+      auto new_Mr = reshape(permute(permute(Mr, 2, 3), 0, 2), b3 * a1 * b1, a3);
       // Pk(i1,[b3,a1,b1],a2) Mr([a1,b1,b3],a3) -> Pk(a2,i1,a3)
-      return permute(reshape(fold(Pk, 1, Mr, 0), i1, a2, a3), 0, 1);
+      return permute(reshape(fold(Pk, 1, new_Mr, 0), i1, a2, a3), 0, 1);
     }
   }
 
@@ -237,9 +233,9 @@ struct MPSManySimplifier {
           weights[i] *
           next_projector(matrix(site - 1, i), matrix(site + 1, i), Q[i][site]);
       if (i)
-        output = output + new_Pk;
+        output += new_Pk;
       else
-        output = new_Pk;
+        output = std::move(new_Pk);
     }
     return output;
   }
