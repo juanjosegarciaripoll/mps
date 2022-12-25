@@ -22,7 +22,7 @@
 namespace mps {
 
 cdouble expected(const CMPS &bra, const CMPO &op, const CMPS &ket) {
-  return scprod(bra, apply(op, ket));
+  return scprod(bra, mps::apply(op, ket));
 }
 
 cdouble expected(const CMPS &psi, const CMPO &op) {

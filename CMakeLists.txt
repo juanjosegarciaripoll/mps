@@ -20,9 +20,9 @@ project(mps
   DESCRIPTION "C++ library for tensor network states"
   HOMEPAGE_URL https://github.com/juanjosegarciaripoll/mps)
 
-# specify the C++ standard
-# GoogleTest requiers C++14 or better
-set(CMAKE_CXX_STANDARD 14)
+# specify the C++ standard.
+# We have to build Tensor with the same version
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Used modules

@@ -56,7 +56,7 @@ RSparse position_product_matrix(const Space &space, const RTensor &J) {
 static RSparse finite_difference_matrix(double a, double b, double c,
                                         index_t qubits, bool periodic) {
   std::vector<SparseTriplet<double>> triplets;
-  index_t L = 1 << qubits;
+  index_t L = index_t(1) << qubits;
   triplets.reserve(static_cast<size_t>(L * 3));
   for (index_t i = 0; i < L; ++i) {
     index_t next = (i + 1);

@@ -126,7 +126,7 @@ void test_qform_expected(const MPS<Tensor> &psi0) {
         Tensor psij = flatten(psi[i]);
         Tensor Hpsij = mmult(Hqform, psij);
         auto psijHpsij = scprod(psij, Hpsij);
-        auto psiHpsi = scprod(psi, apply(mpo, psi));
+        auto psiHpsi = scprod(psi, mps::apply(mpo, psi));
         ASSERT_CEQ(psiHpsi, psijHpsij);
         // and then we use the light-weight application of the tensors
         Tensor Hpsij2 = qf.apply_single_site_matrix(psij);
@@ -166,7 +166,7 @@ void test_qform_expected2(const MPS<Tensor> &psi0) {
         // for that we first use the two_site_matrix()
         Tensor Hpsij = mmult(Hqform, psij);
         auto psijHpsij = scprod(psij, Hpsij);
-        auto psiHpsi = scprod(psi, apply(mpo, psi));
+        auto psiHpsi = scprod(psi, mps::apply(mpo, psi));
         EXPECT_CEQ(psiHpsi, psijHpsij);
         // and then we use the light-weight application of the tensors
         Tensor Hpsij2 = qf.apply_two_site_matrix(psij, DIR_RIGHT);

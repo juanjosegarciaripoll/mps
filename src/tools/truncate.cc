@@ -42,7 +42,7 @@ index_t where_to_truncate(const RTensor &s, double tol, index_t max_dim) {
      * is smaller than the relative tolerance (TOL) or the length of the output
      * is smaller than MAX_DIM.
      */
-  const index L = s.ssize();
+  const index_t L = s.ssize();
   bool debug = FLAGS.get(MPS_DEBUG_TRUNCATION);
 
   if (max_dim == 0 || max_dim > L) {

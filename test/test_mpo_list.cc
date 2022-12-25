@@ -53,7 +53,7 @@ void test_small_mpo_list() {
   EXPECT_EQ(list[0], mpo1);
   EXPECT_EQ(list[1], mpo2);
 
-  EXPECT_CEQ(apply(list, psi), apply(mpo2, apply(mpo1, psi)));
+  EXPECT_CEQ(mps::apply(list, psi), mps::apply(mpo2, mps::apply(mpo1, psi)));
 }
 
 ////////////////////////////////////////////////////////////

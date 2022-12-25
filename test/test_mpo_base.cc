@@ -42,7 +42,7 @@ void test_zero_mpo(int size) {
   }
 
   auto psi = MPS(cluster_state(size));
-  auto mpo_times_psi = apply(mpo, psi);
+  auto mpo_times_psi = mps::apply(mpo, psi);
   EXPECT_CEQ(scprod(psi, mpo_times_psi), 1.0);
 }
 
@@ -66,7 +66,7 @@ void test_small_local_mpo() {
   {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2});
     add_local_term(&mpo, Pauli_z, 0);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(mps::Pauli_z, mps::Pauli_id);
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
@@ -76,7 +76,7 @@ void test_small_local_mpo() {
   {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2});
     add_local_term(&mpo, Pauli_z, 1);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(Pauli_id, Pauli_z);
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
@@ -87,7 +87,7 @@ void test_small_local_mpo() {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2});
     add_local_term(&mpo, Pauli_z, 0);
     add_local_term(&mpo, Pauli_z, 1);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(Pauli_id, Pauli_z) + kron2(Pauli_z, Pauli_id);
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
@@ -99,7 +99,7 @@ void test_small_local_mpo() {
   {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_local_term(&mpo, Pauli_z, 0);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(Pauli_z, kron2(Pauli_id, Pauli_id));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
@@ -109,7 +109,7 @@ void test_small_local_mpo() {
   {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_local_term(&mpo, Pauli_z, 1);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(Pauli_id, kron2(Pauli_z, Pauli_id));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
@@ -119,7 +119,7 @@ void test_small_local_mpo() {
   {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_local_term(&mpo, Pauli_z, 2);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(Pauli_id, kron2(Pauli_id, Pauli_z));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
@@ -130,7 +130,7 @@ void test_small_local_mpo() {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_local_term(&mpo, Pauli_z, 0);
     add_local_term(&mpo, Pauli_z, 2);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(Pauli_z, kron2(Pauli_id, Pauli_id)) +
                kron2(Pauli_id, kron2(Pauli_id, Pauli_z));
@@ -154,7 +154,7 @@ void test_small_nn_mpo() {
   {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2});
     add_interaction(&mpo, Pauli_z, 0, Pauli_z);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(Pauli_z, Pauli_z);
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
@@ -165,7 +165,7 @@ void test_small_nn_mpo() {
   {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_interaction(&mpo, Pauli_z, 0, Pauli_z);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(Pauli_z, kron2(Pauli_z, Pauli_id));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
@@ -175,7 +175,7 @@ void test_small_nn_mpo() {
   {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_interaction(&mpo, Pauli_z, 1, Pauli_z);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(Pauli_id, kron2(Pauli_z, Pauli_z));
     Tensor Hpsi2 = mmult(H, mps_to_vector(psi));
@@ -186,7 +186,7 @@ void test_small_nn_mpo() {
     auto mpo = initialize_interactions_mpo<MPO>({2, 2, 2});
     add_interaction(&mpo, Pauli_z, 0, Pauli_z);
     add_interaction(&mpo, Pauli_z, 1, Pauli_z);
-    Tensor Hpsi1 = mps_to_vector(apply(mpo, psi));
+    Tensor Hpsi1 = mps_to_vector(mps::apply(mpo, psi));
 
     Tensor H = kron2(Pauli_id, kron2(Pauli_z, Pauli_z)) +
                kron2(Pauli_z, kron2(Pauli_z, Pauli_id));
@@ -226,7 +226,7 @@ void test_random_mpo(int size) {
       add_interaction(&mpo, c2 * Pauli_x, j, Pauli_x);
     }
 
-    Tensor mpo_times_psi = mps_to_vector(apply(mpo, psi));
+    Tensor mpo_times_psi = mps_to_vector(mps::apply(mpo, psi));
     Tensor H_times_psi =
         mmult(full(real(sparse_hamiltonian(H))), mps_to_vector(psi));
 

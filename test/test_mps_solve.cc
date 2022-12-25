@@ -52,7 +52,7 @@ void test_solve(CMPS psi) {
   int sense = -1;
   CSparse Hsp;
   CMPO H = build_MPO(fH, dimensions(psi), &Hsp);
-  CMPS Hpsi = apply(H, psi);
+  CMPS Hpsi = mps::apply(H, psi);
   CMPS xi = Hpsi;
   solve(H, &xi, Hpsi, &sense, 4);
 

@@ -25,9 +25,10 @@ namespace mps {
 RMPS apply(const RMPO &mpo, const RMPS &psi) { return do_apply(mpo, psi); }
 
 RMPS apply(const RMPOList &mpolist, const RMPS &psi) {
-  return std::accumulate(
-      mpolist.begin(), mpolist.end(), psi,
-      [](const RMPS &state, const RMPO &mpo) { return apply(mpo, state); });
+  return std::accumulate(mpolist.begin(), mpolist.end(), psi,
+                         [](const RMPS &state, const RMPO &mpo) {
+                           return mps::apply(mpo, state);
+                         });
 }
 
 }  // namespace mps

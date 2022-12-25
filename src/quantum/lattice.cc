@@ -37,7 +37,7 @@ static const index_t byte[256] = {
     4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8};
 
 index_t Lattice::count_bits(Lattice::word w) {
-  if (sizeof(w) == 4) {
+  if constexpr (sizeof(w) == 4) {
     return byte[w & 0xff] + byte[(w >> 8) & 0xff] + byte[(w >> 16) & 0xff] +
            byte[(w >> 24) & 0xff];
   } else {
@@ -149,7 +149,8 @@ const RSparse Lattice::number_operator(index_t site) const {
   return interaction_operator(site, site);
 }
 
-const RSparse Lattice::interaction_operator(index_t site1, index_t site2) const {
+const RSparse Lattice::interaction_operator(index_t site1,
+                                            index_t site2) const {
   auto L = configurations.ssize();
   RTensor values = interaction_inner(site1, site2);
   Indices n = iota(0, L - 1);

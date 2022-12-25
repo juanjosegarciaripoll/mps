@@ -24,7 +24,7 @@ namespace mps {
 
 const Indices Lattice::states_in_particle_range(index_t sites, index_t nmin,
                                                 index_t nmax) {
-  if (sizeof(word) == 4) {
+  if constexpr (sizeof(word) == 4) {
     if (sites >= 32) {
       std::cerr << "In this architecture with 32-bit words, Lattice can only "
                    "handle up to 31 sites"

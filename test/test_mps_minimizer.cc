@@ -74,7 +74,7 @@ void test_minimizer_model(index L) {
 
   // The state must be an eigenstate of the Hamiltonian with given
   // eigenvalue
-  MPS psi2 = apply(mpo, psi);
+  MPS psi2 = mps::apply(mpo, psi);
   number E = scprod(psi, psi2);
   double angle = abs(E) / norm2(psi2);
   EXPECT_CEQ(minE, E);

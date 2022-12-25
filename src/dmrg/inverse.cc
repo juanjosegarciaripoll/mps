@@ -64,9 +64,9 @@ double do_solve(const MPO<Tensor> &H, MPS<Tensor> *ptrP, const MPS<Tensor> &oQ,
   if (!sense) sense = &aux;
   tensor_assert(sweeps > 0);
 
-  double err = 0.0;  // err = <P|H^2|P> + <Q|Q> - 2re<Q|H|P>
-  double normHP;                   // <P|H^2|P>
-  tensor_scalar_t<Tensor> scp;     // <Q|H|P>
+  double err = 0.0;             // err = <P|H^2|P> + <Q|Q> - 2re<Q|H|P>
+  double normHP;                // <P|H^2|P>
+  tensor_scalar_t<Tensor> scp;  // <Q|H|P>
   double normQ2 = abs(scprod(Q[0], Q[0]));  // <Q|Q>
   if (normQ2 < 1e-16) {
     std::cerr << "Right-hand side in solve(MPO, MPS, ...) is zero\n";
@@ -77,7 +77,7 @@ double do_solve(const MPO<Tensor> &H, MPS<Tensor> *ptrP, const MPS<Tensor> &oQ,
   Sweeper s = P.sweeper(-*sense);
 
   // LinearForm object implementing <Q|H|P>
-  LinearForm<Tensor> lf(canonical_form(apply(H, Q), -1), P, s.site());
+  LinearForm<Tensor> lf(canonical_form(mps::apply(H, Q), -1), P, s.site());
 
   // QuadraticForm object implementing <P|H^2|P>
   QuadraticForm<Tensor> qf(mmult(adjoint(H), H), P, P, s.site());

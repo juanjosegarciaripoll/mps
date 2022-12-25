@@ -68,6 +68,9 @@ class vector : public std::vector<elt> {
   void resize(index_t new_size) {
     return super_t::resize(static_cast<size_t>(new_size));
   }
+  void resize(index_t new_size, const elt &value) {
+    return super_t::resize(static_cast<size_t>(new_size), value);
+  }
   void reserve(index_t new_size) {
     return super_t::reserve(static_cast<size_t>(new_size));
   }

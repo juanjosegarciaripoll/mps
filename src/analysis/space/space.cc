@@ -39,7 +39,7 @@ Indices Space::tensor_dimensions() const {
 index_t Space::first_qubit(index_t axis) const {
   assert_valid_axis(axis);
   return std::accumulate(
-      domain_.begin(), domain_.begin() + axis, 0,
+      domain_.begin(), domain_.begin() + axis, index_t(0),
       [](index_t output, const interval_t &i) { return output + i.qubits; });
 }
 
@@ -70,7 +70,7 @@ RSparse Space::extend_matrix(const RSparse &op, index_t axis) const {
 
 index_t Space::total_qubits() const {
   return std::accumulate(
-      domain_.begin(), domain_.end(), 0,
+      domain_.begin(), domain_.end(), index_t(0),
       [](index_t x, const interval_t &i) { return x + i.qubits; });
 }
 
