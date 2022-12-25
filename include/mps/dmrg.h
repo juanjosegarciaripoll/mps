@@ -41,7 +41,7 @@ class DMRG {
   index_t debug{0};
   double tolerance{1e-6};
   double svd_tolerance{1e-8};
-  int allow_E_growth;
+  int allow_E_growth{true};
   size_t neigenvalues{1};
 
   RTensor eigenvalues{};
