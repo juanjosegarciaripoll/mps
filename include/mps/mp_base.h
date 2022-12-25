@@ -77,7 +77,7 @@ class MP {
   const_iterator begin() const { return data_.begin(); }
   const_iterator end() const { return data_.end(); }
   iterator end() { return data_.end(); }
-  const vector<Tensor> to_tensor_vector() const { return data_; }
+  const vector<Tensor> &to_tensor_vector() const { return data_; }
 
   Sweeper sweeper(index_t sense) const { return Sweeper(ssize(), sense); }
 

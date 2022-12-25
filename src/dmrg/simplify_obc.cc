@@ -29,13 +29,10 @@
 namespace mps {
 
 template <class MPS>
-double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
-                   const vector<MPS> &Q, int *sense, index_t sweeps,
-                   bool normalize, index_t Dmax, double tol, double *norm) {
-  tensor_assert(sweeps > 0);
-  bool single_site =
-      !Dmax && (FLAGS.get(MPS_SIMPLIFY_ALGORITHM) == MPS_SINGLE_SITE_ALGORITHM);
-  double tolerance = FLAGS.get(MPS_SIMPLIFY_TOLERANCE);
+SimplificationOutput do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
+                                 const vector<MPS> &Q,
+                                 const SimplificationStrategy &strategy) {
+  bool single_site = strategy.single_site_simplification();
   int debug = FLAGS.get_int(MPS_DEBUG_SIMPLIFY);
   MPS &P = *ptrP;
 
@@ -49,16 +46,19 @@ double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
   //	    normQ2 - norm(Pk)^2
   // and the relative error
   //	    err^2 = 1 - (norm(Pk)^2/normQ2)
-  Sweeper s = P.sweeper(-*sense);
+  Sweeper s = P.sweeper(strategy.direction());
   LinearForm<mp_tensor_t<MPS>> lf(w, Q, P, s.site());
   double err = 1.0, normQ2 = square(lf.norm2()), normP2 = 0.0;
   if (debug) {
-    std::cerr << "simplify_obc: " << (single_site ? "single_site" : "two-sites")
-              << ", dmax=" << Dmax << ", truncate_tol=" << tol
-              << ", stop_tol=" << tolerance << '\n'
+    std::cerr << "simplify_obc: "
+              << (strategy.single_site_simplification() ? "single_site"
+                                                        : "two-sites")
+              << ", dmax=" << strategy.maximum_dimension()
+              << ", truncate_tol=" << strategy.truncation_relative_tolerance()
+              << ", stop_tol=" << strategy.stop_relative_tolerance() << '\n'
               << "\tweights=" << w << '\n';
   }
-  while (sweeps--) {
+  for (index_t i = 0; i < strategy.sweeps(); ++i) {
     if (single_site) {
       do {
         set_canonical(P, s.site(), conj(lf.single_site_vector()), s.sense());
@@ -67,7 +67,7 @@ double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
     } else {
       do {
         set_canonical_2_sites(P, conj(lf.two_site_vector(s.sense())), s.site(),
-                              s.sense(), Dmax, tol, false);
+                              s.sense(), false, strategy);
         lf.propagate(P[s.site()], s.sense());
         --s;
       } while (!s.is_last());
@@ -79,18 +79,15 @@ double do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
       std::cerr << "\terr=" << err << ", sense=" << s.sense() << '\n';
     }
     s.flip();
-    if ((olderr - err) < 1e-5 * abs(olderr) || (err < tolerance)) {
+    if ((olderr - err) < 1e-5 * abs(olderr) ||
+        (err < strategy.stop_relative_tolerance())) {
       break;
     }
   }
-  if (norm) {
-    *norm = normP2;
-  }
-  if (normalize) {
+  if (strategy.normalize()) {
     P.at(s.site()) /= sqrt(normP2);
   }
-  *sense = -s.sense();
-  return err;
+  return {err, normP2, -s.sense()};
 }
 
 }  // namespace mps

@@ -21,16 +21,15 @@
 
 namespace mps {
 
-double simplify_obc(RMPS *ptrP, const RTensor &w, const vector<RMPS> &Q,
-                    int *sense, index_t sweeps, bool normalize, index_t Dmax,
-                    double tol, double *norm) {
-  return do_simplify(ptrP, w, Q, sense, sweeps, normalize, Dmax, tol, norm);
+SimplificationOutput simplify_obc(RMPS *ptrP, const RTensor &w,
+                                  const vector<RMPS> &Q,
+                                  const SimplificationStrategy &strategy) {
+  return do_simplify(ptrP, w, Q, strategy);
 }
 
-double simplify_obc(RMPS *ptrP, const RMPS &Q, int *sense, index_t sweeps,
-                    bool normalize, index_t Dmax, double tol, double *norm) {
-  return do_simplify(ptrP, RTensor::ones(1), vector<RMPS>(1, Q), sense, sweeps,
-                     normalize, Dmax, tol, norm);
+SimplificationOutput simplify_obc(RMPS *ptrP, const RMPS &Q,
+                                  const SimplificationStrategy &strategy) {
+  return do_simplify(ptrP, RTensor::ones(1), vector<RMPS>(1, Q), strategy);
 }
 
 }  // namespace mps

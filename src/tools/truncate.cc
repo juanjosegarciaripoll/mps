@@ -21,6 +21,7 @@
 #include <memory>
 #include <mps/tools.h>
 #include <mps/flags.h>
+#include <mps/vector.h>
 #include <tensor/io.h>
 #include <mps/algorithms/truncation.h>
 

@@ -26,7 +26,7 @@
 #include <memory>
 #include <tensor/sparse.h>
 #include <mps/vector.h>
-#include <mps/mps.h>
+#include <mps/mps/types.h>
 
 namespace mps {
 

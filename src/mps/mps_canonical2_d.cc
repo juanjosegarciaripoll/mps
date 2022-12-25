@@ -27,4 +27,10 @@ void set_canonical_2_sites(RMPS &P, const RTensor &Pij, index_t site, int sense,
                               canonicalize_both);
 }
 
+void set_canonical_2_sites(RMPS &P, const RTensor &Pij, index_t site, int sense,
+                           bool canonicalize_both, const TruncationStrategy &strategy) {
+  set_canonical_2_sites_inner(P, Pij, site, sense,
+                              canonicalize_both, strategy);
+}
+
 }  // namespace mps

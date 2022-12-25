@@ -18,6 +18,7 @@
 */
 
 #include <mps/hamiltonian.h>
+#include <mps/algorithms/expectation.h>
 #include "hamiltonian_expected.cc"
 
 namespace mps {

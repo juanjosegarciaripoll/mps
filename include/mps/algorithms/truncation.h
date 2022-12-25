@@ -1,7 +1,7 @@
 #pragma once
 #include <limits>
 #include <tensor/tensor.h>
-#include <mps/mps.h>
+#include <mps/flags.h>
 
 namespace mps {
 
@@ -68,6 +68,9 @@ class TruncationStrategy {
   TruncationStrategy &use_default_tolerance() {
     return set_relative_tolerance(FLAGS.get(MPS_TRUNCATION_TOLERANCE));
   }
+
+  index_t maximum_dimension() const { return maximum_dimension_; }
+  double truncation_relative_tolerance() const { return tolerance_; }
 };
 
 inline TruncationStrategy default_truncation_strategy() {

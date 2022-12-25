@@ -21,8 +21,11 @@
 #ifndef MPS_MPS_ALGORITHM_H
 #define MPS_MPS_ALGORITHM_H
 
-#include <mps/mps.h>
+#include <mps/mps/types.h>
 #include <mps/mpo.h>
+#include <mps/algorithms/expectation.h>
+#include <mps/algorithms/truncation.h>
+#include <mps/algorithms/simplification.h>
 
 namespace mps {
 
@@ -67,24 +70,6 @@ double simplify(RMPS *P, const vector<RMPS> &Q, const RTensor &weights,
 double simplify(CMPS *P, const vector<CMPS> &Q, const CTensor &weights,
                 index_t Dmax, double tol, int *sense, index_t sweeps,
                 bool normalize);
-
-/* Open boundary condition algorithms that simplify a state, optimizing over one site */
-
-double simplify_obc(RMPS *P, const RMPS &Q, int *sense, index_t sweeps,
-                    bool normalize, index_t Dmax = 0, double tol = -1,
-                    double *norm = 0);
-
-double simplify_obc(CMPS *P, const CMPS &Q, int *sense, index_t sweeps,
-                    bool normalize, index_t Dmax = 0, double tol = -1,
-                    double *norm = 0);
-
-double simplify_obc(RMPS *P, const RTensor &weights, const vector<RMPS> &Q,
-                    int *sense, index_t sweeps, bool normalize,
-                    index_t Dmax = 0, double tol = -1, double *norm = 0);
-
-double simplify_obc(CMPS *P, const CTensor &weights, const vector<CMPS> &Q,
-                    int *sense, index_t sweeps, bool normalize,
-                    index_t Dmax = 0, double tol = -1, double *norm = 0);
 
 double solve(const RMPO &H, RMPS *ptrP, const RMPS &Q, int *sense,
              index_t sweeps, bool normalize = false, index_t Dmax = 0,

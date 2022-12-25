@@ -20,8 +20,8 @@
 #ifndef MPS_ALGORITHMS_EXPECTATION_H
 #define MPS_ALGORITHMS_EXPECTATION_H
 
+#include <mps/mps/types.h>
 #include <mps/algorithms/environments.h>
-#include <tensor/io.h>
 
 namespace mps {
 

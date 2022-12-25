@@ -23,8 +23,8 @@
 
 #include <stdexcept>
 #include <mps/vector.h>
-#include <mps/mpo/types.h>
 #include <mps/hamiltonian.h>
+#include <mps/mpo/types.h>
 
 namespace mps {
 
