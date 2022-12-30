@@ -42,7 +42,7 @@ class TruncationStrategy {
     return *this;
   }
 
-  TruncationStrategy &set_relative_tolerance(double tolerance) {
+  TruncationStrategy &set_relative_truncation_tolerance(double tolerance) {
     tensor_assert(tolerance >= 0 && tolerance <= 1.0);
     tolerance_ = std::max(tolerance, std::numeric_limits<double>::epsilon());
     dispatch_ = &TruncationStrategy::worker_truncate_up_to_relative_tolerance;
@@ -57,16 +57,16 @@ class TruncationStrategy {
     }
     tensor_assert(chi >= 0);
     maximum_dimension_ = chi;
-    return set_relative_tolerance(tolerance_);
+    return set_relative_truncation_tolerance(tolerance_);
   }
 
   TruncationStrategy &allow_any_dimension() {
     maximum_dimension_ = std::numeric_limits<index_t>::max();
-    return set_relative_tolerance(tolerance_);
+    return set_relative_truncation_tolerance(tolerance_);
   }
 
-  TruncationStrategy &use_default_tolerance() {
-    return set_relative_tolerance(FLAGS.get(MPS_TRUNCATION_TOLERANCE));
+  TruncationStrategy &use_default_truncation_tolerance() {
+    return set_relative_truncation_tolerance(FLAGS.get(MPS_TRUNCATION_TOLERANCE));
   }
 
   index_t maximum_dimension() const { return maximum_dimension_; }

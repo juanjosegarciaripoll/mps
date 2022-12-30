@@ -84,13 +84,13 @@ inline SimplificationStrategy make_simplification_strategy(int *sense,
                                                            double tol = -1) {
   SimplificationStrategy strategy;
   if (tol < 0) {
-    strategy.use_default_tolerance();
+    strategy.use_default_truncation_tolerance();
   } else if (tol >= 1) {
     strategy.do_not_truncate();
   } else if (tol == 0) {
     strategy.truncate_only_zeros();
   } else {
-    strategy.set_relative_tolerance(tol);
+    strategy.set_relative_truncation_tolerance(tol);
   }
   if (sense != nullptr) {
     strategy.set_direction(*sense);
