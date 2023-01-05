@@ -49,7 +49,8 @@ class Space {
     }
 
     RTensor coordinates() const {
-      return start + step() * linspace(0.0, static_cast<double>(ssize() - 1), ssize());
+      return start +
+             step() * linspace(0.0, static_cast<double>(ssize() - 1), ssize());
     }
   };
 
@@ -116,6 +117,10 @@ class Space {
   index_t first_qubit(index_t axis) const;
 };
 
+/** Finite difference first order operator as sparse matrix. */
+RSparse finite_difference_matrix(double a, double b, double c,
+                                 const Space &space, index_t axis = 0);
+
 /** Finite difference derivative operator as sparse matrix. */
 RSparse first_derivative_matrix(const Space &space, index_t axis = 0);
 
@@ -127,6 +132,10 @@ RSparse position_matrix(const Space &space, index_t axis = 0);
 
 /** Sum of products \sum_{i,j} J[i,j]*x[i]*x[j] of coordinates. */
 RSparse position_product_matrix(const Space &space, const RTensor &J);
+
+/** Finite difference first order operator as MPO. */
+RMPO finite_difference_mpo(double a, double b, double c, const Space &space,
+                           index_t axis = 0);
 
 /** Finite difference derivative operator as MPO. */
 RMPO first_derivative_mpo(const Space &space, index_t axis = 0);

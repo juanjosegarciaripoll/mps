@@ -102,26 +102,21 @@ static RMPO finite_difference_mpo(double a, double b, double c, index_t qubits,
   return RMPO(tensors);
 }
 
-static RMPO interval_first_derivative_mpo(const Space::interval_t &interval) {
-  auto dx = interval.step();
-  return finite_difference_mpo(0, (-1) / dx, (+1) / dx, interval.qubits,
-                               interval.periodic);
-}
-
-static RMPO interval_second_derivative_mpo(const Space::interval_t &interval) {
-  auto dx2 = square(interval.step());
-  return finite_difference_mpo(-2 / dx2, 1 / dx2, 1 / dx2, interval.qubits,
-                               interval.periodic);
+RMPO finite_difference_mpo(double a, double b, double c, const Space &space,
+                           index_t axis) {
+  const auto &interval = space.interval(axis);
+  return space.extend_mpo(
+      finite_difference_mpo(a, b, c, interval.qubits, interval.periodic), axis);
 }
 
 RMPO first_derivative_mpo(const Space &space, index_t axis) {
-  return space.extend_mpo(interval_first_derivative_mpo(space.interval(axis)),
-                          axis);
+  auto dx = space.interval(axis).step();
+  return finite_difference_mpo(0, (-1) / dx, (+1) / dx, space, axis);
 }
 
 RMPO second_derivative_mpo(const Space &space, index_t axis) {
-  return space.extend_mpo(interval_second_derivative_mpo(space.interval(axis)),
-                          axis);
+  auto dx2 = square(space.interval(axis).step());
+  return finite_difference_mpo(-2 / dx2, 1 / dx2, 1 / dx2, space, axis);
 }
 
 }  // namespace mps
