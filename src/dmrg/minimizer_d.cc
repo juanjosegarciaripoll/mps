@@ -21,24 +21,13 @@
 
 namespace mps {
 
-double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt,
-                const RMPO &constraints, double value,
-                const std::list<RMPS> *other) {
-  Minimizer<RMPO> min(opt, H, *psi);
-  min.add_constraint(constraints, value);
-  if (other) {
-    min.add_states(*other);
-  }
-  return min.full_sweep(psi);
-}
-
-double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt) {
+double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions<RMPO> &opt) {
   Minimizer<RMPO> min(opt, H, *psi);
   return min.full_sweep(psi);
 }
 
 double minimize(const RMPO &H, RMPS *psi) {
-  return minimize(H, psi, MinimizerOptions());
+  return minimize(H, psi, MinimizerOptions<RMPO>());
 }
 
 }  // namespace mps

@@ -1,3 +1,4 @@
+#pragma once
 // -*- mode: c++; fill-column: 80; c-basic-offset: 2; indent-tabs-mode: nil -*-
 /*
     Copyright (c) 2010 Juan Jose Garcia Ripoll
@@ -21,33 +22,37 @@
 #define MPS_MINIMIZER_H
 
 #include <list>
+#include <functional>
+#include <optional>
 #include <mps/mps.h>
 #include <mps/mpo.h>
 
 namespace mps {
 
+template<class MPO>
 struct MinimizerOptions {
+  using mps_t = typename MPO::MPS;
+  using constraints_t = std::tuple<const MPO &, double>;
+  using callback_t = std::function<void(double E, const mps_t &state)>;
+
   index_t sweeps{32};
-  bool display{false};
-  index_t debug{false};
   double tolerance{1e-10};
   double svd_tolerance{1e-11};
   int allow_E_growth{1};
   index_t Dmax{0};
 
+  int debug{0};
+  bool single_site{false};
+  bool display{false};
   bool compute_gap{false};
-  double gap{0}, constrained_gap{0};
+
+  std::optional<callback_t> callback;
+  std::optional<constraints_t> constraints;
+  std::list<mps_t> orthogonal_states{};
 };
 
-double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt,
-                const RMPO &constraint, double value,
-                const std::list<RMPS> *other = nullptr);
-double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt,
-                const CMPO &constraint, cdouble value,
-                const std::list<CMPS> *other = nullptr);
-
-double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions &opt);
-double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt);
+double minimize(const RMPO &H, RMPS *psi, const MinimizerOptions<RMPO> &opt);
+double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions<CMPO> &opt);
 
 double minimize(const RMPO &H, RMPS *psi);
 double minimize(const CMPO &H, CMPS *psi);

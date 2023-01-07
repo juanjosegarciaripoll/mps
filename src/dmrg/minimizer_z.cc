@@ -21,7 +21,7 @@
 
 namespace mps {
 
-double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt,
+double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions<CMPO> &opt,
                 const CMPO &constraint, cdouble value,
                 const std::list<CMPS> *other) {
   Minimizer<CMPO> min(opt, H, *psi);
@@ -32,13 +32,13 @@ double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt,
   return min.full_sweep(psi);
 }
 
-double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions &opt) {
+double minimize(const CMPO &H, CMPS *psi, const MinimizerOptions<CMPO> &opt) {
   Minimizer<CMPO> min(opt, H, *psi);
   return min.full_sweep(psi);
 }
 
 double minimize(const CMPO &H, CMPS *psi) {
-  return minimize(H, psi, MinimizerOptions());
+  return minimize(H, psi, MinimizerOptions<CMPO>());
 }
 
 }  // namespace mps

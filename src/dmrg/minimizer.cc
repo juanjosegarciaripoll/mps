@@ -62,13 +62,17 @@ Tensor apply_qform2_with_subspace(const Tensor &P, int sense, Tensor &P12,
 template <class Tensor, class QForm>
 Tensor apply_qform2(const Tensor &P, int sense, const Indices &d,
                     const QForm &qform, const std::list<Tensor> &ortho) {
-  Tensor v = orthogonalize(reshape(P, d), ortho);
-  v = qform.apply_two_site_matrix(v, sense);
-  return orthogonalize(reshape(v, v.ssize()), ortho);
+  if (ortho.empty()) {
+    return flatten(qform.apply_two_site_matrix(reshape(P, d), sense));
+  } else {
+    Tensor v = orthogonalize(reshape(P, d), ortho);
+    v = qform.apply_two_site_matrix(v, sense);
+    return orthogonalize(reshape(v, v.ssize()), ortho);
+  }
 }
 
 template <class MPO>
-struct Minimizer : public MinimizerOptions {
+struct Minimizer {
   typedef MPO mpo_t;
   typedef typename MPO::MPS mps_t;
   typedef typename mps_t::elt_t tensor_t;
@@ -87,17 +91,26 @@ struct Minimizer : public MinimizerOptions {
   index_t site;
   int step;
   bool converged;
+  double constrained_gap{};
+  double gap{};
+  const MinimizerOptions<MPO> &options;
 
-  Minimizer(const MinimizerOptions &opt, const mpo_t &H, const mps_t &state)
-      : MinimizerOptions(opt),
-        psi(canonical_form(state, -1)),
+  Minimizer(const MinimizerOptions<MPO> &opt, const mpo_t &H, const mps_t &state)
+      : psi(canonical_form(state, -1)),
         Hqform(H, psi, psi, 0),
         Nqform(nullptr),
         Nvalue(0),
         Ntol(1e-6),
         site(0),
         step(+1),
-        converged(true) {}
+        converged(true),
+        options(opt) {
+    if (options.constraints.has_value()) {
+      const auto &[observable, value] = options.constraints.value();
+      add_constraint(observable, value);
+    }
+    add_states(options.orthogonal_states);
+  }
 
   index_t size() const { return psi.ssize(); }
 
@@ -151,7 +164,7 @@ struct Minimizer : public MinimizerOptions {
           return apply_qform1<tensor_t, qform_t>(v, d, Hqform, orthogonal_to);
         },
         P.size(), linalg::SmallestAlgebraic, 1, &P, &converged);
-    if (site == ssize(psi) / 2 && compute_gap) {
+    if (site == ssize(psi) / 2 && options.compute_gap) {
       tensor_t newP = P;
       tensor_t Egap = linalg::eigs(
           [&](const tensor_t &v) -> tensor_t {
@@ -159,14 +172,14 @@ struct Minimizer : public MinimizerOptions {
           },
           newP.size(), linalg::SmallestAlgebraic, 2, &newP, &converged);
       constrained_gap = gap = real(Egap[1] - Egap[0]);
-      if (debug) {
+      if (options.debug) {
         std::cerr << "\thalf-size gap " << constrained_gap << '\n';
       }
     }
     if (converged) {
       set_canonical(psi, site, reshape(P, d), step, false);
       propagate(psi[site], site, step);
-      if (debug > 1) {
+      if (options.debug > 1) {
         std::cerr << "\tsite=" << site << ", E=" << real(E[0]) << ", P.d"
                   << psi[site].dimensions() << '\n';
       }
@@ -194,7 +207,7 @@ struct Minimizer : public MinimizerOptions {
 
   double two_site_step() {
     tensor_t E;
-    if (debug > 1) {
+    if (options.debug > 1) {
       if (step > 0) {
         std::cerr << "\tsite=" << site
                   << ", dimensions=" << psi[site].dimensions() << ","
@@ -208,7 +221,7 @@ struct Minimizer : public MinimizerOptions {
     tensor_t P12 = (step > 0) ? fold(psi[site], -1, psi[site + 1], 0)
                               : fold(psi[site - 1], -1, psi[site], 0);
     tensor_list_t orthogonal_to = orthogonal_projectors(site, step);
-    if (site == ssize(psi) / 2 && compute_gap) {
+    if (site == ssize(psi) / 2 && options.compute_gap) {
       tensor_t newP12 = P12;
       auto fn = [&](const tensor_t &v) {
         return apply_qform2<tensor_t, qform_t>(v, step, newP12.dimensions(),
@@ -217,7 +230,7 @@ struct Minimizer : public MinimizerOptions {
       tensor_t Egap = linalg::eigs(fn, newP12.size(), linalg::SmallestAlgebraic,
                                    2, &newP12);
       constrained_gap = gap = real(Egap[1] - Egap[0]);
-      if (debug) {
+      if (options.debug) {
         std::cerr << "\thalf-size gap " << constrained_gap << '\n';
       }
     }
@@ -226,7 +239,7 @@ struct Minimizer : public MinimizerOptions {
       {
         tensor_t aux = Nqform->take_two_site_matrix_diag(step);
         subspace = which(abs(aux - Nvalue) < Ntol);
-        if (debug > 1) {
+        if (options.debug > 1) {
           std::cerr << "\tsite=" << site << ", constraints=" << subspace.size()
                     << "/" << aux.size() << '\n';
         }
@@ -248,7 +261,7 @@ struct Minimizer : public MinimizerOptions {
                                               orthogonal_to);
           },
           subP12.size(), linalg::SmallestAlgebraic, 1, &subP12, &converged);
-      if (site == ssize(psi) / 2 && compute_gap) {
+      if (site == ssize(psi) / 2 && options.compute_gap) {
         tensor_t newP12 = subP12;
         auto fn = [&](const tensor_t &v) -> tensor_t {
           return apply_qform2_with_subspace(v, step, P12, Hqform, subspace,
@@ -258,7 +271,7 @@ struct Minimizer : public MinimizerOptions {
             linalg::eigs(fn, newP12.size(), linalg::SmallestAlgebraic, 2,
                          &newP12, &converged);
         constrained_gap = real(Egap[1] - Egap[0]);
-        if (debug) {
+        if (options.debug) {
           std::cerr << "\tconstrained half-size gap " << constrained_gap
                     << '\n';
         }
@@ -276,10 +289,10 @@ struct Minimizer : public MinimizerOptions {
       P12 = reshape(P12, d);
     }
     if (converged) {
-      set_canonical_2_sites(psi, P12, site, step, Dmax, svd_tolerance, false);
+      set_canonical_2_sites(psi, P12, site, step, options.Dmax, options.svd_tolerance, false);
     }
     propagate(psi[site], site, step);
-    if (debug > 1) {
+    if (options.debug > 1) {
       std::cerr << "\tsite=" << site << ", E=" << real(E[0])
                 << ", P1.d=" << psi[site].dimensions()
                 << ", P2.d=" << psi[site + step].dimensions()
@@ -304,21 +317,24 @@ struct Minimizer : public MinimizerOptions {
     return E;
   }
 
-  bool single_site() const { return !Dmax; }
+  bool single_site() const { return options.single_site; }
 
   double full_sweep(mps_t *psi_out) {
     double E = 1e28;
-    if (debug) {
+    if (options.debug) {
       tic();
       std::cerr << "***\n*** Algorithm with " << size() << " sites, "
                 << "two-sites = " << !single_site()
                 << (Nqform ? ", constrained" : ", unconstrained") << '\n';
     }
-    for (index_t failures = 0, i = 0; i < sweeps; i++) {
+    for (index_t failures = 0, i = 0; i < options.sweeps; i++) {
       double newE = single_site() ? single_site_sweep() : two_site_sweep();
-      if (debug) {
+      if (options.callback.has_value()) {
+        options.callback.value()(newE, state());
+      }
+      if (options.debug) {
         std::cerr << "iteration=" << i << "; E=" << newE << "; dE=" << newE - E
-                  << "; tol=" << tolerance
+                  << "; tol=" << options.tolerance
                   << (converged ? "" : "; did not converge!") << "; t=" << toc()
                   << "s" << '\n';
       }
@@ -327,20 +343,20 @@ struct Minimizer : public MinimizerOptions {
         return E;
       }
       if (i) {
-        if (tensor::abs(newE - E) < tolerance) {
-          if (debug) {
+        if (tensor::abs(newE - E) < options.tolerance) {
+          if (options.debug) {
             std::cerr << "Reached tolerance dE=" << newE - E
-                      << "<=" << tolerance << '\n'
+                      << "<=" << options.tolerance << '\n'
                       << std::flush;
           }
           E = newE;
           break;
         }
         if ((newE - E) > 1e-14 * tensor::abs(newE)) {
-          if (debug) {
+          if (options.debug) {
             std::cerr << "Energy does not decrease!\n" << std::flush;
           }
-          if (failures >= allow_E_growth) {
+          if (failures >= options.allow_E_growth) {
             E = newE;
             break;
           }
