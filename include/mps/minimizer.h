@@ -26,6 +26,7 @@
 #include <optional>
 #include <mps/mps.h>
 #include <mps/mpo.h>
+#include <mps/algorithms/truncation.h>
 
 namespace mps {
 
@@ -36,15 +37,15 @@ struct MinimizerOptions {
   using callback_t = std::function<void(double E, const mps_t &state)>;
 
   index_t sweeps{32};
-  double tolerance{1e-10};
-  double svd_tolerance{1e-11};
   int allow_E_growth{1};
-  index_t Dmax{0};
+  double tolerance{1e-10};
 
   int debug{0};
   bool single_site{false};
   bool display{false};
   bool compute_gap{false};
+
+  TruncationStrategy truncation_strategy{};
 
   std::optional<callback_t> callback;
   std::optional<constraints_t> constraints;

@@ -19,6 +19,7 @@
 
 #include <list>
 #include <memory>
+#include <iomanip>
 #include <tensor/tools.h>
 #include <tensor/io.h>
 #include <tensor/linalg.h>
@@ -95,7 +96,8 @@ struct Minimizer {
   double gap{};
   const MinimizerOptions<MPO> &options;
 
-  Minimizer(const MinimizerOptions<MPO> &opt, const mpo_t &H, const mps_t &state)
+  Minimizer(const MinimizerOptions<MPO> &opt, const mpo_t &H,
+            const mps_t &state)
       : psi(canonical_form(state, -1)),
         Hqform(H, psi, psi, 0),
         Nqform(nullptr),
@@ -289,7 +291,8 @@ struct Minimizer {
       P12 = reshape(P12, d);
     }
     if (converged) {
-      set_canonical_2_sites(psi, P12, site, step, options.Dmax, options.svd_tolerance, false);
+      set_canonical_2_sites(psi, P12, site, step, false,
+                            options.truncation_strategy);
     }
     propagate(psi[site], site, step);
     if (options.debug > 1) {
@@ -325,7 +328,8 @@ struct Minimizer {
       tic();
       std::cerr << "***\n*** Algorithm with " << size() << " sites, "
                 << "two-sites = " << !single_site()
-                << (Nqform ? ", constrained" : ", unconstrained") << '\n';
+                << (Nqform ? ", constrained" : ", unconstrained") << '\n'
+                << std::setprecision(13);
     }
     for (index_t failures = 0, i = 0; i < options.sweeps; i++) {
       double newE = single_site() ? single_site_sweep() : two_site_sweep();
