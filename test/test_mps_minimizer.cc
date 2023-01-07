@@ -43,7 +43,6 @@ double ground_state(const MPO &mpo, MPS *output) {
   psi.at(L - 1) = psi[L - 1](_, _, Indices{0});
 
   MinimizerOptions<MPO> opts;
-  opts.Dmax = std::min(1 << (L / 2), 50);
   double E = minimize(mpo, &psi, opts);
   *output = psi;
   return E;
