@@ -33,7 +33,6 @@ SimplificationOutput do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
                                  const vector<MPS> &Q,
                                  const SimplificationStrategy &strategy) {
   bool single_site = strategy.single_site_simplification();
-  int debug = FLAGS.get_int(MPS_DEBUG_SIMPLIFY);
   MPS &P = *ptrP;
 
   // The distance between vectors is
@@ -49,7 +48,7 @@ SimplificationOutput do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
   Sweeper s = P.sweeper(strategy.direction());
   LinearForm<mp_tensor_t<MPS>> lf(w, Q, P, s.site());
   double err = 1.0, normQ2 = square(lf.norm2()), normP2 = 0.0;
-  if (debug) {
+  if (strategy.debug_simplification()) {
     std::cerr << "simplify_obc: "
               << (strategy.single_site_simplification() ? "single_site"
                                                         : "two-sites")
@@ -75,7 +74,7 @@ SimplificationOutput do_simplify(MPS *ptrP, const typename MPS::elt_t &w,
     normP2 = abs(scprod(P[s.site()], P[s.site()]));
     double olderr = err;
     err = sqrt(abs(1 - normP2 / normQ2));
-    if (debug) {
+    if (strategy.debug_simplification()) {
       std::cerr << "\terr=" << err << ", sense=" << s.sense() << '\n';
     }
     s.flip();

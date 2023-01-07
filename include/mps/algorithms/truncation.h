@@ -10,7 +10,7 @@ using namespace tensor;
 class TruncationStrategy {
   double tolerance_{FLAGS.get(MPS_TRUNCATION_TOLERANCE)};
   index_t maximum_dimension_{std::numeric_limits<index_t>::max()};
-  const bool debug_{FLAGS.get(MPS_DEBUG_TRUNCATION) != 0};
+  bool debug_truncation_{FLAGS.get(MPS_DEBUG_TRUNCATION) != 0};
 
   using truncation_function_t =
       index_t (TruncationStrategy::*)(const RTensor &schmidt_weights) const;
@@ -23,9 +23,15 @@ class TruncationStrategy {
       const RTensor &schmidt_weights) const;
 
  public:
-  bool debug_truncation() const { return debug_; }
+  bool debug_truncation() const { return debug_truncation_; }
+
   index_t where_to_truncate(const RTensor &schmidt_weights) const {
     return ((*this).*dispatch_)(schmidt_weights);
+  }
+
+  TruncationStrategy &set_truncation_debug_level(bool debug) {
+    debug_truncation_ = debug;
+    return *this;
   }
 
   TruncationStrategy &do_not_truncate() {
@@ -57,12 +63,11 @@ class TruncationStrategy {
     }
     tensor_assert(chi >= 0);
     maximum_dimension_ = chi;
-    return set_relative_truncation_tolerance(tolerance_);
+    return *this;
   }
 
   TruncationStrategy &allow_any_dimension() {
-    maximum_dimension_ = std::numeric_limits<index_t>::max();
-    return set_relative_truncation_tolerance(tolerance_);
+    return set_maximum_dimension(std::numeric_limits<index_t>::max());
   }
 
   TruncationStrategy &use_default_truncation_tolerance() {

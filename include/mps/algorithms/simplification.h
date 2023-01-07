@@ -10,8 +10,14 @@ class SimplificationStrategy : public TruncationStrategy {
   int direction_{+1};
   bool normalize_{false};
   bool single_site_{false};
+  bool debug_simplification_{FLAGS.get_int(MPS_DEBUG_SIMPLIFY) > 0};
 
  public:
+  SimplificationStrategy &set_simplification_debug_level(bool debug) {
+    debug_simplification_ = debug;
+    return *this;
+  }
+
   SimplificationStrategy &set_sweeps(index_t sweeps) {
     tensor_assert(sweeps > 0);
     max_sweeps_ = sweeps;
@@ -49,6 +55,7 @@ class SimplificationStrategy : public TruncationStrategy {
   bool normalize() const { return normalize_; }
   bool single_site_simplification() const { return single_site_; }
   double stop_relative_tolerance() const { return stop_tolerance_; }
+  bool debug_simplification() const { return debug_simplification_; }
 };
 
 inline SimplificationStrategy default_simplification_strategy() { return {}; }
