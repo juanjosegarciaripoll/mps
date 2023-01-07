@@ -39,8 +39,8 @@ double ground_state(const MPO &mpo, MPS *output) {
     Tensor P = RTensor::random(D, 2, D) - 0.5;
     psi.at(i) = P / norm2(P);
   }
-  psi.at(0) = psi[0](range(0), _, _);
-  psi.at(L - 1) = psi[L - 1](_, _, range(0));
+  psi.at(0) = psi[0](Indices{0}, _, _);
+  psi.at(L - 1) = psi[L - 1](_, _, Indices{0});
 
   MinimizerOptions opts;
   opts.Dmax = std::min(1 << (L / 2), 50);
@@ -76,7 +76,9 @@ void test_minimizer_model(index L) {
   // eigenvalue
   MPS psi2 = mps::apply(mpo, psi);
   number E = scprod(psi, psi2);
+  auto norm2_psi2 = norm2(psi2);
   double angle = abs(E) / norm2(psi2);
+  if (abs(E) == 0 && norm2_psi2 == 0) angle = 1.0;
   EXPECT_CEQ(minE, E);
   EXPECT_CEQ3(angle, 1.0, 1e-10);
 }
